@@ -20,6 +20,7 @@ class _SuperLeagueCreatePlayerScreenState
   PlayerPosition _position = PlayerPosition.forward;
   String _nationality = 'Россия';
 
+  // Тот же список национальностей, что и в обычной карьере.
   static const _nationalities = [
     'Россия',
     'Бразилия',
@@ -29,11 +30,80 @@ class _SuperLeagueCreatePlayerScreenState
     'Англия',
     'Италия',
     'Нидерланды',
+    'Бельгия',
+    'Дания',
     'Аргентина',
+    'Хорватия',
+    'Швейцария',
+    'Австрия',
+    'Норвегия',
+    'Польша',
+    'Турция',
+    'Украина',
+    'Греция',
+    'Шотландия',
+    'Ирландия',
+    'Колумбия',
+    'Чили',
+    'Уругвай',
+    'Канада',
+    'Мексика',
     'США',
+    'Иран',
+    'Южная Корея',
     'Япония',
-    'Португалия',
+    'Катар',
+    'Саудовская Аравия',
+    'Алжир',
+    'Марокко',
+    'Камерун',
+    'Нигерия',
+    'Сенегал',
+    'Египет',
+    'Тунис',
   ];
+
+  static const Map<String, String> _countryFlags = {
+    'Россия': '🇷🇺',
+    'Бразилия': '🇧🇷',
+    'Германия': '🇩🇪',
+    'Франция': '🇫🇷',
+    'Испания': '🇪🇸',
+    'Англия': '\u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}',
+    'Италия': '🇮🇹',
+    'Нидерланды': '🇳🇱',
+    'Бельгия': '🇧🇪',
+    'Дания': '🇩🇰',
+    'Аргентина': '🇦🇷',
+    'Хорватия': '🇭🇷',
+    'Швейцария': '🇨🇭',
+    'Австрия': '🇦🇹',
+    'Норвегия': '🇳🇴',
+    'Польша': '🇵🇱',
+    'Турция': '🇹🇷',
+    'Украина': '🇺🇦',
+    'Греция': '🇬🇷',
+    'Шотландия': '\u{1F3F4}\u{E0067}\u{E0062}\u{E0073}\u{E0063}\u{E0074}\u{E007F}',
+    'Ирландия': '🇮🇪',
+    'Колумбия': '🇨🇴',
+    'Чили': '🇨🇱',
+    'Уругвай': '🇺🇾',
+    'Канада': '🇨🇦',
+    'Мексика': '🇲🇽',
+    'США': '🇺🇸',
+    'Иран': '🇮🇷',
+    'Южная Корея': '🇰🇷',
+    'Япония': '🇯🇵',
+    'Катар': '🇶🇦',
+    'Саудовская Аравия': '🇸🇦',
+    'Алжир': '🇩🇿',
+    'Марокко': '🇲🇦',
+    'Камерун': '🇨🇲',
+    'Нигерия': '🇳🇬',
+    'Сенегал': '🇸🇳',
+    'Египет': '🇪🇬',
+    'Тунис': '🇹🇳',
+  };
 
   @override
   void dispose() {
@@ -200,7 +270,9 @@ class _SuperLeagueCreatePlayerScreenState
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: PlayerPosition.values.map((position) {
+              children: PlayerPosition.values
+                  .where((position) => position != PlayerPosition.goalkeeper)
+                  .map((position) {
                 final selected = position == _position;
                 return ChoiceChip(
                   label: Text(_positionLabel(position)),
@@ -248,7 +320,17 @@ class _SuperLeagueCreatePlayerScreenState
               items: _nationalities
                   .map((nationality) => DropdownMenuItem(
                         value: nationality,
-                        child: Text(nationality),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              _countryFlags[nationality] ?? '🏳️',
+                              style: const TextStyle(fontSize: 20),
+                            ),
+                            const SizedBox(width: 10),
+                            Text(nationality),
+                          ],
+                        ),
                       ))
                   .toList(),
               onChanged: (value) {
