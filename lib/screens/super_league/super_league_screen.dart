@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/club.dart';
+import 'package:flutter_football/models/player.dart';
+import 'package:flutter_football/screens/super_league/super_league_create_player_screen.dart';
 
 class SuperLeagueScreen extends StatefulWidget {
   const SuperLeagueScreen({super.key});
@@ -201,12 +203,23 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                 child: ElevatedButton(
                   onPressed: _selectedClubName == null
                       ? null
-                      : () {
+                      : () async {
+                          final club = Clubs.getByName(_selectedClubName!);
+                          final player = await Navigator.push<Player>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  SuperLeagueCreatePlayerScreen(club: club),
+                            ),
+                          );
+
+                          if (!mounted || player == null) return;
+
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                'Выбран клуб: $_selectedClubName. '
-                                'Создание отдельной карьеры подключим следующим шагом.',
+                                'Игрок ${player.name} создан для ${player.club}. '
+                                'Следующим шагом подключим карьеру Суперлиги.',
                               ),
                             ),
                           );
