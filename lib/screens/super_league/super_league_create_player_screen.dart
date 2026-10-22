@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/player.dart';
+import 'package:country_flags/country_flags.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class SuperLeagueCreatePlayerScreen extends StatefulWidget {
   final Club club;
@@ -63,47 +65,73 @@ class _SuperLeagueCreatePlayerScreenState
     'Тунис',
   ];
 
-  static const Map<String, String> _countryFlags = {
-    'Россия': '🇷🇺',
-    'Бразилия': '🇧🇷',
-    'Германия': '🇩🇪',
-    'Франция': '🇫🇷',
-    'Испания': '🇪🇸',
-    'Англия': '\u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}',
-    'Италия': '🇮🇹',
-    'Нидерланды': '🇳🇱',
-    'Бельгия': '🇧🇪',
-    'Дания': '🇩🇰',
-    'Аргентина': '🇦🇷',
-    'Хорватия': '🇭🇷',
-    'Швейцария': '🇨🇭',
-    'Австрия': '🇦🇹',
-    'Норвегия': '🇳🇴',
-    'Польша': '🇵🇱',
-    'Турция': '🇹🇷',
-    'Украина': '🇺🇦',
-    'Греция': '🇬🇷',
-    'Шотландия': '\u{1F3F4}\u{E0067}\u{E0062}\u{E0073}\u{E0063}\u{E0074}\u{E007F}',
-    'Ирландия': '🇮🇪',
-    'Колумбия': '🇨🇴',
-    'Чили': '🇨🇱',
-    'Уругвай': '🇺🇾',
-    'Канада': '🇨🇦',
-    'Мексика': '🇲🇽',
-    'США': '🇺🇸',
-    'Иран': '🇮🇷',
-    'Южная Корея': '🇰🇷',
-    'Япония': '🇯🇵',
-    'Катар': '🇶🇦',
-    'Саудовская Аравия': '🇸🇦',
-    'Алжир': '🇩🇿',
-    'Марокко': '🇲🇦',
-    'Камерун': '🇨🇲',
-    'Нигерия': '🇳🇬',
-    'Сенегал': '🇸🇳',
-    'Египет': '🇪🇬',
-    'Тунис': '🇹🇳',
+  static const Map<String, String> _nationalityCodes = {
+    'Россия': 'RU',
+    'Бразилия': 'BR',
+    'Германия': 'DE',
+    'Франция': 'FR',
+    'Испания': 'ES',
+    'Англия': 'GB',
+    'Италия': 'IT',
+    'Нидерланды': 'NL',
+    'Бельгия': 'BE',
+    'Дания': 'DK',
+    'Аргентина': 'AR',
+    'Хорватия': 'HR',
+    'Швейцария': 'CH',
+    'Австрия': 'AT',
+    'Норвегия': 'NO',
+    'Польша': 'PL',
+    'Турция': 'TR',
+    'Украина': 'UA',
+    'Греция': 'GR',
+    'Шотландия': 'GB',
+    'Ирландия': 'IE',
+    'Колумбия': 'CO',
+    'Чили': 'CL',
+    'Уругвай': 'UY',
+    'Канада': 'CA',
+    'Мексика': 'MX',
+    'США': 'US',
+    'Иран': 'IR',
+    'Южная Корея': 'KR',
+    'Япония': 'JP',
+    'Катар': 'QA',
+    'Саудовская Аравия': 'SA',
+    'Алжир': 'DZ',
+    'Марокко': 'MA',
+    'Камерун': 'CM',
+    'Нигерия': 'NG',
+    'Сенегал': 'SN',
+    'Египет': 'EG',
+    'Тунис': 'TN',
   };
+
+  Widget _buildNationalityFlag(String nationality) {
+    if (nationality == 'Англия') {
+      return SvgPicture.asset(
+        'assets/flags/gb-eng.svg',
+        width: 30,
+        height: 20,
+        fit: BoxFit.cover,
+      );
+    }
+
+    if (nationality == 'Шотландия') {
+      return SvgPicture.asset(
+        'assets/flags/gb-sct.svg',
+        width: 30,
+        height: 20,
+        fit: BoxFit.cover,
+      );
+    }
+
+    return CountryFlag.fromCountryCode(
+      _nationalityCodes[nationality] ?? 'UN',
+      theme: const ImageTheme(height: 20, width: 30),
+    );
+  }
+
 
   @override
   void dispose() {
@@ -122,6 +150,57 @@ class _SuperLeagueCreatePlayerScreenState
       case PlayerPosition.forward:
         return 'Нападающий';
     }
+  }
+
+  Widget _buildPositionButton({
+    required String shortName,
+    required String fullName,
+    required PlayerPosition position,
+  }) {
+    final selected = _position == position;
+
+    return GestureDetector(
+      onTap: () => setState(() => _position = position),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        height: 72,
+        decoration: BoxDecoration(
+          color: selected ? const Color(0xFF1E5729) : Colors.transparent,
+          borderRadius: BorderRadius.circular(11),
+          border: Border.all(
+            color: selected ? const Color(0xFF3E9950) : const Color(0xFF123C1D),
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              shortName,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: Text(
+                fullName,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 9,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _createPlayer() {
@@ -267,28 +346,26 @@ class _SuperLeagueCreatePlayerScreenState
               ),
             ),
             const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: PlayerPosition.values
-                  .where((position) => position != PlayerPosition.goalkeeper)
-                  .map((position) {
-                final selected = position == _position;
-                return ChoiceChip(
-                  label: Text(_positionLabel(position)),
-                  selected: selected,
-                  onSelected: (_) => setState(() => _position = position),
-                  selectedColor: const Color(0xFF1D6330),
-                  backgroundColor: const Color(0xFF0B2813),
-                  labelStyle: TextStyle(
-                    color: selected ? Colors.white : Colors.white70,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  side: BorderSide(
-                    color: selected ? _green : const Color(0xFF174324),
-                  ),
-                );
-              }).toList(),
+            Row(
+              children: [
+                _buildPositionButton(
+                  shortName: 'ST',
+                  fullName: 'Нападающий',
+                  position: PlayerPosition.forward,
+                ),
+                const SizedBox(width: 10),
+                _buildPositionButton(
+                  shortName: 'CM',
+                  fullName: 'Полузащитник',
+                  position: PlayerPosition.midfielder,
+                ),
+                const SizedBox(width: 10),
+                _buildPositionButton(
+                  shortName: 'CB',
+                  fullName: 'Защитник',
+                  position: PlayerPosition.defender,
+                ),
+              ].map((button) => Expanded(child: button)).toList(),
             ),
             const SizedBox(height: 22),
             const Text(
@@ -303,7 +380,9 @@ class _SuperLeagueCreatePlayerScreenState
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
               initialValue: _nationality,
+              isExpanded: true,
               dropdownColor: const Color(0xFF0B3A1A),
+              icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
               style: const TextStyle(color: Colors.white, fontSize: 15),
               decoration: InputDecoration(
                 filled: true,
@@ -317,22 +396,35 @@ class _SuperLeagueCreatePlayerScreenState
                   borderSide: const BorderSide(color: Color(0xFF174324)),
                 ),
               ),
-              items: _nationalities
-                  .map((nationality) => DropdownMenuItem(
-                        value: nationality,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              _countryFlags[nationality] ?? '🏳️',
-                              style: const TextStyle(fontSize: 20),
-                            ),
-                            const SizedBox(width: 10),
-                            Text(nationality),
-                          ],
+              selectedItemBuilder: (context) => _nationalities.map((nationality) {
+                return Row(
+                  children: [
+                    _buildNationalityFlag(nationality),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(nationality, overflow: TextOverflow.ellipsis),
+                    ),
+                  ],
+                );
+              }).toList(),
+              items: _nationalities.map((nationality) {
+                return DropdownMenuItem<String>(
+                  value: nationality,
+                  child: Row(
+                    children: [
+                      _buildNationalityFlag(nationality),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          nationality,
+                          style: const TextStyle(color: Colors.white),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ))
-                  .toList(),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
               onChanged: (value) {
                 if (value != null) setState(() => _nationality = value);
               },
