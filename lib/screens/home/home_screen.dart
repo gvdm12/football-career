@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/screens/create%20player/create_player_screen.dart';
 import 'package:flutter_football/screens/player/player_screen.dart';
+import 'package:flutter_football/screens/super_league/super_league_screen.dart';
 import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/services/career_storage.dart';
 import 'package:flutter_football/settings/settings_screen.dart';
@@ -233,6 +234,40 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SuperLeagueScreen(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.emoji_events_outlined),
+                    label: const Text(
+                      'СУПЕРЛИГА',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: BorderSide(color: green.withValues(alpha: 0.8)),
+                      backgroundColor: const Color(0xFF10351B),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
                   ),
