@@ -243,40 +243,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 SizedBox(
                   width: double.infinity,
-                  height: 52,
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const SuperLeagueScreen(),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.emoji_events_outlined),
-                    label: const Text(
-                      'СУПЕРЛИГА',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      side: BorderSide(color: green.withValues(alpha: 0.8)),
-                      backgroundColor: const Color(0xFF10351B),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 14),
-
-                SizedBox(
-                  width: double.infinity,
                   height: 56,
                   child: OutlinedButton(
                     onPressed: _isLoading || !_hasSavedCareer
@@ -310,6 +276,40 @@ class _HomeScreenState extends State<HomeScreen> {
                               fontWeight: FontWeight.w700,
                             ),
                           ),
+                  ),
+                ),
+
+                const SizedBox(height: 14),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SuperLeagueScreen(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.emoji_events_outlined),
+                    label: const Text(
+                      'СУПЕРЛИГА',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: BorderSide(color: green.withValues(alpha: 0.8)),
+                      backgroundColor: const Color(0xFF10351B),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
                   ),
                 ),
 

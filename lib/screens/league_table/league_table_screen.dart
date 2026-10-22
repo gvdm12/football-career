@@ -14,7 +14,7 @@ class LeagueTableScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final table = career.leagueTable;
-    int _getChampionsLeagueSlots(League league) {
+    int getChampionsLeagueSlots(League league) {
       return LeagueSeasonSimulator.qualificationSlots[league] ?? 0;
     }
 

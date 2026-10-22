@@ -362,7 +362,7 @@ class ChampionsLeague {
         throw ArgumentError('Счёт серии пенальти не может быть равным.');
       }
 
-      winner = homePenalties! > awayPenalties!
+      winner = homePenalties > awayPenalties
           ? finalTie.homeTeam
           : finalTie.awayTeam;
     }
@@ -513,7 +513,7 @@ class ChampionsLeague {
 
         // Во втором матче хозяева — awayTeam из пары.
         // Поэтому счёт пенальти относится к командам ответного матча.
-        matchWinner = penaltiesHome! > penaltiesAway!
+        matchWinner = penaltiesHome > penaltiesAway
             ? tie.awayTeam
             : tie.homeTeam;
       }
