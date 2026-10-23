@@ -495,7 +495,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                                     color: const Color(0xFFFFC857),
                                   ),
                                 ),
-                                child: const Column(
+                                child: Column(
                                   children: [
                                     Icon(
                                       Icons.emoji_events_rounded,
