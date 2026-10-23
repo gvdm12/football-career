@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -94,7 +95,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
       if (!mounted) return;
       setState(() {
         _isPlaying = false;
-        _error = 'Не удалось сохранить результат матча.';
+        _error = AppStrings.saveMatchError;
       });
     }
   }
@@ -127,7 +128,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
           backgroundColor: const Color.fromARGB(82, 81, 84, 82),
           foregroundColor: Colors.white,
           title: Text(
-            'СЕЗОН ${_career.season}',
+            AppStrings.seasonUpper(_career.season),
             style: const TextStyle(
               fontWeight: FontWeight.w900,
               letterSpacing: 1,
@@ -156,7 +157,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                     ),
                     SizedBox(height: 2),
                     Text(
-                      'ТАБЛИЦА',
+                      AppStrings.superLeagueTableTitle,
                       style: TextStyle(
                         color: Colors.white70,
                         fontSize: 8,
@@ -188,7 +189,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                     ),
                     SizedBox(height: 2),
                     Text(
-                      'КАЛЕНДАРЬ',
+                      AppStrings.seasonCalendar,
                       style: TextStyle(
                         color: Color.fromARGB(255, 255, 255, 255),
                         fontSize: 8,
@@ -247,7 +248,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'ПРОГРЕСС',
+                          'PROGRESS',
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w900,
@@ -298,7 +299,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                                         ),
                                         const SizedBox(width: 6),
                                         const Text(
-                                          'СУПЕРЛИГА',
+                                          AppStrings.superLeague,
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 10,
@@ -326,7 +327,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'СЕЗОН ${_career.season}/10',
+                                  AppStrings.seasonOfTen(_career.season),
                                   style: const TextStyle(
                                     color: Colors.white70,
                                     fontSize: 10,
@@ -372,7 +373,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                               const SizedBox(width: 9),
                               const Expanded(
                                 child: Text(
-                                  'ТРОФЕИ СУПЕРЛИГИ',
+                                  AppStrings.superLeagueTrophies,
                                   style: TextStyle(
                                     color: Color(0xFFFFD778),
                                     fontSize: 10,
@@ -400,7 +401,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'СТАТИСТИКА СЕЗОНА',
+                          AppStrings.seasonStatisticsUpper,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 12,
@@ -413,22 +414,22 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                           children: [
                             Expanded(
                               child: _seasonStat(
-                                'Матчи',
+                                AppStrings.matches,
                                 '${_career.playedMatches}',
                               ),
                             ),
                             Expanded(
-                              child: _seasonStat('Голы', '${_career.goals}'),
+                              child: _seasonStat(AppStrings.goalsLabel, '${_career.goals}'),
                             ),
                             Expanded(
                               child: _seasonStat(
-                                'Ассисты',
+                                AppStrings.assistsLabel,
                                 '${_career.assists}',
                               ),
                             ),
                             Expanded(
                               child: _seasonStat(
-                                'Оценка',
+                                AppStrings.rating,
                                 _career.averageRating == 0
                                     ? '—'
                                     : _career.averageRating.toStringAsFixed(1),
@@ -449,7 +450,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                         onPressed: () =>
                             setState(() => _showLastResult = false),
                         label: const Text(
-                          'СЛЕДУЮЩИЙ МАТЧ',
+                          AppStrings.nextMatchUpper,
                           style: TextStyle(
                             fontWeight: FontWeight.w900,
                             fontSize: 12,
@@ -503,7 +504,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                                     ),
                                     SizedBox(height: 5),
                                     Text(
-                                      'ЧЕМПИОН СУПЕРЛИГИ!',
+                                      AppStrings.superLeagueChampion,
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: Color(0xFFFFD778),
@@ -516,7 +517,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                               ),
                             ],
                             const Text(
-                              'Сезон завершён!',
+                              AppStrings.seasonCompleted,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
@@ -525,7 +526,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                             ),
                             const SizedBox(height: 6),
                             const Text(
-                              'Все матчи твоей команды сыграны.',
+                              AppStrings.allTeamMatchesPlayed,
                               style: TextStyle(color: Colors.white70),
                             ),
                             if (_career.season < 10) ...[
@@ -544,7 +545,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                                     ),
                                   ),
                                   child: const Text(
-                                    'СЛЕДУЮЩИЙ СЕЗОН',
+                                    AppStrings.nextSeasonUpper,
                                     style: TextStyle(
                                       fontWeight: FontWeight.w900,
                                       fontSize: 13,
@@ -555,7 +556,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                             ] else ...[
                               const SizedBox(height: 12),
                               const Text(
-                                'Карьера Суперлиги завершена! Ты прошёл все 10 сезонов.',
+                                AppStrings.superLeagueCareerCompleteMessage,
                                 style: TextStyle(
                                   color: Color(0xFF8BE07F),
                                   fontWeight: FontWeight.w800,
@@ -572,7 +573,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                                     foregroundColor: const Color(0xFF082A12),
                                   ),
                                   child: const Text(
-                                    'ПОСМОТРЕТЬ ИТОГИ КАРЬЕРЫ',
+                                    AppStrings.viewCareerSummary,
                                     style: TextStyle(
                                       fontWeight: FontWeight.w900,
                                     ),
@@ -588,7 +589,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                         Column(
                           children: [
                             Text(
-                              'ТУР ${next.round}',
+                              AppStrings.roundUpper(next.round),
                               style: const TextStyle(
                                 color: Color(0xFF8BE07F),
                                 fontWeight: FontWeight.w900,
@@ -641,7 +642,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                                 )
                               : const Icon(Icons.sports_soccer_rounded),
                           label: Text(
-                            _isPlaying ? 'СИМУЛЯЦИЯ...' : 'СЫГРАТЬ МАТЧ',
+                            _isPlaying ? AppStrings.simulating : AppStrings.playMatchUpper,
                             style: const TextStyle(
                               fontWeight: FontWeight.w900,
                               letterSpacing: 1,
@@ -709,7 +710,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
       if (!mounted) return;
       setState(() {
         _isPlaying = false;
-        _error = 'Не удалось сформировать итоги карьеры.';
+        _error = AppStrings.careerSummaryError;
       });
     }
   }
@@ -823,7 +824,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
       if (!mounted) return;
       setState(() {
         _isPlaying = false;
-        _error = 'Не удалось сохранить новый сезон.';
+        _error = AppStrings.saveSeasonError;
       });
     }
   }
@@ -857,7 +858,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
       child: Column(
         children: [
           const Text(
-            'РЕЗУЛЬТАТ МАТЧА',
+            AppStrings.matchResultUpper,
             style: TextStyle(
               color: Color.fromARGB(255, 255, 255, 255),
               fontSize: 10,
@@ -910,11 +911,11 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
           const Divider(color: Color(0xFF24552C), height: 26),
           Row(
             children: [
-              Expanded(child: _resultStat('ГОЛЫ', '${fixture.playerGoals}')),
+              Expanded(child: _resultStat(AppStrings.goalsUpperLabel, '${fixture.playerGoals}')),
               Expanded(
-                child: _resultStat('АССИСТЫ', '${fixture.playerAssists}'),
+                child: _resultStat(AppStrings.assistsUpperLabel, '${fixture.playerAssists}'),
               ),
-              Expanded(child: _resultStat('ОЦЕНКА', rating)),
+              Expanded(child: _resultStat(AppStrings.ratingUpperLabel, rating)),
               // Expanded(
               //   child: _resultStat(
               //     'УЧАСТИЕ',
