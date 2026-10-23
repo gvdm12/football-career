@@ -148,10 +148,11 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.table_chart_rounded,
+                    SvgPicture.asset(
+                      'assets/icons/table.svg',
+                      width: 32,
+                      height: 32,
                       color: Colors.white,
-                      size: 23,
                     ),
                     SizedBox(height: 2),
                     Text(
