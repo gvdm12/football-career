@@ -40,7 +40,7 @@ class SuperLeagueEndScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFF0B3A1A),
         foregroundColor: Colors.white,
-        title: const Text(
+        title: Text(
           AppStrings.careerEndTitle.toUpperCase(),
           style: TextStyle(
             fontSize: 16,
@@ -70,7 +70,7 @@ class SuperLeagueEndScreen extends StatelessWidget {
                   color: Color(0xFFFFC857),
                 ),
                 const SizedBox(height: 12),
-                const Text(
+                Text(
                   AppStrings.superLeagueCareerFinished,
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -128,7 +128,7 @@ class SuperLeagueEndScreen extends StatelessWidget {
                       backgroundColor: const Color(0xFF8BE07F),
                       foregroundColor: const Color(0xFF082A12),
                     ),
-                    child: const Text(
+                    child: Text(
                       AppStrings.returnButton,
                       style: TextStyle(fontWeight: FontWeight.w900),
                     ),
