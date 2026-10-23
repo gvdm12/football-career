@@ -78,6 +78,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
   @override
   Widget build(BuildContext context) {
     final next = _career.nextFixture;
+    final isChampion = next == null && _career.standings.isNotEmpty && _career.standings.first.club == _career.player.club;
     final showResult = _showLastResult && _lastPlayedFixture != null;
     final played = _career.fixtures.where((f) => f.isPlayed && (f.homeTeam == _career.player.club || f.awayTeam == _career.player.club)).length;
     const total = 38;
@@ -185,6 +186,27 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
             const SizedBox(height: 10),
             if (next == null)
               _panelCard(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                if (isChampion) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.only(bottom: 14),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(colors: [Color(0xFF5A3B0A), Color(0xFF211707)]),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFFFFC857)),
+                    ),
+                    child: const Column(children: [
+                      Icon(Icons.emoji_events_rounded, color: Color(0xFFFFC857), size: 48),
+                      SizedBox(height: 8),
+                      Text('ЧЕМПИОН СУПЕРЛИГИ!', textAlign: TextAlign.center,
+                        style: TextStyle(color: Color(0xFFFFD778), fontSize: 18, fontWeight: FontWeight.w900)),
+                      SizedBox(height: 4),
+                      Text('Трофей добавлен в достижения карьеры', textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white70, fontSize: 12)),
+                    ]),
+                  ),
+                ],
                 const Text('Сезон завершён!', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
                 const SizedBox(height: 6),
                 const Text('Все матчи твоей команды сыграны.', style: TextStyle(color: Colors.white70)),
@@ -264,6 +286,13 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
     setState(() { _isPlaying = true; _error = null; });
     try {
       var completed = _career;
+      final standings = completed.standings;
+      final wonLeague = standings.isNotEmpty && standings.first.club == completed.player.club;
+      if (wonLeague && !completed.championSeasons.contains(completed.season)) {
+        completed = completed.copyWith(
+          championSeasons: [...completed.championSeasons, completed.season],
+        );
+      }
       if (completed.developmentPointsAwardedSeason < completed.season) {
         completed = completed.copyWith(
           developmentPoints: completed.developmentPoints + completed.developmentPointsForSeason,
