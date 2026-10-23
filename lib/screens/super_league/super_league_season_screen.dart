@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/club.dart';
+import 'package:flutter_football/models/club_colors.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_football/models/super_league_career.dart';
 import 'package:flutter_football/screens/super_league/super_league_table_screen.dart';
 import 'package:flutter_football/services/super_league_storage.dart';
@@ -43,7 +45,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
     return Scaffold(
       backgroundColor: _bg,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0B3A1A),
+        backgroundColor: const Color.fromARGB(82, 81, 84, 82),
         foregroundColor: Colors.white,
         title: Text('СЕЗОН ${_career.season}',
           style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1)),
@@ -52,24 +54,30 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
             tooltip: 'Таблица',
             onPressed: () => Navigator.push(context, MaterialPageRoute(
               builder: (_) => SuperLeagueTableScreen(career: _career))),
-            icon: const Icon(Icons.leaderboard_rounded),
+            icon: SvgPicture.asset('assets/icons/table.svg', width: 32, height: 32, color: Colors.white),
           ),
         ],
       ),
-      body: SafeArea(
-        child: ListView(
+      body: Stack(children: [
+        Positioned.fill(child: Opacity(opacity: 0.20,
+          child: Image.asset('assets/images/fon2.png', fit: BoxFit.cover))),
+        SafeArea(child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [Color(0xFF163C22), Color(0xFF0B2813)]),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF285438)),
+                gradient: LinearGradient(colors: [
+                  ClubColors.primary(_career.player.club).withValues(alpha: 0.82),
+                  Color.lerp(ClubColors.primary(_career.player.club), const Color(0xFF071B0D), 0.65)!,
+                  const Color(0xFF071B0D),
+                ], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(22), bottomRight: Radius.circular(22), topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+                border: Border.all(color: ClubColors.primary(_career.player.club).withValues(alpha: 0.8)),
               ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 const Text('ПРОГРЕСС ЧЕМПИОНАТА', style: TextStyle(
-                  color: Color(0xFF8BE07F), fontWeight: FontWeight.w900, fontSize: 11, letterSpacing: 1.2)),
+                  color: Colors.white, fontWeight: FontWeight.w900, fontSize: 11, letterSpacing: 1.2)),
                 const SizedBox(height: 10),
                 Row(children: [
                   Expanded(child: Text(_career.player.club, style: const TextStyle(
@@ -78,14 +86,14 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                 ]),
                 const SizedBox(height: 12),
                 ClipRRect(borderRadius: BorderRadius.circular(8), child: LinearProgressIndicator(
-                  value: played / total, minHeight: 8, backgroundColor: const Color(0xFF24402B),
-                  valueColor: const AlwaysStoppedAnimation<Color>(_green))),
+                  value: played / total, minHeight: 8, backgroundColor: const Color(0xFF12381B),
+                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8BE07F)))),
               ]),
             ),
             const SizedBox(height: 18),
             _panelCard(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Text('СТАТИСТИКА СЕЗОНА', style: TextStyle(
-                color: Color(0xFF8BE07F), fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1)),
+                color: Colors.white, fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1)),
               const SizedBox(height: 14),
               Row(children: [
                 Expanded(child: _seasonStat('Матчи', '${_career.playedMatches}')),
@@ -155,8 +163,8 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                 margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 12),
                 decoration: BoxDecoration(
-                  color: _panel, borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: fixture.isPlayed ? const Color(0xFF24402B) : const Color(0xFF183822))),
+                  color: Color.lerp(const Color(0xFF0A2110), ClubColors.primary(opponent), 0.12)!, borderRadius: BorderRadius.circular(10),
+                  border: Border(left: BorderSide(color: ClubColors.primary(opponent), width: 4))),
                 child: Row(children: [
                   SizedBox(width: 38, child: Text('${fixture.round}.', style: const TextStyle(color: Colors.white54, fontSize: 12))),
                   Expanded(child: Text(isHome ? '${_career.player.club} — $opponent' : '$opponent — ${_career.player.club}',
@@ -170,7 +178,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
             OutlinedButton.icon(
               onPressed: () => Navigator.push(context, MaterialPageRoute(
                 builder: (_) => SuperLeagueTableScreen(career: _career))),
-              icon: const Icon(Icons.leaderboard_rounded),
+              icon: SvgPicture.asset('assets/icons/table.svg', width: 24, height: 24, color: const Color(0xFF8BE07F)),
               label: const Text('ТАБЛИЦА ЧЕМПИОНАТА'),
               style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF8BE07F),
                 side: const BorderSide(color: Color(0xFF285135))),
@@ -205,9 +213,9 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
     final club = Clubs.getByName(name);
     return Column(crossAxisAlignment: alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start, children: [
       Container(width: 42, height: 42, alignment: Alignment.center,
-        decoration: BoxDecoration(color: club.primaryColor.withValues(alpha: 0.18),
-          borderRadius: BorderRadius.circular(12), border: Border.all(color: club.primaryColor)),
-        child: Text(name.split(' ').map((p) => p.isEmpty ? '' : p[0]).take(2).join(),
+        decoration: BoxDecoration(color: ClubColors.primary(name).withValues(alpha: 0.18),
+          borderRadius: BorderRadius.circular(12), border: Border.all(color: ClubColors.primary(name))),
+        child: Text(name.isNotEmpty ? name[0].toUpperCase() : '?',
           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900))),
       const SizedBox(height: 8),
       Text(name, textAlign: alignEnd ? TextAlign.end : TextAlign.start, maxLines: 2,
@@ -218,7 +226,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
   Widget _panelCard(Widget child) => Container(
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(color: _panel, borderRadius: BorderRadius.circular(15),
-      border: Border.all(color: const Color(0xFF25432D))),
+      border: Border.all(color: const Color(0xFF14401E))),
     child: child,
   );
 }
