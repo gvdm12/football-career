@@ -9,10 +9,12 @@ class SuperLeagueDevelopmentScreen extends StatefulWidget {
   const SuperLeagueDevelopmentScreen({super.key, required this.career});
 
   @override
-  State<SuperLeagueDevelopmentScreen> createState() => _SuperLeagueDevelopmentScreenState();
+  State<SuperLeagueDevelopmentScreen> createState() =>
+      _SuperLeagueDevelopmentScreenState();
 }
 
-class _SuperLeagueDevelopmentScreenState extends State<SuperLeagueDevelopmentScreen> {
+class _SuperLeagueDevelopmentScreenState
+    extends State<SuperLeagueDevelopmentScreen> {
   late SuperLeagueCareer _career;
   final Map<SkillName, int> _planned = {};
 
@@ -26,23 +28,35 @@ class _SuperLeagueDevelopmentScreenState extends State<SuperLeagueDevelopmentScr
 
   String _name(SkillName skill) {
     switch (skill) {
-      case SkillName.pace: return 'Скорость';
-      case SkillName.physical: return 'Физика';
-      case SkillName.shooting: return 'Удары';
-      case SkillName.passing: return 'Пасы';
-      case SkillName.dribbling: return 'Дриблинг';
-      case SkillName.defending: return 'Защита';
+      case SkillName.pace:
+        return 'Скорость';
+      case SkillName.physical:
+        return 'Физика';
+      case SkillName.shooting:
+        return 'Удары';
+      case SkillName.passing:
+        return 'Пасы';
+      case SkillName.dribbling:
+        return 'Дриблинг';
+      case SkillName.defending:
+        return 'Защита';
     }
   }
 
   IconData _icon(SkillName skill) {
     switch (skill) {
-      case SkillName.pace: return Icons.bolt;
-      case SkillName.physical: return Icons.fitness_center;
-      case SkillName.shooting: return Icons.gps_fixed;
-      case SkillName.passing: return Icons.adjust;
-      case SkillName.dribbling: return Icons.blur_circular;
-      case SkillName.defending: return Icons.shield;
+      case SkillName.pace:
+        return Icons.bolt;
+      case SkillName.physical:
+        return Icons.fitness_center;
+      case SkillName.shooting:
+        return Icons.gps_fixed;
+      case SkillName.passing:
+        return Icons.adjust;
+      case SkillName.dribbling:
+        return Icons.blur_circular;
+      case SkillName.defending:
+        return Icons.shield;
     }
   }
 
@@ -51,16 +65,23 @@ class _SuperLeagueDevelopmentScreenState extends State<SuperLeagueDevelopmentScr
   PlayerSkills _increase(PlayerSkills skills, SkillName skill, int amount) {
     final value = (_value(skill) + amount).clamp(0, 99).toInt();
     switch (skill) {
-      case SkillName.pace: return skills.copyWith(pace: value);
-      case SkillName.physical: return skills.copyWith(physical: value);
-      case SkillName.shooting: return skills.copyWith(shooting: value);
-      case SkillName.passing: return skills.copyWith(passing: value);
-      case SkillName.dribbling: return skills.copyWith(dribbling: value);
-      case SkillName.defending: return skills.copyWith(defending: value);
+      case SkillName.pace:
+        return skills.copyWith(pace: value);
+      case SkillName.physical:
+        return skills.copyWith(physical: value);
+      case SkillName.shooting:
+        return skills.copyWith(shooting: value);
+      case SkillName.passing:
+        return skills.copyWith(passing: value);
+      case SkillName.dribbling:
+        return skills.copyWith(dribbling: value);
+      case SkillName.defending:
+        return skills.copyWith(defending: value);
     }
   }
 
-  int get _plannedPoints => _planned.values.fold(0, (sum, value) => sum + value);
+  int get _plannedPoints =>
+      _planned.values.fold(0, (sum, value) => sum + value);
 
   void _changePlanned(SkillName skill, int delta) {
     final current = _planned[skill] ?? 0;
@@ -87,7 +108,10 @@ class _SuperLeagueDevelopmentScreenState extends State<SuperLeagueDevelopmentScr
   }
 
   void _apply(PlayerSkills skills, int cost) {
-    final overall = calculateOverall(skills: skills, position: _player.position);
+    final overall = calculateOverall(
+      skills: skills,
+      position: _player.position,
+    );
     setState(() {
       _career = _career.copyWith(
         player: _player.copyWith(skills: skills, overall: overall),
@@ -98,90 +122,217 @@ class _SuperLeagueDevelopmentScreenState extends State<SuperLeagueDevelopmentScr
 
   @override
   Widget build(BuildContext context) {
-    return PopScope<SuperLeagueCareer>(
+    return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        if (!didPop && mounted) Navigator.pop(context, _career);
-      },
       child: Scaffold(
         backgroundColor: const Color(0xFF061B0C),
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: const Color.fromARGB(82, 81, 84, 82),
           foregroundColor: Colors.white,
-          title: const Text('РАЗВИТИЕ ИГРОКА', style: TextStyle(fontWeight: FontWeight.w900)),
+          title: const Text(
+            'РАЗВИТИЕ ИГРОКА',
+            style: TextStyle(fontWeight: FontWeight.w900),
+          ),
         ),
-        body: Stack(children: [
-          Positioned.fill(child: Opacity(opacity: 0.16,
-            child: Image.asset('assets/images/training.png', fit: BoxFit.cover))),
-          SafeArea(child: ListView(
-            padding: const EdgeInsets.all(18),
-            children: [
-              Container(
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [ClubColors.primary(_player.club).withValues(alpha: 0.7), const Color(0xFF071B0D)],
-                    begin: Alignment.topLeft, end: Alignment.bottomRight),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: ClubColors.primary(_player.club)),
+        body: Stack(
+          children: [
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.12,
+                child: Image.asset(
+                  'assets/images/training.png',
+                  fit: BoxFit.cover,
                 ),
-                child: Row(children: [
-                  SvgPicture.asset('assets/icons/player.svg', width: 66, height: 66),
-                  const SizedBox(width: 14),
-                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(_player.name, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
-                    const SizedBox(height: 5),
-                    Text('${_player.club} • РЕЙТИНГ ${_player.overall}',
-                      style: const TextStyle(color: Color(0xFF8BE07F), fontWeight: FontWeight.w800, fontSize: 12)),
-                  ])),
-                ]),
               ),
-              const SizedBox(height: 14),
-              Container(
+            ),
+            SafeArea(
+              child: ListView(
                 padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: const Color(0x14FFFFFF), borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: const Color(0xFF14401E)),
-                ),
-                child: Row(children: [
-                  const Icon(Icons.bolt, color: Color(0xFF8BE07F), size: 32),
-                  const SizedBox(width: 12),
-                  const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('ОЧКИ РАЗВИТИЯ', style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w900)),
-                    SizedBox(height: 4),
-                    Text('Трать очки на улучшение навыков', style: TextStyle(color: Colors.white54, fontSize: 11)),
-                  ])),
-                  Text('${_career.developmentPoints}', style: const TextStyle(color: Color(0xFF8BE07F), fontSize: 30, fontWeight: FontWeight.w900)),
-                ]),
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          ClubColors.primary(
+                            _player.club,
+                          ).withValues(alpha: 0.7),
+                          const Color(0xFF071B0D),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: ClubColors.primary(_player.club),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        SvgPicture.asset(
+                          'assets/icons/player.svg',
+                          width: 66,
+                          height: 66,
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _player.name,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                '${_player.club} • РЕЙТИНГ ${_player.overall}',
+                                style: const TextStyle(
+                                  color: Color(0xFF8BE07F),
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Container(
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: const Color(0x14FFFFFF),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: const Color(0xFF14401E)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.bolt,
+                          color: Color(0xFF8BE07F),
+                          size: 32,
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'ОЧКИ РАЗВИТИЯ',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'Трать очки на улучшение навыков',
+                                style: TextStyle(
+                                  color: Colors.white54,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          '${_career.developmentPoints}',
+                          style: const TextStyle(
+                            color: Color(0xFF8BE07F),
+                            fontSize: 30,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: const Color(0x14FFFFFF),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: const Color(0xFF14401E)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Expanded(
+                          child: Text(
+                            'Запланировано улучшений',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          '$_plannedPoints / ${_career.developmentPoints}',
+                          style: const TextStyle(
+                            color: Color(0xFF8BE07F),
+                            fontWeight: FontWeight.w900,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  const Text(
+                    'НАВЫКИ',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  ...SkillName.values.map(_skillCard),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: _plannedPoints > 0 ? _applyPlanned : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF8BE07F),
+                        foregroundColor: const Color(0xFF082A12),
+                      ),
+                      child: Text(
+                        'ПРИМЕНИТЬ ($_plannedPoints ОЧК.)',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    height: 50,
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context, _career),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        side: const BorderSide(color: Color(0xFF3C884A)),
+                      ),
+                      child: const Text(
+                        'ПРОДОЛЖИТЬ К ТРАНСФЕРАМ',
+                        style: TextStyle(fontWeight: FontWeight.w900),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 18),
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(color: const Color(0x14FFFFFF), borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0xFF14401E))),
-                child: Row(children: [
-                  const Expanded(child: Text('Запланировано улучшений', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w700))),
-                  Text('$_plannedPoints / ${_career.developmentPoints}', style: const TextStyle(color: Color(0xFF8BE07F), fontWeight: FontWeight.w900, fontSize: 16)),
-                ]),
-              ),
-              const SizedBox(height: 18),
-              const Text('НАВЫКИ', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1)),
-              const SizedBox(height: 10),
-              ...SkillName.values.map(_skillCard),
-              const SizedBox(height: 14),
-              SizedBox(height: 50, child: ElevatedButton(
-                onPressed: _plannedPoints > 0 ? _applyPlanned : null,
-                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF8BE07F), foregroundColor: const Color(0xFF082A12)),
-                child: Text('ПРИМЕНИТЬ УЛУЧШЕНИЯ ($_plannedPoints ОЧК.)', style: const TextStyle(fontWeight: FontWeight.w900)),
-              )),
-              const SizedBox(height: 10),
-              SizedBox(height: 50, child: OutlinedButton(
-                onPressed: () => Navigator.pop(context, _career),
-                style: OutlinedButton.styleFrom(foregroundColor: Colors.white, side: const BorderSide(color: Color(0xFF3C884A))),
-                child: const Text('ПРОДОЛЖИТЬ К ТРАНСФЕРАМ', style: TextStyle(fontWeight: FontWeight.w900)),
-              )),
-            ],
-          )),
-        ]),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -203,49 +354,87 @@ class _SuperLeagueDevelopmentScreenState extends State<SuperLeagueDevelopmentScr
       decoration: BoxDecoration(
         color: planned > 0 ? const Color(0xFF12381B) : const Color(0x14FFFFFF),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: planned > 0 ? const Color(0xFF8BE07F) : const Color(0xFF14401E)),
+        border: Border.all(
+          color: planned > 0
+              ? const Color(0xFF8BE07F)
+              : const Color(0xFF14401E),
+        ),
       ),
-      child: Row(children: [
-        Icon(_icon(skill), color: color, size: 23),
-        const SizedBox(width: 10),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(_name(skill), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 6),
-          ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(
-            value: value / 99, minHeight: 5, backgroundColor: const Color(0xFF12381B),
-            valueColor: AlwaysStoppedAnimation<Color>(color))),
-        ])),
-        const SizedBox(width: 10),
-        Text('$value', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 17)),
-        const SizedBox(width: 6),
-        SizedBox(
-          width: 34,
-          child: IconButton(
-            padding: EdgeInsets.zero,
-            tooltip: 'Уменьшить улучшение',
-            onPressed: planned > 0 ? () => _changePlanned(skill, -1) : null,
-            icon: const Icon(Icons.remove_circle_outline, size: 20),
-            color: const Color(0xFF8BE07F),
+      child: Row(
+        children: [
+          Icon(_icon(skill), color: color, size: 23),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _name(skill),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: value / 99,
+                    minHeight: 5,
+                    backgroundColor: const Color(0xFF12381B),
+                    valueColor: AlwaysStoppedAnimation<Color>(color),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        SizedBox(
-          width: 28,
-          child: Text(planned > 0 ? '+$planned' : '+0',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: planned > 0 ? const Color(0xFF8BE07F) : Colors.white38, fontWeight: FontWeight.w900)),
-        ),
-        SizedBox(
-          width: 34,
-          child: IconButton(
-            padding: EdgeInsets.zero,
-            tooltip: 'Улучшить на 1 пункт',
-            onPressed: value + planned < 99 && _plannedPoints < _career.developmentPoints
-              ? () => _changePlanned(skill, 1) : null,
-            icon: const Icon(Icons.add_circle_outline, size: 20),
-            color: const Color(0xFF8BE07F),
+          const SizedBox(width: 10),
+          Text(
+            '$value',
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w900,
+              fontSize: 17,
+            ),
           ),
-        ),
-      ]),
+          const SizedBox(width: 6),
+          SizedBox(
+            width: 34,
+            child: IconButton(
+              padding: EdgeInsets.zero,
+              tooltip: 'Уменьшить улучшение',
+              onPressed: planned > 0 ? () => _changePlanned(skill, -1) : null,
+              icon: const Icon(Icons.remove_circle_outline, size: 20),
+              color: const Color(0xFF8BE07F),
+            ),
+          ),
+          SizedBox(
+            width: 28,
+            child: Text(
+              planned > 0 ? '+$planned' : '+0',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: planned > 0 ? const Color(0xFF8BE07F) : Colors.white38,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 34,
+            child: IconButton(
+              padding: EdgeInsets.zero,
+              tooltip: 'Улучшить на 1 пункт',
+              onPressed:
+                  value + planned < 99 &&
+                      _plannedPoints < _career.developmentPoints
+                  ? () => _changePlanned(skill, 1)
+                  : null,
+              icon: const Icon(Icons.add_circle_outline, size: 20),
+              color: const Color(0xFF8BE07F),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

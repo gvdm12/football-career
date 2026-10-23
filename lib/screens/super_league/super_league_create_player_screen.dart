@@ -39,10 +39,8 @@ class _SuperLeagueCreatePlayerScreenState
     dribbling: 75,
   );
 
-  int get _previewOverall => calculateOverall(
-    skills: _previewSkills,
-    position: _position,
-  );
+  int get _previewOverall =>
+      calculateOverall(skills: _previewSkills, position: _position);
 
   // Тот же список национальностей, что и в обычной карьере.
   static const _nationalities = [
@@ -189,7 +187,9 @@ class _SuperLeagueCreatePlayerScreenState
         duration: const Duration(milliseconds: 180),
         height: 72,
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFF1E5729) : Colors.transparent,
+          color: selected
+              ? const Color(0xFF1E5729)
+              : const Color.fromARGB(52, 0, 0, 0),
           borderRadius: BorderRadius.circular(11),
           border: Border.all(
             color: selected ? const Color(0xFF3E9950) : const Color(0xFF123C1D),
@@ -202,18 +202,18 @@ class _SuperLeagueCreatePlayerScreenState
               shortName,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 15,
+                fontSize: 14,
                 fontWeight: FontWeight.w900,
               ),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 3),
             Text(
               fullName,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
@@ -247,257 +247,289 @@ class _SuperLeagueCreatePlayerScreenState
         foregroundColor: Colors.white,
         title: const Text(
           'СОЗДАНИЕ ИГРОКА',
-          style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.2),
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.2,
+            fontSize: 14,
+          ),
         ),
       ),
-      body: Stack(children: [
-        Positioned.fill(child: Opacity(opacity: 0.20,
-          child: Image.asset('assets/images/fon2.png', fit: BoxFit.cover))),
-        SafeArea(child: ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [
-                  ClubColors.primary(widget.club.name).withValues(alpha: 0.55),
-                  const Color(0xFF0A2110),
-                ], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: ClubColors.primary(widget.club.name)),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 54,
-                    height: 54,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [
-                        ClubColors.secondary(widget.club.name),
-                        ClubColors.primary(widget.club.name),
-                      ]),
-                      borderRadius: BorderRadius.circular(14),
+      body: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color.fromARGB(117, 16, 127, 46),
+              Color(0xFF061A0C),
+              Color(0xFF021107),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(20),
+            children: [
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      ClubColors.primary(
+                        widget.club.name,
+                      ).withValues(alpha: 0.55),
+                      const Color(0xFF0A2110),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: ClubColors.primary(widget.club.name),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 54,
+                      height: 54,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            ClubColors.secondary(widget.club.name),
+                            ClubColors.primary(widget.club.name),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Text(
+                        widget.club.name
+                            .split(' ')
+                            .map((part) => part.isEmpty ? '' : part[0])
+                            .take(2)
+                            .join()
+                            .toUpperCase(),
+                        style: TextStyle(
+                          color:
+                              ClubColors.secondary(
+                                    widget.club.name,
+                                  ).computeLuminance() >
+                                  0.45
+                              ? Colors.black
+                              : Colors.white,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
                     ),
-                    child: Text(
-                      widget.club.name
-                          .split(' ')
-                          .map((part) => part.isEmpty ? '' : part[0])
-                          .take(2)
-                          .join()
-                          .toUpperCase(),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'ТВОЙ КЛУБ',
+                            style: TextStyle(
+                              color: Color(0xFF8BE07F),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            widget.club.name,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 19,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          Text(
+                            'Сила клуба: ${widget.club.strength}',
+                            style: const TextStyle(color: Colors.white60),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      '$_previewOverall',
                       style: TextStyle(
-                        color: ClubColors.secondary(widget.club.name).computeLuminance() > 0.45 ? Colors.black : Colors.white,
+                        color: _green,
+                        fontSize: 30,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 26),
+              const Text(
+                'ИМЯ ФУТБОЛИСТА',
+                style: TextStyle(
+                  color: Color(0xFF8BE07F),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.1,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _nameController,
+                textCapitalization: TextCapitalization.words,
+                textInputAction: TextInputAction.done,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'Введи имя',
+                  hintStyle: const TextStyle(color: Colors.white38),
+                  filled: true,
+                  fillColor: const Color(0xFF0B2813),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(13),
+                    borderSide: const BorderSide(color: Color(0xFF174324)),
                   ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(13),
+                    borderSide: const BorderSide(color: Color(0xFF174324)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 15),
+              const Text(
+                'ПОЗИЦИЯ',
+                style: TextStyle(
+                  color: Color(0xFF8BE07F),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.1,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children:
+                    [
+                          _buildPositionButton(
+                            shortName: 'ST',
+                            fullName: 'Нападающий',
+                            position: PlayerPosition.forward,
+                          ),
+                          _buildPositionButton(
+                            shortName: 'CM',
+                            fullName: 'Полузащитник',
+                            position: PlayerPosition.midfielder,
+                          ),
+                          _buildPositionButton(
+                            shortName: 'CB',
+                            fullName: 'Защитник',
+                            position: PlayerPosition.defender,
+                          ),
+                        ]
+                        .map(
+                          (button) => Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 5),
+                              child: button,
+                            ),
+                          ),
+                        )
+                        .toList(),
+              ),
+              const SizedBox(height: 15),
+              const Text(
+                'СТРАНА',
+                style: TextStyle(
+                  color: Color(0xFF8BE07F),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.1,
+                ),
+              ),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                initialValue: _nationality,
+                isExpanded: true,
+                dropdownColor: const Color(0xFF0B3A1A),
+                icon: const Icon(
+                  Icons.keyboard_arrow_down,
+                  color: Colors.white,
+                ),
+                style: const TextStyle(color: Colors.white, fontSize: 15),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: const Color(0xFF0B2813),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(13),
+                    borderSide: const BorderSide(color: Color(0xFF174324)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(13),
+                    borderSide: const BorderSide(color: Color(0xFF174324)),
+                  ),
+                ),
+                selectedItemBuilder: (context) =>
+                    _nationalities.map((nationality) {
+                      return Row(
+                        children: [
+                          _buildNationalityFlag(nationality),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              nationality,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
+                        ],
+                      );
+                    }).toList(),
+                items: _nationalities.map((nationality) {
+                  return DropdownMenuItem<String>(
+                    value: nationality,
+                    child: Row(
                       children: [
-                        const Text(
-                          'ТВОЙ КЛУБ',
-                          style: TextStyle(
-                            color: Color(0xFF8BE07F),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.2,
+                        _buildNationalityFlag(nationality),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            nationality,
+                            style: const TextStyle(color: Colors.white),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          widget.club.name,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 19,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                        Text(
-                          'Сила клуба: ${widget.club.strength}',
-                          style: const TextStyle(color: Colors.white60),
                         ),
                       ],
                     ),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) setState(() => _nationality = value);
+                },
+              ),
+              const SizedBox(height: 28),
+              SizedBox(
+                height: 54,
+                child: ElevatedButton(
+                  onPressed: _createPlayer,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _green,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
-                  Text(
-                    '$_previewOverall',
+                  child: const Text(
+                    'СОЗДАТЬ ИГРОКА',
                     style: TextStyle(
-                      color: _green,
-                      fontSize: 30,
                       fontWeight: FontWeight.w900,
+                      letterSpacing: 1.1,
                     ),
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 26),
-            const Text(
-              'ИМЯ ФУТБОЛИСТА',
-              style: TextStyle(
-                color: Color(0xFF8BE07F),
-                fontSize: 12,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.1,
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _nameController,
-              textCapitalization: TextCapitalization.words,
-              textInputAction: TextInputAction.done,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                hintText: 'Введи имя',
-                hintStyle: const TextStyle(color: Colors.white38),
-                filled: true,
-                fillColor: const Color(0xFF0B2813),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(13),
-                  borderSide: const BorderSide(color: Color(0xFF174324)),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(13),
-                  borderSide: const BorderSide(color: Color(0xFF174324)),
                 ),
               ),
-            ),
-            const SizedBox(height: 22),
-            const Text(
-              'ПОЗИЦИЯ',
-              style: TextStyle(
-                color: Color(0xFF8BE07F),
-                fontSize: 12,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.1,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children:
-                  [
-                        _buildPositionButton(
-                          shortName: 'ST',
-                          fullName: 'Нападающий',
-                          position: PlayerPosition.forward,
-                        ),
-                        _buildPositionButton(
-                          shortName: 'CM',
-                          fullName: 'Полузащитник',
-                          position: PlayerPosition.midfielder,
-                        ),
-                        _buildPositionButton(
-                          shortName: 'CB',
-                          fullName: 'Защитник',
-                          position: PlayerPosition.defender,
-                        ),
-                      ]
-                      .map(
-                        (button) => Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 10),
-                            child: button,
-                          ),
-                        ),
-                      )
-                      .toList(),
-            ),
-            const SizedBox(height: 22),
-            const Text(
-              'НАЦИОНАЛЬНОСТЬ',
-              style: TextStyle(
-                color: Color(0xFF8BE07F),
-                fontSize: 12,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.1,
-              ),
-            ),
-            const SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              initialValue: _nationality,
-              isExpanded: true,
-              dropdownColor: const Color(0xFF0B3A1A),
-              icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
-              style: const TextStyle(color: Colors.white, fontSize: 15),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: const Color(0xFF0B2813),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(13),
-                  borderSide: const BorderSide(color: Color(0xFF174324)),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(13),
-                  borderSide: const BorderSide(color: Color(0xFF174324)),
-                ),
-              ),
-              selectedItemBuilder: (context) => _nationalities.map((
-                nationality,
-              ) {
-                return Row(
-                  children: [
-                    _buildNationalityFlag(nationality),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(nationality, overflow: TextOverflow.ellipsis),
-                    ),
-                  ],
-                );
-              }).toList(),
-              items: _nationalities.map((nationality) {
-                return DropdownMenuItem<String>(
-                  value: nationality,
-                  child: Row(
-                    children: [
-                      _buildNationalityFlag(nationality),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          nationality,
-                          style: const TextStyle(color: Colors.white),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-              onChanged: (value) {
-                if (value != null) setState(() => _nationality = value);
-              },
-            ),
-            const SizedBox(height: 28),
-            SizedBox(
-              height: 54,
-              child: ElevatedButton(
-                onPressed: _createPlayer,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _green,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                child: const Text(
-                  'СОЗДАТЬ ИГРОКА',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.1,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              'Начальный рейтинг: 75 • все навыки соответствуют рейтингу',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white54, fontSize: 12),
-            ),
-          ],
-        )),
-      ]),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

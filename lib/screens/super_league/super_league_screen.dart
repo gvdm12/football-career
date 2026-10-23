@@ -45,9 +45,7 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
   void _startNewGame() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => const SuperLeagueClubSelectionScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => const SuperLeagueClubSelectionScreen()),
     ).then((_) => _checkSavedCareer());
   }
 
@@ -97,171 +95,189 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
           style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2),
         ),
       ),
-      body: Stack(children: [
-        Positioned.fill(child: Opacity(opacity: 0.20,
-          child: Image.asset('assets/images/fon2.png', fit: BoxFit.cover))),
-        SafeArea(child: ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            Container(
-              padding: const EdgeInsets.all(22),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFF0B3A1A), Color(0xFF082A12), Color(0xFF04160A)],
-                ),
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: const Color(0xFF14401E)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 58,
-                    height: 58,
-                    decoration: BoxDecoration(
-                      color: _green.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(17),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.20,
+              child: Image.asset('assets/images/fon2.png', fit: BoxFit.cover),
+            ),
+          ),
+          SafeArea(
+            child: ListView(
+              padding: const EdgeInsets.all(20),
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(22),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFF0B3A1A),
+                        Color(0xFF082A12),
+                        Color(0xFF04160A),
+                      ],
                     ),
-                    child: Image.asset('assets/icons/cup.png', width: 34, height: 34, fit: BoxFit.contain),
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(color: const Color(0xFF14401E)),
                   ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'ТВОЯ ДОРОГА К ВЕРШИНЕ',
-                    style: TextStyle(
-                      color: Color(0xFF8BE07F),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Суперлига',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 30,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Выбери один из 20 топ-клубов, создай футболиста '
-                    'с рейтингом 75 и постарайся привести свою команду '
-                    'к чемпионству. Тебя ждут 10 сезонов борьбы за титулы.',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.78),
-                      height: 1.5,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: _ModeStat(
-                          icon: Icons.groups_rounded,
-                          value: '20',
-                          label: 'КЛУБОВ',
+                      Container(
+                        width: 58,
+                        height: 58,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(17),
+                        ),
+                        child: Image.asset(
+                          'assets/icons/cup.png',
+                          width: 34,
+                          height: 34,
+                          fit: BoxFit.contain,
+                          color: Colors.white,
                         ),
                       ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: _ModeStat(
-                          icon: Icons.calendar_month_rounded,
-                          value: '10',
-                          label: 'СЕЗОНОВ',
+                      const SizedBox(height: 20),
+                      // const Text(
+                      //   'ТВОЯ ДОРОГА К ВЕРШИНЕ',
+                      //   style: TextStyle(
+                      //     color: Color(0xFF8BE07F),
+                      //     fontSize: 11,
+                      //     fontWeight: FontWeight.w900,
+                      //     letterSpacing: 1.5,
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 8),
+                      const Text(
+                        'Суперлига',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 30,
+                          fontWeight: FontWeight.w900,
                         ),
                       ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: _ModeStat(
-                          icon: Icons.trending_up_rounded,
-                          value: '75',
-                          label: 'РЕЙТИНГ',
+                      const SizedBox(height: 10),
+                      Text(
+                        'Выбери один из 20 топ-клубов, создай футболиста '
+                        'с рейтингом 75 и постарайся привести свою команду '
+                        'к чемпионству. Тебя ждут 10 сезонов борьбы за титулы.',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.78),
+                          height: 1.5,
+                          fontSize: 14,
                         ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Row(
+                        children: [
+                          Expanded(
+                            child: _ModeStat(
+                              icon: Icons.groups_rounded,
+                              value: '20',
+                              label: 'КЛУБОВ',
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: _ModeStat(
+                              icon: Icons.calendar_month_rounded,
+                              value: '10',
+                              label: 'СЕЗОНОВ',
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: _ModeStat(
+                              icon: Icons.trending_up_rounded,
+                              value: '75',
+                              label: 'РЕЙТИНГ',
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              height: 58,
-              child: ElevatedButton.icon(
-                onPressed: _startNewGame,
-                icon: const Icon(Icons.add_circle_outline_rounded),
-                label: const Text(
-                  'НОВАЯ ИГРА',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.1,
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  height: 58,
+                  child: ElevatedButton.icon(
+                    onPressed: _startNewGame,
+                    icon: const Icon(Icons.add_circle_outline_rounded),
+                    label: const Text(
+                      'НОВАЯ ИГРА',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.1,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _green,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
                   ),
                 ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _green,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 58,
-              child: OutlinedButton.icon(
-                onPressed: _isCheckingSave || !_hasSavedCareer || _isOpeningCareer
-                    ? null
-                    : _continueCareer,
-                icon: _isOpeningCareer
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white70,
-                        ),
-                      )
-                    : const Icon(Icons.play_circle_outline_rounded),
-                label: Text(
-                  _isCheckingSave
-                      ? 'ПРОВЕРКА СОХРАНЕНИЯ'
-                      : _hasSavedCareer
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 58,
+                  child: OutlinedButton.icon(
+                    onPressed:
+                        _isCheckingSave || !_hasSavedCareer || _isOpeningCareer
+                        ? null
+                        : _continueCareer,
+                    icon: _isOpeningCareer
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white70,
+                            ),
+                          )
+                        : const Icon(Icons.play_circle_outline_rounded),
+                    label: Text(
+                      _isCheckingSave
+                          ? 'ПРОВЕРКА СОХРАНЕНИЯ'
+                          : _hasSavedCareer
                           ? 'ПРОДОЛЖИТЬ'
                           : 'НЕТ СОХРАНЕНИЯ',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.1,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.1,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      disabledForegroundColor: Colors.white38,
+                      side: const BorderSide(color: Color(0xFF285135)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
                   ),
                 ),
-                style: OutlinedButton.styleFrom(
-                  disabledForegroundColor: Colors.white38,
-                  side: const BorderSide(color: Color(0xFF285135)),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                ),
-              ),
+                const SizedBox(height: 10),
+                // Text(
+                //   _hasSavedCareer
+                //       ? 'Найдено сохранение Суперлиги.'
+                //       : 'Создай игрока, чтобы начать карьеру. '
+                //             'После сохранения здесь появится возможность продолжить.',
+                //   textAlign: TextAlign.center,
+                //   style: const TextStyle(
+                //     color: Colors.white54,
+                //     fontSize: 12,
+                //     height: 1.4,
+                //   ),
+                // ),
+              ],
             ),
-            const SizedBox(height: 10),
-            Text(
-              _hasSavedCareer
-                  ? 'Найдено сохранение Суперлиги.'
-                  : 'Создай игрока, чтобы начать карьеру. '
-                      'После сохранения здесь появится возможность продолжить.',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white54,
-                fontSize: 12,
-                height: 1.4,
-              ),
-            ),
-          ],
-        )),
-      ]),
+          ),
+        ],
+      ),
     );
   }
 }
