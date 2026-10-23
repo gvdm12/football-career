@@ -7,11 +7,33 @@ import 'package:flutter_football/screens/super_league/super_league_season_screen
 import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class SuperLeagueCareerScreen extends StatelessWidget {
+class SuperLeagueCareerScreen extends StatefulWidget {
   final SuperLeagueCareer career;
   const SuperLeagueCareerScreen({super.key, required this.career});
 
-  Player get player => career.player;
+  @override
+  State<SuperLeagueCareerScreen> createState() => _SuperLeagueCareerScreenState();
+}
+
+class _SuperLeagueCareerScreenState extends State<SuperLeagueCareerScreen> {
+  late SuperLeagueCareer _career;
+
+  @override
+  void initState() {
+    super.initState();
+    _career = widget.career;
+  }
+
+  Player get player => _career.player;
+
+  Future<void> _openSeason() async {
+    final updated = await Navigator.push<SuperLeagueCareer>(
+      context,
+      MaterialPageRoute(builder: (_) => SuperLeagueSeasonScreen(career: _career)),
+    );
+    if (!mounted || updated == null) return;
+    setState(() => _career = updated);
+  }
 
   static const Color _green = Color(0xFF8BE07F);
   static const Color _border = Color(0xFF14401E);
@@ -74,8 +96,7 @@ class SuperLeagueCareerScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton.icon(
-                  onPressed: () => Navigator.push(context, MaterialPageRoute(
-                    builder: (_) => SuperLeagueSeasonScreen(career: career))),
+                  onPressed: _openSeason,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF8BE07F),
                     foregroundColor: const Color(0xFF082A12),
