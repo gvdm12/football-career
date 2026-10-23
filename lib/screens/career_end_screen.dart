@@ -45,7 +45,7 @@ class CareerEndScreen extends StatelessWidget {
   int get goldenBoots => career.history.fold(
     0,
     (sum, item) =>
-        sum + item.achievements.where((a) => a == AppStrings.goldenBootTrophy).length,
+        sum + item.achievements.where((a) => a == 'Золотая бутса').length,
   );
 
   int get totalTrophies => leagueTitles + nationalCups + championsLeagueTitles;
