@@ -332,7 +332,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Лига чемпионов · ${match.stage.title}',
+                  '${AppStrings.championsLeague} · ${match.stage.title}',
                   style: const TextStyle(
                     color: Color(0xFF8DB8FF),
                     fontSize: 11,
@@ -445,7 +445,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Лига чемпионов · ${tournament.stage.title}',
+                  '${AppStrings.championsLeague} · ${tournament.stage.title}',
                   style: const TextStyle(
                     color: Color(0xFF8DB8FF),
                     fontSize: 11,
@@ -523,7 +523,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         match.awayTeam != expectedAwayTeam) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Ошибка: результат матча не совпадает с календарём.'),
+          content: Text(AppStrings.matchCalendarError),
         ),
       );
       return;
@@ -1648,7 +1648,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         const Text(
-          'ТРОФЕИ СЕЗОНА',
+          AppStrings.seasonTrophies,
           style: TextStyle(
             color: Colors.white,
             fontSize: 15,
@@ -1667,7 +1667,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
           ),
           child: trophies.isEmpty
               ? const Text(
-                  'В этом сезоне трофеев нет',
+                  AppStrings.noSeasonTrophies,
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white60),
                 )
@@ -2026,7 +2026,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
               ),
               const SizedBox(width: 8),
               const Text(
-                'СЛЕДУЮЩИЙ МАТЧ · КУБОК',
+                '${AppStrings.nextMatchUpper} · ${AppStrings.nationalCup.toUpperCase()}',
                 style: TextStyle(
                   color: Color.fromARGB(255, 243, 245, 243),
                   fontWeight: FontWeight.bold,
@@ -2065,7 +2065,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 ),
               ),
               child: const Text(
-                'ИГРАТЬ МАТЧ',
+                AppStrings.playMatchUpper,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -2265,7 +2265,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                       const SizedBox(width: 8),
                       const Expanded(
                         child: Text(
-                          'СЛЕДУЮЩИЙ МАТЧ · ЛИГА ЧЕМПИОНОВ',
+                          '${AppStrings.nextMatchUpper} · ${AppStrings.championsLeague.toUpperCase()}',
                           style: TextStyle(
                             color: Color(0xFF8DB8FF),
                             fontWeight: FontWeight.bold,
@@ -2337,7 +2337,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
       if (cupMatch.isDraw) {
         resultText +=
-            ' (пен. ${cupMatch.homePenalties}:${cupMatch.awayPenalties})';
+            ' ${AppStrings.penaltiesResult(cupMatch.homePenalties,cupMatch.awayPenalties)}';
       }
 
       if (cupMatch.winner == playerClub) {
