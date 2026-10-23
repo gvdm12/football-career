@@ -150,7 +150,7 @@ class SuperLeagueCareer {
     return SuperLeagueCareer(player: player, season: 1, fixtures: fixtures);
   }
 
-  int get playedMatches => fixtures.where((fixture) => fixture.isPlayed).length;
+  int get playedMatches => fixtures.where((fixture) => fixture.isPlayed && (fixture.homeTeam == player.club || fixture.awayTeam == player.club)).length;
   int get goals => fixtures.fold(0, (sum, f) => sum + f.playerGoals);
   int get assists => fixtures.fold(0, (sum, f) => sum + f.playerAssists);
   double get averageRating {
