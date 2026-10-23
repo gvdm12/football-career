@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/player.dart';
+import 'package:flutter_football/models/super_league_career.dart';
 import 'package:flutter_football/screens/super_league/super_league_create_player_screen.dart';
 import 'package:flutter_football/screens/super_league/super_league_career_screen.dart';
 import 'package:flutter_football/services/super_league_storage.dart';
@@ -222,12 +223,13 @@ class _SuperLeagueClubSelectionScreenState extends State<SuperLeagueClubSelectio
                           if (!mounted || player == null) return;
 
                           try {
-                            await SuperLeagueStorage.savePlayer(player);
+                            final career = SuperLeagueCareer.newCareer(player);
+                            await SuperLeagueStorage.saveCareer(career);
                             if (!mounted) return;
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => SuperLeagueCareerScreen(player: player),
+                                builder: (_) => SuperLeagueCareerScreen(career: career),
                               ),
                             );
                           } catch (error) {
