@@ -415,7 +415,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                               ),
                                             ),
                                             child: Text(
-                                              achievement,
+                                              AppStrings.achievementName(achievement),
                                               style: const TextStyle(
                                                 color: Color(0xFF8BE07F),
                                                 fontSize: 11,
