@@ -101,12 +101,14 @@ class SuperLeagueCareer {
   final int season;
   final List<SuperLeagueFixture> fixtures;
   final int developmentPoints;
+  final int developmentPointsAwardedSeason;
 
   const SuperLeagueCareer({
     required this.player,
     required this.season,
     required this.fixtures,
     this.developmentPoints = 0,
+    this.developmentPointsAwardedSeason = 0,
   });
 
   static const List<String> clubNames = [
@@ -228,11 +230,13 @@ class SuperLeagueCareer {
     int? season,
     List<SuperLeagueFixture>? fixtures,
     int? developmentPoints,
+    int? developmentPointsAwardedSeason,
   }) => SuperLeagueCareer(
     player: player ?? this.player,
     season: season ?? this.season,
     fixtures: fixtures ?? this.fixtures,
     developmentPoints: developmentPoints ?? this.developmentPoints,
+    developmentPointsAwardedSeason: developmentPointsAwardedSeason ?? this.developmentPointsAwardedSeason,
   );
 
   int get developmentPointsForSeason {
@@ -298,6 +302,7 @@ class SuperLeagueCareer {
       season: season,
       fixtures: updatedFixtures,
       developmentPoints: developmentPoints,
+      developmentPointsAwardedSeason: developmentPointsAwardedSeason,
     );
   }
 
@@ -326,6 +331,7 @@ class SuperLeagueCareer {
       season: nextSeasonNumber,
       fixtures: freshSeason.fixtures,
       developmentPoints: developmentPoints,
+      developmentPointsAwardedSeason: developmentPointsAwardedSeason,
     );
   }
 
@@ -334,6 +340,7 @@ class SuperLeagueCareer {
     'season': season,
     'fixtures': fixtures.map((fixture) => fixture.toJson()).toList(),
     'developmentPoints': developmentPoints,
+    'developmentPointsAwardedSeason': developmentPointsAwardedSeason,
   };
 
   factory SuperLeagueCareer.fromJson(Map<String, dynamic> json) {
@@ -347,6 +354,7 @@ class SuperLeagueCareer {
             )).toList()
           : [],
       developmentPoints: (json['developmentPoints'] as num?)?.toInt() ?? 0,
+      developmentPointsAwardedSeason: (json['developmentPointsAwardedSeason'] as num?)?.toInt() ?? 0,
     );
   }
 }
