@@ -39,6 +39,32 @@ class _SuperLeagueCareerScreenState extends State<SuperLeagueCareerScreen> {
   static const Color _border = Color(0xFF14401E);
   static const Color _panel = Color(0x14FFFFFF);
 
+  static const Map<String, String> _flagCodes = {
+    'Россия': 'RU', 'Бразилия': 'BR', 'Германия': 'DE', 'Франция': 'FR',
+    'Испания': 'ES', 'Англия': 'GB', 'Италия': 'IT', 'Нидерланды': 'NL',
+    'Бельгия': 'BE', 'Дания': 'DK', 'Аргентина': 'AR', 'Хорватия': 'HR',
+    'Швейцария': 'CH', 'Австрия': 'AT', 'Норвегия': 'NO', 'Польша': 'PL',
+    'Турция': 'TR', 'Украина': 'UA', 'Греция': 'GR', 'Шотландия': 'GB',
+    'Ирландия': 'IE', 'Колумбия': 'CO', 'Чили': 'CL', 'Уругвай': 'UY',
+    'Канада': 'CA', 'Мексика': 'MX', 'США': 'US', 'Иран': 'IR',
+    'Южная Корея': 'KR', 'Япония': 'JP', 'Катар': 'QA',
+    'Саудовская Аравия': 'SA', 'Алжир': 'DZ', 'Марокко': 'MA',
+    'Камерун': 'CM', 'Нигерия': 'NG', 'Сенегал': 'SN', 'Египет': 'EG',
+    'Тунис': 'TN',
+  };
+
+  String _flagEmoji(String nationality) {
+    if (nationality == 'Англия') {
+      return '\u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}';
+    }
+    if (nationality == 'Шотландия') {
+      return '\u{1F3F4}\u{E0067}\u{E0062}\u{E0073}\u{E0063}\u{E0074}\u{E007F}';
+    }
+    final code = _flagCodes[nationality];
+    if (code == null) return '🏳️';
+    return String.fromCharCodes(code.codeUnits.map((c) => 0x1F1E6 + c - 0x41));
+  }
+
   String get _position {
     switch (player.position) {
       case PlayerPosition.goalkeeper: return 'GK';
@@ -144,7 +170,7 @@ class _SuperLeagueCareerScreenState extends State<SuperLeagueCareerScreen> {
               style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
             const SizedBox(height: 6),
             Row(children: [
-              const Icon(Icons.flag_rounded, color: _green, size: 16),
+              Text(_flagEmoji(player.nationality), style: const TextStyle(fontSize: 16)),
               const SizedBox(width: 7),
               Expanded(child: Text(AppStrings.nationalityName(player.nationality), maxLines: 1, overflow: TextOverflow.ellipsis,
                 style: const TextStyle(color: _green, fontSize: 13))),
