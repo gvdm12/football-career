@@ -105,6 +105,10 @@ class _DevelopmentScreenState extends State<DevelopmentScreen> {
         return skills.copyWith(
           dribbling: (skills.dribbling + amount).clamp(0, 99),
         );
+      case SkillName.heading:
+        return skills.copyWith(heading: (skills.heading + amount).clamp(0, 99));
+      case SkillName.vision:
+        return skills.copyWith(vision: (skills.vision + amount).clamp(0, 99));
     }
   }
 
@@ -140,6 +144,10 @@ class _DevelopmentScreenState extends State<DevelopmentScreen> {
         return AppStrings.defending;
       case SkillName.dribbling:
         return AppStrings.dribbling;
+      case SkillName.heading:
+        return AppStrings.heading;
+      case SkillName.vision:
+        return AppStrings.vision;
     }
   }
 
@@ -157,6 +165,10 @@ class _DevelopmentScreenState extends State<DevelopmentScreen> {
         return Icons.shield;
       case SkillName.dribbling:
         return Icons.blur_circular;
+      case SkillName.heading:
+        return Icons.sports_soccer;
+      case SkillName.vision:
+        return Icons.visibility;
     }
   }
 
