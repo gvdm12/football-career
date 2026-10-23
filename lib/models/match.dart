@@ -56,7 +56,7 @@ class Match {
 
   factory Match.generate({
     required Player player,
-    required Career career,
+    Career? career,
     required String opponent,
     required bool isHome,
   }) {
