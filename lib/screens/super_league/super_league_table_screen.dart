@@ -18,7 +18,7 @@ class SuperLeagueTableScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(82, 81, 84, 82),
         foregroundColor: Colors.white,
-        title: const Text(
+        title: Text(
           AppStrings.superLeagueTableTitle,
           style: TextStyle(fontWeight: FontWeight.w900),
         ),
