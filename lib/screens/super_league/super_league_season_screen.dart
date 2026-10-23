@@ -4,6 +4,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_football/models/super_league_career.dart';
 import 'package:flutter_football/screens/super_league/super_league_table_screen.dart';
 import 'package:flutter_football/services/super_league_storage.dart';
+import 'package:flutter_football/screens/super_league/super_league_development_screen.dart';
+import 'package:flutter_football/screens/super_league/super_league_transfers_screen.dart';
 
 class SuperLeagueSeasonScreen extends StatefulWidget {
   final SuperLeagueCareer career;
@@ -16,6 +18,8 @@ class SuperLeagueSeasonScreen extends StatefulWidget {
 class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
   late SuperLeagueCareer _career = widget.career;
   bool _isPlaying = false;
+  bool _showLastResult = false;
+  SuperLeagueFixture? _lastPlayedFixture;
   String? _error;
 
   static const Color _bg = Color(0xFF061B0C);
@@ -26,10 +30,18 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
     if (_isPlaying || _career.nextFixture == null) return;
     setState(() { _isPlaying = true; _error = null; });
     try {
+      final before = _career.nextFixture;
       final updated = _career.playNextMatch();
       await SuperLeagueStorage.saveCareer(updated);
       if (!mounted) return;
-      setState(() { _career = updated; _isPlaying = false; });
+      setState(() {
+        _career = updated;
+        _lastPlayedFixture = before == null ? null : updated.fixtures.firstWhere(
+          (fixture) => fixture.round == before.round && fixture.homeTeam == before.homeTeam && fixture.awayTeam == before.awayTeam,
+        );
+        _showLastResult = _lastPlayedFixture != null;
+        _isPlaying = false;
+      });
     } catch (_) {
       if (!mounted) return;
       setState(() { _isPlaying = false; _error = 'Не удалось сохранить результат матча.'; });
@@ -39,6 +51,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
   @override
   Widget build(BuildContext context) {
     final next = _career.nextFixture;
+    final showResult = _showLastResult && _lastPlayedFixture != null;
     final played = _career.fixtures.where((f) => f.isPlayed && (f.homeTeam == _career.player.club || f.awayTeam == _career.player.club)).length;
     const total = 38;
     return PopScope<SuperLeagueCareer>(
@@ -130,6 +143,16 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
               ]),
             ])),
             const SizedBox(height: 18),
+            if (showResult) ...[
+              _resultCard(_lastPlayedFixture!),
+              const SizedBox(height: 12),
+              SizedBox(height: 50, child: ElevatedButton.icon(
+                onPressed: () => setState(() => _showLastResult = false),
+                icon: const Icon(Icons.skip_next_rounded),
+                label: const Text('СЛЕДУЮЩИЙ МАТЧ', style: TextStyle(fontWeight: FontWeight.w900)),
+                style: ElevatedButton.styleFrom(backgroundColor: _green, foregroundColor: const Color(0xFF082A12)),
+              )),
+            ] else ...[
             const Text('СЛЕДУЮЩИЙ МАТЧ', style: TextStyle(
               color: Color(0xFF8BE07F), fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.1)),
             const SizedBox(height: 10),
@@ -173,6 +196,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13))),
               )),
             ],
+            ],
             if (_error != null) Padding(padding: const EdgeInsets.only(top: 10),
               child: Text(_error!, style: const TextStyle(color: Colors.redAccent))),
             const SizedBox(height: 22),
@@ -202,14 +226,6 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
               );
             }),
             const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: () => Navigator.push(context, MaterialPageRoute(
-                builder: (_) => SuperLeagueTableScreen(career: _career))),
-              icon: SvgPicture.asset('assets/icons/table.svg', width: 24, height: 24, color: const Color(0xFF8BE07F)),
-              label: const Text('ТАБЛИЦА ЧЕМПИОНАТА'),
-              style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF8BE07F),
-                side: const BorderSide(color: Color(0xFF285135))),
-            ),
           ],
         )),
       ]),
@@ -220,15 +236,93 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
     if (_career.season >= 10 || _isPlaying) return;
     setState(() { _isPlaying = true; _error = null; });
     try {
-      final nextCareer = _career.nextSeason();
+      var completed = _career;
+      if (completed.developmentPointsAwardedSeason < completed.season) {
+        completed = completed.copyWith(
+          developmentPoints: completed.developmentPoints + completed.developmentPointsForSeason,
+          developmentPointsAwardedSeason: completed.season,
+        );
+      }
+      await SuperLeagueStorage.saveCareer(completed);
+      if (!mounted) return;
+      setState(() { _career = completed; _isPlaying = false; });
+
+      final developmentResult = await Navigator.push<SuperLeagueCareer>(
+        context,
+        MaterialPageRoute(builder: (_) => SuperLeagueDevelopmentScreen(career: _career)),
+      );
+      if (!mounted) return;
+      if (developmentResult != null) {
+        setState(() => _career = developmentResult);
+        await SuperLeagueStorage.saveCareer(developmentResult);
+      }
+
+      final transferResult = await Navigator.push<SuperLeagueCareer>(
+        context,
+        MaterialPageRoute(builder: (_) => SuperLeagueTransfersScreen(career: _career)),
+      );
+      if (!mounted) return;
+      final afterTransfer = transferResult ?? _career;
+      final nextCareer = afterTransfer.nextSeason();
       await SuperLeagueStorage.saveCareer(nextCareer);
       if (!mounted) return;
-      setState(() { _career = nextCareer; _isPlaying = false; });
+      setState(() {
+        _career = nextCareer;
+        _showLastResult = false;
+        _lastPlayedFixture = null;
+        _isPlaying = false;
+      });
     } catch (_) {
       if (!mounted) return;
       setState(() { _isPlaying = false; _error = 'Не удалось сохранить новый сезон.'; });
     }
   }
+
+  Widget _resultCard(SuperLeagueFixture fixture) {
+    final isHome = fixture.homeTeam == _career.player.club;
+    final goals = isHome ? fixture.playerGoals : fixture.playerGoals;
+    final rating = fixture.playerPlayed ? fixture.playerRating.toStringAsFixed(1) : '—';
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [ClubColors.primary(_career.player.club).withValues(alpha: 0.55), const Color(0xFF0A2110)],
+          begin: Alignment.topLeft, end: Alignment.bottomRight),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: ClubColors.primary(_career.player.club)),
+      ),
+      child: Column(children: [
+        const Text('РЕЗУЛЬТАТ МАТЧА', style: TextStyle(
+          color: Color(0xFF8BE07F), fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.2)),
+        const SizedBox(height: 14),
+        Row(children: [
+          Expanded(child: _teamName(fixture.homeTeam, fixture.homeTeam == _career.player.club)),
+          Column(children: [
+            Text('${fixture.homeGoals} : ${fixture.awayGoals}',
+              style: const TextStyle(color: Colors.white, fontSize: 27, fontWeight: FontWeight.w900)),
+            const SizedBox(height: 4),
+            Text(fixture.homeGoals! > fixture.awayGoals! ? 'ПОБЕДА' :
+              fixture.homeGoals! < fixture.awayGoals! ? 'ПОРАЖЕНИЕ' : 'НИЧЬЯ',
+              style: const TextStyle(color: Colors.white70, fontSize: 9, fontWeight: FontWeight.w900)),
+          ]),
+          Expanded(child: _teamName(fixture.awayTeam, fixture.awayTeam == _career.player.club, alignEnd: true)),
+        ]),
+        const Divider(color: Color(0xFF24552C), height: 26),
+        Row(children: [
+          Expanded(child: _resultStat('ГОЛЫ', '${fixture.playerGoals}')),
+          Expanded(child: _resultStat('АССИСТЫ', '${fixture.playerAssists}')),
+          Expanded(child: _resultStat('ОЦЕНКА', rating)),
+          Expanded(child: _resultStat('УЧАСТИЕ', fixture.playerPlayed ? 'Да' : 'Нет')),
+        ]),
+      ]),
+    );
+  }
+
+  Widget _resultStat(String label, String value) => Column(children: [
+    Text(value, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900)),
+    const SizedBox(height: 4),
+    Text(label, style: const TextStyle(color: Colors.white54, fontSize: 9, fontWeight: FontWeight.w800)),
+  ]);
 
   Widget _seasonStat(String label, String value) => Column(children: [
     Text(value, style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w900)),
