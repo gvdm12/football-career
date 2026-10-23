@@ -134,77 +134,49 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
             ),
           ),
           actions: [
-            IconButton(
-              tooltip: 'Таблица',
-              onPressed: () => Navigator.push(
+            InkWell(
+              borderRadius: BorderRadius.circular(10),
+              onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (_) => SuperLeagueTableScreen(career: _career),
                 ),
               ),
-              icon: SvgPicture.asset(
-                'assets/icons/table.svg',
-                width: 32,
-                height: 32,
-                color: Colors.white,
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.table_chart_rounded, color: Colors.white, size: 23),
+                    SizedBox(height: 2),
+                    Text('ТАБЛИЦА', style: TextStyle(color: Colors.white70, fontSize: 8, fontWeight: FontWeight.w800)),
+                  ],
+                ),
+              ),
+            ),
+            InkWell(
+              borderRadius: BorderRadius.circular(10),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SuperLeagueCalendarScreen(career: _career),
+                ),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.only(left: 5, right: 12, top: 5, bottom: 5),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.calendar_month_rounded, color: Color(0xFF8BE07F), size: 23),
+                    SizedBox(height: 2),
+                    Text('КАЛЕНДАРЬ', style: TextStyle(color: Color(0xFF8BE07F), fontSize: 8, fontWeight: FontWeight.w800)),
+                  ],
+                ),
               ),
             ),
           ],
-        ),
-        bottomNavigationBar: Container(
-          padding: const EdgeInsets.fromLTRB(18, 8, 18, 10),
-          decoration: const BoxDecoration(
-            color: Color(0xFF0B2813),
-            border: Border(top: BorderSide(color: Color(0xFF14401E))),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => SuperLeagueTableScreen(career: _career),
-                    ),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 4),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.table_chart_rounded, color: Colors.white, size: 25),
-                        SizedBox(height: 3),
-                        Text('ТАБЛИЦА', style: TextStyle(color: Colors.white70, fontSize: 9, fontWeight: FontWeight.w800)),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => SuperLeagueCalendarScreen(career: _career),
-                    ),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 4),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.calendar_month_rounded, color: Color(0xFF8BE07F), size: 25),
-                        SizedBox(height: 3),
-                        Text('КАЛЕНДАРЬ', style: TextStyle(color: Color(0xFF8BE07F), fontSize: 9, fontWeight: FontWeight.w800)),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
         ),
         body: Stack(
           children: [
