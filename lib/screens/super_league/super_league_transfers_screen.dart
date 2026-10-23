@@ -36,9 +36,6 @@ class _SuperLeagueTransfersScreenState extends State<SuperLeagueTransfersScreen>
     return candidates.take(3).toList();
   }
 
-  int _salary(Club club) => (1200 + club.strength * club.strength * 1.8 +
-      _career.player.overall * 120).round();
-
   void _accept(Club club) {
     if (!SuperLeagueCareer.clubNames.contains(club.name)) return;
     final next = _career.copyWith(player: _career.player.copyWith(club: club.name));
@@ -156,12 +153,12 @@ class _SuperLeagueTransfersScreenState extends State<SuperLeagueTransfersScreen>
           ]),
         ]),
         const SizedBox(height: 14),
-        Row(children: [
-          const Icon(Icons.payments_outlined, color: Color(0xFF8BE07F), size: 18),
-          const SizedBox(width: 7),
-          Text('${_salary(club)} € / месяц', style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w700)),
-          const Spacer(),
-          const Text('2 года', style: TextStyle(color: Colors.white70, fontSize: 12)),
+        const Row(children: [
+          Icon(Icons.swap_horiz_rounded, color: Color(0xFF8BE07F), size: 18),
+          SizedBox(width: 7),
+          Text('Переход в новый клуб', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w700)),
+          Spacer(),
+          Text('Суперлига', style: TextStyle(color: Colors.white70, fontSize: 12)),
         ]),
         const SizedBox(height: 14),
         SizedBox(width: double.infinity, height: 46, child: ElevatedButton(
