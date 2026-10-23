@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/player.dart';
+import 'package:flutter_football/models/match.dart';
 
 class SuperLeagueFixture {
   final int round;
@@ -102,6 +103,7 @@ class SuperLeagueCareer {
   final List<SuperLeagueFixture> fixtures;
   final int developmentPoints;
   final int developmentPointsAwardedSeason;
+  final List<int> championSeasons;
 
   const SuperLeagueCareer({
     required this.player,
@@ -109,6 +111,7 @@ class SuperLeagueCareer {
     required this.fixtures,
     this.developmentPoints = 0,
     this.developmentPointsAwardedSeason = 0,
+    this.championSeasons = const [],
   });
 
   static const List<String> clubNames = [
@@ -231,12 +234,14 @@ class SuperLeagueCareer {
     List<SuperLeagueFixture>? fixtures,
     int? developmentPoints,
     int? developmentPointsAwardedSeason,
+    List<int>? championSeasons,
   }) => SuperLeagueCareer(
     player: player ?? this.player,
     season: season ?? this.season,
     fixtures: fixtures ?? this.fixtures,
     developmentPoints: developmentPoints ?? this.developmentPoints,
     developmentPointsAwardedSeason: developmentPointsAwardedSeason ?? this.developmentPointsAwardedSeason,
+    championSeasons: championSeasons ?? this.championSeasons,
   );
 
   int get developmentPointsForSeason {
@@ -253,16 +258,26 @@ class SuperLeagueCareer {
     final updatedFixtures = fixtures.map((fixture) {
       if (fixture.round != playerFixture.round || fixture.isPlayed) return fixture;
 
+      final playerInFixture = fixture.homeTeam == player.club || fixture.awayTeam == player.club;
+      if (playerInFixture) {
+        final isHome = fixture.homeTeam == player.club;
+        final opponent = isHome ? fixture.awayTeam : fixture.homeTeam;
+        final match = Match.generate(player: player, opponent: opponent, isHome: isHome);
+        return fixture.copyWith(
+          homeGoals: match.homeGoals,
+          awayGoals: match.awayGoals,
+          playerGoals: match.playerGoals,
+          playerAssists: match.playerAssists,
+          playerRating: match.playerRating,
+          playerPlayed: match.playerPlayed,
+        );
+      }
+
       final homeClub = Clubs.getByName(fixture.homeTeam);
       final awayClub = Clubs.getByName(fixture.awayTeam);
       final difference = homeClub.strength - awayClub.strength;
       final homeGoals = _goalsFor(1.35 + difference * 0.035 + 0.18, random);
       final awayGoals = _goalsFor(1.10 - difference * 0.035, random);
-      final playerInFixture = fixture.homeTeam == player.club || fixture.awayTeam == player.club;
-      if (!playerInFixture) {
-        return fixture.copyWith(homeGoals: homeGoals, awayGoals: awayGoals);
-      }
-
       final playerClubGoals = fixture.homeTeam == player.club ? homeGoals : awayGoals;
       final played = random.nextDouble() < 0.96;
       var playerGoals = 0;
@@ -332,6 +347,7 @@ class SuperLeagueCareer {
       fixtures: freshSeason.fixtures,
       developmentPoints: developmentPoints,
       developmentPointsAwardedSeason: developmentPointsAwardedSeason,
+      championSeasons: championSeasons,
     );
   }
 
@@ -341,6 +357,7 @@ class SuperLeagueCareer {
     'fixtures': fixtures.map((fixture) => fixture.toJson()).toList(),
     'developmentPoints': developmentPoints,
     'developmentPointsAwardedSeason': developmentPointsAwardedSeason,
+    'championSeasons': championSeasons,
   };
 
   factory SuperLeagueCareer.fromJson(Map<String, dynamic> json) {
@@ -355,6 +372,7 @@ class SuperLeagueCareer {
           : [],
       developmentPoints: (json['developmentPoints'] as num?)?.toInt() ?? 0,
       developmentPointsAwardedSeason: (json['developmentPointsAwardedSeason'] as num?)?.toInt() ?? 0,
+      championSeasons: (json['championSeasons'] as List?)?.map((value) => (value as num).toInt()).toList() ?? const [],
     );
   }
 }
