@@ -90,7 +90,7 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(82, 81, 84, 82),
         foregroundColor: Colors.white,
-        title: const Text(
+        title: Text(
           AppStrings.superLeague,
           style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2),
         ),
@@ -192,7 +192,7 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                   child: ElevatedButton.icon(
                     onPressed: _startNewGame,
                     icon: const Icon(Icons.add_circle_outline_rounded),
-                    label: const Text(
+                    label: Text(
                       AppStrings.newGame,
                       style: TextStyle(
                         fontWeight: FontWeight.w900,
