@@ -300,8 +300,8 @@ class _SuperLeagueCareerScreenState extends State<SuperLeagueCareerScreen> {
                             ),
                           ),
                           const SizedBox(width: 10),
-                          const Text(
-                            'РЕЙТИНГ',
+                          Text(
+                            AppStrings.overallUpper,
                             style: TextStyle(color: Colors.white, fontSize: 11),
                           ),
                           const SizedBox(width: 7),
@@ -365,8 +365,8 @@ class _SuperLeagueCareerScreenState extends State<SuperLeagueCareerScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'ТВОЙ КЛУБ',
+                Text(
+                  AppStrings.yourClubUpper,
                   style: TextStyle(
                     color: _green,
                     fontSize: 8,
