@@ -49,7 +49,7 @@ class _SuperLeagueDevelopmentScreenState extends State<SuperLeagueDevelopmentScr
   int _value(SkillName skill) => _player.skills.getSkill(skill);
 
   PlayerSkills _increase(PlayerSkills skills, SkillName skill, int amount) {
-    final value = (_value(skill) + amount).clamp(0, 99);
+    final value = (_value(skill) + amount).clamp(0, 99).toInt();
     switch (skill) {
       case SkillName.pace: return skills.copyWith(pace: value);
       case SkillName.physical: return skills.copyWith(physical: value);
