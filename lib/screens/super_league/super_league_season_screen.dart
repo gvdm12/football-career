@@ -84,10 +84,33 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                 const Text('ПРОГРЕСС ЧЕМПИОНАТА', style: TextStyle(
                   color: Colors.white, fontWeight: FontWeight.w900, fontSize: 11, letterSpacing: 1.2)),
                 const SizedBox(height: 10),
-                Row(children: [
-                  Expanded(child: Text(_career.player.club, style: const TextStyle(
-                    color: Colors.white, fontSize: 19, fontWeight: FontWeight.w900))),
-                  Text('$played/$total', style: const TextStyle(color: _green, fontSize: 20, fontWeight: FontWeight.w900)),
+                Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(_career.player.club, style: const TextStyle(
+                      color: Colors.white, fontSize: 19, fontWeight: FontWeight.w900)),
+                    const SizedBox(height: 7),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0A2110).withValues(alpha: 0.72),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: const Color(0xFF14401E)),
+                      ),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Image.asset('assets/icons/cup.png', width: 22, height: 22, fit: BoxFit.contain),
+                        const SizedBox(width: 6),
+                        const Text('СУПЕРЛИГА', style: TextStyle(
+                          color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.7)),
+                      ]),
+                    ),
+                  ])),
+                  const SizedBox(width: 10),
+                  Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                    Text('$played/$total', style: const TextStyle(color: _green, fontSize: 20, fontWeight: FontWeight.w900)),
+                    const SizedBox(height: 4),
+                    Text('СЕЗОН ${_career.season}/10', style: const TextStyle(
+                      color: Colors.white70, fontSize: 10, fontWeight: FontWeight.w800)),
+                  ]),
                 ]),
                 const SizedBox(height: 12),
                 ClipRRect(borderRadius: BorderRadius.circular(8), child: LinearProgressIndicator(
