@@ -2025,7 +2025,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 fit: BoxFit.contain,
               ),
               const SizedBox(width: 8),
-              const Text(
+              Text(
                 '${AppStrings.nextMatchUpper} · ${AppStrings.nationalCup.toUpperCase()}',
                 style: TextStyle(
                   color: Color.fromARGB(255, 243, 245, 243),
