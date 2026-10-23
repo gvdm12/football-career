@@ -626,7 +626,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 13),
                       SizedBox(
                         height: 50,
                         child: ElevatedButton.icon(

@@ -143,7 +143,7 @@ class _SuperLeagueTransfersScreenState
                   letterSpacing: 1,
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 6),
               if (_offers.isEmpty)
                 _emptyOffers()
               else
@@ -259,28 +259,13 @@ class _SuperLeagueTransfersScreenState
           const SizedBox(height: 14),
           const Row(
             children: [
-              Icon(
-                Icons.swap_horiz_rounded,
-                color: Color(0xFF8BE07F),
-                size: 18,
-              ),
-              SizedBox(width: 7),
-              Text(
-                'Переход в новый клуб',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              Spacer(),
-              Text(
-                'Суперлига',
-                style: TextStyle(color: Colors.white70, fontSize: 12),
-              ),
+              // Text(
+              //   'Суперлига',
+              //   style: TextStyle(color: Colors.white70, fontSize: 12),
+              // ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 6),
           SizedBox(
             width: double.infinity,
             height: 46,
