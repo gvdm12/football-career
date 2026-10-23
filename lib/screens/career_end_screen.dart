@@ -152,7 +152,7 @@ class CareerEndScreen extends StatelessWidget {
                   _stat(AppStrings.nationalCups, nationalCups.toString()),
                   _stat(AppStrings.championsLeague, championsLeagueTitles.toString()),
                   const Divider(color: Color(0xFF24552C)),
-                  _stat('Золотая бутса', goldenBoots.toString()),
+                  _stat(AppStrings.goldenBootTrophy, goldenBoots.toString()),
                 ]),
                 const SizedBox(height: 10),
                 _section(
