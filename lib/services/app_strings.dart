@@ -476,4 +476,47 @@ class AppStrings {
   static String get errorTitle => _en ? 'Error' : 'Ошибка';
   static String get languageRussian => _en ? 'Russian' : 'Русский';
 
+
+  // Achievements and tournament labels. Keep stored achievement values in Russian
+  // so existing saves and trophy counters remain compatible.
+  static String achievementName(String value) {
+    if (!_en) return value;
+    const names = <String, String>{
+      'Чемпион страны': 'National League Champion',
+      'Чемпион лиги': 'League Champion',
+      'Обладатель кубка страны': 'National Cup Winner',
+      'кубок страны': 'National Cup Winner',
+      'Победитель Лиги чемпионов': 'Champions League Winner',
+      'Лига чемпионов': 'Champions League',
+      'Золотая бутса': 'Golden Boot',
+      'Лучший бомбардир': 'Top Scorer',
+      'Лучший ассистент': 'Top Assister',
+      'Лучший игрок сезона': 'Player of the Season',
+    };
+    return names[value] ?? value;
+  }
+
+  static String cupStageName(int round) {
+    switch (round) {
+      case 1:
+        return _en ? 'Round of 16' : '1/8 финала';
+      case 2:
+        return _en ? 'Quarter-final' : 'Четвертьфинал';
+      case 3:
+        return _en ? 'Semi-final' : 'Полуфинал';
+      case 4:
+        return _en ? 'Final' : 'Финал';
+      default:
+        return nationalCup;
+    }
+  }
+
+  static String get firstLegLabel => _en ? 'First leg' : 'Первый матч';
+  static String get secondLegLabel => _en ? 'Second leg' : 'Ответный матч';
+  static String get penaltiesShort => _en ? 'Pens.' : 'П:';
+  static String get languageSection => _en ? 'LANGUAGE' : 'ЯЗЫК';
+  static String get englishLanguage => 'English';
+  static String get russianLanguage => 'Русский';
+  static String get appAuthor => _en ? 'App by Gadjiev M' : 'Автор приложения — Gadjiev M';
+
 }
