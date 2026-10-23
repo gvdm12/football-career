@@ -34,7 +34,7 @@ class SuperLeagueTableScreen extends StatelessWidget {
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF0B3A1A), Colors.black, Color(0xFF04160A)],
+                  colors: [Color(0xFF0B3A1A), Color(0xFF082A12), Color(0xFF04160A)],
                   begin: Alignment.topLeft, end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(16),
@@ -74,7 +74,7 @@ class SuperLeagueTableScreen extends StatelessWidget {
       border: Border.all(color: const Color(0xFF14401E)),
     ),
     child: const Row(children: [
-      SizedBox(width: 25, child: Text('#', style: TextStyle(color: Color(0xFF082A12), fontWeight: FontWeight.w900))),
+      SizedBox(width: 25, child: Text('#', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900))),
       Expanded(child: Text('КЛУБ', style: TextStyle(color: Color(0xFF082A12), fontWeight: FontWeight.w900))),
       SizedBox(width: 30, child: Text('И', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFF082A12), fontWeight: FontWeight.w900))),
       SizedBox(width: 55, child: Text('РМ', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFF082A12), fontWeight: FontWeight.w900, fontSize: 11))),
