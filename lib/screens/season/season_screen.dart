@@ -1690,7 +1690,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              trophy,
+                              AppStrings.achievementName(trophy),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -1988,11 +1988,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
     final opponent = isHome ? match.awayTeam : match.homeTeam;
 
     final stage = switch (match.round) {
-      1 => '1/8 финала',
-      2 => 'Четвертьфинал',
-      3 => 'Полуфинал',
-      4 => 'Финал',
-      _ => 'Кубок страны',
+      1 => AppStrings.cupStageName(1),
+      2 => AppStrings.cupStageName(2),
+      3 => AppStrings.cupStageName(3),
+      4 => AppStrings.cupStageName(4),
+      _ => AppStrings.nationalCup,
     };
 
     final playerColor = ClubColors.primary(playerClub);
@@ -2201,10 +2201,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
     final opponent = tie.homeTeam == club ? tie.awayTeam : tie.homeTeam;
 
     final matchTitle = isFinal
-        ? 'Финал'
+        ? AppStrings.finalStage
         : isFirstLeg
-        ? 'Первый матч'
-        : 'Ответный матч';
+        ? AppStrings.firstLegLabel
+        : AppStrings.secondLegLabel;
 
     return Container(
       decoration: BoxDecoration(
@@ -2301,8 +2301,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
                         foregroundColor: const Color(0xFF071526),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: const Text(
-                        'ИГРАТЬ МАТЧ',
+                      child: Text(
+                        AppStrings.playMatchUpper,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -2322,11 +2322,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
     final opponent = isHome ? cupMatch.awayTeam : cupMatch.homeTeam;
 
     final stage = switch (cupMatch.round) {
-      1 => '1/8 финала',
-      2 => 'Четвертьфинал',
-      3 => 'Полуфинал',
-      4 => 'Финал',
-      _ => 'Кубок страны',
+      1 => AppStrings.cupStageName(1),
+      2 => AppStrings.cupStageName(2),
+      3 => AppStrings.cupStageName(3),
+      4 => AppStrings.cupStageName(4),
+      _ => AppStrings.nationalCup,
     };
 
     String? resultText;
@@ -2378,7 +2378,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Кубок страны · $stage',
+                  '${AppStrings.nationalCup} · $stage',
                   style: const TextStyle(
                     color: Color(0xFF8BE07F),
                     fontSize: 11,
