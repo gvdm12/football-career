@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/screens/super_league/super_league_create_player_screen.dart';
+import 'package:flutter_football/screens/super_league/super_league_career_screen.dart';
+import 'package:flutter_football/services/super_league_storage.dart';
 
 class SuperLeagueClubSelectionScreen extends StatefulWidget {
   const SuperLeagueClubSelectionScreen({super.key});
@@ -219,14 +221,23 @@ class _SuperLeagueClubSelectionScreenState extends State<SuperLeagueClubSelectio
 
                           if (!mounted || player == null) return;
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Игрок ${player.name} создан для ${player.club}. '
-                                'Следующим шагом подключим карьеру Суперлиги.',
+                          try {
+                            await SuperLeagueStorage.savePlayer(player);
+                            if (!mounted) return;
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => SuperLeagueCareerScreen(player: player),
                               ),
-                            ),
-                          );
+                            );
+                          } catch (error) {
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Не удалось сохранить карьеру Суперлиги.'),
+                              ),
+                            );
+                          }
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _green,
