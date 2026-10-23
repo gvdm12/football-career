@@ -19,7 +19,7 @@ class SuperLeagueTableScreen extends StatelessWidget {
         backgroundColor: const Color.fromARGB(82, 81, 84, 82),
         foregroundColor: Colors.white,
         title: const Text(
-          'ТАБЛИЦА',
+          AppStrings.superLeagueTableTitle,
           style: TextStyle(fontWeight: FontWeight.w900),
         ),
       ),
@@ -66,7 +66,7 @@ class SuperLeagueTableScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'СЕЗОН ${career.season}/10',
+                                AppStrings.seasonOfTen(career.season),
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
@@ -116,14 +116,14 @@ class SuperLeagueTableScreen extends StatelessWidget {
         ),
         Expanded(
           child: Text(
-            'КЛУБ',
+            AppStrings.clubColumn,
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900),
           ),
         ),
         SizedBox(
           width: 30,
           child: Text(
-            'И',
+            AppStrings.playedColumn,
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900),
           ),
@@ -131,7 +131,7 @@ class SuperLeagueTableScreen extends StatelessWidget {
         SizedBox(
           width: 55,
           child: Text(
-            'РМ',
+            AppStrings.goalDifferenceColumn,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.black,
@@ -143,7 +143,7 @@ class SuperLeagueTableScreen extends StatelessWidget {
         SizedBox(
           width: 40,
           child: Text(
-            'О',
+            AppStrings.pointsColumn,
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900),
           ),
