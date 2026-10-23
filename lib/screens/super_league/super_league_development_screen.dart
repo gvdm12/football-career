@@ -232,7 +232,7 @@ class _SuperLeagueDevelopmentScreenState
                           size: 32,
                         ),
                         const SizedBox(width: 12),
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
