@@ -263,7 +263,7 @@ class _SuperLeagueClubSelectionScreenState
                               } catch (error) {
                                 if (!mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
+                                  SnackBar(
                                     content: Text(
                                       AppStrings.superLeagueSaveCareerError,
                                     ),
