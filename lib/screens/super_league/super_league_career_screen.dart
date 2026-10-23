@@ -4,6 +4,7 @@ import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/super_league_career.dart';
 import 'package:flutter_football/screens/super_league/super_league_season_screen.dart';
+import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class SuperLeagueCareerScreen extends StatelessWidget {
@@ -18,10 +19,10 @@ class SuperLeagueCareerScreen extends StatelessWidget {
 
   String get _position {
     switch (player.position) {
-      case PlayerPosition.goalkeeper: return 'ВР';
-      case PlayerPosition.defender: return 'ЗЩ';
-      case PlayerPosition.midfielder: return 'ПЗ';
-      case PlayerPosition.forward: return 'НП';
+      case PlayerPosition.goalkeeper: return 'GK';
+      case PlayerPosition.defender: return 'CB';
+      case PlayerPosition.midfielder: return 'CM';
+      case PlayerPosition.forward: return 'ST';
     }
   }
 
@@ -124,7 +125,7 @@ class SuperLeagueCareerScreen extends StatelessWidget {
             Row(children: [
               const Icon(Icons.flag_rounded, color: _green, size: 16),
               const SizedBox(width: 7),
-              Expanded(child: Text(player.nationality, maxLines: 1, overflow: TextOverflow.ellipsis,
+              Expanded(child: Text(AppStrings.nationalityName(player.nationality), maxLines: 1, overflow: TextOverflow.ellipsis,
                 style: const TextStyle(color: _green, fontSize: 13))),
             ]),
             const SizedBox(height: 8),
@@ -205,37 +206,56 @@ class SuperLeagueCareerScreen extends StatelessWidget {
 
   List<Widget> _skillRows() {
     final stats = <({String name, int value, IconData icon, Color color})>[
-      (name: 'Скорость', value: player.skills.pace, icon: Icons.bolt, color: Color(0xFFC8E04A)),
-      (name: 'Физика', value: player.skills.physical, icon: Icons.fitness_center, color: Color(0xFFFFC94A)),
-      (name: 'Пасы', value: player.skills.passing, icon: Icons.adjust, color: Color(0xFF5FD070)),
-      (name: 'Удары', value: player.skills.shooting, icon: Icons.gps_fixed, color: Color(0xFFFF6B4A)),
-      (name: 'Защита', value: player.skills.defending, icon: Icons.shield, color: Color(0xFF7EA7FF)),
-      (name: 'Дриблинг', value: player.skills.dribbling, icon: Icons.blur_circular, color: Color(0xFF4AA8FF)),
+      (name: AppStrings.pace, value: player.skills.pace, icon: Icons.bolt, color: Color(0xFFC8E04A)),
+      (name: AppStrings.physical, value: player.skills.physical, icon: Icons.fitness_center, color: Color(0xFFFFC94A)),
+      (name: AppStrings.passing, value: player.skills.passing, icon: Icons.adjust, color: Color(0xFF5FD070)),
+      (name: AppStrings.shooting, value: player.skills.shooting, icon: Icons.gps_fixed, color: Color(0xFFFF6B4A)),
+      (name: AppStrings.defending, value: player.skills.defending, icon: Icons.shield, color: Color(0xFF7EA7FF)),
+      (name: AppStrings.dribbling, value: player.skills.dribbling, icon: Icons.blur_circular, color: Color(0xFF4AA8FF)),
     ];
     return [
       for (var i = 0; i < stats.length; i++) ...[
         Row(children: [
-          Icon(stats[i].icon, color: stats[i].color, size: 22),
+          Icon(stats[i].icon, color: stats[i].color, size: 20),
           const SizedBox(width: 10),
-          SizedBox(width: 82, child: Text(stats[i].name,
-            style: const TextStyle(color: Color(0xFFD5E8D8), fontSize: 12, fontWeight: FontWeight.w700))),
-          const SizedBox(width: 8),
-          Expanded(child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: LinearProgressIndicator(
-              value: stats[i].value.clamp(0, 100) / 100,
-              minHeight: 8,
-              backgroundColor: const Color(0xFF12381B),
-              valueColor: AlwaysStoppedAnimation<Color>(stats[i].color),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(stats[i].name, style: const TextStyle(
+              color: Color(0xFFD5E8D8), fontSize: 12, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 4),
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: stats[i].value.clamp(0, 100) / 100),
+              duration: const Duration(milliseconds: 700),
+              curve: Curves.easeOutCubic,
+              builder: (context, t, _) => Container(
+                height: 5,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF123C1D),
+                  borderRadius: BorderRadius.circular(3),
+                ),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: FractionallySizedBox(
+                    widthFactor: t,
+                    child: Container(
+                      height: 5,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(3),
+                        gradient: const LinearGradient(colors: [
+                          Color.fromARGB(255, 155, 207, 10),
+                          Color.fromARGB(255, 204, 206, 206),
+                        ]),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
-          )),
+          ])),
           const SizedBox(width: 12),
-          SizedBox(width: 26, child: Text('${stats[i].value}', textAlign: TextAlign.end,
-            style: const TextStyle(color: Color(0xFFD5E8D8), fontWeight: FontWeight.w900))),
+          SizedBox(width: 32, child: Text('${stats[i].value}', textAlign: TextAlign.right,
+            style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800))),
         ]),
-        if (i != stats.length - 1)
-          const Padding(padding: EdgeInsets.symmetric(vertical: 14),
-            child: Divider(height: 1, color: Color(0xFF24552C))),
+        if (i != stats.length - 1) const SizedBox(height: 14),
       ],
     ];
   }
