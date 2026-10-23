@@ -208,7 +208,8 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
             ]),
             const SizedBox(height: 10),
             ..._career.fixtures.where((f) => f.homeTeam == _career.player.club || f.awayTeam == _career.player.club).map((fixture) {
-                        final opponent = isHome ? fixture.awayTeam : fixture.homeTeam;
+              final isHome = fixture.homeTeam == _career.player.club;
+              final opponent = isHome ? fixture.awayTeam : fixture.homeTeam;
               return Container(
                 margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 12),
