@@ -184,8 +184,8 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                 side: const BorderSide(color: Color(0xFF285135))),
             ),
           ],
-        ),
-      ),
+        )),
+      ]),
     );
   }
 
