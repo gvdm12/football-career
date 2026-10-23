@@ -117,8 +117,8 @@ class _SuperLeagueCareerScreenState extends State<SuperLeagueCareerScreen> {
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(82, 81, 84, 82),
         foregroundColor: Colors.white,
-        title: const Text(
-          'СУПЕРЛИГА',
+        title: Text(
+          AppStrings.superLeague,
           style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14),
         ),
       ),
@@ -148,8 +148,8 @@ class _SuperLeagueCareerScreenState extends State<SuperLeagueCareerScreen> {
                   ),
                   child: Column(
                     children: [
-                      const Text(
-                        'ХАРАКТЕРИСТИКИ',
+                      Text(
+                        AppStrings.skillsUpper,
                         style: TextStyle(
                           color: _green,
                           fontSize: 11,
@@ -184,8 +184,8 @@ class _SuperLeagueCareerScreenState extends State<SuperLeagueCareerScreen> {
                         BlendMode.srcIn,
                       ),
                     ),
-                    label: const Text(
-                      'ПЕРЕЙТИ К СЕЗОНУ',
+                    label: Text(
+                      AppStrings.seasonButton,
                       style: TextStyle(fontWeight: FontWeight.w900),
                     ),
                   ),
@@ -386,9 +386,9 @@ class _SuperLeagueCareerScreenState extends State<SuperLeagueCareerScreen> {
               ],
             ),
           ),
-          _miniInfo('ВОЗРАСТ', '${player.age}'),
+          _miniInfo(AppStrings.age.toUpperCase(), '${player.age}'),
           const SizedBox(width: 12),
-          _miniInfo('СЕЗОН', '${_career.season}/10'),
+          _miniInfo(AppStrings.seasonUpper(_career.season), '${_career.season}/10'),
         ],
       ),
     );
