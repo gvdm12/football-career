@@ -521,11 +521,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     if (match.homeTeam != expectedHomeTeam ||
         match.awayTeam != expectedAwayTeam) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppStrings.matchCalendarError),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppStrings.matchCalendarError)));
       return;
     }
 
@@ -2337,7 +2335,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
       if (cupMatch.isDraw) {
         resultText +=
-            ' ${AppStrings.penaltiesResult(cupMatch.homePenalties,cupMatch.awayPenalties)}';
+            ' (пен. ${cupMatch.homePenalties}:${cupMatch.awayPenalties})';
       }
 
       if (cupMatch.winner == playerClub) {
