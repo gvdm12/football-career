@@ -58,6 +58,7 @@ class SuperLeagueTableScreen extends StatelessWidget {
                   DataColumn(label: Text('Н')),
                   DataColumn(label: Text('П')),
                   DataColumn(label: Text('МЯЧИ')),
+                  DataColumn(label: Text('РМ')),
                   DataColumn(label: Text('О')),
                 ],
                 rows: [
@@ -88,6 +89,9 @@ class SuperLeagueTableScreen extends StatelessWidget {
                         DataCell(Text('${standings[i].draws}')),
                         DataCell(Text('${standings[i].losses}')),
                         DataCell(Text('${standings[i].goalsFor}:${standings[i].goalsAgainst}')),
+                        DataCell(Text('${standings[i].goalDifference > 0 ? '+' : ''}${standings[i].goalDifference}', style: TextStyle(
+                          color: standings[i].goalDifference > 0 ? const Color(0xFF8BE07F) : Colors.white70,
+                          fontWeight: FontWeight.w800))),
                         DataCell(Text('${standings[i].points}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900))),
                       ],
                     ),
