@@ -299,7 +299,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     if (match.stage == ChampionsLeagueStage.finalMatch &&
         match.winner != null) {
-      outcomeLabel = 'Победитель турнира: ${match.winner}';
+      outcomeLabel = AppStrings.tournamentWinner(match.winner);
     } else if (match.leg == 2 && match.winner != null) {
       outcomeLabel = match.winner == club
           ? 'Вы прошли дальше'
@@ -332,7 +332,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${AppStrings.championsLeague} · ${match.stage.title}',
+                  '${AppStrings.championsLeague} · ${AppStrings.tournamentStageName(match.stage.title)}',
                   style: const TextStyle(
                     color: Color(0xFF8DB8FF),
                     fontSize: 11,
@@ -341,7 +341,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '$matchTitle · ${isHome ? 'Дома' : 'В гостях'}: $opponent',
+                  '$matchTitle · ${isHome ? AppStrings.homeVenue : AppStrings.awayVenue}: $opponent',
                   style: const TextStyle(color: Colors.white, fontSize: 12),
                 ),
                 if (outcomeLabel != null) ...[
@@ -402,7 +402,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         ? tie.isFirstLegPlayed
         : tie.isSecondLegPlayed;
 
-    String result = 'Ожидается';
+    String result = AppStrings.pendingResult;
     if (isPlayed) {
       final homeGoals = isFinal
           ? tie.finalHomeGoals
@@ -445,7 +445,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${AppStrings.championsLeague} · ${tournament.stage.title}',
+                  '${AppStrings.championsLeague} · ${AppStrings.tournamentStageName(tournament.stage.title)}',
                   style: const TextStyle(
                     color: Color(0xFF8DB8FF),
                     fontSize: 11,
@@ -454,7 +454,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${isHome ? 'Дома' : 'В гостях'}: $opponent',
+                  '${isHome ? AppStrings.homeVenue : AppStrings.awayVenue}: $opponent',
                   style: const TextStyle(color: Colors.white),
                 ),
               ],
@@ -2037,7 +2037,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            '$stage · ${isHome ? "Дома" : "В гостях"}',
+            '${stage} · ${isHome ? AppStrings.homeVenue : AppStrings.awayVenue}',
             style: const TextStyle(color: Colors.white),
           ),
           const SizedBox(height: 6),
@@ -2277,7 +2277,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${tournament.stage.title} · $matchTitle',
+                    '${AppStrings.tournamentStageName(tournament.stage.title)} · $matchTitle',
                     style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                   const SizedBox(height: 6),
