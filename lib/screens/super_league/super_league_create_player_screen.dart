@@ -414,17 +414,17 @@ class _SuperLeagueCreatePlayerScreenState
                     [
                           _buildPositionButton(
                             shortName: 'ST',
-                            fullName: 'Нападающий',
+                            fullName: AppStrings.striker,
                             position: PlayerPosition.forward,
                           ),
                           _buildPositionButton(
                             shortName: 'CM',
-                            fullName: 'Полузащитник',
+                            fullName: AppStrings.midfielder,
                             position: PlayerPosition.midfielder,
                           ),
                           _buildPositionButton(
                             shortName: 'CB',
-                            fullName: 'Защитник',
+                            fullName: AppStrings.defender,
                             position: PlayerPosition.defender,
                           ),
                         ]
