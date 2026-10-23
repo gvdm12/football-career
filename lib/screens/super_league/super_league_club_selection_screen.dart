@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/club.dart';
+import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/super_league_career.dart';
 import 'package:flutter_football/screens/super_league/super_league_create_player_screen.dart';
@@ -51,15 +52,17 @@ class _SuperLeagueClubSelectionScreenState extends State<SuperLeagueClubSelectio
     return Scaffold(
       backgroundColor: _background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0B3A1A),
+        backgroundColor: const Color.fromARGB(82, 81, 84, 82),
         foregroundColor: Colors.white,
         title: const Text(
           'СУПЕРЛИГА',
           style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2),
         ),
       ),
-      body: SafeArea(
-        child: Column(
+      body: Stack(children: [
+        Positioned.fill(child: Opacity(opacity: 0.20,
+          child: Image.asset('assets/images/fon2.png', fit: BoxFit.cover))),
+        SafeArea(child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
@@ -106,8 +109,8 @@ class _SuperLeagueClubSelectionScreenState extends State<SuperLeagueClubSelectio
 
                   return Material(
                     color: selected
-                        ? const Color(0xFF164526)
-                        : const Color(0xFF0B2813),
+                        ? const Color(0xFF16401E)
+                        : const Color(0x14FFFFFF),
                     borderRadius: BorderRadius.circular(14),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(14),
@@ -122,7 +125,7 @@ class _SuperLeagueClubSelectionScreenState extends State<SuperLeagueClubSelectio
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: selected ? _green : const Color(0xFF174324),
+                            color: selected ? const Color(0xFF8BE07F) : const Color(0xFF14401E),
                           ),
                         ),
                         child: Row(
@@ -132,9 +135,10 @@ class _SuperLeagueClubSelectionScreenState extends State<SuperLeagueClubSelectio
                               height: 42,
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
-                                color: club.primaryColor.withValues(
-                                  alpha: 0.25,
-                                ),
+                                gradient: LinearGradient(colors: [
+                                  ClubColors.secondary(club.name),
+                                  ClubColors.primary(club.name),
+                                ]),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
@@ -146,8 +150,8 @@ class _SuperLeagueClubSelectionScreenState extends State<SuperLeagueClubSelectio
                                     .take(2)
                                     .join()
                                     .toUpperCase(),
-                                style: const TextStyle(
-                                  color: Colors.white,
+                                style: TextStyle(
+                                  color: ClubColors.secondary(club.name).computeLuminance() > 0.45 ? Colors.black : Colors.white,
                                   fontWeight: FontWeight.w900,
                                   fontSize: 12,
                                 ),
