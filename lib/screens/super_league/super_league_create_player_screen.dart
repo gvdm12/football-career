@@ -248,7 +248,7 @@ class _SuperLeagueCreatePlayerScreenState
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(82, 81, 84, 82),
         foregroundColor: Colors.white,
-        title: const Text(
+        title: Text(
           AppStrings.playerCreation,
           style: TextStyle(
             fontWeight: FontWeight.w900,
@@ -331,7 +331,7 @@ class _SuperLeagueCreatePlayerScreenState
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             AppStrings.yourClubUpper,
                             style: TextStyle(
                               color: Color(0xFF8BE07F),
@@ -368,7 +368,7 @@ class _SuperLeagueCreatePlayerScreenState
                 ),
               ),
               const SizedBox(height: 26),
-              const Text(
+              Text(
                 AppStrings.footballerName,
                 style: TextStyle(
                   color: Color(0xFF8BE07F),
@@ -439,7 +439,7 @@ class _SuperLeagueCreatePlayerScreenState
                         .toList(),
               ),
               const SizedBox(height: 15),
-              const Text(
+              Text(
                 AppStrings.countryUpper,
                 style: TextStyle(
                   color: Color(0xFF8BE07F),
@@ -520,7 +520,7 @@ class _SuperLeagueCreatePlayerScreenState
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     AppStrings.createCareer,
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
