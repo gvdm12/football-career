@@ -58,7 +58,14 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
     setState(() { _isPlaying = true; _error = null; });
     try {
       final before = _career.nextFixture;
-      final updated = _career.playNextMatch();
+      var updated = _career.playNextMatch();
+      if (updated.nextFixture == null && updated.standings.isNotEmpty &&
+          updated.standings.first.club == updated.player.club &&
+          !updated.championSeasons.contains(updated.season)) {
+        updated = updated.copyWith(
+          championSeasons: [...updated.championSeasons, updated.season],
+        );
+      }
       await SuperLeagueStorage.saveCareer(updated);
       if (!mounted) return;
       setState(() {
