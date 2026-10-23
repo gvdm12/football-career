@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/super_league_career.dart';
@@ -143,7 +144,7 @@ class _SuperLeagueDevelopmentScreenState
           backgroundColor: const Color.fromARGB(82, 81, 84, 82),
           foregroundColor: Colors.white,
           title: const Text(
-            'РАЗВИТИЕ ИГРОКА',
+            AppStrings.developmentScreenTitle,
             style: TextStyle(fontWeight: FontWeight.w900),
           ),
         ),
@@ -236,7 +237,7 @@ class _SuperLeagueDevelopmentScreenState
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'ОЧКИ РАЗВИТИЯ',
+                                AppStrings.developmentPointsTitle,
                                 style: TextStyle(
                                   color: Colors.white70,
                                   fontSize: 11,
@@ -245,7 +246,7 @@ class _SuperLeagueDevelopmentScreenState
                               ),
                               SizedBox(height: 4),
                               Text(
-                                'Трать очки на улучшение навыков',
+                                AppStrings.spendPointsHint,
                                 style: TextStyle(
                                   color: Colors.white54,
                                   fontSize: 11,
@@ -277,7 +278,7 @@ class _SuperLeagueDevelopmentScreenState
                       children: [
                         const Expanded(
                           child: Text(
-                            'Запланировано улучшений',
+                            AppStrings.plannedUpgrades,
                             style: TextStyle(
                               color: Colors.white70,
                               fontWeight: FontWeight.w700,
@@ -297,7 +298,7 @@ class _SuperLeagueDevelopmentScreenState
                   ),
                   const SizedBox(height: 18),
                   const Text(
-                    'НАВЫКИ',
+                    AppStrings.skillsUpper,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -317,7 +318,7 @@ class _SuperLeagueDevelopmentScreenState
                         foregroundColor: const Color(0xFF082A12),
                       ),
                       child: Text(
-                        'ПРИМЕНИТЬ ($_plannedPoints ОЧК.)',
+                        AppStrings.applyUpgrades(_plannedPoints),
                         style: const TextStyle(
                           fontWeight: FontWeight.w900,
                           fontSize: 14,
@@ -335,7 +336,7 @@ class _SuperLeagueDevelopmentScreenState
                         side: const BorderSide(color: Color(0xFF3C884A)),
                       ),
                       child: const Text(
-                        'ПРОДОЛЖИТЬ К ТРАНСФЕРАМ',
+                        AppStrings.continueToTransfers,
                         style: TextStyle(fontWeight: FontWeight.w900),
                       ),
                     ),
@@ -416,7 +417,7 @@ class _SuperLeagueDevelopmentScreenState
             width: 34,
             child: IconButton(
               padding: EdgeInsets.zero,
-              tooltip: 'Уменьшить улучшение',
+              tooltip: AppStrings.decreaseUpgrade,
               onPressed: planned > 0 ? () => _changePlanned(skill, -1) : null,
               icon: const Icon(Icons.remove_circle_outline, size: 20),
               color: const Color(0xFF8BE07F),
@@ -437,7 +438,7 @@ class _SuperLeagueDevelopmentScreenState
             width: 34,
             child: IconButton(
               padding: EdgeInsets.zero,
-              tooltip: 'Улучшить на 1 пункт',
+              tooltip: AppStrings.upgradeOnePoint,
               onPressed:
                   value + planned < 99 &&
                       _plannedPoints < _career.developmentPoints
