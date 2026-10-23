@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/club.dart';
+import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:country_flags/country_flags.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -216,23 +217,28 @@ class _SuperLeagueCreatePlayerScreenState
     return Scaffold(
       backgroundColor: const Color(0xFF061B0C),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0B3A1A),
+        backgroundColor: const Color.fromARGB(82, 81, 84, 82),
         foregroundColor: Colors.white,
         title: const Text(
           'СОЗДАНИЕ ИГРОКА',
           style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.2),
         ),
       ),
-      body: SafeArea(
-        child: ListView(
+      body: Stack(children: [
+        Positioned.fill(child: Opacity(opacity: 0.20,
+          child: Image.asset('assets/images/fon2.png', fit: BoxFit.cover))),
+        SafeArea(child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: const Color(0xFF0B2813),
+                gradient: LinearGradient(colors: [
+                  ClubColors.primary(widget.club.name).withValues(alpha: 0.55),
+                  const Color(0xFF0A2110),
+                ], begin: Alignment.topLeft, end: Alignment.bottomRight),
                 borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: widget.club.primaryColor),
+                border: Border.all(color: ClubColors.primary(widget.club.name)),
               ),
               child: Row(
                 children: [
@@ -241,7 +247,10 @@ class _SuperLeagueCreatePlayerScreenState
                     height: 54,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: widget.club.primaryColor.withValues(alpha: 0.22),
+                      gradient: LinearGradient(colors: [
+                        ClubColors.secondary(widget.club.name),
+                        ClubColors.primary(widget.club.name),
+                      ]),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Text(
@@ -251,8 +260,8 @@ class _SuperLeagueCreatePlayerScreenState
                           .take(2)
                           .join()
                           .toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: ClubColors.secondary(widget.club.name).computeLuminance() > 0.45 ? Colors.black : Colors.white,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
@@ -461,8 +470,8 @@ class _SuperLeagueCreatePlayerScreenState
               style: TextStyle(color: Colors.white54, fontSize: 12),
             ),
           ],
-        ),
-      ),
+        )),
+      ]),
     );
   }
 }
