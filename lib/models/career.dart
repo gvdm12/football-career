@@ -778,6 +778,10 @@ class Career {
         case SkillName.dribbling:
           skills = skills.copyWith(dribbling: newValue);
           break;
+        case SkillName.heading:
+          skills = skills.copyWith(heading: newValue);
+        case SkillName.vision:
+          skills = skills.copyWith(vision: newValue);
       }
     }
 

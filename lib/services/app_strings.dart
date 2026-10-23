@@ -111,6 +111,8 @@ class AppStrings {
   static String get shooting => _en ? 'Shooting' : 'Удар';
   static String get defending => _en ? 'Defending' : 'Защита';
   static String get dribbling => _en ? 'Dribbling' : 'Дриблинг';
+  static String get heading => _en ? 'Heading' : 'Игра головой';
+  static String get vision => _en ? 'Vision' : 'Видение';
   static String get careerStats =>
       _en ? 'CAREER STATISTICS' : 'СТАТИСТИКА ЗА КАРЬЕРУ';
   static String get matchesUpper => _en ? 'MATCHES' : 'МАТЧИ';

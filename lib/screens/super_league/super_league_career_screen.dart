@@ -454,6 +454,8 @@ class _SuperLeagueCareerScreenState extends State<SuperLeagueCareerScreen> {
         icon: Icons.blur_circular,
         color: Color(0xFF4AA8FF),
       ),
+      (name: AppStrings.heading, value: player.skills.heading, icon: Icons.sports_soccer, color: Color(0xFFFF9F43)),
+      (name: AppStrings.vision, value: player.skills.vision, icon: Icons.visibility, color: Color(0xFFB78BFA)),
     ];
     return [
       for (var i = 0; i < stats.length; i++) ...[

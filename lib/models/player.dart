@@ -2,7 +2,16 @@ import 'dart:math';
 
 enum PlayerPosition { goalkeeper, defender, midfielder, forward }
 
-enum SkillName { pace, physical, shooting, passing, dribbling, defending }
+enum SkillName {
+  pace,
+  physical,
+  shooting,
+  passing,
+  dribbling,
+  defending,
+  heading,
+  vision,
+}
 
 class PlayerSkills {
   final int pace;
@@ -11,6 +20,8 @@ class PlayerSkills {
   final int shooting;
   final int defending;
   final int dribbling;
+  final int heading;
+  final int vision;
 
   const PlayerSkills({
     required this.pace,
@@ -19,6 +30,8 @@ class PlayerSkills {
     required this.shooting,
     required this.defending,
     required this.dribbling,
+    this.heading = 50,
+    this.vision = 50,
   });
 
   static PlayerSkills initial(PlayerPosition position) {
@@ -37,16 +50,20 @@ class PlayerSkills {
           shooting: randomValue(15, 30),
           defending: randomValue(60, 75),
           dribbling: randomValue(25, 40),
+          heading: randomValue(20, 35),
+          vision: randomValue(48, 60),
         );
 
       case PlayerPosition.defender:
         return PlayerSkills(
-          pace: randomValue(57, 65),
-          physical: randomValue(57, 69),
-          passing: randomValue(49, 60),
-          shooting: randomValue(34, 48),
-          defending: randomValue(63, 75),
-          dribbling: randomValue(48, 58),
+          pace: randomValue(52, 65),
+          physical: randomValue(57, 67),
+          passing: randomValue(48, 60),
+          shooting: randomValue(25, 40),
+          defending: randomValue(60, 75),
+          dribbling: randomValue(45, 58),
+          heading: randomValue(60, 75),
+          vision: randomValue(45, 60),
         );
 
       case PlayerPosition.midfielder:
@@ -57,6 +74,8 @@ class PlayerSkills {
           shooting: randomValue(60, 65),
           defending: randomValue(50, 57),
           dribbling: randomValue(59, 67),
+          heading: randomValue(45, 58),
+          vision: randomValue(65, 78),
         );
 
       case PlayerPosition.forward:
@@ -67,12 +86,22 @@ class PlayerSkills {
           shooting: randomValue(65, 69),
           defending: randomValue(40, 56),
           dribbling: randomValue(64, 68),
+          heading: randomValue(58, 72),
+          vision: randomValue(55, 68),
         );
     }
   }
 
   int get average {
-    return ((pace + physical + passing + shooting + defending + dribbling) / 6)
+    return ((pace +
+                physical +
+                passing +
+                shooting +
+                defending +
+                dribbling +
+                heading +
+                vision) /
+            8)
         .round();
   }
 
@@ -90,6 +119,10 @@ class PlayerSkills {
         return defending;
       case SkillName.dribbling:
         return dribbling;
+      case SkillName.heading:
+        return heading;
+      case SkillName.vision:
+        return vision;
     }
   }
 
@@ -100,6 +133,8 @@ class PlayerSkills {
     int? shooting,
     int? defending,
     int? dribbling,
+    int? heading,
+    int? vision,
   }) {
     return PlayerSkills(
       pace: pace ?? this.pace,
@@ -108,6 +143,8 @@ class PlayerSkills {
       shooting: shooting ?? this.shooting,
       defending: defending ?? this.defending,
       dribbling: dribbling ?? this.dribbling,
+      heading: heading ?? this.heading,
+      vision: vision ?? this.vision,
     );
   }
 
@@ -119,6 +156,8 @@ class PlayerSkills {
       'shooting': shooting,
       'defending': defending,
       'dribbling': dribbling,
+      'heading': heading,
+      'vision': vision,
     };
   }
 
@@ -134,6 +173,8 @@ class PlayerSkills {
       shooting: readSkill('shooting', 50),
       defending: readSkill('defending', 50),
       dribbling: readSkill('dribbling', 50),
+      heading: readSkill('heading', 50),
+      vision: readSkill('vision', 50),
     );
   }
 }
@@ -254,42 +295,50 @@ int calculateOverall({
   switch (position) {
     case PlayerPosition.goalkeeper:
       weights = {
-        SkillName.pace: 0.05,
-        SkillName.physical: 0.15,
-        SkillName.passing: 0.20,
-        SkillName.shooting: 0.02,
-        SkillName.defending: 0.50,
-        SkillName.dribbling: 0.08,
+        SkillName.pace: 0.0425,
+        SkillName.physical: 0.1275,
+        SkillName.passing: 0.17,
+        SkillName.shooting: 0.017,
+        SkillName.defending: 0.425,
+        SkillName.dribbling: 0.068,
+        SkillName.heading: 0.02,
+        SkillName.vision: 0.13,
       };
 
     case PlayerPosition.defender:
       weights = {
-        SkillName.pace: 0.15,
-        SkillName.physical: 0.20,
-        SkillName.passing: 0.15,
-        SkillName.shooting: 0.03,
-        SkillName.defending: 0.35,
-        SkillName.dribbling: 0.12,
+        SkillName.pace: 0.1245,
+        SkillName.physical: 0.166,
+        SkillName.passing: 0.1245,
+        SkillName.shooting: 0.0249,
+        SkillName.defending: 0.2905,
+        SkillName.dribbling: 0.0996,
+        SkillName.heading: 0.12,
+        SkillName.vision: 0.05,
       };
 
     case PlayerPosition.midfielder:
       weights = {
-        SkillName.pace: 0.15,
-        SkillName.physical: 0.12,
-        SkillName.passing: 0.28,
-        SkillName.shooting: 0.15,
-        SkillName.defending: 0.12,
-        SkillName.dribbling: 0.16,
+        SkillName.pace: 0.123,
+        SkillName.physical: 0.0984,
+        SkillName.passing: 0.2296,
+        SkillName.shooting: 0.123,
+        SkillName.defending: 0.0984,
+        SkillName.dribbling: 0.1312,
+        SkillName.heading: 0.04,
+        SkillName.vision: 0.1564,
       };
 
     case PlayerPosition.forward:
       weights = {
-        SkillName.pace: 0.20,
-        SkillName.physical: 0.12,
-        SkillName.passing: 0.10,
-        SkillName.shooting: 0.35,
-        SkillName.defending: 0.03,
-        SkillName.dribbling: 0.20,
+        SkillName.pace: 0.166,
+        SkillName.physical: 0.0996,
+        SkillName.passing: 0.083,
+        SkillName.shooting: 0.2905,
+        SkillName.defending: 0.0249,
+        SkillName.dribbling: 0.166,
+        SkillName.heading: 0.12,
+        SkillName.vision: 0.05,
       };
   }
 
@@ -299,7 +348,9 @@ int calculateOverall({
       skills.passing * weights[SkillName.passing]! +
       skills.shooting * weights[SkillName.shooting]! +
       skills.defending * weights[SkillName.defending]! +
-      skills.dribbling * weights[SkillName.dribbling]!;
+      skills.dribbling * weights[SkillName.dribbling]! +
+      skills.heading * weights[SkillName.heading]! +
+      skills.vision * weights[SkillName.vision]!;
 
   return result.round();
 }

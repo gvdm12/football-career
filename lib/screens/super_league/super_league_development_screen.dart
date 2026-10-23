@@ -40,6 +40,10 @@ class _SuperLeagueDevelopmentScreenState
         return 'Дриблинг';
       case SkillName.defending:
         return 'Защита';
+      case SkillName.heading:
+        return 'Игра головой';
+      case SkillName.vision:
+        return 'Видение';
     }
   }
 
@@ -57,6 +61,10 @@ class _SuperLeagueDevelopmentScreenState
         return Icons.blur_circular;
       case SkillName.defending:
         return Icons.shield;
+      case SkillName.heading:
+        return Icons.sports_soccer;
+      case SkillName.vision:
+        return Icons.visibility;
     }
   }
 
@@ -77,6 +85,10 @@ class _SuperLeagueDevelopmentScreenState
         return skills.copyWith(dribbling: value);
       case SkillName.defending:
         return skills.copyWith(defending: value);
+      case SkillName.heading:
+        return skills.copyWith(heading: value);
+      case SkillName.vision:
+        return skills.copyWith(vision: value);
     }
   }
 
@@ -347,6 +359,8 @@ class _SuperLeagueDevelopmentScreenState
       SkillName.passing => const Color(0xFF5FD070),
       SkillName.dribbling => const Color(0xFF4AA8FF),
       SkillName.defending => const Color(0xFF7EA7FF),
+      SkillName.heading => const Color(0xFFFF9F43),
+      SkillName.vision => const Color(0xFFB78BFA),
     };
     return Container(
       margin: const EdgeInsets.only(bottom: 9),
