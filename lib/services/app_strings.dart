@@ -367,6 +367,7 @@ class AppStrings {
 
 
   // Super League
+  static String get progress => _en ? 'PROGRESS' : 'ПРОГРЕСС';
   static String get superLeague => _en ? 'SUPER LEAGUE' : 'СУПЕРЛИГА';
   static String get superLeagueName => _en ? 'Super League' : 'Суперлига';
   static String get superLeagueDescription => _en
