@@ -143,7 +143,7 @@ class _SuperLeagueDevelopmentScreenState
           automaticallyImplyLeading: false,
           backgroundColor: const Color.fromARGB(82, 81, 84, 82),
           foregroundColor: Colors.white,
-          title: const Text(
+          title: Text(
             AppStrings.developmentScreenTitle,
             style: TextStyle(fontWeight: FontWeight.w900),
           ),
@@ -297,7 +297,7 @@ class _SuperLeagueDevelopmentScreenState
                     ),
                   ),
                   const SizedBox(height: 18),
-                  const Text(
+                  Text(
                     AppStrings.skillsUpper,
                     style: TextStyle(
                       color: Colors.white,
@@ -335,7 +335,7 @@ class _SuperLeagueDevelopmentScreenState
                         foregroundColor: Colors.white,
                         side: const BorderSide(color: Color(0xFF3C884A)),
                       ),
-                      child: const Text(
+                      child: Text(
                         AppStrings.continueToTransfers,
                         style: TextStyle(fontWeight: FontWeight.w900),
                       ),
