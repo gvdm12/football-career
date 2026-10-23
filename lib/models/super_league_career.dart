@@ -278,38 +278,7 @@ class SuperLeagueCareer {
       final difference = homeClub.strength - awayClub.strength;
       final homeGoals = _goalsFor(1.35 + difference * 0.035 + 0.18, random);
       final awayGoals = _goalsFor(1.10 - difference * 0.035, random);
-      final playerClubGoals = fixture.homeTeam == player.club ? homeGoals : awayGoals;
-      final played = random.nextDouble() < 0.96;
-      var playerGoals = 0;
-      var playerAssists = 0;
-      var rating = 0.0;
-      if (played) {
-        final positionGoalChance = player.position == PlayerPosition.forward
-            ? 0.48
-            : player.position == PlayerPosition.midfielder
-                ? 0.25
-                : player.position == PlayerPosition.defender
-                    ? 0.10
-                    : 0.02;
-        for (var i = 0; i < playerClubGoals; i++) {
-          if (random.nextDouble() < positionGoalChance) {
-            playerGoals++;
-          } else if (random.nextDouble() < 0.58) {
-            playerAssists++;
-          }
-        }
-        playerAssists = min(playerAssists, playerClubGoals - playerGoals);
-        rating = (6.2 + random.nextDouble() * 1.5 + playerGoals * 0.55 + playerAssists * 0.25)
-            .clamp(5.5, 10.0).toDouble();
-      }
-      return fixture.copyWith(
-        homeGoals: homeGoals,
-        awayGoals: awayGoals,
-        playerGoals: playerGoals,
-        playerAssists: playerAssists,
-        playerRating: rating,
-        playerPlayed: played,
-      );
+      return fixture.copyWith(homeGoals: homeGoals, awayGoals: awayGoals);
     }).toList();
 
     return SuperLeagueCareer(
@@ -318,6 +287,7 @@ class SuperLeagueCareer {
       fixtures: updatedFixtures,
       developmentPoints: developmentPoints,
       developmentPointsAwardedSeason: developmentPointsAwardedSeason,
+      championSeasons: championSeasons,
     );
   }
 
