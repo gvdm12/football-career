@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/models/super_league_career.dart';
 
 class SuperLeagueEndScreen extends StatelessWidget {
@@ -40,7 +41,7 @@ class SuperLeagueEndScreen extends StatelessWidget {
         backgroundColor: const Color(0xFF0B3A1A),
         foregroundColor: Colors.white,
         title: const Text(
-          'ИТОГИ КАРЬЕРЫ',
+          AppStrings.careerEndTitle.toUpperCase(),
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w900,
@@ -70,7 +71,7 @@ class SuperLeagueEndScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 const Text(
-                  'КАРЬЕРА СУПЕРЛИГИ ЗАВЕРШЕНА!',
+                  AppStrings.superLeagueCareerFinished,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
@@ -80,7 +81,7 @@ class SuperLeagueEndScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  '${career.player.name} прошёл все 10 сезонов',
+                  AppStrings.superLeagueSeasonsComplete(career.player.name),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Colors.white,
@@ -89,32 +90,32 @@ class SuperLeagueEndScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                _section('ОБЩАЯ СТАТИСТИКА', [
-                  _stat('Сыграно матчей', '$totalMatches'),
-                  _stat('Забито голов', '$totalGoals'),
-                  _stat('Голевых передач', '$totalAssists'),
+                _section(AppStrings.overallStatistics.toUpperCase(), [
+                  _stat(AppStrings.totalMatchesPlayed, '$totalMatches'),
+                  _stat(AppStrings.totalGoalsScored, '$totalGoals'),
+                  _stat(AppStrings.totalAssistsMade, '$totalAssists'),
                   _stat(
-                    'Средняя оценка',
+                    AppStrings.averageSeasonRating,
                     averageRating == 0 ? '—' : averageRating.toStringAsFixed(2),
                   ),
                 ]),
                 const SizedBox(height: 8),
-                _section('🏆 ТРОФЕИ СУПЕРЛИГИ', [
-                  _stat('Всего чемпионских титулов', '$titles'),
+                _section('🏆 ' + AppStrings.superLeagueTrophies, [
+                  _stat(AppStrings.totalTrophies, '$titles'),
                 ]),
                 const SizedBox(height: 8),
-                _section('КЛУБЫ ЗА КАРЬЕРУ', [
-                  if (clubs.isEmpty) _stat('Клуб', career.player.club),
+                _section(AppStrings.careerClubs.toUpperCase(), [
+                  if (clubs.isEmpty) _stat(AppStrings.club, career.player.club),
                   ...clubs.asMap().entries.map(
-                    (entry) => _stat('Клуб ${entry.key + 1}', entry.value),
+                    (entry) => _stat(AppStrings.clubNumber(entry.key + 1), entry.value),
                   ),
                 ]),
                 const SizedBox(height: 8),
-                _section('ИСТОРИЯ СЕЗОНОВ', [
+                _section(AppStrings.seasonHistory.toUpperCase(), [
                   ...career.history.reversed.map(
                     (item) => _stat(
-                      'Сезон ${item.season} • ${item.club}${item.champion ? ' 🏆' : ''}',
-                      '${item.matches} матч.  •  ${item.goals} гол.  •  ${item.assists} асс.',
+                      '${AppStrings.seasonNumber(item.season)} • ${item.club}${item.champion ? ' 🏆' : ''}',
+                      AppStrings.seasonSummaryStats(item.matches, item.goals, item.assists),
                     ),
                   ),
                 ]),
@@ -128,7 +129,7 @@ class SuperLeagueEndScreen extends StatelessWidget {
                       foregroundColor: const Color(0xFF082A12),
                     ),
                     child: const Text(
-                      'ВЕРНУТЬСЯ',
+                      AppStrings.returnButton,
                       style: TextStyle(fontWeight: FontWeight.w900),
                     ),
                   ),
