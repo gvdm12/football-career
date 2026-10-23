@@ -156,6 +156,23 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                 ClipRRect(borderRadius: BorderRadius.circular(8), child: LinearProgressIndicator(
                   value: played / total, minHeight: 8, backgroundColor: const Color(0xFF12381B),
                   valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8BE07F)))),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                  decoration: BoxDecoration(
+                    color: const Color(0x24FFC857),
+                    borderRadius: BorderRadius.circular(11),
+                    border: Border.all(color: const Color(0x66FFC857)),
+                  ),
+                  child: Row(children: [
+                    Image.asset('assets/icons/cup.png', width: 25, height: 25, fit: BoxFit.contain),
+                    const SizedBox(width: 9),
+                    const Expanded(child: Text('ТРОФЕИ СУПЕРЛИГИ',
+                      style: TextStyle(color: Color(0xFFFFD778), fontSize: 11, fontWeight: FontWeight.w900))),
+                    Text('${_career.championSeasons.length}',
+                      style: const TextStyle(color: Color(0xFFFFD778), fontSize: 20, fontWeight: FontWeight.w900)),
+                  ]),
+                ),
               ]),
             ),
             const SizedBox(height: 18),
