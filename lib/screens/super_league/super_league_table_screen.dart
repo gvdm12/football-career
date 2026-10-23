@@ -34,7 +34,7 @@ class SuperLeagueTableScreen extends StatelessWidget {
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF0B3A1A), Color(0xFF082A12), Color(0xFF04160A)],
+                  colors: [Color(0xFF0B3A1A), Colors.black, Color(0xFF04160A)],
                   begin: Alignment.topLeft, end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(16),
@@ -69,7 +69,7 @@ class SuperLeagueTableScreen extends StatelessWidget {
   Widget _buildHeader() => Container(
     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
     decoration: BoxDecoration(
-      color: const Color(0xFF8BE07F),
+      color: const Color.fromARGB(255, 215, 219, 6),
       borderRadius: BorderRadius.circular(16),
       border: Border.all(color: const Color(0xFF14401E)),
     ),
