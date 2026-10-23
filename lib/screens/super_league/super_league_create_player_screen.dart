@@ -183,18 +183,13 @@ class _SuperLeagueCreatePlayerScreenState
               ),
             ),
             const SizedBox(height: 5),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 2),
-              child: Text(
-                fullName,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 9,
-                  fontWeight: FontWeight.w600,
-                ),
+            Text(
+              fullName,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 9,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -353,19 +348,26 @@ class _SuperLeagueCreatePlayerScreenState
                   fullName: 'Нападающий',
                   position: PlayerPosition.forward,
                 ),
-                const SizedBox(width: 10),
                 _buildPositionButton(
                   shortName: 'CM',
                   fullName: 'Полузащитник',
                   position: PlayerPosition.midfielder,
                 ),
-                const SizedBox(width: 10),
                 _buildPositionButton(
                   shortName: 'CB',
                   fullName: 'Защитник',
                   position: PlayerPosition.defender,
                 ),
-              ].map((button) => Expanded(child: button)).toList(),
+              ]
+                  .map(
+                    (button) => Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: button,
+                      ),
+                    ),
+                  )
+                  .toList(),
             ),
             const SizedBox(height: 22),
             const Text(

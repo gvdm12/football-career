@@ -1,0 +1,53 @@
+[1mdiff --git a/lib/screens/super_league/super_league_create_player_screen.dart b/lib/screens/super_league/super_league_create_player_screen.dart[m
+[1mindex a650051..1341d93 100644[m
+[1m--- a/lib/screens/super_league/super_league_create_player_screen.dart[m
+[1m+++ b/lib/screens/super_league/super_league_create_player_screen.dart[m
+[36m@@ -152,12 +152,21 @@[m [mclass _SuperLeagueCreatePlayerScreenState[m
+                       fontWeight: FontWeight.w900,[m
+                     ),[m
+                   ),[m
+[32m+[m[32m                  SizedBox(width: 5),[m
+[32m+[m[32m                  Text([m
+[32m+[m[32m                    'ovr',[m
+[32m+[m[32m                    style: TextStyle([m
+[32m+[m[32m                      color: const Color.fromARGB(255, 150, 161, 154),[m
+[32m+[m[32m                      fontSize: 12,[m
+[32m+[m[32m                      fontWeight: FontWeight.w900,[m
+[32m+[m[32m                    ),[m
+[32m+[m[32m                  ),[m
+                 ],[m
+               ),[m
+             ),[m
+             const SizedBox(height: 26),[m
+             const Text([m
+[31m-              'ИМЯ ФУТБОЛИСТА',[m
+[32m+[m[32m              'ИМЯ',[m
+               style: TextStyle([m
+                 color: Color(0xFF8BE07F),[m
+                 fontSize: 12,[m
+[36m@@ -220,7 +229,7 @@[m [mclass _SuperLeagueCreatePlayerScreenState[m
+             ),[m
+             const SizedBox(height: 22),[m
+             const Text([m
+[31m-              'НАЦИОНАЛЬНОСТЬ',[m
+[32m+[m[32m              'СТРАНА',[m
+               style: TextStyle([m
+                 color: Color(0xFF8BE07F),[m
+                 fontSize: 12,[m
+[36m@@ -246,10 +255,12 @@[m [mclass _SuperLeagueCreatePlayerScreenState[m
+                 ),[m
+               ),[m
+               items: _nationalities[m
+[31m-                  .map((nationality) => DropdownMenuItem([m
+[31m-                        value: nationality,[m
+[31m-                        child: Text(nationality),[m
+[31m-                      ))[m
+[32m+[m[32m                  .map([m
+[32m+[m[32m                    (nationality) => DropdownMenuItem([m
+[32m+[m[32m                      value: nationality,[m
+[32m+[m[32m                      child: Text(nationality),[m
+[32m+[m[32m                    ),[m
+[32m+[m[32m                  )[m
+                   .toList(),[m
+               onChanged: (value) {[m
+                 if (value != null) setState(() => _nationality = value);[m

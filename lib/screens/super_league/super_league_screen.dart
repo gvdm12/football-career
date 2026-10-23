@@ -96,7 +96,7 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
               child: ListView.separated(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
                 itemCount: _clubs.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 8),
+                separatorBuilder: (_, _) => const SizedBox(height: 8),
                 itemBuilder: (context, index) {
                   final club = _clubs[index];
                   final selected = club.name == _selectedClubName;
@@ -119,9 +119,7 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: selected
-                                ? _green
-                                : const Color(0xFF174324),
+                            color: selected ? _green : const Color(0xFF174324),
                           ),
                         ),
                         child: Row(
@@ -131,13 +129,17 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                               height: 42,
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
-                                color: club.primaryColor.withValues(alpha: 0.25),
+                                color: club.primaryColor.withValues(
+                                  alpha: 0.25,
+                                ),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
                                 club.name
                                     .split(' ')
-                                    .map((part) => part.isNotEmpty ? part[0] : '')
+                                    .map(
+                                      (part) => part.isNotEmpty ? part[0] : '',
+                                    )
                                     .take(2)
                                     .join()
                                     .toUpperCase(),
@@ -165,7 +167,9 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                                   Text(
                                     club.league.countryName,
                                     style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.58),
+                                      color: Colors.white.withValues(
+                                        alpha: 0.58,
+                                      ),
                                       fontSize: 12,
                                     ),
                                   ),
