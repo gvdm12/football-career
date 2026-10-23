@@ -1,19 +1,88 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_football/models/player.dart';
+import 'package:flutter_football/screens/super_league/super_league_career_screen.dart';
 import 'package:flutter_football/screens/super_league/super_league_club_selection_screen.dart';
+import 'package:flutter_football/services/super_league_storage.dart';
 
-class SuperLeagueScreen extends StatelessWidget {
+class SuperLeagueScreen extends StatefulWidget {
   const SuperLeagueScreen({super.key});
 
+  @override
+  State<SuperLeagueScreen> createState() => _SuperLeagueScreenState();
+}
+
+class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
   static const Color _green = Color(0xFF22C55E);
   static const Color _background = Color(0xFF061B0C);
 
-  void _startNewGame(BuildContext context) {
+  bool _isCheckingSave = true;
+  bool _hasSavedCareer = false;
+  bool _isOpeningCareer = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSavedCareer();
+  }
+
+  Future<void> _checkSavedCareer() async {
+    try {
+      final hasSave = await SuperLeagueStorage.hasSavedCareer();
+      if (!mounted) return;
+      setState(() {
+        _hasSavedCareer = hasSave;
+        _isCheckingSave = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _hasSavedCareer = false;
+        _isCheckingSave = false;
+      });
+    }
+  }
+
+  void _startNewGame() {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => const SuperLeagueClubSelectionScreen(),
       ),
-    );
+    ).then((_) => _checkSavedCareer());
+  }
+
+  Future<void> _continueCareer() async {
+    if (_isOpeningCareer || !_hasSavedCareer) return;
+
+    setState(() => _isOpeningCareer = true);
+    try {
+      final Player? player = await SuperLeagueStorage.loadPlayer();
+      if (!mounted) return;
+
+      if (player == null) {
+        setState(() {
+          _hasSavedCareer = false;
+          _isOpeningCareer = false;
+        });
+        return;
+      }
+
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => SuperLeagueCareerScreen(player: player),
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Не удалось загрузить сохранение Суперлиги.'),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isOpeningCareer = false);
+    }
   }
 
   @override
@@ -124,7 +193,7 @@ class SuperLeagueScreen extends StatelessWidget {
             SizedBox(
               height: 58,
               child: ElevatedButton.icon(
-                onPressed: () => _startNewGame(context),
+                onPressed: _startNewGame,
                 icon: const Icon(Icons.add_circle_outline_rounded),
                 label: const Text(
                   'НОВАЯ ИГРА',
@@ -146,11 +215,26 @@ class SuperLeagueScreen extends StatelessWidget {
             SizedBox(
               height: 58,
               child: OutlinedButton.icon(
-                onPressed: null,
-                icon: const Icon(Icons.play_circle_outline_rounded),
-                label: const Text(
-                  'ПРОДОЛЖИТЬ',
-                  style: TextStyle(
+                onPressed: _isCheckingSave || !_hasSavedCareer || _isOpeningCareer
+                    ? null
+                    : _continueCareer,
+                icon: _isOpeningCareer
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white70,
+                        ),
+                      )
+                    : const Icon(Icons.play_circle_outline_rounded),
+                label: Text(
+                  _isCheckingSave
+                      ? 'ПРОВЕРКА СОХРАНЕНИЯ'
+                      : _hasSavedCareer
+                          ? 'ПРОДОЛЖИТЬ'
+                          : 'НЕТ СОХРАНЕНИЯ',
+                  style: const TextStyle(
                     fontWeight: FontWeight.w900,
                     letterSpacing: 1.1,
                   ),
@@ -165,11 +249,17 @@ class SuperLeagueScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            const Text(
-              'Продолжение станет доступно, когда будет подключено '
-              'сохранение карьеры Суперлиги.',
+            Text(
+              _hasSavedCareer
+                  ? 'Найдено сохранение Суперлиги.'
+                  : 'Создай игрока, чтобы начать карьеру. '
+                      'После сохранения здесь появится возможность продолжить.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white54, fontSize: 12, height: 1.4),
+              style: const TextStyle(
+                color: Colors.white54,
+                fontSize: 12,
+                height: 1.4,
+              ),
             ),
           ],
         ),
