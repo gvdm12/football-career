@@ -248,7 +248,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'PROGRESS',
+                          AppStrings.progress,
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w900,
