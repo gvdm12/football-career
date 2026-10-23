@@ -75,7 +75,7 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Не удалось загрузить сохранение Суперлиги.'),
+          content: Text(AppStrings.superLeagueSaveError),
         ),
       );
     } finally {
@@ -91,7 +91,7 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
         backgroundColor: const Color.fromARGB(82, 81, 84, 82),
         foregroundColor: Colors.white,
         title: const Text(
-          'СУПЕРЛИГА',
+          AppStrings.superLeague,
           style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2),
         ),
       ),
@@ -150,8 +150,8 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                       //   ),
                       // ),
                       // const SizedBox(height: 8),
-                      const Text(
-                        'Суперлига',
+                      Text(
+                        AppStrings.superLeagueName,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 30,
@@ -160,9 +160,7 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'Выбери один из 20 топ-клубов, создай футболиста '
-                        'с рейтингом 75 и постарайся привести свою команду '
-                        'к чемпионству. Тебя ждут 10 сезонов борьбы за титулы.',
+                        AppStrings.superLeagueDescription,
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.78),
                           height: 1.5,
@@ -173,15 +171,15 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                       const Row(
                         children: [
                           Expanded(
-                            child: _ModeStat(value: '20', label: 'КЛУБОВ'),
+                            child: _ModeStat(value: '20', label: AppStrings.clubsUpper),
                           ),
                           SizedBox(width: 10),
                           Expanded(
-                            child: _ModeStat(value: '10', label: 'СЕЗОНОВ'),
+                            child: _ModeStat(value: '10', label: AppStrings.seasonsUpper),
                           ),
                           SizedBox(width: 10),
                           Expanded(
-                            child: _ModeStat(value: '75', label: 'РЕЙТИНГ'),
+                            child: _ModeStat(value: '75', label: AppStrings.overallUpper),
                           ),
                         ],
                       ),
@@ -195,7 +193,7 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                     onPressed: _startNewGame,
                     icon: const Icon(Icons.add_circle_outline_rounded),
                     label: const Text(
-                      'НОВАЯ ИГРА',
+                      AppStrings.newGame,
                       style: TextStyle(
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.1,
@@ -230,10 +228,10 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                         : const Icon(Icons.play_circle_outline_rounded),
                     label: Text(
                       _isCheckingSave
-                          ? 'ПРОВЕРКА СОХРАНЕНИЯ'
+                          ? AppStrings.checkingSave
                           : _hasSavedCareer
                           ? 'ПРОДОЛЖИТЬ'
-                          : 'НЕТ СОХРАНЕНИЯ',
+                          : AppStrings.noSave,
                       style: const TextStyle(
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.1,
