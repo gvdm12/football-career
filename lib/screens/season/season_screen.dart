@@ -285,25 +285,25 @@ class _SeasonScreenState extends State<SeasonScreen> {
         : Colors.redAccent;
 
     final matchTitle = match.stage == ChampionsLeagueStage.finalMatch
-        ? 'Финал'
+        ? AppStrings.finalStage
         : match.leg == 1
-        ? 'Первый матч'
-        : 'Ответный матч';
+        ? AppStrings.firstLegLabel
+        : AppStrings.secondLegLabel;
 
     final score = hasPenalties
         ? '$playerGoals : $opponentGoals '
-              '(пен. $playerPenalties:$opponentPenalties)'
+              '${AppStrings.penaltiesShort} $playerPenalties:$opponentPenalties'
         : '$playerGoals : $opponentGoals';
 
     String? outcomeLabel;
 
     if (match.stage == ChampionsLeagueStage.finalMatch &&
         match.winner != null) {
-      outcomeLabel = AppStrings.tournamentWinner(match.winner);
+      outcomeLabel = AppStrings.tournamentWinner(match.winner!);
     } else if (match.leg == 2 && match.winner != null) {
       outcomeLabel = match.winner == club
-          ? 'Вы прошли дальше'
-          : '${match.winner} прошёл дальше';
+          ? AppStrings.advancedToNextRound
+          : AppStrings.winnerAdvancedToNextRound(match.winner!);
     }
 
     return Container(
