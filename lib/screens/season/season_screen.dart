@@ -522,7 +522,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
     if (match.homeTeam != expectedHomeTeam ||
         match.awayTeam != expectedAwayTeam) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(AppStrings.matchCalendarError),
         ),
       );
