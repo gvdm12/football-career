@@ -27,8 +27,17 @@ class _SuperLeagueCreatePlayerScreenState
   @override
   void initState() {
     super.initState();
-    _previewSkills = PlayerSkills.initial(_position);
+    _previewSkills = _startingSkills();
   }
+
+  PlayerSkills _startingSkills() => const PlayerSkills(
+    pace: 75,
+    physical: 75,
+    passing: 75,
+    shooting: 75,
+    defending: 75,
+    dribbling: 75,
+  );
 
   int get _previewOverall => calculateOverall(
     skills: _previewSkills,
@@ -174,7 +183,7 @@ class _SuperLeagueCreatePlayerScreenState
     return GestureDetector(
       onTap: () => setState(() {
         _position = position;
-        _previewSkills = PlayerSkills.initial(position);
+        _previewSkills = _startingSkills();
       }),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
@@ -482,7 +491,7 @@ class _SuperLeagueCreatePlayerScreenState
             ),
             const SizedBox(height: 10),
             const Text(
-              'Начальный рейтинг рассчитывается по навыкам выбранной позиции',
+              'Начальный рейтинг: 75 • все навыки соответствуют рейтингу',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white54, fontSize: 12),
             ),
