@@ -298,7 +298,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                                           color: Colors.white,
                                         ),
                                         const SizedBox(width: 6),
-                                        const Text(
+                                        Text(
                                           AppStrings.superLeague,
                                           style: TextStyle(
                                             color: Colors.white,
@@ -400,7 +400,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           AppStrings.seasonStatisticsUpper,
                           style: TextStyle(
                             color: Colors.white,
@@ -449,7 +449,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                       child: ElevatedButton.icon(
                         onPressed: () =>
                             setState(() => _showLastResult = false),
-                        label: const Text(
+                        label: Text(
                           AppStrings.nextMatchUpper,
                           style: TextStyle(
                             fontWeight: FontWeight.w900,
@@ -516,7 +516,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                                 ),
                               ),
                             ],
-                            const Text(
+                            Text(
                               AppStrings.seasonCompleted,
                               style: TextStyle(
                                 color: Colors.white,
@@ -525,7 +525,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                               ),
                             ),
                             const SizedBox(height: 6),
-                            const Text(
+                            Text(
                               AppStrings.allTeamMatchesPlayed,
                               style: TextStyle(color: Colors.white70),
                             ),
@@ -544,7 +544,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                                           BorderRadiusGeometry.circular(10),
                                     ),
                                   ),
-                                  child: const Text(
+                                  child: Text(
                                     AppStrings.nextSeasonUpper,
                                     style: TextStyle(
                                       fontWeight: FontWeight.w900,
@@ -555,7 +555,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                               ),
                             ] else ...[
                               const SizedBox(height: 12),
-                              const Text(
+                              Text(
                                 AppStrings.superLeagueCareerCompleteMessage,
                                 style: TextStyle(
                                   color: Color(0xFF8BE07F),
@@ -572,7 +572,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                                     backgroundColor: _green,
                                     foregroundColor: const Color(0xFF082A12),
                                   ),
-                                  child: const Text(
+                                  child: Text(
                                     AppStrings.viewCareerSummary,
                                     style: TextStyle(
                                       fontWeight: FontWeight.w900,
@@ -857,7 +857,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
       ),
       child: Column(
         children: [
-          const Text(
+          Text(
             AppStrings.matchResultUpper,
             style: TextStyle(
               color: Color.fromARGB(255, 255, 255, 255),
