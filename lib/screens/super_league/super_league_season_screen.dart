@@ -279,6 +279,9 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
 
   Widget _resultCard(SuperLeagueFixture fixture) {
     final isHome = fixture.homeTeam == _career.player.club;
+    final playerGoals = isHome ? fixture.homeGoals! : fixture.awayGoals!;
+    final opponentGoals = isHome ? fixture.awayGoals! : fixture.homeGoals!;
+    final resultLabel = playerGoals > opponentGoals ? 'ПОБЕДА' : playerGoals < opponentGoals ? 'ПОРАЖЕНИЕ' : 'НИЧЬЯ';
     final rating = fixture.playerPlayed ? fixture.playerRating.toStringAsFixed(1) : '—';
     return Container(
       padding: const EdgeInsets.all(18),
