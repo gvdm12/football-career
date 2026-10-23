@@ -39,12 +39,12 @@ class _SuperLeagueTransfersScreenState extends State<SuperLeagueTransfersScreen>
       _career.player.overall * 120).round();
 
   void _accept(Club club) {
-    final next = _career.nextSeason(newClub: club.name);
+    final next = _career.copyWith(player: _career.player.copyWith(club: club.name));
     Navigator.pop(context, next);
   }
 
   void _stay() {
-    Navigator.pop(context, _career.nextSeason());
+    Navigator.pop(context, _career);
   }
 
   @override
