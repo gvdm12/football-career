@@ -6,18 +6,24 @@ class SuperLeagueEndScreen extends StatelessWidget {
 
   const SuperLeagueEndScreen({super.key, required this.career});
 
-  int get totalMatches => career.history.fold(0, (sum, item) => sum + item.matches);
+  int get totalMatches =>
+      career.history.fold(0, (sum, item) => sum + item.matches);
   int get totalGoals => career.history.fold(0, (sum, item) => sum + item.goals);
-  int get totalAssists => career.history.fold(0, (sum, item) => sum + item.assists);
+  int get totalAssists =>
+      career.history.fold(0, (sum, item) => sum + item.assists);
   int get titles => career.history.where((item) => item.champion).length;
 
   double get averageRating {
-    final matches = career.history.fold<int>(0, (sum, item) => sum + item.matches);
+    final matches = career.history.fold<int>(
+      0,
+      (sum, item) => sum + item.matches,
+    );
     if (matches == 0) return 0;
     return career.history.fold<double>(
-      0,
-      (sum, item) => sum + item.averageRating * item.matches,
-    ) / matches;
+          0,
+          (sum, item) => sum + item.averageRating * item.matches,
+        ) /
+        matches;
   }
 
   @override
@@ -33,58 +39,86 @@ class SuperLeagueEndScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFF0B3A1A),
         foregroundColor: Colors.white,
-        title: const Text('ИТОГИ КАРЬЕРЫ'),
+        title: const Text(
+          'ИТОГИ КАРЬЕРЫ',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w900,
+            color: Color.fromARGB(255, 205, 246, 2),
+          ),
+        ),
       ),
       body: Stack(
         children: [
           Positioned.fill(
             child: Opacity(
               opacity: 0.20,
-              child: Image.asset('assets/images/careerend.png', fit: BoxFit.cover),
+              child: Image.asset(
+                'assets/images/careerend.png',
+                fit: BoxFit.cover,
+              ),
             ),
           ),
           SafeArea(
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                const Icon(Icons.emoji_events_rounded, size: 76, color: Color(0xFFFFC857)),
+                const Icon(
+                  Icons.emoji_events_rounded,
+                  size: 60,
+                  color: Color(0xFFFFC857),
+                ),
                 const SizedBox(height: 12),
                 const Text(
                   'КАРЬЕРА СУПЕРЛИГИ ЗАВЕРШЕНА!',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   '${career.player.name} прошёл все 10 сезонов',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 8),
                 _section('ОБЩАЯ СТАТИСТИКА', [
                   _stat('Сыграно матчей', '$totalMatches'),
                   _stat('Забито голов', '$totalGoals'),
                   _stat('Голевых передач', '$totalAssists'),
-                  _stat('Средняя оценка', averageRating == 0 ? '—' : averageRating.toStringAsFixed(2)),
+                  _stat(
+                    'Средняя оценка',
+                    averageRating == 0 ? '—' : averageRating.toStringAsFixed(2),
+                  ),
                 ]),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 _section('🏆 ТРОФЕИ СУПЕРЛИГИ', [
                   _stat('Всего чемпионских титулов', '$titles'),
-                  _stat('Сезонов завершено', '${career.history.length} / 10'),
                 ]),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 _section('КЛУБЫ ЗА КАРЬЕРУ', [
                   if (clubs.isEmpty) _stat('Клуб', career.player.club),
-                  ...clubs.asMap().entries.map((entry) => _stat('Клуб ${entry.key + 1}', entry.value)),
+                  ...clubs.asMap().entries.map(
+                    (entry) => _stat('Клуб ${entry.key + 1}', entry.value),
+                  ),
                 ]),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 _section('ИСТОРИЯ СЕЗОНОВ', [
-                  ...career.history.reversed.map((item) => _stat(
-                    'Сезон ${item.season} • ${item.club}${item.champion ? ' 🏆' : ''}',
-                    '${item.matches} матч.  •  ${item.goals} гол.  •  ${item.assists} асс.',
-                  )),
+                  ...career.history.reversed.map(
+                    (item) => _stat(
+                      'Сезон ${item.season} • ${item.club}${item.champion ? ' 🏆' : ''}',
+                      '${item.matches} матч.  •  ${item.goals} гол.  •  ${item.assists} асс.',
+                    ),
+                  ),
                 ]),
-                const SizedBox(height: 24),
+                const SizedBox(height: 10),
                 SizedBox(
                   height: 52,
                   child: ElevatedButton(
@@ -93,7 +127,10 @@ class SuperLeagueEndScreen extends StatelessWidget {
                       backgroundColor: const Color(0xFF8BE07F),
                       foregroundColor: const Color(0xFF082A12),
                     ),
-                    child: const Text('ВЕРНУТЬСЯ', style: TextStyle(fontWeight: FontWeight.w900)),
+                    child: const Text(
+                      'ВЕРНУТЬСЯ',
+                      style: TextStyle(fontWeight: FontWeight.w900),
+                    ),
                   ),
                 ),
               ],
@@ -114,7 +151,14 @@ class SuperLeagueEndScreen extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w900)),
+        Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
         const SizedBox(height: 10),
         ...children,
       ],
@@ -126,11 +170,20 @@ class SuperLeagueEndScreen extends StatelessWidget {
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: Text(label, style: const TextStyle(color: Colors.white70))),
+        Expanded(
+          child: Text(label, style: const TextStyle(color: Colors.white70)),
+        ),
         const SizedBox(width: 16),
         Flexible(
-          child: Text(value, textAlign: TextAlign.end,
-            style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ),
       ],
     ),

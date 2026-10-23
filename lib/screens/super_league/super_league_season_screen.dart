@@ -142,7 +142,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                   builder: (_) => SuperLeagueTableScreen(career: _career),
                 ),
               ),
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 9, vertical: 5),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -183,14 +183,14 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                   children: [
                     Icon(
                       Icons.calendar_month_rounded,
-                      color: Color(0xFF8BE07F),
-                      size: 23,
+                      color: Color.fromARGB(255, 255, 255, 255),
+                      size: 32,
                     ),
                     SizedBox(height: 2),
                     Text(
                       'КАЛЕНДАРЬ',
                       style: TextStyle(
-                        color: Color(0xFF8BE07F),
+                        color: Color.fromARGB(255, 255, 255, 255),
                         fontSize: 8,
                         fontWeight: FontWeight.w800,
                       ),

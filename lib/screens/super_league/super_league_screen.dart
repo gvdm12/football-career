@@ -173,27 +173,15 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                       const Row(
                         children: [
                           Expanded(
-                            child: _ModeStat(
-                              icon: Icons.groups_rounded,
-                              value: '20',
-                              label: 'КЛУБОВ',
-                            ),
+                            child: _ModeStat(value: '20', label: 'КЛУБОВ'),
                           ),
                           SizedBox(width: 10),
                           Expanded(
-                            child: _ModeStat(
-                              icon: Icons.calendar_month_rounded,
-                              value: '10',
-                              label: 'СЕЗОНОВ',
-                            ),
+                            child: _ModeStat(value: '10', label: 'СЕЗОНОВ'),
                           ),
                           SizedBox(width: 10),
                           Expanded(
-                            child: _ModeStat(
-                              icon: Icons.trending_up_rounded,
-                              value: '75',
-                              label: 'РЕЙТИНГ',
-                            ),
+                            child: _ModeStat(value: '75', label: 'РЕЙТИНГ'),
                           ),
                         ],
                       ),
@@ -252,8 +240,15 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                       ),
                     ),
                     style: OutlinedButton.styleFrom(
-                      disabledForegroundColor: Colors.white38,
+                      disabledForegroundColor: const Color.fromARGB(
+                        250,
+                        255,
+                        255,
+                        255,
+                      ),
+                      backgroundColor: const Color.fromARGB(187, 85, 82, 82),
                       side: const BorderSide(color: Color(0xFF285135)),
+                      foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -283,15 +278,10 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
 }
 
 class _ModeStat extends StatelessWidget {
-  final IconData icon;
   final String value;
   final String label;
 
-  const _ModeStat({
-    required this.icon,
-    required this.value,
-    required this.label,
-  });
+  const _ModeStat({required this.value, required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -304,7 +294,6 @@ class _ModeStat extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(icon, color: const Color(0xFF8BE07F), size: 18),
           const SizedBox(height: 7),
           Text(
             value,
