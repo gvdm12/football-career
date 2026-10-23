@@ -145,132 +145,353 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                 color: Colors.white,
               ),
             ),
-<<<<<<< Updated upstream
             const SizedBox(height: 18),
-            _panelCard(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('СТАТИСТИКА СЕЗОНА', style: TextStyle(
-                color: Colors.white, fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1)),
-              const SizedBox(height: 14),
-              Row(children: [
-                Expanded(child: _seasonStat('Матчи', '${_career.playedMatches}')),
-                Expanded(child: _seasonStat('Голы', '${_career.goals}')),
-                Expanded(child: _seasonStat('Ассисты', '${_career.assists}')),
-                Expanded(child: _seasonStat('Оценка', _career.averageRating == 0 ? '—' : _career.averageRating.toStringAsFixed(1))),
-              ]),
-            ])),
+            _panelCard(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'СТАТИСТИКА СЕЗОНА',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _seasonStat('Матчи', '${_career.playedMatches}'),
+                      ),
+                      Expanded(child: _seasonStat('Голы', '${_career.goals}')),
+                      Expanded(
+                        child: _seasonStat('Ассисты', '${_career.assists}'),
+                      ),
+                      Expanded(
+                        child: _seasonStat(
+                          'Оценка',
+                          _career.averageRating == 0
+                              ? '—'
+                              : _career.averageRating.toStringAsFixed(1),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(height: 18),
             if (showResult) ...[
               _resultCard(_lastPlayedFixture!),
               const SizedBox(height: 12),
-              SizedBox(height: 50, child: ElevatedButton.icon(
-                onPressed: () => setState(() => _showLastResult = false),
-                icon: const Icon(Icons.skip_next_rounded),
-                label: const Text('СЛЕДУЮЩИЙ МАТЧ', style: TextStyle(fontWeight: FontWeight.w900)),
-                style: ElevatedButton.styleFrom(backgroundColor: _green, foregroundColor: const Color(0xFF082A12)),
-              )),
-            ] else ...[
-            const Text('СЛЕДУЮЩИЙ МАТЧ', style: TextStyle(
-              color: Color(0xFF8BE07F), fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.1)),
-            const SizedBox(height: 10),
-            if (next == null)
-              _panelCard(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                if (isChampion) ...[
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    margin: const EdgeInsets.only(bottom: 14),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: [Color(0xFF5A3B0A), Color(0xFF211707)]),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFFFC857)),
-                    ),
-                    child: const Column(children: [
-                      Icon(Icons.emoji_events_rounded, color: Color(0xFFFFC857), size: 48),
-                      SizedBox(height: 8),
-                      Text('ЧЕМПИОН СУПЕРЛИГИ!', textAlign: TextAlign.center,
-                        style: TextStyle(color: Color(0xFFFFD778), fontSize: 18, fontWeight: FontWeight.w900)),
-                      SizedBox(height: 4),
-                      Text('Трофей добавлен в достижения карьеры', textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white70, fontSize: 12)),
-                    ]),
+              SizedBox(
+                height: 50,
+                child: ElevatedButton.icon(
+                  onPressed: () => setState(() => _showLastResult = false),
+                  icon: const Icon(Icons.skip_next_rounded),
+                  label: const Text(
+                    'СЛЕДУЮЩИЙ МАТЧ',
+                    style: TextStyle(fontWeight: FontWeight.w900),
                   ),
-                ],
-                const Text('Сезон завершён!', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
-                const SizedBox(height: 6),
-                const Text('Все матчи твоей команды сыграны.', style: TextStyle(color: Colors.white70)),
-                if (_career.season < 10) ...[
-                  const SizedBox(height: 16),
-                  SizedBox(width: double.infinity, height: 48, child: ElevatedButton(
-                    onPressed: _startNextSeason,
-                    style: ElevatedButton.styleFrom(backgroundColor: _green, foregroundColor: Colors.white),
-                    child: const Text('НАЧАТЬ СЛЕДУЮЩИЙ СЕЗОН', style: TextStyle(fontWeight: FontWeight.w900)),
-                  )),
-                ] else ...[
-                  const SizedBox(height: 12),
-                  const Text('Карьера Суперлиги завершена! Ты прошёл все 10 сезонов.',
-                    style: TextStyle(color: Color(0xFF8BE07F), fontWeight: FontWeight.w800)),
-                  const SizedBox(height: 16),
-                  SizedBox(width: double.infinity, height: 48, child: ElevatedButton(
-                    onPressed: _isPlaying ? null : _finishCareer,
-                    style: ElevatedButton.styleFrom(backgroundColor: _green, foregroundColor: Colors.white),
-                    child: const Text('ПОСМОТРЕТЬ ИТОГИ КАРЬЕРЫ', style: TextStyle(fontWeight: FontWeight.w900)),
-                  )),
-                ],
-              ]))
-            else ...[
-              _panelCard(Column(children: [
-                Text('ТУР ${next.round}', style: const TextStyle(
-                  color: Color(0xFF8BE07F), fontWeight: FontWeight.w900, fontSize: 11)),
-                const SizedBox(height: 16),
-                Row(children: [
-                  Expanded(child: _teamName(next.homeTeam, next.homeTeam == _career.player.club)),
-                  const Padding(padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text('VS', style: TextStyle(color: Colors.white54, fontWeight: FontWeight.w900))),
-                  Expanded(child: _teamName(next.awayTeam, next.awayTeam == _career.player.club, alignEnd: true)),
-                ]),
-              ])),
-              const SizedBox(height: 12),
-              SizedBox(height: 54, child: ElevatedButton.icon(
-                onPressed: _isPlaying ? null : _playNext,
-                icon: _isPlaying ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.sports_soccer_rounded),
-                label: Text(_isPlaying ? 'СИМУЛЯЦИЯ...' : 'СЫГРАТЬ МАТЧ',
-                  style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1)),
-                style: ElevatedButton.styleFrom(backgroundColor: _green, foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13))),
-              )),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _green,
+                    foregroundColor: const Color(0xFF082A12),
+                  ),
+                ),
+              ),
+            ] else ...[
+              const Text(
+                'СЛЕДУЮЩИЙ МАТЧ',
+                style: TextStyle(
+                  color: Color(0xFF8BE07F),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.1,
+                ),
+              ),
+              const SizedBox(height: 10),
+              if (next == null)
+                _panelCard(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (isChampion) ...[
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          margin: const EdgeInsets.only(bottom: 14),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF5A3B0A), Color(0xFF211707)],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: const Color(0xFFFFC857)),
+                          ),
+                          child: const Column(
+                            children: [
+                              Icon(
+                                Icons.emoji_events_rounded,
+                                color: Color(0xFFFFC857),
+                                size: 48,
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'ЧЕМПИОН СУПЕРЛИГИ!',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Color(0xFFFFD778),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'Трофей добавлен в достижения карьеры',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                      const Text(
+                        'Сезон завершён!',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Все матчи твоей команды сыграны.',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      if (_career.season < 10) ...[
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: ElevatedButton(
+                            onPressed: _startNextSeason,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _green,
+                              foregroundColor: Colors.white,
+                            ),
+                            child: const Text(
+                              'НАЧАТЬ СЛЕДУЮЩИЙ СЕЗОН',
+                              style: TextStyle(fontWeight: FontWeight.w900),
+                            ),
+                          ),
+                        ),
+                      ] else ...[
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Карьера Суперлиги завершена! Ты прошёл все 10 сезонов.',
+                          style: TextStyle(
+                            color: Color(0xFF8BE07F),
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: ElevatedButton(
+                            onPressed: _isPlaying ? null : _finishCareer,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _green,
+                              foregroundColor: Colors.white,
+                            ),
+                            child: const Text(
+                              'ПОСМОТРЕТЬ ИТОГИ КАРЬЕРЫ',
+                              style: TextStyle(fontWeight: FontWeight.w900),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                )
+              else ...[
+                _panelCard(
+                  Column(
+                    children: [
+                      Text(
+                        'ТУР ${next.round}',
+                        style: const TextStyle(
+                          color: Color(0xFF8BE07F),
+                          fontWeight: FontWeight.w900,
+                          fontSize: 11,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _teamName(
+                              next.homeTeam,
+                              next.homeTeam == _career.player.club,
+                            ),
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 12),
+                            child: Text(
+                              'VS',
+                              style: TextStyle(
+                                color: Colors.white54,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: _teamName(
+                              next.awayTeam,
+                              next.awayTeam == _career.player.club,
+                              alignEnd: true,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 54,
+                  child: ElevatedButton.icon(
+                    onPressed: _isPlaying ? null : _playNext,
+                    icon: _isPlaying
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.sports_soccer_rounded),
+                    label: Text(
+                      _isPlaying ? 'СИМУЛЯЦИЯ...' : 'СЫГРАТЬ МАТЧ',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _green,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(13),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ],
-            ],
-            if (_error != null) Padding(padding: const EdgeInsets.only(top: 10),
-              child: Text(_error!, style: const TextStyle(color: Colors.redAccent))),
+            if (_error != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Text(
+                  _error!,
+                  style: const TextStyle(color: Colors.redAccent),
+                ),
+              ),
             const SizedBox(height: 22),
-            Row(children: [
-              const Expanded(child: Text('КАЛЕНДАРЬ', style: TextStyle(
-                color: Colors.white, fontSize: 15, fontWeight: FontWeight.w900, letterSpacing: 0.6))),
-              Text('${_career.fixtures.where((f) => f.isPlayed && (f.homeTeam == _career.player.club || f.awayTeam == _career.player.club)).length} сыграно',
-                style: const TextStyle(color: Colors.white54, fontSize: 12)),
-            ]),
+            Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'КАЛЕНДАРЬ',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.6,
+                    ),
+                  ),
+                ),
+                Text(
+                  '${_career.fixtures.where((f) => f.isPlayed && (f.homeTeam == _career.player.club || f.awayTeam == _career.player.club)).length} сыграно',
+                  style: const TextStyle(color: Colors.white54, fontSize: 12),
+                ),
+              ],
+            ),
             const SizedBox(height: 10),
-            ..._career.fixtures.where((f) => f.homeTeam == _career.player.club || f.awayTeam == _career.player.club).map((fixture) {
-              final isHome = fixture.homeTeam == _career.player.club;
-              final opponent = isHome ? fixture.awayTeam : fixture.homeTeam;
-              return Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Color.lerp(const Color(0xFF0A2110), ClubColors.primary(opponent), 0.12)!, borderRadius: BorderRadius.circular(10),
-                  border: Border(left: BorderSide(color: ClubColors.primary(opponent), width: 4))),
-                child: Row(children: [
-                  SizedBox(width: 38, child: Text('${fixture.round}.', style: const TextStyle(color: Colors.white54, fontSize: 12))),
-                  Expanded(child: Text(isHome ? '${_career.player.club} — $opponent' : '$opponent — ${_career.player.club}',
-                    style: TextStyle(color: fixture.isPlayed ? Colors.white70 : Colors.white, fontSize: 12, fontWeight: fixture.isPlayed ? FontWeight.w500 : FontWeight.w800))),
-                  Text(fixture.isPlayed ? '${fixture.homeGoals} : ${fixture.awayGoals}' : '— : —',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13)),
-                ]),
-              );
-            }),
+            ..._career.fixtures
+                .where(
+                  (f) =>
+                      f.homeTeam == _career.player.club ||
+                      f.awayTeam == _career.player.club,
+                )
+                .map((fixture) {
+                  final isHome = fixture.homeTeam == _career.player.club;
+                  final opponent = isHome ? fixture.awayTeam : fixture.homeTeam;
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 13,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Color.lerp(
+                        const Color(0xFF0A2110),
+                        ClubColors.primary(opponent),
+                        0.12,
+                      )!,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border(
+                        left: BorderSide(
+                          color: ClubColors.primary(opponent),
+                          width: 4,
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 38,
+                          child: Text(
+                            '${fixture.round}.',
+                            style: const TextStyle(
+                              color: Colors.white54,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            isHome
+                                ? '${_career.player.club} — $opponent'
+                                : '$opponent — ${_career.player.club}',
+                            style: TextStyle(
+                              color: fixture.isPlayed
+                                  ? Colors.white70
+                                  : Colors.white,
+                              fontSize: 12,
+                              fontWeight: fixture.isPlayed
+                                  ? FontWeight.w500
+                                  : FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          fixture.isPlayed
+                              ? '${fixture.homeGoals} : ${fixture.awayGoals}'
+                              : '— : —',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
             const SizedBox(height: 12),
-=======
->>>>>>> Stashed changes
           ],
         ),
         body: Stack(
@@ -830,42 +1051,74 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
 
   Future<void> _finishCareer() async {
     if (_isPlaying) return;
-    setState(() { _isPlaying = true; _error = null; });
+    setState(() {
+      _isPlaying = true;
+      _error = null;
+    });
     try {
       var completed = _recordSeasonSummary(_career);
       final standings = completed.standings;
-      final wonLeague = standings.isNotEmpty && standings.first.club == completed.player.club;
+      final wonLeague =
+          standings.isNotEmpty && standings.first.club == completed.player.club;
       if (wonLeague && !completed.championSeasons.contains(completed.season)) {
-        completed = completed.copyWith(championSeasons: [...completed.championSeasons, completed.season]);
+        completed = completed.copyWith(
+          championSeasons: [...completed.championSeasons, completed.season],
+        );
       }
       await SuperLeagueStorage.saveCareer(completed);
       if (!mounted) return;
-      setState(() { _career = completed; _isPlaying = false; });
+      setState(() {
+        _career = completed;
+        _isPlaying = false;
+      });
       await Navigator.push<SuperLeagueCareer>(
         context,
-        MaterialPageRoute(builder: (_) => SuperLeagueEndScreen(career: _career)),
+        MaterialPageRoute(
+          builder: (_) => SuperLeagueEndScreen(career: _career),
+        ),
       );
     } catch (_) {
       if (!mounted) return;
-      setState(() { _isPlaying = false; _error = 'Не удалось сформировать итоги карьеры.'; });
+      setState(() {
+        _isPlaying = false;
+        _error = 'Не удалось сформировать итоги карьеры.';
+      });
     }
   }
 
   SuperLeagueCareer _recordSeasonSummary(SuperLeagueCareer career) {
-    if (career.history.any((item) => item.season == career.season)) return career;
+    if (career.history.any((item) => item.season == career.season))
+      return career;
 
-    final playerFixtures = career.fixtures.where((fixture) =>
-      fixture.isPlayed &&
-      (fixture.homeTeam == career.player.club || fixture.awayTeam == career.player.club)
-    ).toList();
-    final appearances = playerFixtures.where((fixture) => fixture.playerPlayed).toList();
-    final goals = playerFixtures.fold<int>(0, (sum, fixture) => sum + fixture.playerGoals);
-    final assists = playerFixtures.fold<int>(0, (sum, fixture) => sum + fixture.playerAssists);
+    final playerFixtures = career.fixtures
+        .where(
+          (fixture) =>
+              fixture.isPlayed &&
+              (fixture.homeTeam == career.player.club ||
+                  fixture.awayTeam == career.player.club),
+        )
+        .toList();
+    final appearances = playerFixtures
+        .where((fixture) => fixture.playerPlayed)
+        .toList();
+    final goals = playerFixtures.fold<int>(
+      0,
+      (sum, fixture) => sum + fixture.playerGoals,
+    );
+    final assists = playerFixtures.fold<int>(
+      0,
+      (sum, fixture) => sum + fixture.playerAssists,
+    );
     final average = appearances.isEmpty
-      ? 0.0
-      : appearances.fold<double>(0, (sum, fixture) => sum + fixture.playerRating) / appearances.length;
+        ? 0.0
+        : appearances.fold<double>(
+                0,
+                (sum, fixture) => sum + fixture.playerRating,
+              ) /
+              appearances.length;
     final standings = career.standings;
-    final champion = standings.isNotEmpty && standings.first.club == career.player.club;
+    final champion =
+        standings.isNotEmpty && standings.first.club == career.player.club;
     final summary = SuperLeagueSeasonSummary(
       season: career.season,
       club: career.player.club,
