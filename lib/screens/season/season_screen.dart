@@ -1647,7 +1647,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const Text(
+        Text(
           AppStrings.seasonTrophies,
           style: TextStyle(
             color: Colors.white,
@@ -1666,7 +1666,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
             borderRadius: BorderRadius.circular(10),
           ),
           child: trophies.isEmpty
-              ? const Text(
+              ? Text(
                   AppStrings.noSeasonTrophies,
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white60),
@@ -2064,7 +2064,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                   borderRadius: BorderRadiusGeometry.circular(10),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 AppStrings.playMatchUpper,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
