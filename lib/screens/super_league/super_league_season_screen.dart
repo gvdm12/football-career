@@ -83,14 +83,38 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
               ]),
             ),
             const SizedBox(height: 18),
+            _panelCard(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Text('СТАТИСТИКА СЕЗОНА', style: TextStyle(
+                color: Color(0xFF8BE07F), fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1)),
+              const SizedBox(height: 14),
+              Row(children: [
+                Expanded(child: _seasonStat('Матчи', '${_career.playedMatches}')),
+                Expanded(child: _seasonStat('Голы', '${_career.goals}')),
+                Expanded(child: _seasonStat('Ассисты', '${_career.assists}')),
+                Expanded(child: _seasonStat('Оценка', _career.averageRating == 0 ? '—' : _career.averageRating.toStringAsFixed(1))),
+              ]),
+            ])),
+            const SizedBox(height: 18),
             const Text('СЛЕДУЮЩИЙ МАТЧ', style: TextStyle(
               color: Color(0xFF8BE07F), fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.1)),
             const SizedBox(height: 10),
             if (next == null)
-              _panelCard(const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Сезон завершён!', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
-                SizedBox(height: 6),
-                Text('Все матчи твоей команды сыграны.', style: TextStyle(color: Colors.white70)),
+              _panelCard(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Text('Сезон завершён!', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
+                const SizedBox(height: 6),
+                const Text('Все матчи твоей команды сыграны.', style: TextStyle(color: Colors.white70)),
+                if (_career.season < 10) ...[
+                  const SizedBox(height: 16),
+                  SizedBox(width: double.infinity, height: 48, child: ElevatedButton(
+                    onPressed: _startNextSeason,
+                    style: ElevatedButton.styleFrom(backgroundColor: _green, foregroundColor: Colors.white),
+                    child: const Text('НАЧАТЬ СЛЕДУЮЩИЙ СЕЗОН', style: TextStyle(fontWeight: FontWeight.w900)),
+                  )),
+                ] else ...[
+                  const SizedBox(height: 12),
+                  const Text('Карьера Суперлиги завершена! Ты прошёл все 10 сезонов.',
+                    style: TextStyle(color: Color(0xFF8BE07F), fontWeight: FontWeight.w800)),
+                ],
               ]))
             else ...[
               _panelCard(Column(children: [
@@ -156,6 +180,26 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
       ),
     );
   }
+
+  Future<void> _startNextSeason() async {
+    if (_career.season >= 10 || _isPlaying) return;
+    setState(() { _isPlaying = true; _error = null; });
+    try {
+      final nextCareer = _career.nextSeason();
+      await SuperLeagueStorage.saveCareer(nextCareer);
+      if (!mounted) return;
+      setState(() { _career = nextCareer; _isPlaying = false; });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() { _isPlaying = false; _error = 'Не удалось сохранить новый сезон.'; });
+    }
+  }
+
+  Widget _seasonStat(String label, String value) => Column(children: [
+    Text(value, style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w900)),
+    const SizedBox(height: 5),
+    Text(label, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white60, fontSize: 10)),
+  ]);
 
   Widget _teamName(String name, bool isPlayer, {bool alignEnd = false}) {
     final club = Clubs.getByName(name);
