@@ -279,8 +279,8 @@ class _SuperLeagueTransfersScreenState
                   borderRadius: BorderRadius.circular(11),
                 ),
               ),
-              child: const Text(
-                'ПРИНЯТЬ ПРЕДЛОЖЕНИЕ',
+              child: Text(
+                AppStrings.acceptTransferOffer,
                 style: TextStyle(fontWeight: FontWeight.w900),
               ),
             ),
