@@ -30,21 +30,21 @@ class _SuperLeagueDevelopmentScreenState
   String _name(SkillName skill) {
     switch (skill) {
       case SkillName.pace:
-        return 'Скорость';
+        return AppStrings.pace;
       case SkillName.physical:
-        return 'Физика';
+        return AppStrings.physical;
       case SkillName.shooting:
-        return 'Удары';
+        return AppStrings.shots;
       case SkillName.passing:
-        return 'Пасы';
+        return AppStrings.passes;
       case SkillName.dribbling:
-        return 'Дриблинг';
+        return AppStrings.dribbling;
       case SkillName.defending:
-        return 'Защита';
+        return AppStrings.defending;
       case SkillName.heading:
-        return 'Игра головой';
+        return AppStrings.heading;
       case SkillName.vision:
-        return 'Видение';
+        return AppStrings.vision;
     }
   }
 
@@ -203,7 +203,7 @@ class _SuperLeagueDevelopmentScreenState
                               ),
                               const SizedBox(height: 5),
                               Text(
-                                '${_player.club} • РЕЙТИНГ ${_player.overall}',
+                                '${_player.club} • ${AppStrings.overallUpper} ${_player.overall}',
                                 style: const TextStyle(
                                   color: Color(0xFF8BE07F),
                                   fontWeight: FontWeight.w800,
