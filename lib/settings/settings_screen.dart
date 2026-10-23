@@ -69,12 +69,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           const SizedBox(height: 28),
 
-          _buildSectionTitle(LanguageService.isEnglish ? 'LANGUAGE' : 'ЯЗЫК'),
+          _buildSectionTitle(AppStrings.languageSection),
 
           _buildSettingCard(
             icon: Icons.language,
             title: AppStrings.language,
-            subtitle: LanguageService.isEnglish ? 'English' : 'Русский',
+            subtitle: LanguageService.isEnglish ? AppStrings.englishLanguage : AppStrings.russianLanguage,
             trailing: const Icon(Icons.chevron_right, color: green),
             onTap: _showLanguageSelector,
           ),
@@ -92,7 +92,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Padding(
             padding: const EdgeInsets.only(top: 1, left: 10),
             child: Text(
-              'Author this app - Gadjiev M',
+              AppStrings.appAuthor,
               style: TextStyle(
                 color: green.withValues(alpha: 0.6),
                 fontSize: 14,
@@ -132,8 +132,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                 ListTile(
                   leading: const Text('🇷🇺', style: TextStyle(fontSize: 24)),
-                  title: const Text(
-                    'Русский',
+                  title: Text(
+                    AppStrings.russianLanguage,
                     style: TextStyle(color: Colors.white),
                   ),
                   trailing: LanguageService.locale.value.languageCode == 'ru'
@@ -154,8 +154,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                 ListTile(
                   leading: const Text('🇬🇧', style: TextStyle(fontSize: 24)),
-                  title: const Text(
-                    'English',
+                  title: Text(
+                    AppStrings.englishLanguage,
                     style: TextStyle(color: Colors.white),
                   ),
                   trailing: LanguageService.locale.value.languageCode == 'en'
