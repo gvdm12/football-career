@@ -222,45 +222,61 @@ class SuperLeagueCareer {
   }
 
   SuperLeagueCareer playNextMatch() {
-    final fixture = nextFixture;
-    if (fixture == null) return this;
+    final playerFixture = nextFixture;
+    if (playerFixture == null) return this;
     final random = Random();
-    final homeClub = Clubs.getByName(fixture.homeTeam);
-    final awayClub = Clubs.getByName(fixture.awayTeam);
-    final difference = homeClub.strength - awayClub.strength;
-    final homeGoals = _goalsFor(1.35 + difference * 0.035 + 0.18, random);
-    final awayGoals = _goalsFor(1.10 - difference * 0.035, random);
-    final playerInFixture = fixture.homeTeam == player.club || fixture.awayTeam == player.club;
-    final playerClubGoals = fixture.homeTeam == player.club ? homeGoals : awayGoals;
-    final played = playerInFixture && random.nextDouble() < 0.96;
-    var playerGoals = 0;
-    var playerAssists = 0;
-    var rating = 0.0;
-    if (played) {
-      final positionGoalChance = player.position == PlayerPosition.forward
-          ? 0.48 : player.position == PlayerPosition.midfielder ? 0.25 : 0.10;
-      for (var i = 0; i < playerClubGoals; i++) {
-        if (random.nextDouble() < positionGoalChance) playerGoals++;
-        else if (random.nextDouble() < 0.58) playerAssists++;
+    final updatedFixtures = fixtures.map((fixture) {
+      if (fixture.round != playerFixture.round || fixture.isPlayed) return fixture;
+
+      final homeClub = Clubs.getByName(fixture.homeTeam);
+      final awayClub = Clubs.getByName(fixture.awayTeam);
+      final difference = homeClub.strength - awayClub.strength;
+      final homeGoals = _goalsFor(1.35 + difference * 0.035 + 0.18, random);
+      final awayGoals = _goalsFor(1.10 - difference * 0.035, random);
+      final playerInFixture = fixture.homeTeam == player.club || fixture.awayTeam == player.club;
+      if (!playerInFixture) {
+        return fixture.copyWith(homeGoals: homeGoals, awayGoals: awayGoals);
       }
-      playerAssists = min(playerAssists, playerClubGoals - playerGoals);
-      rating = (6.2 + random.nextDouble() * 1.5 + playerGoals * 0.55 + playerAssists * 0.25)
-          .clamp(5.5, 10.0).toDouble();
-    }
-    final updated = fixture.copyWith(
-      homeGoals: homeGoals,
-      awayGoals: awayGoals,
-      playerGoals: playerGoals,
-      playerAssists: playerAssists,
-      playerRating: rating,
-      playerPlayed: played,
-    );
-    final updatedFixtures = fixtures.map((f) => f == fixture ? updated : f).toList();
-    final updatedPlayer = player.copyWith(
+
+      final playerClubGoals = fixture.homeTeam == player.club ? homeGoals : awayGoals;
+      final played = random.nextDouble() < 0.96;
+      var playerGoals = 0;
+      var playerAssists = 0;
+      var rating = 0.0;
+      if (played) {
+        final positionGoalChance = player.position == PlayerPosition.forward
+            ? 0.48
+            : player.position == PlayerPosition.midfielder
+                ? 0.25
+                : player.position == PlayerPosition.defender
+                    ? 0.10
+                    : 0.02;
+        for (var i = 0; i < playerClubGoals; i++) {
+          if (random.nextDouble() < positionGoalChance) {
+            playerGoals++;
+          } else if (random.nextDouble() < 0.58) {
+            playerAssists++;
+          }
+        }
+        playerAssists = min(playerAssists, playerClubGoals - playerGoals);
+        rating = (6.2 + random.nextDouble() * 1.5 + playerGoals * 0.55 + playerAssists * 0.25)
+            .clamp(5.5, 10.0).toDouble();
+      }
+      return fixture.copyWith(
+        homeGoals: homeGoals,
+        awayGoals: awayGoals,
+        playerGoals: playerGoals,
+        playerAssists: playerAssists,
+        playerRating: rating,
+        playerPlayed: played,
+      );
+    }).toList();
+
+    return SuperLeagueCareer(
+      player: player.copyWith(season: season),
       season: season,
-      age: player.age,
+      fixtures: updatedFixtures,
     );
-    return SuperLeagueCareer(player: updatedPlayer, season: season, fixtures: updatedFixtures);
   }
 
   static int _goalsFor(double expected, Random random) {
