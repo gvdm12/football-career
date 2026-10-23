@@ -208,8 +208,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
             ]),
             const SizedBox(height: 10),
             ..._career.fixtures.where((f) => f.homeTeam == _career.player.club || f.awayTeam == _career.player.club).map((fixture) {
-              final isHome = fixture.homeTeam == _career.player.club;
-              final opponent = isHome ? fixture.awayTeam : fixture.homeTeam;
+                        final opponent = isHome ? fixture.awayTeam : fixture.homeTeam;
               return Container(
                 margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 12),
@@ -280,7 +279,6 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
 
   Widget _resultCard(SuperLeagueFixture fixture) {
     final isHome = fixture.homeTeam == _career.player.club;
-    final goals = isHome ? fixture.playerGoals : fixture.playerGoals;
     final rating = fixture.playerPlayed ? fixture.playerRating.toStringAsFixed(1) : '—';
     return Container(
       padding: const EdgeInsets.all(18),
