@@ -264,8 +264,8 @@ class _SuperLeagueClubSelectionScreenState extends State<SuperLeagueClubSelectio
               ),
             ),
           ],
-        ),
-      ),
+        )),
+      ]),
     );
   }
 
