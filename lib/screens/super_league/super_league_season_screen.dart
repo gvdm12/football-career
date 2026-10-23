@@ -299,8 +299,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
             Text('${fixture.homeGoals} : ${fixture.awayGoals}',
               style: const TextStyle(color: Colors.white, fontSize: 27, fontWeight: FontWeight.w900)),
             const SizedBox(height: 4),
-            Text(fixture.homeGoals! > fixture.awayGoals! ? 'ПОБЕДА' :
-              fixture.homeGoals! < fixture.awayGoals! ? 'ПОРАЖЕНИЕ' : 'НИЧЬЯ',
+            Text(resultLabel,
               style: const TextStyle(color: Colors.white70, fontSize: 9, fontWeight: FontWeight.w900)),
           ]),
           Expanded(child: _teamName(fixture.awayTeam, fixture.awayTeam == _career.player.club, alignEnd: true)),
