@@ -106,7 +106,7 @@ class SuperLeagueTableScreen extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       border: Border.all(color: const Color(0xFF14401E)),
     ),
-    child: const Row(
+    child: Row(
       children: [
         SizedBox(
           width: 25,
