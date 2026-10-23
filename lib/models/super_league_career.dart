@@ -292,8 +292,14 @@ class SuperLeagueCareer {
   }
 
   SuperLeagueCareer nextSeason() {
-    final nextPlayer = player.copyWith(age: player.age + 1, season: season + 1);
-    return SuperLeagueCareer.newCareer(nextPlayer);
+    final nextSeasonNumber = season + 1;
+    final nextPlayer = player.copyWith(age: player.age + 1, season: nextSeasonNumber);
+    final freshSeason = SuperLeagueCareer.newCareer(nextPlayer);
+    return SuperLeagueCareer(
+      player: nextPlayer,
+      season: nextSeasonNumber,
+      fixtures: freshSeason.fixtures,
+    );
   }
 
   Map<String, dynamic> toJson() => {
