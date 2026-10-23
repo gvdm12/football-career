@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/player.dart';
@@ -64,7 +65,7 @@ class _SuperLeagueTransfersScreenState
           backgroundColor: const Color.fromARGB(82, 81, 84, 82),
           foregroundColor: Colors.white,
           automaticallyImplyLeading: false,
-          title: const Text(
+          title: Text(
             AppStrings.transfersWindow,
             style: TextStyle(fontWeight: FontWeight.w900),
           ),
@@ -134,7 +135,7 @@ class _SuperLeagueTransfersScreenState
                 ),
               ),
               const SizedBox(height: 18),
-              const Text(
+              Text(
                 AppStrings.clubOffers,
                 style: TextStyle(
                   color: Colors.white,
@@ -244,7 +245,7 @@ class _SuperLeagueTransfersScreenState
                       fontWeight: FontWeight.w900,
                     ),
                   ),
-                  const Text(
+                  Text(
                     AppStrings.strengthUpper,
                     style: TextStyle(
                       color: Colors.white54,
@@ -300,7 +301,7 @@ class _SuperLeagueTransfersScreenState
       children: [
         const Icon(Icons.hourglass_empty, color: Color(0xFF8BE07F), size: 34),
         const SizedBox(height: 8),
-        const Text(
+        Text(
           AppStrings.noOffersYet,
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
         ),
