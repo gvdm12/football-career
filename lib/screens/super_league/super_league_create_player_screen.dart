@@ -132,7 +132,6 @@ class _SuperLeagueCreatePlayerScreenState
     );
   }
 
-
   @override
   void dispose() {
     _nameController.dispose();
@@ -188,7 +187,7 @@ class _SuperLeagueCreatePlayerScreenState
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 9,
+                fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -342,32 +341,33 @@ class _SuperLeagueCreatePlayerScreenState
             ),
             const SizedBox(height: 10),
             Row(
-              children: [
-                _buildPositionButton(
-                  shortName: 'ST',
-                  fullName: 'Нападающий',
-                  position: PlayerPosition.forward,
-                ),
-                _buildPositionButton(
-                  shortName: 'CM',
-                  fullName: 'Полузащитник',
-                  position: PlayerPosition.midfielder,
-                ),
-                _buildPositionButton(
-                  shortName: 'CB',
-                  fullName: 'Защитник',
-                  position: PlayerPosition.defender,
-                ),
-              ]
-                  .map(
-                    (button) => Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: button,
-                      ),
-                    ),
-                  )
-                  .toList(),
+              children:
+                  [
+                        _buildPositionButton(
+                          shortName: 'ST',
+                          fullName: 'Нападающий',
+                          position: PlayerPosition.forward,
+                        ),
+                        _buildPositionButton(
+                          shortName: 'CM',
+                          fullName: 'Полузащитник',
+                          position: PlayerPosition.midfielder,
+                        ),
+                        _buildPositionButton(
+                          shortName: 'CB',
+                          fullName: 'Защитник',
+                          position: PlayerPosition.defender,
+                        ),
+                      ]
+                      .map(
+                        (button) => Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: button,
+                          ),
+                        ),
+                      )
+                      .toList(),
             ),
             const SizedBox(height: 22),
             const Text(
@@ -398,7 +398,9 @@ class _SuperLeagueCreatePlayerScreenState
                   borderSide: const BorderSide(color: Color(0xFF174324)),
                 ),
               ),
-              selectedItemBuilder: (context) => _nationalities.map((nationality) {
+              selectedItemBuilder: (context) => _nationalities.map((
+                nationality,
+              ) {
                 return Row(
                   children: [
                     _buildNationalityFlag(nationality),
