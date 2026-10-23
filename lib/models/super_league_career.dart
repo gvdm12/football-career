@@ -116,24 +116,19 @@ class SuperLeagueCareer {
   ];
 
   factory SuperLeagueCareer.newCareer(Player player) {
-    final fixtures = <SuperLeagueFixture>[];
+    final firstLeg = <SuperLeagueFixture>[];
     final teams = List<String>.from(clubNames);
-    // Round-robin circle method: 19 rounds, each club plays once per round.
+    // Round-robin circle method: every club plays once per round.
     for (var round = 1; round <= teams.length - 1; round++) {
       for (var i = 0; i < teams.length ~/ 2; i++) {
         final first = teams[i];
         final second = teams[teams.length - 1 - i];
         final home = round.isEven ? second : first;
         final away = round.isEven ? first : second;
-        fixtures.add(SuperLeagueFixture(
+        firstLeg.add(SuperLeagueFixture(
           round: round,
           homeTeam: home,
           awayTeam: away,
-        ));
-        fixtures.add(SuperLeagueFixture(
-          round: round + 19,
-          homeTeam: away,
-          awayTeam: home,
         ));
       }
       final fixed = teams.first;
@@ -144,6 +139,14 @@ class SuperLeagueCareer {
         ..add(fixed)
         ..addAll(rotating);
     }
+    final fixtures = <SuperLeagueFixture>[
+      ...firstLeg,
+      ...firstLeg.map((fixture) => SuperLeagueFixture(
+        round: fixture.round + 19,
+        homeTeam: fixture.awayTeam,
+        awayTeam: fixture.homeTeam,
+      )),
+    ];
     return SuperLeagueCareer(player: player, season: 1, fixtures: fixtures);
   }
 
