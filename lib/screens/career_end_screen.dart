@@ -45,7 +45,7 @@ class CareerEndScreen extends StatelessWidget {
   int get goldenBoots => career.history.fold(
     0,
     (sum, item) =>
-        sum + item.achievements.where((a) => a == 'Золотая бутса').length,
+        sum + item.achievements.where((a) => a == AppStrings.goldenBootTrophy).length,
   );
 
   int get totalTrophies => leagueTitles + nationalCups + championsLeagueTitles;
@@ -146,11 +146,11 @@ class CareerEndScreen extends StatelessWidget {
                   ),
                 ]),
                 const SizedBox(height: 10),
-                _section('🏆 Трофеи за карьеру', [
-                  _stat('Всего трофеев', totalTrophies.toString()),
-                  _stat('Чемпионаты страны', leagueTitles.toString()),
-                  _stat('Кубки страны', nationalCups.toString()),
-                  _stat('Лига чемпионов', championsLeagueTitles.toString()),
+                _section(AppStrings.trophiesDuringCareer, [
+                  _stat(AppStrings.totalTrophies, totalTrophies.toString()),
+                  _stat(AppStrings.nationalChampionships, leagueTitles.toString()),
+                  _stat(AppStrings.nationalCups, nationalCups.toString()),
+                  _stat(AppStrings.championsLeague, championsLeagueTitles.toString()),
                   const Divider(color: Color(0xFF24552C)),
                   _stat('Золотая бутса', goldenBoots.toString()),
                 ]),
