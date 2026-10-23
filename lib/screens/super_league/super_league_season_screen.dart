@@ -371,7 +371,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                                 color: Color(0xFFFFD778),
                               ),
                               const SizedBox(width: 9),
-                              const Expanded(
+                              Expanded(
                                 child: Text(
                                   AppStrings.superLeagueTrophies,
                                   style: TextStyle(
