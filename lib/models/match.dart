@@ -145,14 +145,16 @@ class Match {
         case PlayerPosition.forward:
           // Нападающий влияет прежде всего на создание и реализацию моментов.
           final attackPower =
-              skills.shooting * 0.45 +
-              skills.dribbling * 0.30 +
-              skills.pace * 0.25;
+              skills.shooting * 0.40 +
+              skills.dribbling * 0.25 +
+              skills.pace * 0.20 +
+              skills.heading * 0.15;
 
           final attackBonus =
               ((attackPower - 60) * 0.004 + (player.overall - 60) * 0.003)
                   .clamp(-0.08, 0.18)
-                  .toDouble();
+                  .toDouble() +
+              (skills.vision - 60) * 0.001;
 
           if (isHome) {
             homeExpectedGoals += attackBonus;
@@ -164,15 +166,17 @@ class Match {
         case PlayerPosition.midfielder:
           // Полузащитник помогает продвижению мяча и атаке.
           final midfieldPower =
-              skills.passing * 0.35 +
-              skills.dribbling * 0.30 +
-              skills.shooting * 0.20 +
-              skills.pace * 0.10;
+              skills.passing * 0.30 +
+              skills.vision * 0.25 +
+              skills.dribbling * 0.25 +
+              skills.shooting * 0.12 +
+              skills.pace * 0.08;
 
           final attackBonus =
               ((midfieldPower - 60) * 0.003 + (player.overall - 60) * 0.002)
                   .clamp(-0.06, 0.13)
-                  .toDouble();
+                  .toDouble() +
+              (skills.vision - 60) * 0.0015;
 
           if (isHome) {
             homeExpectedGoals += attackBonus;
@@ -185,7 +189,9 @@ class Match {
           // Хороший защитник немного уменьшает ожидаемые голы соперника.
           final defenseBonus =
               ((skills.defending - 60) * 0.003 +
-                      (skills.physical - 60) * 0.0015)
+                      (skills.physical - 60) * 0.0015 +
+                      (skills.heading - 60) * 0.0015 +
+                      (skills.vision - 60) * 0.0008)
                   .clamp(-0.06, 0.15)
                   .toDouble();
 
@@ -199,7 +205,9 @@ class Match {
         case PlayerPosition.goalkeeper:
           // Вратарь влияет на защиту, если эта позиция используется.
           final defenseBonus =
-              ((skills.defending - 60) * 0.004 + (skills.physical - 60) * 0.001)
+              ((skills.defending - 60) * 0.004 +
+                      (skills.physical - 60) * 0.001 +
+                      (skills.vision - 60) * 0.0008)
                   .clamp(-0.06, 0.16)
                   .toDouble();
 
@@ -374,7 +382,10 @@ class Match {
     final skills = player.skills;
 
     final attackPower =
-        skills.shooting * 0.50 + skills.dribbling * 0.30 + skills.pace * 0.20;
+        skills.shooting * 0.42 +
+        skills.dribbling * 0.25 +
+        skills.pace * 0.18 +
+        skills.heading * 0.15;
 
     // Базовая вероятность остаётся зависимой от навыков и рейтинга.
     double chance =
@@ -421,7 +432,10 @@ class Match {
     }
 
     final chance =
-        0.10 + player.skills.passing * 0.003 + player.skills.dribbling * 0.002;
+        0.10 +
+        player.skills.passing * 0.0025 +
+        player.skills.dribbling * 0.0015 +
+        player.skills.vision * 0.002;
 
     return random.nextDouble() < chance ? 1 : 0;
   }
@@ -446,7 +460,7 @@ class Match {
         skills.dribbling * 0.30 +
         skills.passing * 0.25;
 
-    final chance = 0.07 + (attackPower / 100) * 0.18;
+    final chance = 0.07 + (attackPower / 100) * 0.18 + player.skills.vision * 0.0005;
 
     int goals = 0;
 
@@ -473,7 +487,10 @@ class Match {
 
     // Для CM пас имеет большое значение.
     final chance =
-        0.11 + player.skills.passing * 0.003 + player.skills.dribbling * 0.002;
+        0.09 +
+        player.skills.passing * 0.0025 +
+        player.skills.dribbling * 0.0015 +
+        player.skills.vision * 0.0035;
 
     int assists = 0;
 
@@ -502,8 +519,9 @@ class Match {
     // Защитник забивает редко.
     final chance =
         0.015 +
-        player.skills.defending * 0.0005 +
-        player.skills.physical * 0.0003;
+        player.skills.defending * 0.0004 +
+        player.skills.physical * 0.0002 +
+        player.skills.heading * 0.0008;
 
     return random.nextDouble() < chance ? 1 : 0;
   }
@@ -520,7 +538,10 @@ class Match {
       return 0;
     }
 
-    final chance = 0.025 + player.skills.passing * 0.0015;
+    final chance =
+        0.015 +
+        player.skills.passing * 0.001 +
+        player.skills.vision * 0.0015;
 
     return random.nextDouble() < chance ? 1 : 0;
   }
