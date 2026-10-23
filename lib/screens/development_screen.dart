@@ -210,11 +210,11 @@ class _DevelopmentScreenState extends State<DevelopmentScreen> {
                 child: Column(
                   children: [
                     _buildHeader(),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 4),
                     GridView.count(
                       crossAxisCount: 2,
                       crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
+                      mainAxisSpacing: 3,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       childAspectRatio: 2.5,
@@ -245,17 +245,19 @@ class _DevelopmentScreenState extends State<DevelopmentScreen> {
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFF14401E)),
       ),
-      child: Column(
+      child: Row(
         children: [
+          SizedBox(width: 5),
           Text(
             player.name,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.w900,
             ),
           ),
-          const SizedBox(height: 5),
+          const SizedBox(width: 35),
           Text(
             'OVERALL ${player.overall}',
             style: const TextStyle(
@@ -264,7 +266,7 @@ class _DevelopmentScreenState extends State<DevelopmentScreen> {
               fontWeight: FontWeight.w900,
             ),
           ),
-          const SizedBox(height: 5),
+          const SizedBox(width: 20),
           Text(
             AppStrings.availableDevelopmentPoints(availablePoints),
             style: const TextStyle(
