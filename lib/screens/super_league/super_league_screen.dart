@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_football/models/player.dart';
+import 'package:flutter_football/models/super_league_career.dart';
 import 'package:flutter_football/screens/super_league/super_league_career_screen.dart';
 import 'package:flutter_football/screens/super_league/super_league_club_selection_screen.dart';
 import 'package:flutter_football/services/super_league_storage.dart';
@@ -56,10 +56,10 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
 
     setState(() => _isOpeningCareer = true);
     try {
-      final Player? player = await SuperLeagueStorage.loadPlayer();
+      final career = await SuperLeagueStorage.loadCareer();
       if (!mounted) return;
 
-      if (player == null) {
+      if (career == null) {
         setState(() {
           _hasSavedCareer = false;
           _isOpeningCareer = false;
@@ -70,7 +70,7 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => SuperLeagueCareerScreen(player: player),
+          builder: (_) => SuperLeagueCareerScreen(career: career),
         ),
       );
     } catch (_) {
