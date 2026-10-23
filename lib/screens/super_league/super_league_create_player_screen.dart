@@ -37,6 +37,8 @@ class _SuperLeagueCreatePlayerScreenState
     shooting: 75,
     defending: 75,
     dribbling: 75,
+    heading: 75,
+    vision: 75,
   );
 
   int get _previewOverall =>
