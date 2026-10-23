@@ -7,6 +7,7 @@ import 'package:flutter_football/screens/super_league/super_league_table_screen.
 import 'package:flutter_football/services/super_league_storage.dart';
 import 'package:flutter_football/screens/super_league/super_league_development_screen.dart';
 import 'package:flutter_football/screens/super_league/super_league_transfers_screen.dart';
+import 'package:flutter_football/screens/super_league/super_league_end_screen.dart';
 
 class SuperLeagueSeasonScreen extends StatefulWidget {
   final SuperLeagueCareer career;
@@ -245,6 +246,12 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                   const SizedBox(height: 12),
                   const Text('Карьера Суперлиги завершена! Ты прошёл все 10 сезонов.',
                     style: TextStyle(color: Color(0xFF8BE07F), fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 16),
+                  SizedBox(width: double.infinity, height: 48, child: ElevatedButton(
+                    onPressed: _isPlaying ? null : _finishCareer,
+                    style: ElevatedButton.styleFrom(backgroundColor: _green, foregroundColor: Colors.white),
+                    child: const Text('ПОСМОТРЕТЬ ИТОГИ КАРЬЕРЫ', style: TextStyle(fontWeight: FontWeight.w900)),
+                  )),
                 ],
               ]))
             else ...[
@@ -305,11 +312,61 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
     ));
   }
 
+  Future<void> _finishCareer() async {
+    if (_isPlaying) return;
+    setState(() { _isPlaying = true; _error = null; });
+    try {
+      var completed = _recordSeasonSummary(_career);
+      final standings = completed.standings;
+      final wonLeague = standings.isNotEmpty && standings.first.club == completed.player.club;
+      if (wonLeague && !completed.championSeasons.contains(completed.season)) {
+        completed = completed.copyWith(championSeasons: [...completed.championSeasons, completed.season]);
+      }
+      await SuperLeagueStorage.saveCareer(completed);
+      if (!mounted) return;
+      setState(() { _career = completed; _isPlaying = false; });
+      await Navigator.push<SuperLeagueCareer>(
+        context,
+        MaterialPageRoute(builder: (_) => SuperLeagueEndScreen(career: _career)),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      setState(() { _isPlaying = false; _error = 'Не удалось сформировать итоги карьеры.'; });
+    }
+  }
+
+  SuperLeagueCareer _recordSeasonSummary(SuperLeagueCareer career) {
+    if (career.history.any((item) => item.season == career.season)) return career;
+
+    final playerFixtures = career.fixtures.where((fixture) =>
+      fixture.isPlayed &&
+      (fixture.homeTeam == career.player.club || fixture.awayTeam == career.player.club)
+    ).toList();
+    final appearances = playerFixtures.where((fixture) => fixture.playerPlayed).toList();
+    final goals = playerFixtures.fold<int>(0, (sum, fixture) => sum + fixture.playerGoals);
+    final assists = playerFixtures.fold<int>(0, (sum, fixture) => sum + fixture.playerAssists);
+    final average = appearances.isEmpty
+      ? 0.0
+      : appearances.fold<double>(0, (sum, fixture) => sum + fixture.playerRating) / appearances.length;
+    final standings = career.standings;
+    final champion = standings.isNotEmpty && standings.first.club == career.player.club;
+    final summary = SuperLeagueSeasonSummary(
+      season: career.season,
+      club: career.player.club,
+      matches: appearances.length,
+      goals: goals,
+      assists: assists,
+      averageRating: average,
+      champion: champion,
+    );
+    return career.copyWith(history: [...career.history, summary]);
+  }
+
   Future<void> _startNextSeason() async {
     if (_career.season >= 10 || _isPlaying) return;
     setState(() { _isPlaying = true; _error = null; });
     try {
-      var completed = _career;
+      var completed = _recordSeasonSummary(_career);
       final standings = completed.standings;
       final wonLeague = standings.isNotEmpty && standings.first.club == completed.player.club;
       if (wonLeague && !completed.championSeasons.contains(completed.season)) {
