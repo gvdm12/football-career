@@ -100,11 +100,13 @@ class SuperLeagueCareer {
   final Player player;
   final int season;
   final List<SuperLeagueFixture> fixtures;
+  final int developmentPoints;
 
   const SuperLeagueCareer({
     required this.player,
     required this.season,
     required this.fixtures,
+    this.developmentPoints = 0,
   });
 
   static const List<String> clubNames = [
@@ -147,7 +149,7 @@ class SuperLeagueCareer {
         awayTeam: fixture.homeTeam,
       )),
     ];
-    return SuperLeagueCareer(player: player, season: 1, fixtures: fixtures);
+    return SuperLeagueCareer(player: player, season: 1, fixtures: fixtures, developmentPoints: 0);
   }
 
   int get playedMatches => fixtures.where((fixture) => fixture.isPlayed && (fixture.homeTeam == player.club || fixture.awayTeam == player.club)).length;
@@ -221,6 +223,25 @@ class SuperLeagueCareer {
     return result;
   }
 
+  SuperLeagueCareer copyWith({
+    Player? player,
+    int? season,
+    List<SuperLeagueFixture>? fixtures,
+    int? developmentPoints,
+  }) => SuperLeagueCareer(
+    player: player ?? this.player,
+    season: season ?? this.season,
+    fixtures: fixtures ?? this.fixtures,
+    developmentPoints: developmentPoints ?? this.developmentPoints,
+  );
+
+  int get developmentPointsForSeason {
+    if (playedMatches < 5) return 2;
+    if (playedMatches >= 30) return 8;
+    if (playedMatches >= 20) return 6;
+    return 4;
+  }
+
   SuperLeagueCareer playNextMatch() {
     final playerFixture = nextFixture;
     if (playerFixture == null) return this;
@@ -276,6 +297,7 @@ class SuperLeagueCareer {
       player: player.copyWith(season: season),
       season: season,
       fixtures: updatedFixtures,
+      developmentPoints: developmentPoints,
     );
   }
 
@@ -291,14 +313,19 @@ class SuperLeagueCareer {
     return goals;
   }
 
-  SuperLeagueCareer nextSeason() {
+  SuperLeagueCareer nextSeason({String? newClub}) {
     final nextSeasonNumber = season + 1;
-    final nextPlayer = player.copyWith(age: player.age + 1, season: nextSeasonNumber);
+    final nextPlayer = player.copyWith(
+      age: player.age + 1,
+      season: nextSeasonNumber,
+      club: newClub ?? player.club,
+    );
     final freshSeason = SuperLeagueCareer.newCareer(nextPlayer);
     return SuperLeagueCareer(
       player: nextPlayer,
       season: nextSeasonNumber,
       fixtures: freshSeason.fixtures,
+      developmentPoints: developmentPoints,
     );
   }
 
@@ -306,6 +333,7 @@ class SuperLeagueCareer {
     'player': player.toJson(),
     'season': season,
     'fixtures': fixtures.map((fixture) => fixture.toJson()).toList(),
+    'developmentPoints': developmentPoints,
   };
 
   factory SuperLeagueCareer.fromJson(Map<String, dynamic> json) {
@@ -318,6 +346,7 @@ class SuperLeagueCareer {
               Map<String, dynamic>.from(item as Map),
             )).toList()
           : [],
+      developmentPoints: (json['developmentPoints'] as num?)?.toInt() ?? 0,
     );
   }
 }
