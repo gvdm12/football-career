@@ -167,7 +167,7 @@ class MatchScreen extends StatelessWidget {
           if (match.hasPenalties) ...[
             const SizedBox(height: 6),
             Text(
-              'П: ${match.homePenalties} : ${match.awayPenalties}',
+              '${AppStrings.penaltiesShort} ${match.homePenalties} : ${match.awayPenalties}',
               style: const TextStyle(
                 color: Color(0xFF8BE07F),
                 fontSize: 16,
