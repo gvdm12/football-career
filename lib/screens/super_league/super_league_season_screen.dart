@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_football/models/super_league_career.dart';
@@ -16,7 +17,7 @@ class SuperLeagueSeasonScreen extends StatefulWidget {
 }
 
 class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
-  late SuperLeagueCareer _career = widget.career;
+  late SuperLeagueCareer _career;
   bool _isPlaying = false;
   bool _showLastResult = false;
   SuperLeagueFixture? _lastPlayedFixture;
@@ -25,6 +26,32 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
   static const Color _bg = Color(0xFF061B0C);
   static const Color _panel = Color(0xFF0B2813);
   static const Color _green = Color(0xFF22C55E);
+
+  @override
+  void initState() {
+    super.initState();
+    _career = _normalizeCareer(widget.career);
+    if (_career.player.club != widget.career.player.club) {
+      Future.microtask(() => SuperLeagueStorage.saveCareer(_career));
+    }
+  }
+
+  SuperLeagueCareer _normalizeCareer(SuperLeagueCareer career) {
+    if (SuperLeagueCareer.clubNames.contains(career.player.club)) return career;
+
+    final oldClub = Clubs.getByName(career.player.club);
+    final eligibleClubs = SuperLeagueCareer.clubNames
+        .map(Clubs.getByName)
+        .toList()
+      ..sort((a, b) =>
+          (a.strength - oldClub.strength).abs().compareTo(
+            (b.strength - oldClub.strength).abs(),
+          ));
+
+    return career.copyWith(
+      player: career.player.copyWith(club: eligibleClubs.first.name),
+    );
+  }
 
   Future<void> _playNext() async {
     if (_isPlaying || _career.nextFixture == null) return;
