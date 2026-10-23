@@ -148,9 +148,20 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.table_chart_rounded, color: Colors.white, size: 23),
+                    Icon(
+                      Icons.table_chart_rounded,
+                      color: Colors.white,
+                      size: 23,
+                    ),
                     SizedBox(height: 2),
-                    Text('ТАБЛИЦА', style: TextStyle(color: Colors.white70, fontSize: 8, fontWeight: FontWeight.w800)),
+                    Text(
+                      'ТАБЛИЦА',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 8,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -169,9 +180,20 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.calendar_month_rounded, color: Color(0xFF8BE07F), size: 23),
+                    Icon(
+                      Icons.calendar_month_rounded,
+                      color: Color(0xFF8BE07F),
+                      size: 23,
+                    ),
                     SizedBox(height: 2),
-                    Text('КАЛЕНДАРЬ', style: TextStyle(color: Color(0xFF8BE07F), fontSize: 8, fontWeight: FontWeight.w800)),
+                    Text(
+                      'КАЛЕНДАРЬ',
+                      style: TextStyle(
+                        color: Color(0xFF8BE07F),
+                        fontSize: 8,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -550,7 +572,9 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                                   ),
                                   child: const Text(
                                     'ПОСМОТРЕТЬ ИТОГИ КАРЬЕРЫ',
-                                    style: TextStyle(fontWeight: FontWeight.w900),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w900,
+                                    ),
                                   ),
                                 ),
                               ),
