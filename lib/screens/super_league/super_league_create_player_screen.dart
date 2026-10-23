@@ -399,8 +399,8 @@ class _SuperLeagueCreatePlayerScreenState
                 ),
               ),
               const SizedBox(height: 15),
-              const Text(
-                'ПОЗИЦИЯ',
+              Text(
+                AppStrings.position,
                 style: TextStyle(
                   color: Color(0xFF8BE07F),
                   fontSize: 12,
