@@ -57,7 +57,7 @@ class _SuperLeagueClubSelectionScreenState
         backgroundColor: const Color.fromARGB(82, 81, 84, 82),
         foregroundColor: Colors.white,
         title: const Text(
-          'СУПЕРЛИГА',
+          AppStrings.superLeague,
           style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2),
         ),
       ),
@@ -78,7 +78,7 @@ class _SuperLeagueClubSelectionScreenState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Выбери свой клуб',
+                        AppStrings.chooseClub,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 27,
@@ -96,11 +96,11 @@ class _SuperLeagueClubSelectionScreenState
                       // const SizedBox(height: 14),
                       Row(
                         children: [
-                          _infoChip('20 КЛУБОВ'),
+                          _infoChip('20 ${AppStrings.clubsUpper}'),
                           const SizedBox(width: 8),
-                          _infoChip('10 СЕЗОНОВ'),
+                          _infoChip('10 ${AppStrings.seasonsUpper}'),
                           const SizedBox(width: 8),
-                          _infoChip('РЕЙТИНГ 75'),
+                          _infoChip('${AppStrings.overallUpper} 75'),
                         ],
                       ),
                     ],
@@ -264,7 +264,7 @@ class _SuperLeagueClubSelectionScreenState
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text(
-                                      'Не удалось сохранить карьеру Суперлиги.',
+                                      AppStrings.superLeagueSaveCareerError,
                                     ),
                                   ),
                                 );
@@ -279,7 +279,7 @@ class _SuperLeagueClubSelectionScreenState
                         ),
                       ),
                       child: const Text(
-                        'ВЫБРАТЬ КЛУБ',
+                        AppStrings.chooseClubButton,
                         style: TextStyle(
                           fontWeight: FontWeight.w900,
                           letterSpacing: 1.2,
