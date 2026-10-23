@@ -65,7 +65,7 @@ class _SuperLeagueTransfersScreenState
           foregroundColor: Colors.white,
           automaticallyImplyLeading: false,
           title: const Text(
-            'ТРАНСФЕРНОЕ ОКНО',
+            AppStrings.transfersWindow,
             style: TextStyle(fontWeight: FontWeight.w900),
           ),
         ),
@@ -113,7 +113,7 @@ class _SuperLeagueTransfersScreenState
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'ТЕКУЩИЙ КЛУБ: ${_career.player.club}',
+                            AppStrings.currentClubUpper(_career.player.club),
                             style: const TextStyle(
                               color: Color(0xFF8BE07F),
                               fontSize: 11,
@@ -121,7 +121,7 @@ class _SuperLeagueTransfersScreenState
                             ),
                           ),
                           Text(
-                            'РЕЙТИНГ ${_career.player.overall} • ВОЗРАСТ ${_career.player.age}',
+                            AppStrings.playerRatingAge(_career.player.overall, _career.player.age),
                             style: const TextStyle(
                               color: Colors.white70,
                               fontSize: 11,
@@ -135,7 +135,7 @@ class _SuperLeagueTransfersScreenState
               ),
               const SizedBox(height: 18),
               const Text(
-                'ПРЕДЛОЖЕНИЯ КЛУБОВ',
+                AppStrings.clubOffers,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 14,
@@ -161,7 +161,7 @@ class _SuperLeagueTransfersScreenState
                     ),
                   ),
                   child: Text(
-                    'ОСТАТЬСЯ В ${_career.player.club.toUpperCase()}',
+                    AppStrings.stayAtClub(_career.player.club.toUpperCase()),
                     style: const TextStyle(fontWeight: FontWeight.w900),
                   ),
                 ),
@@ -245,7 +245,7 @@ class _SuperLeagueTransfersScreenState
                     ),
                   ),
                   const Text(
-                    'СИЛА',
+                    AppStrings.strengthUpper,
                     style: TextStyle(
                       color: Colors.white54,
                       fontSize: 9,
@@ -301,13 +301,13 @@ class _SuperLeagueTransfersScreenState
         const Icon(Icons.hourglass_empty, color: Color(0xFF8BE07F), size: 34),
         const SizedBox(height: 8),
         const Text(
-          'Пока нет предложений',
+          AppStrings.noOffersYet,
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
         ),
         const SizedBox(height: 10),
         OutlinedButton(
           onPressed: () => setState(() => _offers = _generateOffers()),
-          child: const Text('ОБНОВИТЬ ПРЕДЛОЖЕНИЯ'),
+          child: Text(AppStrings.refreshClubOffers,
         ),
       ],
     ),
