@@ -97,6 +97,47 @@ class SuperLeagueStanding {
   int get goalDifference => goalsFor - goalsAgainst;
 }
 
+class SuperLeagueSeasonSummary {
+  final int season;
+  final String club;
+  final int matches;
+  final int goals;
+  final int assists;
+  final double averageRating;
+  final bool champion;
+
+  const SuperLeagueSeasonSummary({
+    required this.season,
+    required this.club,
+    required this.matches,
+    required this.goals,
+    required this.assists,
+    required this.averageRating,
+    required this.champion,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'season': season,
+    'club': club,
+    'matches': matches,
+    'goals': goals,
+    'assists': assists,
+    'averageRating': averageRating,
+    'champion': champion,
+  };
+
+  factory SuperLeagueSeasonSummary.fromJson(Map<String, dynamic> json) =>
+      SuperLeagueSeasonSummary(
+        season: (json['season'] as num?)?.toInt() ?? 1,
+        club: json['club'] as String? ?? '',
+        matches: (json['matches'] as num?)?.toInt() ?? 0,
+        goals: (json['goals'] as num?)?.toInt() ?? 0,
+        assists: (json['assists'] as num?)?.toInt() ?? 0,
+        averageRating: (json['averageRating'] as num?)?.toDouble() ?? 0,
+        champion: json['champion'] as bool? ?? false,
+      );
+}
+
 class SuperLeagueCareer {
   final Player player;
   final int season;
@@ -104,6 +145,7 @@ class SuperLeagueCareer {
   final int developmentPoints;
   final int developmentPointsAwardedSeason;
   final List<int> championSeasons;
+  final List<SuperLeagueSeasonSummary> history;
 
   const SuperLeagueCareer({
     required this.player,
@@ -112,6 +154,7 @@ class SuperLeagueCareer {
     this.developmentPoints = 0,
     this.developmentPointsAwardedSeason = 0,
     this.championSeasons = const [],
+    this.history = const [],
   });
 
   static const List<String> clubNames = [
@@ -235,6 +278,7 @@ class SuperLeagueCareer {
     int? developmentPoints,
     int? developmentPointsAwardedSeason,
     List<int>? championSeasons,
+    List<SuperLeagueSeasonSummary>? history,
   }) => SuperLeagueCareer(
     player: player ?? this.player,
     season: season ?? this.season,
@@ -242,6 +286,7 @@ class SuperLeagueCareer {
     developmentPoints: developmentPoints ?? this.developmentPoints,
     developmentPointsAwardedSeason: developmentPointsAwardedSeason ?? this.developmentPointsAwardedSeason,
     championSeasons: championSeasons ?? this.championSeasons,
+    history: history ?? this.history,
   );
 
   int get developmentPointsForSeason {
@@ -288,6 +333,7 @@ class SuperLeagueCareer {
       developmentPoints: developmentPoints,
       developmentPointsAwardedSeason: developmentPointsAwardedSeason,
       championSeasons: championSeasons,
+      history: history,
     );
   }
 
@@ -318,6 +364,7 @@ class SuperLeagueCareer {
       developmentPoints: developmentPoints,
       developmentPointsAwardedSeason: developmentPointsAwardedSeason,
       championSeasons: championSeasons,
+      history: history,
     );
   }
 
@@ -328,6 +375,7 @@ class SuperLeagueCareer {
     'developmentPoints': developmentPoints,
     'developmentPointsAwardedSeason': developmentPointsAwardedSeason,
     'championSeasons': championSeasons,
+    'history': history.map((item) => item.toJson()).toList(),
   };
 
   factory SuperLeagueCareer.fromJson(Map<String, dynamic> json) {
@@ -343,6 +391,7 @@ class SuperLeagueCareer {
       developmentPoints: (json['developmentPoints'] as num?)?.toInt() ?? 0,
       developmentPointsAwardedSeason: (json['developmentPointsAwardedSeason'] as num?)?.toInt() ?? 0,
       championSeasons: (json['championSeasons'] as List?)?.map((value) => (value as num).toInt()).toList() ?? const [],
+      history: (json['history'] as List?)?.map((item) => SuperLeagueSeasonSummary.fromJson(Map<String, dynamic>.from(item as Map))).toList() ?? const [],
     );
   }
 }
