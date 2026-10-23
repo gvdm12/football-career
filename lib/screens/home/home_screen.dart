@@ -295,7 +295,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     icon: const Icon(Icons.emoji_events_outlined),
                     label: const Text(
-                      'СУПЕРЛИГА',
+                      AppStrings.superLeague,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w900,
