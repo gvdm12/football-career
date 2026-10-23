@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_football/services/app_strings.dart';
-import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/super_league_career.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -19,8 +17,8 @@ class SuperLeagueTableScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(82, 81, 84, 82),
         foregroundColor: Colors.white,
-        title: Text(
-          AppStrings.superLeagueTableTitle,
+        title: const Text(
+          'ТАБЛИЦА',
           style: TextStyle(fontWeight: FontWeight.w900),
         ),
       ),
@@ -67,7 +65,7 @@ class SuperLeagueTableScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                AppStrings.seasonOfTen(career.season),
+                                'СЕЗОН ${career.season}/10',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
@@ -106,7 +104,7 @@ class SuperLeagueTableScreen extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       border: Border.all(color: const Color(0xFF14401E)),
     ),
-    child: Row(
+    child: const Row(
       children: [
         SizedBox(
           width: 25,
@@ -117,14 +115,14 @@ class SuperLeagueTableScreen extends StatelessWidget {
         ),
         Expanded(
           child: Text(
-            AppStrings.clubColumn,
+            'КЛУБ',
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900),
           ),
         ),
         SizedBox(
           width: 30,
           child: Text(
-            AppStrings.playedColumn,
+            'И',
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900),
           ),
@@ -132,7 +130,7 @@ class SuperLeagueTableScreen extends StatelessWidget {
         SizedBox(
           width: 55,
           child: Text(
-            AppStrings.goalDifferenceColumn,
+            'РМ',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.black,
@@ -144,7 +142,7 @@ class SuperLeagueTableScreen extends StatelessWidget {
         SizedBox(
           width: 40,
           child: Text(
-            AppStrings.pointsColumn,
+            'О',
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900),
           ),
