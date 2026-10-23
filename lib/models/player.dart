@@ -86,8 +86,8 @@ class PlayerSkills {
           shooting: randomValue(65, 69),
           defending: randomValue(40, 56),
           dribbling: randomValue(64, 68),
-          heading: randomValue(58, 72),
-          vision: randomValue(55, 68),
+          heading: randomValue(63, 72),
+          vision: randomValue(58, 68),
         );
     }
   }
