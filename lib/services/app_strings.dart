@@ -519,4 +519,32 @@ class AppStrings {
   static String get russianLanguage => 'Русский';
   static String get appAuthor => _en ? 'App by Gadjiev M' : 'Автор приложения — Gadjiev M';
 
+
+  static String tournamentStageName(String value) {
+    if (!_en) return value;
+    const names = <String, String>{
+      '1/16 финала': 'Round of 32',
+      '1/8 финала': 'Round of 16',
+      '1/4 финала': 'Quarter-final',
+      '1/2 финала': 'Semi-final',
+      'Четвертьфинал': 'Quarter-final',
+      'Полуфинал': 'Semi-final',
+      'Финал': 'Final',
+      'Завершён': 'Completed',
+      'Турнир завершён': 'Tournament completed',
+    };
+    return names[value] ?? value;
+  }
+
+  static String get homeVenue => _en ? 'Home' : 'Дома';
+  static String get awayVenue => _en ? 'Away' : 'В гостях';
+  static String get pendingResult => _en ? 'Pending' : 'Ожидается';
+  static String tournamentWinner(String winner) =>
+      _en ? 'Tournament winner: $winner' : 'Победитель турнира: $winner';
+  static String get advancedToNextRound => _en
+      ? 'You advanced to the next round'
+      : 'Вы прошли дальше';
+  static String winnerAdvancedToNextRound(String winner) =>
+      _en ? '$winner advanced to the next round' : '$winner прошёл дальше';
+
 }
