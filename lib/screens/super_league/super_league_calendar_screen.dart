@@ -25,7 +25,7 @@ class SuperLeagueCalendarScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFF0B3A1A),
         foregroundColor: Colors.white,
-        title: const Text('КАЛЕНДАРЬ СЕЗОНА',
+        title: Text(AppStrings.calendarTitle,
             style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 0.6)),
       ),
       body: Stack(
@@ -50,7 +50,7 @@ class SuperLeagueCalendarScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('СЕЗОН ${career.season}',
+                      Text(AppStrings.seasonUpper(career.season),
                           style: const TextStyle(color: _green, fontSize: 12,
                               fontWeight: FontWeight.w900, letterSpacing: 1)),
                       const SizedBox(height: 6),
@@ -118,7 +118,7 @@ class SuperLeagueCalendarScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(isHome ? 'ДОМА' : 'В ГОСТЯХ',
+                              Text(isHome ? AppStrings.homeMatchUpper : AppStrings.awayMatchUpper,
                                   style: const TextStyle(color: _green, fontSize: 9,
                                       fontWeight: FontWeight.w900, letterSpacing: 0.8)),
                               const SizedBox(height: 4),
@@ -142,7 +142,7 @@ class SuperLeagueCalendarScreen extends StatelessWidget {
                                   won ? _green : drawn ? Colors.white : const Color(0xFFFF9B9B),
                               fontSize: 14, fontWeight: FontWeight.w900)),
                             const SizedBox(height: 3),
-                            Text(fixture.isPlayed ? 'СЫГРАН' : 'ОЖИДАЕТСЯ',
+                            Text(fixture.isPlayed ? AppStrings.playedStatus : AppStrings.pendingStatus,
                                 style: const TextStyle(color: Colors.white38,
                                     fontSize: 8, fontWeight: FontWeight.w800)),
                           ],
