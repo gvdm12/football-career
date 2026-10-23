@@ -14,7 +14,7 @@ class SuperLeagueDevelopmentScreen extends StatefulWidget {
 
 class _SuperLeagueDevelopmentScreenState extends State<SuperLeagueDevelopmentScreen> {
   late SuperLeagueCareer _career;
-  final Set<SkillName> _selected = {};
+  final Map<SkillName, int> _planned = {};
 
   @override
   void initState() {
@@ -60,32 +60,30 @@ class _SuperLeagueDevelopmentScreenState extends State<SuperLeagueDevelopmentScr
     }
   }
 
-  void _upgradeOne(SkillName skill) {
-    if (_career.developmentPoints < 3 || _value(skill) >= 99) return;
-    var skills = _player.skills;
-    skills = _increase(skills, skill, 3);
-    _apply(skills, 3);
-  }
+  int get _plannedPoints => _planned.values.fold(0, (sum, value) => sum + value);
 
-  void _toggle(SkillName skill) {
-    if (_career.developmentPoints < 6 || _value(skill) >= 99) return;
+  void _changePlanned(SkillName skill, int delta) {
+    final current = _planned[skill] ?? 0;
+    final next = (current + delta).clamp(0, 99 - _value(skill)).toInt();
+    final total = _plannedPoints - current + next;
+    if (total > _career.developmentPoints) return;
     setState(() {
-      if (_selected.contains(skill)) {
-        _selected.remove(skill);
-      } else if (_selected.length < 3) {
-        _selected.add(skill);
+      if (next == 0) {
+        _planned.remove(skill);
+      } else {
+        _planned[skill] = next;
       }
     });
   }
 
-  void _upgradeSelected() {
-    if (_career.developmentPoints < 6 || _selected.length != 3) return;
+  void _applyPlanned() {
+    if (_plannedPoints == 0) return;
     var skills = _player.skills;
-    for (final skill in _selected) {
-      skills = _increase(skills, skill, 2);
+    for (final entry in _planned.entries) {
+      skills = _increase(skills, entry.key, entry.value);
     }
-    _apply(skills, 6);
-    setState(() => _selected.clear());
+    _apply(skills, _plannedPoints);
+    setState(() => _planned.clear());
   }
 
   void _apply(PlayerSkills skills, int cost) {
@@ -157,14 +155,23 @@ class _SuperLeagueDevelopmentScreenState extends State<SuperLeagueDevelopmentScr
                 ]),
               ),
               const SizedBox(height: 18),
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(color: const Color(0x14FFFFFF), borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0xFF14401E))),
+                child: Row(children: [
+                  const Expanded(child: Text('Запланировано улучшений', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w700))),
+                  Text('$_plannedPoints / ${_career.developmentPoints}', style: const TextStyle(color: Color(0xFF8BE07F), fontWeight: FontWeight.w900, fontSize: 16)),
+                ]),
+              ),
+              const SizedBox(height: 18),
               const Text('НАВЫКИ', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1)),
               const SizedBox(height: 10),
               ...SkillName.values.map(_skillCard),
               const SizedBox(height: 14),
               SizedBox(height: 50, child: ElevatedButton(
-                onPressed: _selected.length == 3 && _career.developmentPoints >= 6 ? _upgradeSelected : null,
+                onPressed: _plannedPoints > 0 ? _applyPlanned : null,
                 style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF8BE07F), foregroundColor: const Color(0xFF082A12)),
-                child: const Text('УЛУЧШИТЬ 3 НАВЫКА (+2)', style: TextStyle(fontWeight: FontWeight.w900)),
+                child: Text('ПРИМЕНИТЬ УЛУЧШЕНИЯ ($_plannedPoints ОЧК.)', style: const TextStyle(fontWeight: FontWeight.w900)),
               )),
               const SizedBox(height: 10),
               SizedBox(height: 50, child: OutlinedButton(
@@ -181,7 +188,7 @@ class _SuperLeagueDevelopmentScreenState extends State<SuperLeagueDevelopmentScr
 
   Widget _skillCard(SkillName skill) {
     final value = _value(skill);
-    final selected = _selected.contains(skill);
+    final planned = _planned[skill] ?? 0;
     final color = switch (skill) {
       SkillName.pace => const Color(0xFFC8E04A),
       SkillName.physical => const Color(0xFFFFC94A),
@@ -194,9 +201,9 @@ class _SuperLeagueDevelopmentScreenState extends State<SuperLeagueDevelopmentScr
       margin: const EdgeInsets.only(bottom: 9),
       padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 12),
       decoration: BoxDecoration(
-        color: selected ? const Color(0xFF12381B) : const Color(0x14FFFFFF),
+        color: planned > 0 ? const Color(0xFF12381B) : const Color(0x14FFFFFF),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: selected ? const Color(0xFF8BE07F) : const Color(0xFF14401E)),
+        border: Border.all(color: planned > 0 ? const Color(0xFF8BE07F) : const Color(0xFF14401E)),
       ),
       child: Row(children: [
         Icon(_icon(skill), color: color, size: 23),
@@ -211,17 +218,32 @@ class _SuperLeagueDevelopmentScreenState extends State<SuperLeagueDevelopmentScr
         const SizedBox(width: 10),
         Text('$value', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 17)),
         const SizedBox(width: 6),
-        IconButton(
-          tooltip: 'Улучшить на 3 за 3 очка',
-          onPressed: _career.developmentPoints >= 3 && value < 99 ? () => _upgradeOne(skill) : null,
-          icon: const Icon(Icons.add_circle_outline),
-          color: const Color(0xFF8BE07F),
+        SizedBox(
+          width: 34,
+          child: IconButton(
+            padding: EdgeInsets.zero,
+            tooltip: 'Уменьшить улучшение',
+            onPressed: planned > 0 ? () => _changePlanned(skill, -1) : null,
+            icon: const Icon(Icons.remove_circle_outline, size: 20),
+            color: const Color(0xFF8BE07F),
+          ),
         ),
-        IconButton(
-          tooltip: selected ? 'Убрать из выбора' : 'Выбрать для улучшения',
-          onPressed: value < 99 && _career.developmentPoints >= 6 ? () => _toggle(skill) : null,
-          icon: Icon(selected ? Icons.check_circle : Icons.circle_outlined),
-          color: const Color(0xFF8BE07F),
+        SizedBox(
+          width: 28,
+          child: Text(planned > 0 ? '+$planned' : '+0',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: planned > 0 ? const Color(0xFF8BE07F) : Colors.white38, fontWeight: FontWeight.w900)),
+        ),
+        SizedBox(
+          width: 34,
+          child: IconButton(
+            padding: EdgeInsets.zero,
+            tooltip: 'Улучшить на 1 пункт',
+            onPressed: value + planned < 99 && _plannedPoints < _career.developmentPoints
+              ? () => _changePlanned(skill, 1) : null,
+            icon: const Icon(Icons.add_circle_outline, size: 20),
+            color: const Color(0xFF8BE07F),
+          ),
         ),
       ]),
     );
