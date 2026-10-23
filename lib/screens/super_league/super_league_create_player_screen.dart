@@ -21,7 +21,19 @@ class _SuperLeagueCreatePlayerScreenState
   final _nameController = TextEditingController();
 
   PlayerPosition _position = PlayerPosition.forward;
+  late PlayerSkills _previewSkills;
   String _nationality = 'Россия';
+
+  @override
+  void initState() {
+    super.initState();
+    _previewSkills = PlayerSkills.initial(_position);
+  }
+
+  int get _previewOverall => calculateOverall(
+    skills: _previewSkills,
+    position: _position,
+  );
 
   // Тот же список национальностей, что и в обычной карьере.
   static const _nationalities = [
@@ -160,7 +172,10 @@ class _SuperLeagueCreatePlayerScreenState
     final selected = _position == position;
 
     return GestureDetector(
-      onTap: () => setState(() => _position = position),
+      onTap: () => setState(() {
+        _position = position;
+        _previewSkills = PlayerSkills.initial(position);
+      }),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         height: 72,
@@ -207,8 +222,10 @@ class _SuperLeagueCreatePlayerScreenState
       club: widget.club.name,
     );
 
-    // В Суперлиге рейтинг на старте фиксирован, независимо от позиции.
-    final player = generatedPlayer.copyWith(overall: 75);
+    final player = generatedPlayer.copyWith(
+      skills: _previewSkills,
+      overall: _previewOverall,
+    );
     Navigator.pop(context, player);
   }
 
@@ -296,8 +313,8 @@ class _SuperLeagueCreatePlayerScreenState
                       ],
                     ),
                   ),
-                  const Text(
-                    '75',
+                  Text(
+                    '$_previewOverall',
                     style: TextStyle(
                       color: _green,
                       fontSize: 30,
@@ -465,7 +482,7 @@ class _SuperLeagueCreatePlayerScreenState
             ),
             const SizedBox(height: 10),
             const Text(
-              'Начальный рейтинг игрока в Суперлиге — 75',
+              'Начальный рейтинг рассчитывается по навыкам выбранной позиции',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white54, fontSize: 12),
             ),
