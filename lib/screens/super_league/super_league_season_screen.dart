@@ -42,7 +42,12 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
     final next = _career.nextFixture;
     final played = _career.fixtures.where((f) => f.isPlayed && (f.homeTeam == _career.player.club || f.awayTeam == _career.player.club)).length;
     const total = 38;
-    return Scaffold(
+    return PopScope<SuperLeagueCareer>(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && mounted) Navigator.pop(context, _career);
+      },
+      child: Scaffold(
       backgroundColor: _bg,
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(82, 81, 84, 82),
@@ -186,7 +191,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
           ],
         )),
       ]),
-    );
+    ));
   }
 
   Future<void> _startNextSeason() async {
