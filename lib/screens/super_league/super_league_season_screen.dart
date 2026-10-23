@@ -463,8 +463,8 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                       ),
                     ),
                   ] else ...[
-                    const Text(
-                      'СЛЕДУЮЩИЙ МАТЧ',
+                    Text(
+                      AppStrings.nextMatchUpper,
                       style: TextStyle(
                         color: Color(0xFF8BE07F),
                         fontSize: 11,
@@ -834,10 +834,10 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
     final playerGoals = isHome ? fixture.homeGoals! : fixture.awayGoals!;
     final opponentGoals = isHome ? fixture.awayGoals! : fixture.homeGoals!;
     final resultLabel = playerGoals > opponentGoals
-        ? 'ПОБЕДА'
+        ? AppStrings.victory
         : playerGoals < opponentGoals
-        ? 'ПОРАЖЕНИЕ'
-        : 'НИЧЬЯ';
+        ? AppStrings.defeat
+        : AppStrings.draw;
     final rating = fixture.playerPlayed
         ? fixture.playerRating.toStringAsFixed(1)
         : '—';
