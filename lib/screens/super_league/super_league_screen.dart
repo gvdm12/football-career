@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_football/models/super_league_career.dart';
 import 'package:flutter_football/screens/super_league/super_league_career_screen.dart';
 import 'package:flutter_football/screens/super_league/super_league_club_selection_screen.dart';
@@ -90,15 +91,17 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
     return Scaffold(
       backgroundColor: _background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0B3A1A),
+        backgroundColor: const Color.fromARGB(82, 81, 84, 82),
         foregroundColor: Colors.white,
         title: const Text(
           'СУПЕРЛИГА',
           style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2),
         ),
       ),
-      body: SafeArea(
-        child: ListView(
+      body: Stack(children: [
+        Positioned.fill(child: Opacity(opacity: 0.20,
+          child: Image.asset('assets/images/fon2.png', fit: BoxFit.cover))),
+        SafeArea(child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
             Container(
@@ -107,10 +110,10 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [Color(0xFF164A25), Color(0xFF0B2813)],
+                  colors: [Color(0xFF0B3A1A), Color(0xFF082A12), Color(0xFF04160A)],
                 ),
                 borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: const Color(0xFF28683A)),
+                border: Border.all(color: const Color(0xFF14401E)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,11 +125,7 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                       color: _green.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(17),
                     ),
-                    child: const Icon(
-                      Icons.emoji_events_rounded,
-                      color: _green,
-                      size: 34,
-                    ),
+                    child: SvgPicture.asset('assets/icons/cup.svg', width: 34, height: 34, color: _green),
                   ),
                   const SizedBox(height: 20),
                   const Text(
@@ -262,8 +261,8 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
               ),
             ),
           ],
-        ),
-      ),
+        )),
+      ]),
     );
   }
 }
