@@ -214,7 +214,7 @@ class _SuperLeagueCareerScreenState extends State<SuperLeagueCareerScreen> {
         ])),
         _miniInfo('ВОЗРАСТ', '${player.age}'),
         const SizedBox(width: 12),
-        _miniInfo('СЕЗОН', '${career.season}/10'),
+        _miniInfo('СЕЗОН', '${_career.season}/10'),
       ]),
     );
   }
