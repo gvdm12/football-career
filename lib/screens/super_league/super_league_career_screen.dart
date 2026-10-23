@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/super_league_career.dart';
