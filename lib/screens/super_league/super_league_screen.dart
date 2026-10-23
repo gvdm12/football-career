@@ -231,7 +231,7 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                       _isCheckingSave
                           ? AppStrings.checkingSave
                           : _hasSavedCareer
-                          ? 'ПРОДОЛЖИТЬ'
+                          ? AppStrings.continueCareer
                           : AppStrings.noSave,
                       style: const TextStyle(
                         fontWeight: FontWeight.w900,
