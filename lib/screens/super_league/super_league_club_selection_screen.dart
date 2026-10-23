@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/player.dart';
@@ -56,7 +57,7 @@ class _SuperLeagueClubSelectionScreenState
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(82, 81, 84, 82),
         foregroundColor: Colors.white,
-        title: const Text(
+        title: Text(
           AppStrings.superLeague,
           style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2),
         ),
@@ -77,7 +78,7 @@ class _SuperLeagueClubSelectionScreenState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         AppStrings.chooseClub,
                         style: TextStyle(
                           color: Colors.white,
@@ -278,7 +279,7 @@ class _SuperLeagueClubSelectionScreenState
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         AppStrings.chooseClubButton,
                         style: TextStyle(
                           fontWeight: FontWeight.w900,
