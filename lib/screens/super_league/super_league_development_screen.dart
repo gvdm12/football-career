@@ -276,7 +276,7 @@ class _SuperLeagueDevelopmentScreenState
                     ),
                     child: Row(
                       children: [
-                        const Expanded(
+                        Expanded(
                           child: Text(
                             AppStrings.plannedUpgrades,
                             style: TextStyle(
