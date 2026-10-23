@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/models/super_league_career.dart';
 import 'package:flutter_football/screens/super_league/super_league_career_screen.dart';
 import 'package:flutter_football/screens/super_league/super_league_club_selection_screen.dart';
@@ -168,7 +169,7 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const Row(
+                      Row(
                         children: [
                           Expanded(
                             child: _ModeStat(value: '20', label: AppStrings.clubsUpper),
