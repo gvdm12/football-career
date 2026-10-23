@@ -87,23 +87,19 @@ class SuperLeagueTableScreen extends StatelessWidget {
     final difference = entry.goalDifference;
     final primary = ClubColors.primary(entry.club);
     final secondary = ClubColors.secondary(entry.club);
-    final qualifies = position <= 4;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: isPlayerClub
           ? const Color(0xB414401E)
-          : qualifies
-            ? const Color(0xCD163B62)
-            : const Color(0x72665353),
+          : const Color(0x72665353),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isPlayerClub ? const Color(0xFF4F9F59)
-            : qualifies ? Colors.white : const Color(0xFF14401E)),
+          color: isPlayerClub ? const Color(0xFF4F9F59) : const Color(0xFF14401E)),
       ),
       child: Row(children: [
         SizedBox(width: 25, child: Text('$position',
-          style: TextStyle(color: isPlayerClub ? green : qualifies ? const Color(0xFF8DB8FF) : Colors.white70,
+          style: TextStyle(color: isPlayerClub ? green : Colors.white70,
             fontWeight: FontWeight.w900))),
         Expanded(child: Row(children: [
           Container(width: 28, height: 28, alignment: Alignment.center,
