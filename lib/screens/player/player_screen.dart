@@ -825,6 +825,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
         Icons.blur_circular,
         const Color(0xFF4AA8FF),
       ),
+      _Stat(AppStrings.heading, player.skills.heading, Icons.sports_soccer, const Color(0xFFFF9F43)),
+      _Stat(AppStrings.vision, player.skills.vision, Icons.visibility, const Color(0xFFB78BFA)),
     ];
 
     return Column(
