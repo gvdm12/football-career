@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/player.dart';
@@ -163,13 +164,13 @@ class _SuperLeagueCreatePlayerScreenState
   String _positionLabel(PlayerPosition position) {
     switch (position) {
       case PlayerPosition.goalkeeper:
-        return 'Вратарь';
+        return AppStrings.goalkeeper;
       case PlayerPosition.defender:
-        return 'Защитник';
+        return AppStrings.defender;
       case PlayerPosition.midfielder:
-        return 'Полузащитник';
+        return AppStrings.midfielder;
       case PlayerPosition.forward:
-        return 'Нападающий';
+        return AppStrings.striker;
     }
   }
 
@@ -248,7 +249,7 @@ class _SuperLeagueCreatePlayerScreenState
         backgroundColor: const Color.fromARGB(82, 81, 84, 82),
         foregroundColor: Colors.white,
         title: const Text(
-          'СОЗДАНИЕ ИГРОКА',
+          AppStrings.playerCreation,
           style: TextStyle(
             fontWeight: FontWeight.w900,
             letterSpacing: 1.2,
@@ -331,7 +332,7 @@ class _SuperLeagueCreatePlayerScreenState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            'ТВОЙ КЛУБ',
+                            AppStrings.yourClubUpper,
                             style: TextStyle(
                               color: Color(0xFF8BE07F),
                               fontSize: 11,
@@ -349,7 +350,7 @@ class _SuperLeagueCreatePlayerScreenState
                             ),
                           ),
                           Text(
-                            'Сила клуба: ${widget.club.strength}',
+                            AppStrings.clubStrengthValue(widget.club.strength),
                             style: const TextStyle(color: Colors.white60),
                           ),
                         ],
@@ -368,7 +369,7 @@ class _SuperLeagueCreatePlayerScreenState
               ),
               const SizedBox(height: 26),
               const Text(
-                'ИМЯ ФУТБОЛИСТА',
+                AppStrings.footballerName,
                 style: TextStyle(
                   color: Color(0xFF8BE07F),
                   fontSize: 12,
@@ -383,7 +384,7 @@ class _SuperLeagueCreatePlayerScreenState
                 textInputAction: TextInputAction.done,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: 'Введи имя',
+                  hintText: AppStrings.enterNameHint,
                   hintStyle: const TextStyle(color: Colors.white38),
                   filled: true,
                   fillColor: const Color(0xFF0B2813),
@@ -439,7 +440,7 @@ class _SuperLeagueCreatePlayerScreenState
               ),
               const SizedBox(height: 15),
               const Text(
-                'СТРАНА',
+                AppStrings.countryUpper,
                 style: TextStyle(
                   color: Color(0xFF8BE07F),
                   fontSize: 12,
@@ -520,7 +521,7 @@ class _SuperLeagueCreatePlayerScreenState
                     ),
                   ),
                   child: const Text(
-                    'СОЗДАТЬ ИГРОКА',
+                    AppStrings.createCareer,
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.1,
