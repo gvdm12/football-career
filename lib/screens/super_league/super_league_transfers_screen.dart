@@ -28,6 +28,7 @@ class _SuperLeagueTransfersScreenState extends State<SuperLeagueTransfersScreen>
     final current = Clubs.getByName(_career.player.club);
     final maxStrength = (_career.player.overall + 15).clamp(65, 99);
     final candidates = Clubs.all.where((club) =>
+      SuperLeagueCareer.clubNames.contains(club.name) &&
       club.name != _career.player.club &&
       club.strength <= maxStrength &&
       club.strength >= (current.strength - 12)).toList();
@@ -39,6 +40,7 @@ class _SuperLeagueTransfersScreenState extends State<SuperLeagueTransfersScreen>
       _career.player.overall * 120).round();
 
   void _accept(Club club) {
+    if (!SuperLeagueCareer.clubNames.contains(club.name)) return;
     final next = _career.copyWith(player: _career.player.copyWith(club: club.name));
     Navigator.pop(context, next);
   }
