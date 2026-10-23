@@ -1,36 +1,27 @@
 import 'dart:convert';
 
-import 'package:flutter_football/models/player.dart';
+import 'package:flutter_football/models/super_league_career.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Отдельное хранилище Суперлиги — не затрагивает обычную карьеру.
+/// Separate save slot for Super League; never touches the regular career.
 class SuperLeagueStorage {
-  static const String _saveKey = 'super_league_career_v1';
+  static const String _saveKey = 'super_league_career_v2';
 
-  static Future<void> savePlayer(Player player) async {
+  static Future<void> saveCareer(SuperLeagueCareer career) async {
     final preferences = await SharedPreferences.getInstance();
-    final saved = await preferences.setString(
-      _saveKey,
-      jsonEncode({'player': player.toJson()}),
-    );
-    if (!saved) {
-      throw Exception('Не удалось сохранить карьеру Суперлиги');
-    }
+    final saved = await preferences.setString(_saveKey, jsonEncode(career.toJson()));
+    if (!saved) throw Exception('Не удалось сохранить карьеру Суперлиги');
   }
 
-  static Future<Player?> loadPlayer() async {
+  static Future<SuperLeagueCareer?> loadCareer() async {
     final preferences = await SharedPreferences.getInstance();
     final raw = preferences.getString(_saveKey);
     if (raw == null) return null;
-
     final decoded = jsonDecode(raw);
-    if (decoded is! Map || decoded['player'] is! Map) {
+    if (decoded is! Map) {
       throw const FormatException('Некорректное сохранение Суперлиги');
     }
-
-    return Player.fromJson(
-      Map<String, dynamic>.from(decoded['player'] as Map),
-    );
+    return SuperLeagueCareer.fromJson(Map<String, dynamic>.from(decoded));
   }
 
   static Future<bool> hasSavedCareer() async {
