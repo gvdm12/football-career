@@ -2263,7 +2263,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                         fit: BoxFit.contain,
                       ),
                       const SizedBox(width: 8),
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           '${AppStrings.nextMatchUpper} · ${AppStrings.championsLeague.toUpperCase()}',
                           style: TextStyle(
