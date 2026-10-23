@@ -575,7 +575,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         : _openSeason,
                     child: Text(
                       career.isCareerFinished
-                          ? 'ИТОГИ КАРЬЕРЫ'
+                          ? AppStrings.careerEndTitle.toUpperCase()
                           : AppStrings.seasonButton,
                       style: const TextStyle(
                         fontWeight: FontWeight.w900,
