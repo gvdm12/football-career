@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_football/models/super_league_career.dart';
@@ -238,7 +237,6 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
   ]);
 
   Widget _teamName(String name, bool isPlayer, {bool alignEnd = false}) {
-    final club = Clubs.getByName(name);
     return Column(crossAxisAlignment: alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start, children: [
       Container(width: 42, height: 42, alignment: Alignment.center,
         decoration: BoxDecoration(color: ClubColors.primary(name).withValues(alpha: 0.18),
