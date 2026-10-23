@@ -125,7 +125,7 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                       color: _green.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(17),
                     ),
-                    child: SvgPicture.asset('assets/icons/cup.svg', width: 34, height: 34, color: _green),
+                    child: Image.asset('assets/icons/cup.png', width: 34, height: 34, fit: BoxFit.contain),
                   ),
                   const SizedBox(height: 20),
                   const Text(
