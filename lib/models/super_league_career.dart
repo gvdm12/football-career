@@ -168,42 +168,49 @@ class SuperLeagueCareer {
       SuperLeagueDivisionConfig.clubsFor(playerDivision);
 
   factory SuperLeagueCareer.newCareer(Player player) {
-    final firstLeg = <SuperLeagueFixture>[];
-    final teams = List<String>.from(
-      SuperLeagueDivisionConfig.clubsFor(
-        SuperLeagueDivisionConfig.divisionOf(player.club),
-      ),
-    );
-    // Round-robin circle method: every club plays once per round.
-    for (var round = 1; round <= teams.length - 1; round++) {
-      for (var i = 0; i < teams.length ~/ 2; i++) {
-        final first = teams[i];
-        final second = teams[teams.length - 1 - i];
-        final home = round.isEven ? second : first;
-        final away = round.isEven ? first : second;
-        firstLeg.add(SuperLeagueFixture(
-          round: round,
-          homeTeam: home,
-          awayTeam: away,
-        ));
+    List<SuperLeagueFixture> buildCalendar(List<String> clubNames) {
+      final teams = List<String>.from(clubNames);
+      final firstLeg = <SuperLeagueFixture>[];
+      for (var round = 1; round <= teams.length - 1; round++) {
+        for (var i = 0; i < teams.length ~/ 2; i++) {
+          final first = teams[i];
+          final second = teams[teams.length - 1 - i];
+          final home = round.isEven ? second : first;
+          final away = round.isEven ? first : second;
+          firstLeg.add(SuperLeagueFixture(
+            round: round,
+            homeTeam: home,
+            awayTeam: away,
+          ));
+        }
+        final fixed = teams.first;
+        final rotating = teams.sublist(1);
+        rotating.insert(0, rotating.removeLast());
+        teams
+          ..clear()
+          ..add(fixed)
+          ..addAll(rotating);
       }
-      final fixed = teams.first;
-      final rotating = teams.sublist(1);
-      rotating.insert(0, rotating.removeLast());
-      teams
-        ..clear()
-        ..add(fixed)
-        ..addAll(rotating);
+      return <SuperLeagueFixture>[
+        ...firstLeg,
+        ...firstLeg.map((fixture) => SuperLeagueFixture(
+          round: fixture.round + clubNames.length - 1,
+          homeTeam: fixture.awayTeam,
+          awayTeam: fixture.homeTeam,
+        )),
+      ];
     }
+
     final fixtures = <SuperLeagueFixture>[
-      ...firstLeg,
-      ...firstLeg.map((fixture) => SuperLeagueFixture(
-        round: fixture.round + teams.length - 1,
-        homeTeam: fixture.awayTeam,
-        awayTeam: fixture.homeTeam,
-      )),
+      ...buildCalendar(SuperLeagueDivisionConfig.firstDivisionClubs),
+      ...buildCalendar(SuperLeagueDivisionConfig.secondDivisionClubs),
     ];
-    return SuperLeagueCareer(player: player, season: 1, fixtures: fixtures, developmentPoints: 0);
+    return SuperLeagueCareer(
+      player: player,
+      season: 1,
+      fixtures: fixtures,
+      developmentPoints: 0,
+    );
   }
 
   int get playedMatches => fixtures.where((fixture) => fixture.isPlayed && (fixture.homeTeam == player.club || fixture.awayTeam == player.club)).length;
@@ -225,15 +232,20 @@ class SuperLeagueCareer {
     return null;
   }
 
-  List<SuperLeagueStanding> get standings {
+  List<SuperLeagueStanding> get standings => standingsFor(playerDivision);
+
+  List<SuperLeagueStanding> standingsFor(SuperLeagueDivision division) {
+    final divisionClubs = SuperLeagueDivisionConfig.clubsFor(division);
+    final clubSet = divisionClubs.toSet();
     final stats = {
-      for (final club in currentDivisionClubNames)
+      for (final club in divisionClubs)
         club: <String, int>{
           'played': 0, 'wins': 0, 'draws': 0, 'losses': 0,
           'gf': 0, 'ga': 0,
         },
     };
-    for (final fixture in fixtures.where((f) => f.isPlayed)) {
+    for (final fixture in fixtures.where((f) =>
+        f.isPlayed && clubSet.contains(f.homeTeam) && clubSet.contains(f.awayTeam))) {
       final home = stats[fixture.homeTeam];
       final away = stats[fixture.awayTeam];
       if (home == null || away == null) continue;
