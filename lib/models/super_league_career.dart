@@ -394,8 +394,42 @@ class SuperLeagueCareer {
       season: nextSeasonNumber,
       club: newClub ?? player.club,
     );
-    final firstStandings = standingsFor(SuperLeagueDivision.first);
-    final secondStandings = standingsFor(SuperLeagueDivision.second);
+
+    // The first division has 38 rounds and the second has 42.
+    // Complete the remaining second-division rounds before calculating promotions.
+    final random = Random();
+    final completedFixtures = fixtures.map((fixture) {
+      if (fixture.isPlayed) return fixture;
+      final isPlayerFixture = fixture.homeTeam == player.club ||
+          fixture.awayTeam == player.club;
+      if (isPlayerFixture) {
+        final isHome = fixture.homeTeam == player.club;
+        final opponent = isHome ? fixture.awayTeam : fixture.homeTeam;
+        final match = Match.generate(
+          player: player,
+          opponent: opponent,
+          isHome: isHome,
+        );
+        return fixture.copyWith(
+          homeGoals: match.homeGoals,
+          awayGoals: match.awayGoals,
+          playerGoals: match.playerGoals,
+          playerAssists: match.playerAssists,
+          playerRating: match.playerRating,
+          playerPlayed: match.playerPlayed,
+        );
+      }
+      final homeClub = Clubs.getByName(fixture.homeTeam);
+      final awayClub = Clubs.getByName(fixture.awayTeam);
+      final difference = homeClub.strength - awayClub.strength;
+      return fixture.copyWith(
+        homeGoals: _goalsFor(1.35 + difference * 0.035 + 0.18, random),
+        awayGoals: _goalsFor(1.10 - difference * 0.035, random),
+      );
+    }).toList();
+    final completedSeason = copyWith(fixtures: completedFixtures);
+    final firstStandings = completedSeason.standingsFor(SuperLeagueDivision.first);
+    final secondStandings = completedSeason.standingsFor(SuperLeagueDivision.second);
     final relegated = firstStandings.skip(15).take(5).map((entry) => entry.club).toList();
     final promoted = secondStandings.take(5).map((entry) => entry.club).toList();
     final nextFirst = <String>[
