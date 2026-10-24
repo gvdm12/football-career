@@ -69,25 +69,25 @@ class PlayerSkills {
       case PlayerPosition.midfielder:
         return PlayerSkills(
           pace: randomValue(59, 67),
-          physical: randomValue(58, 65),
-          passing: randomValue(62, 68),
-          shooting: randomValue(60, 65),
-          defending: randomValue(50, 57),
-          dribbling: randomValue(59, 67),
-          heading: randomValue(45, 58),
-          vision: randomValue(65, 78),
+          physical: randomValue(59, 67),
+          passing: randomValue(64, 68),
+          shooting: randomValue(61, 66),
+          defending: randomValue(53, 59),
+          dribbling: randomValue(60, 67),
+          heading: randomValue(49, 58),
+          vision: randomValue(68, 78),
         );
 
       case PlayerPosition.forward:
         return PlayerSkills(
-          pace: randomValue(63, 70),
-          physical: randomValue(60, 67),
+          pace: randomValue(64, 70),
+          physical: randomValue(61, 67),
           passing: randomValue(62, 68),
-          shooting: randomValue(65, 69),
-          defending: randomValue(40, 56),
-          dribbling: randomValue(64, 68),
-          heading: randomValue(63, 72),
-          vision: randomValue(58, 68),
+          shooting: randomValue(66, 69),
+          defending: randomValue(44, 56),
+          dribbling: randomValue(65, 68),
+          heading: randomValue(65, 72),
+          vision: randomValue(60, 68),
         );
     }
   }

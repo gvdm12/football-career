@@ -145,7 +145,7 @@ class Match {
         case PlayerPosition.forward:
           // Нападающий влияет прежде всего на создание и реализацию моментов.
           final attackPower =
-              skills.shooting * 0.40 +
+              skills.shooting * 0.45 +
               skills.dribbling * 0.25 +
               skills.pace * 0.20 +
               skills.heading * 0.15;
@@ -389,7 +389,7 @@ class Match {
 
     // Базовая вероятность остаётся зависимой от навыков и рейтинга.
     double chance =
-        0.24 + (attackPower / 100) * 0.25 + (player.overall - 60) * 0.002;
+        0.28 + (attackPower / 100) * 0.25 + (player.overall - 60) * 0.002;
 
     final club = Clubs.getByName(player.club);
     chance += (club.strength - 70) * 0.003;
@@ -460,7 +460,8 @@ class Match {
         skills.dribbling * 0.30 +
         skills.passing * 0.25;
 
-    final chance = 0.07 + (attackPower / 100) * 0.18 + player.skills.vision * 0.0005;
+    final chance =
+        0.07 + (attackPower / 100) * 0.18 + player.skills.vision * 0.0005;
 
     int goals = 0;
 
@@ -539,9 +540,7 @@ class Match {
     }
 
     final chance =
-        0.015 +
-        player.skills.passing * 0.001 +
-        player.skills.vision * 0.0015;
+        0.015 + player.skills.passing * 0.001 + player.skills.vision * 0.0015;
 
     return random.nextDouble() < chance ? 1 : 0;
   }
