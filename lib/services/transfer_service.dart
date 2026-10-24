@@ -393,8 +393,41 @@ class TransferService {
     final rating = career.averageRating ?? 0;
     final contributions = career.goals + career.assists;
 
-    // При слабом сезоне клуб может отказаться от продления.
-    if (rating < 6.5 && _random.nextDouble() < 0.5) {
+    // После 32 лет клубы чаще отказываются продлевать контракт.
+    // Чем сильнее клуб и старше игрок, тем выше риск отказа.
+    if (career.player.age >= 32) {
+      final age = career.player.age;
+      double refusalChance;
+
+      if (currentClub.strength >= 85) {
+        refusalChance = 0.25;
+      } else if (currentClub.strength >= 80) {
+        refusalChance = 0.18;
+      } else {
+        refusalChance = 0.08;
+      }
+
+      if (age >= 32 && age <= 33) refusalChance += 0.08;
+      if (age >= 34 && age <= 35) refusalChance += 0.18;
+      if (age >= 36) refusalChance += 0.30;
+      if (rating > 0 && rating < 6.5) refusalChance += 0.25;
+      if (rating >= 6.5 && rating < 7.0) refusalChance += 0.12;
+
+      // Отличный сезон помогает сохранить доверие клуба,
+      // но не гарантирует продление в зрелом возрасте.
+      if (rating >= 7.5 && contributions >= 18) {
+        refusalChance -= 0.12;
+      } else if (rating >= 7.2 && contributions >= 12) {
+        refusalChance -= 0.06;
+      }
+
+      refusalChance = refusalChance.clamp(0.05, 0.85);
+
+      if (_random.nextDouble() < refusalChance) {
+        return null;
+      }
+    } else if (rating < 6.5 && _random.nextDouble() < 0.5) {
+      // Для игроков младше 32 лет сохраняем прежнее правило.
       return null;
     }
 
