@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/super_league_career.dart';
+import 'package:flutter_football/models/super_league_division.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class SuperLeagueTableScreen extends StatelessWidget {
+class SuperLeagueTableScreen extends StatefulWidget {
   final SuperLeagueCareer career;
   const SuperLeagueTableScreen({super.key, required this.career});
 
+  @override
+  State<SuperLeagueTableScreen> createState() => _SuperLeagueTableScreenState();
+}
+
+class _SuperLeagueTableScreenState extends State<SuperLeagueTableScreen> {
   static const Color green = Color(0xFF8BE07F);
+  SuperLeagueDivision _selectedDivision = SuperLeagueDivision.first;
 
   @override
   Widget build(BuildContext context) {
-    final standings = career.standings;
+    final career = widget.career;
+    final standings = career.standingsFor(_selectedDivision);
     return Scaffold(
       backgroundColor: const Color(0xFF061B0C),
       appBar: AppBar(
@@ -79,6 +87,39 @@ class SuperLeagueTableScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
+                  Row(
+                    children: SuperLeagueDivision.values.map((division) {
+                      final selected = division == _selectedDivision;
+                      return Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            right: division == SuperLeagueDivision.first ? 8 : 0,
+                          ),
+                          child: OutlinedButton(
+                            onPressed: () => setState(() => _selectedDivision = division),
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: selected
+                                  ? const Color(0xFF16401E)
+                                  : const Color(0xFF0A2110),
+                              foregroundColor: selected ? green : Colors.white70,
+                              side: BorderSide(
+                                color: selected ? green : const Color(0xFF14401E),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                              division.displayName,
+                              style: const TextStyle(fontWeight: FontWeight.w900),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 10),
                   _buildHeader(),
                   const SizedBox(height: 8),
                   ...List.generate(
