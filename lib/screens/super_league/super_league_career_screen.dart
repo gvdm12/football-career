@@ -175,15 +175,6 @@ class _SuperLeagueCareerScreenState extends State<SuperLeagueCareerScreen> {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    icon: SvgPicture.asset(
-                      'assets/icons/table.svg',
-                      width: 25,
-                      height: 25,
-                      colorFilter: const ColorFilter.mode(
-                        Color(0xFF082A12),
-                        BlendMode.srcIn,
-                      ),
-                    ),
                     label: Text(
                       AppStrings.seasonButton,
                       style: TextStyle(fontWeight: FontWeight.w900),
@@ -388,7 +379,10 @@ class _SuperLeagueCareerScreenState extends State<SuperLeagueCareerScreen> {
           ),
           _miniInfo(AppStrings.age.toUpperCase(), '${player.age}'),
           const SizedBox(width: 12),
-          _miniInfo(AppStrings.seasonUpper(_career.season), '${_career.season}/10'),
+          _miniInfo(
+            AppStrings.seasonUpper(_career.season),
+            '${_career.season}/10',
+          ),
         ],
       ),
     );
@@ -454,8 +448,18 @@ class _SuperLeagueCareerScreenState extends State<SuperLeagueCareerScreen> {
         icon: Icons.blur_circular,
         color: Color(0xFF4AA8FF),
       ),
-      (name: AppStrings.heading, value: player.skills.heading, icon: Icons.sports_soccer, color: Color(0xFFFF9F43)),
-      (name: AppStrings.vision, value: player.skills.vision, icon: Icons.visibility, color: Color(0xFFB78BFA)),
+      (
+        name: AppStrings.heading,
+        value: player.skills.heading,
+        icon: Icons.sports_soccer,
+        color: Color(0xFFFF9F43),
+      ),
+      (
+        name: AppStrings.vision,
+        value: player.skills.vision,
+        icon: Icons.visibility,
+        color: Color(0xFFB78BFA),
+      ),
     ];
     return [
       for (var i = 0; i < stats.length; i++) ...[

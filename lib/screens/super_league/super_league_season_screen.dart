@@ -175,7 +175,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                     Text(
                       'ТАБЛИЦА',
                       style: TextStyle(
-                        color: Colors.white70,
+                        color: Colors.white,
                         fontSize: 8,
                         fontWeight: FontWeight.w800,
                       ),
@@ -520,7 +520,8 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                                     ),
                                     const SizedBox(height: 5),
                                     Text(
-                                      _career.playerDivision == SuperLeagueDivision.first
+                                      _career.playerDivision ==
+                                              SuperLeagueDivision.first
                                           ? 'ЧЕМПИОН СУПЕРЛИГИ · 1-Й ДИВИЗИОН!'
                                           : 'ЧЕМПИОН СУПЕРЛИГИ · 2-Й ДИВИЗИОН!',
                                       textAlign: TextAlign.center,
@@ -532,7 +533,8 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      _career.playerDivision == SuperLeagueDivision.first
+                                      _career.playerDivision ==
+                                              SuperLeagueDivision.first
                                           ? 'Трофей первого дивизиона'
                                           : 'Трофей второго дивизиона',
                                       textAlign: TextAlign.center,
@@ -719,7 +721,8 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
       final standings = completed.standings;
       final wonLeague =
           standings.isNotEmpty && standings.first.club == completed.player.club;
-      if (wonLeague && completed.playerDivision == SuperLeagueDivision.first &&
+      if (wonLeague &&
+          completed.playerDivision == SuperLeagueDivision.first &&
           !completed.championSeasons.contains(completed.season)) {
         completed = completed.copyWith(
           championSeasons: [...completed.championSeasons, completed.season],

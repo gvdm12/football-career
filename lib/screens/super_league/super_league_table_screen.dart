@@ -67,13 +67,6 @@ class _SuperLeagueTableScreenState extends State<SuperLeagueTableScreen> {
                     ),
                     child: Row(
                       children: [
-                        SvgPicture.asset(
-                          'assets/icons/table.svg',
-                          width: 38,
-                          height: 38,
-                          color: green,
-                        ),
-                        const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,17 +92,24 @@ class _SuperLeagueTableScreenState extends State<SuperLeagueTableScreen> {
                       return Expanded(
                         child: Padding(
                           padding: EdgeInsets.only(
-                            right: division == SuperLeagueDivision.first ? 8 : 0,
+                            right: division == SuperLeagueDivision.first
+                                ? 8
+                                : 0,
                           ),
                           child: OutlinedButton(
-                            onPressed: () => setState(() => _selectedDivision = division),
+                            onPressed: () =>
+                                setState(() => _selectedDivision = division),
                             style: OutlinedButton.styleFrom(
                               backgroundColor: selected
                                   ? const Color(0xFF16401E)
                                   : const Color(0xFF0A2110),
-                              foregroundColor: selected ? green : Colors.white70,
+                              foregroundColor: selected
+                                  ? green
+                                  : Colors.white70,
                               side: BorderSide(
-                                color: selected ? green : const Color(0xFF14401E),
+                                color: selected
+                                    ? green
+                                    : const Color(0xFF14401E),
                               ),
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(
@@ -118,7 +118,9 @@ class _SuperLeagueTableScreenState extends State<SuperLeagueTableScreen> {
                             ),
                             child: Text(
                               division.displayName,
-                              style: const TextStyle(fontWeight: FontWeight.w900),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w900,
+                              ),
                             ),
                           ),
                         ),
@@ -207,8 +209,8 @@ class _SuperLeagueTableScreenState extends State<SuperLeagueTableScreen> {
     final zoneColor = isRelegationZone
         ? const Color(0xFFFF5555)
         : isPromotionZone
-            ? const Color(0xFF22C55E)
-            : null;
+        ? const Color(0xFF22C55E)
+        : null;
     final difference = entry.goalDifference;
     final primary = ClubColors.primary(entry.club);
     final secondary = ClubColors.secondary(entry.club);
@@ -218,13 +220,14 @@ class _SuperLeagueTableScreenState extends State<SuperLeagueTableScreen> {
         color: zoneColor != null
             ? zoneColor.withValues(alpha: 0.16)
             : isPlayerClub
-                ? const Color(0xB414401E)
-                : const Color(0x72665353),
+            ? const Color.fromARGB(172, 58, 64, 20)
+            : const Color(0x72665353),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: zoneColor ??
+          color:
+              zoneColor ??
               (isPlayerClub
-                  ? const Color(0xFF4F9F59)
+                  ? const Color.fromARGB(255, 205, 221, 30)
                   : const Color(0xFF14401E)),
         ),
       ),

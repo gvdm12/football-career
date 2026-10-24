@@ -122,20 +122,19 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                     border: Border.all(color: const Color(0xFF14401E)),
                   ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
-                        width: 58,
-                        height: 58,
+                        width: 72,
+                        height: 72,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(17),
                         ),
                         child: Image.asset(
-                          'assets/icons/cup.png',
-                          width: 34,
-                          height: 34,
+                          'assets/images/superleague.png',
+                          width: 38,
+                          height: 38,
                           fit: BoxFit.contain,
-                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 20),
