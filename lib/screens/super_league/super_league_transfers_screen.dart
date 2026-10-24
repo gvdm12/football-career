@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/super_league_career.dart';
+import 'package:flutter_football/models/super_league_division.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class SuperLeagueTransfersScreen extends StatefulWidget {
@@ -31,7 +32,7 @@ class _SuperLeagueTransfersScreenState
     final candidates = Clubs.all
         .where(
           (club) =>
-              SuperLeagueCareer.clubNames.contains(club.name) &&
+              SuperLeagueDivisionConfig.containsClub(club.name) &&
               club.name != _career.player.club &&
               club.strength <= maxStrength &&
               club.strength >= (current.strength - 12),
@@ -42,7 +43,7 @@ class _SuperLeagueTransfersScreenState
   }
 
   void _accept(Club club) {
-    if (!SuperLeagueCareer.clubNames.contains(club.name)) return;
+    if (!SuperLeagueDivisionConfig.containsClub(club.name)) return;
     final next = _career.copyWith(
       player: _career.player.copyWith(club: club.name),
     );
@@ -226,6 +227,15 @@ class _SuperLeagueTransfersScreenState
                       style: const TextStyle(
                         color: Color(0xFF8BE07F),
                         fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      'Суперлига · ${SuperLeagueDivisionConfig.divisionOf(club.name).displayName}',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 11,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
