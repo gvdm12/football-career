@@ -21,8 +21,13 @@ import 'package:flutter_svg/svg.dart';
 
 class SeasonScreen extends StatefulWidget {
   final Career career;
+  final bool calendarOnly;
 
-  const SeasonScreen({super.key, required this.career});
+  const SeasonScreen({
+    super.key,
+    required this.career,
+    this.calendarOnly = false,
+  });
 
   @override
   State<SeasonScreen> createState() => _SeasonScreenState();
@@ -1174,6 +1179,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     if (!mounted) return;
 
+    if (widget.calendarOnly) {
+      Navigator.pop(context, nextCareer);
+      return;
+    }
+
     setState(() {
       isSaving = false;
       seasonFinishing = false;
@@ -1194,6 +1204,37 @@ class _SeasonScreenState extends State<SeasonScreen> {
     await Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => LeagueTableScreen(career: career)),
+    );
+  }
+
+  Future<void> _openCalendar() async {
+    final result = await Navigator.push<Career>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SeasonScreen(career: career, calendarOnly: true),
+      ),
+    );
+    if (!mounted || result == null) return;
+    setState(() => career = result);
+    await _saveCareer(result);
+  }
+
+  Widget _buildCalendarButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () => _openCalendar(),
+        icon: const Icon(Icons.calendar_month_rounded),
+        label: const Text('КАЛЕНДАРЬ СЕЗОНА'),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: const Color(0xFF8BE07F),
+          side: const BorderSide(color: Color(0xFF24552C)),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
     );
   }
 
@@ -1233,11 +1274,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
           //   borderRadius: BorderRadius.vertical(bottom: Radius.circular(18)),
           // ),
           title: Text(
-            '${AppStrings.seasonTitle} ${career.season}',
-            style: TextStyle(fontWeight: FontWeight.w700),
+            widget.calendarOnly
+                ? AppStrings.seasonCalendar
+                : '${AppStrings.seasonTitle} ${career.season}',
+            style: const TextStyle(fontWeight: FontWeight.w700),
           ),
           actions: [
-            IconButton(
+            if (!widget.calendarOnly)
+              IconButton(
               tooltip: AppStrings.leagueTableTooltip,
               onPressed: _openLeagueTable,
               icon: SvgPicture.asset(
@@ -1251,46 +1295,54 @@ class _SeasonScreenState extends State<SeasonScreen> {
         ),
         body: Stack(
           children: [
-            // Фоновая фотография
             Positioned.fill(
               child: Opacity(
-                opacity: 0.20, // Прозрачность фото: от 0.0 до 1.0
+                opacity: 0.20,
                 child: Image.asset('assets/images/fon2.png', fit: BoxFit.cover),
               ),
             ),
             SafeArea(
               child: Column(
                 children: [
-                  _buildCareerHeader(),
+                  if (!widget.calendarOnly) _buildCareerHeader(),
                   Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.all(16),
-                      children: [
-                        _buildProgressCard(),
-                        const SizedBox(height: 16),
-                        if (isSaving)
-                          const Padding(
-                            padding: EdgeInsets.all(12),
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                color: Color(0xFF8BE07F),
-                              ),
-                            ),
+                    child: widget.calendarOnly
+                        ? ListView(
+                            padding: const EdgeInsets.all(16),
+                            children: [
+                              _buildSeasonMatches(),
+                              const SizedBox(height: 16),
+                              _buildSeasonButton(),
+                            ],
+                          )
+                        : ListView(
+                            padding: const EdgeInsets.all(16),
+                            children: [
+                              _buildProgressCard(),
+                              const SizedBox(height: 16),
+                              if (isSaving)
+                                const Padding(
+                                  padding: EdgeInsets.all(12),
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      color: Color(0xFF8BE07F),
+                                    ),
+                                  ),
+                                ),
+                              if (!seasonFinished && showUcl)
+                                _buildNextChampionsLeagueMatchCard()
+                              else if (!seasonFinished &&
+                                  showCup &&
+                                  nextCupMatch != null)
+                                _buildNextCupMatchCard(nextCupMatch)
+                              else if (!seasonFinished && nextMatch != null)
+                                _buildNextMatchCard(nextMatch),
+                              const SizedBox(height: 12),
+                              _buildCalendarButton(),
+                              const SizedBox(height: 10),
+                              _buildSeasonButton(),
+                            ],
                           ),
-                        if (!seasonFinished && showUcl)
-                          _buildNextChampionsLeagueMatchCard()
-                        else if (!seasonFinished &&
-                            showCup &&
-                            nextCupMatch != null)
-                          _buildNextCupMatchCard(nextCupMatch)
-                        else if (!seasonFinished && nextMatch != null)
-                          _buildNextMatchCard(nextMatch),
-                        const SizedBox(height: 8),
-                        _buildSeasonMatches(),
-                        const SizedBox(height: 16),
-                        _buildSeasonButton(),
-                      ],
-                    ),
                   ),
                 ],
               ),
