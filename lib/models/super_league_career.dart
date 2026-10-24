@@ -471,23 +471,60 @@ class SuperLeagueCareer {
   };
 
   factory SuperLeagueCareer.fromJson(Map<String, dynamic> json) {
+    final player = Player.fromJson(
+      Map<String, dynamic>.from(json['player'] as Map),
+    );
+    final firstDivision = (json['firstDivision'] as List?)
+            ?.map((value) => value as String)
+            .toList() ??
+        SuperLeagueDivisionConfig.firstDivisionClubs;
+    final secondDivision = (json['secondDivision'] as List?)
+            ?.map((value) => value as String)
+            .toList() ??
+        SuperLeagueDivisionConfig.secondDivisionClubs;
     final rawFixtures = json['fixtures'];
+    final fixtures = rawFixtures is List
+        ? rawFixtures
+            .map((item) => SuperLeagueFixture.fromJson(
+                  Map<String, dynamic>.from(item as Map),
+                ))
+            .toList()
+        : <SuperLeagueFixture>[];
+
+    // Migrate old saves that only stored the original 20-club calendar.
+    final hasSecondDivisionFixtures = fixtures.any((fixture) =>
+        secondDivision.contains(fixture.homeTeam) &&
+        secondDivision.contains(fixture.awayTeam));
+    if (!hasSecondDivisionFixtures && json['secondDivision'] == null) {
+      final generated = SuperLeagueCareer.newCareer(
+        player,
+        firstDivisionClubs: firstDivision,
+        secondDivisionClubs: secondDivision,
+      ).fixtures.where((fixture) =>
+          secondDivision.contains(fixture.homeTeam) &&
+          secondDivision.contains(fixture.awayTeam));
+      fixtures.addAll(generated);
+    }
+
     return SuperLeagueCareer(
-      player: Player.fromJson(Map<String, dynamic>.from(json['player'] as Map)),
+      player: player,
       season: (json['season'] as num?)?.toInt() ?? 1,
-      fixtures: rawFixtures is List
-          ? rawFixtures.map((item) => SuperLeagueFixture.fromJson(
-              Map<String, dynamic>.from(item as Map),
-            )).toList()
-          : [],
+      fixtures: fixtures,
       developmentPoints: (json['developmentPoints'] as num?)?.toInt() ?? 0,
-      developmentPointsAwardedSeason: (json['developmentPointsAwardedSeason'] as num?)?.toInt() ?? 0,
-      championSeasons: (json['championSeasons'] as List?)?.map((value) => (value as num).toInt()).toList() ?? const [],
-      history: (json['history'] as List?)?.map((item) => SuperLeagueSeasonSummary.fromJson(Map<String, dynamic>.from(item as Map))).toList() ?? const [],
-      firstDivision: (json['firstDivision'] as List?)?.map((value) => value as String).toList() ??
-          SuperLeagueDivisionConfig.firstDivisionClubs,
-      secondDivision: (json['secondDivision'] as List?)?.map((value) => value as String).toList() ??
-          SuperLeagueDivisionConfig.secondDivisionClubs,
+      developmentPointsAwardedSeason:
+          (json['developmentPointsAwardedSeason'] as num?)?.toInt() ?? 0,
+      championSeasons: (json['championSeasons'] as List?)
+              ?.map((value) => (value as num).toInt())
+              .toList() ??
+          const [],
+      history: (json['history'] as List?)
+              ?.map((item) => SuperLeagueSeasonSummary.fromJson(
+                    Map<String, dynamic>.from(item as Map),
+                  ))
+              .toList() ??
+          const [],
+      firstDivision: firstDivision,
+      secondDivision: secondDivision,
     );
   }
 }
