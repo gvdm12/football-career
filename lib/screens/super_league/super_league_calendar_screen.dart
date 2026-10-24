@@ -100,15 +100,22 @@ class SuperLeagueCalendarScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Color.lerp(const Color(0xFF0A2110), primary, 0.12),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border(
-                        left: BorderSide(color: primary, width: 4),
-                        top: BorderSide(color: const Color(0xFF24552C).withValues(alpha: 0.6)),
-                        right: BorderSide(color: const Color(0xFF24552C).withValues(alpha: 0.6)),
-                        bottom: BorderSide(color: const Color(0xFF24552C).withValues(alpha: 0.6)),
+                      // Rounded borders require one uniform border color.
+                      border: Border.all(
+                        color: const Color(0xFF24552C).withValues(alpha: 0.6),
                       ),
                     ),
                     child: Row(
                       children: [
+                        Container(
+                          width: 4,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            color: primary,
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        ),
+                        const SizedBox(width: 9),
                         SizedBox(
                           width: 34,
                           child: Text('${fixture.round}',

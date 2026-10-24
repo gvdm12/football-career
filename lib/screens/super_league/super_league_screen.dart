@@ -159,9 +159,10 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'Выбери один из 20 топ-клубов, создай футболиста '
-                        'с рейтингом 75 и постарайся привести свою команду '
-                        'к чемпионству. Тебя ждут 10 сезонов борьбы за титулы.',
+                        'Выбери клуб в одном из двух дивизионов: 20 команд в первом и '
+                        '22 во втором. Создай футболиста с рейтингом 75, '
+                        'борись за чемпионство, повышение в классе или спасение '
+                        'от вылета. Каждый сезон состав дивизионов может меняться.',
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.78),
                           height: 1.5,
@@ -172,11 +173,11 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                       const Row(
                         children: [
                           Expanded(
-                            child: _ModeStat(value: '20', label: 'КЛУБОВ'),
+                            child: _ModeStat(value: '42', label: 'КЛУБА'),
                           ),
                           SizedBox(width: 10),
                           Expanded(
-                            child: _ModeStat(value: '10', label: 'СЕЗОНОВ'),
+                            child: _ModeStat(value: '2', label: 'ДИВИЗИОНА'),
                           ),
                           SizedBox(width: 10),
                           Expanded(

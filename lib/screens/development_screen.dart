@@ -247,32 +247,47 @@ class _DevelopmentScreenState extends State<DevelopmentScreen> {
       ),
       child: Row(
         children: [
-          SizedBox(width: 5),
-          Text(
-            player.name,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
+          const SizedBox(width: 4),
+          Expanded(
+            flex: 6,
+            child: Text(
+              player.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w900,
+              ),
             ),
           ),
-          const SizedBox(width: 35),
-          Text(
-            'OVERALL ${player.overall}',
-            style: const TextStyle(
-              color: Color(0xFF8BE07F),
-              fontSize: 14,
-              fontWeight: FontWeight.w900,
+          const SizedBox(width: 8),
+          Flexible(
+            flex: 3,
+            child: Text(
+              'OVR ${player.overall}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Color(0xFF8BE07F),
+                fontSize: 13,
+                fontWeight: FontWeight.w900,
+              ),
             ),
           ),
-          const SizedBox(width: 20),
-          Text(
-            AppStrings.availableDevelopmentPoints(availablePoints),
-            style: const TextStyle(
-              color: Color(0xFFFFD75A),
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
+          const SizedBox(width: 18),
+          Flexible(
+            flex: 4,
+            child: Text(
+              AppStrings.availableDevelopmentPoints(availablePoints),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.end,
+              style: const TextStyle(
+                color: Color(0xFFFFD75A),
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
         ],

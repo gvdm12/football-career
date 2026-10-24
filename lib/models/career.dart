@@ -669,13 +669,13 @@ class Career {
 
     switch (player.position) {
       case PlayerPosition.forward:
-        if (goals >= 34) {
-          addBonus(SkillName.shooting, 2);
+        if (goals >= 15) {
+          addBonus(SkillName.shooting, 1);
         }
 
-        // if (goals >= 15) {
-        //   addBonus(SkillName.shooting, 1);
-        // }
+        if (goals >= 34) {
+          addBonus(SkillName.shooting, 1);
+        }
 
         if (assists >= 14 || contributions >= 20) {
           addBonus(SkillName.dribbling, 1);
@@ -695,7 +695,7 @@ class Career {
           addBonus(SkillName.passing, 1);
         }
 
-        if (assists >= 31) {
+        if (assists >= 30) {
           addBonus(SkillName.passing, 1);
         }
 

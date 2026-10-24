@@ -1,17 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/super_league_career.dart';
+import 'package:flutter_football/models/super_league_division.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class SuperLeagueTableScreen extends StatelessWidget {
+class SuperLeagueTableScreen extends StatefulWidget {
   final SuperLeagueCareer career;
   const SuperLeagueTableScreen({super.key, required this.career});
 
+  @override
+  State<SuperLeagueTableScreen> createState() => _SuperLeagueTableScreenState();
+}
+
+class _SuperLeagueTableScreenState extends State<SuperLeagueTableScreen> {
   static const Color green = Color(0xFF8BE07F);
+  late SuperLeagueDivision _selectedDivision;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDivision = widget.career.playerDivision;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final standings = career.standings;
+    final career = widget.career;
+    final standings = career.standingsFor(_selectedDivision);
     return Scaffold(
       backgroundColor: const Color(0xFF061B0C),
       appBar: AppBar(
@@ -79,6 +93,39 @@ class SuperLeagueTableScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
+                  Row(
+                    children: SuperLeagueDivision.values.map((division) {
+                      final selected = division == _selectedDivision;
+                      return Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            right: division == SuperLeagueDivision.first ? 8 : 0,
+                          ),
+                          child: OutlinedButton(
+                            onPressed: () => setState(() => _selectedDivision = division),
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: selected
+                                  ? const Color(0xFF16401E)
+                                  : const Color(0xFF0A2110),
+                              foregroundColor: selected ? green : Colors.white70,
+                              side: BorderSide(
+                                color: selected ? green : const Color(0xFF14401E),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                              division.displayName,
+                              style: const TextStyle(fontWeight: FontWeight.w900),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 10),
                   _buildHeader(),
                   const SizedBox(height: 8),
                   ...List.generate(
@@ -152,19 +199,33 @@ class SuperLeagueTableScreen extends StatelessWidget {
   );
 
   Widget _buildRow(int position, SuperLeagueStanding entry) {
-    final isPlayerClub = entry.club == career.player.club;
+    final isPlayerClub = entry.club == widget.career.player.club;
+    final isRelegationZone =
+        _selectedDivision == SuperLeagueDivision.first && position >= 16;
+    final isPromotionZone =
+        _selectedDivision == SuperLeagueDivision.second && position <= 5;
+    final zoneColor = isRelegationZone
+        ? const Color(0xFFFF5555)
+        : isPromotionZone
+            ? const Color(0xFF22C55E)
+            : null;
     final difference = entry.goalDifference;
     final primary = ClubColors.primary(entry.club);
     final secondary = ClubColors.secondary(entry.club);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: isPlayerClub ? const Color(0xB414401E) : const Color(0x72665353),
+        color: zoneColor != null
+            ? zoneColor.withValues(alpha: 0.16)
+            : isPlayerClub
+                ? const Color(0xB414401E)
+                : const Color(0x72665353),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isPlayerClub
-              ? const Color(0xFF4F9F59)
-              : const Color(0xFF14401E),
+          color: zoneColor ??
+              (isPlayerClub
+                  ? const Color(0xFF4F9F59)
+                  : const Color(0xFF14401E)),
         ),
       ),
       child: Row(

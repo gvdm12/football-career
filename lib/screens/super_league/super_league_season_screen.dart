@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/club_colors.dart';
+import 'package:flutter_football/models/super_league_division.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_football/models/super_league_career.dart';
 import 'package:flutter_football/screens/super_league/super_league_table_screen.dart';
@@ -40,11 +41,17 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
   }
 
   SuperLeagueCareer _normalizeCareer(SuperLeagueCareer career) {
-    if (SuperLeagueCareer.clubNames.contains(career.player.club)) return career;
+    if (career.firstDivision.contains(career.player.club) ||
+        career.secondDivision.contains(career.player.club)) {
+      return career;
+    }
 
     final oldClub = Clubs.getByName(career.player.club);
     final eligibleClubs =
-        SuperLeagueCareer.clubNames.map(Clubs.getByName).toList()..sort(
+        [
+          ...career.firstDivision,
+          ...career.secondDivision,
+        ].map(Clubs.getByName).toList()..sort(
           (a, b) => (a.strength - oldClub.strength).abs().compareTo(
             (b.strength - oldClub.strength).abs(),
           ),
@@ -66,11 +73,21 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
       var updated = _career.playNextMatch();
       if (updated.nextFixture == null &&
           updated.standings.isNotEmpty &&
-          updated.standings.first.club == updated.player.club &&
-          !updated.championSeasons.contains(updated.season)) {
-        updated = updated.copyWith(
-          championSeasons: [...updated.championSeasons, updated.season],
-        );
+          updated.standings.first.club == updated.player.club) {
+        if (updated.playerDivision == SuperLeagueDivision.first &&
+            !updated.championSeasons.contains(updated.season)) {
+          updated = updated.copyWith(
+            championSeasons: [...updated.championSeasons, updated.season],
+          );
+        } else if (updated.playerDivision == SuperLeagueDivision.second &&
+            !updated.secondDivisionChampionSeasons.contains(updated.season)) {
+          updated = updated.copyWith(
+            secondDivisionChampionSeasons: [
+              ...updated.secondDivisionChampionSeasons,
+              updated.season,
+            ],
+          );
+        }
       }
       await SuperLeagueStorage.saveCareer(updated);
       if (!mounted) return;
@@ -115,7 +132,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                   f.awayTeam == _career.player.club),
         )
         .length;
-    const total = 38;
+    final total = _career.playerDivision.clubCount == 22 ? 42 : 38;
     return PopScope<SuperLeagueCareer>(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
@@ -381,7 +398,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                                 ),
                               ),
                               Text(
-                                '${_career.championSeasons.length}',
+                                '${_career.championSeasons.length + _career.secondDivisionChampionSeasons.length}',
                                 style: const TextStyle(
                                   color: Color(0xFFFFD778),
                                   fontSize: 16,
@@ -494,21 +511,35 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                                     color: const Color(0xFFFFC857),
                                   ),
                                 ),
-                                child: const Column(
+                                child: Column(
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.emoji_events_rounded,
                                       color: Color(0xFFFFC857),
                                       size: 40,
                                     ),
-                                    SizedBox(height: 5),
+                                    const SizedBox(height: 5),
                                     Text(
-                                      'ЧЕМПИОН СУПЕРЛИГИ!',
+                                      _career.playerDivision == SuperLeagueDivision.first
+                                          ? 'ЧЕМПИОН СУПЕРЛИГИ · 1-Й ДИВИЗИОН!'
+                                          : 'ЧЕМПИОН СУПЕРЛИГИ · 2-Й ДИВИЗИОН!',
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Color(0xFFFFD778),
                                         fontSize: 16,
                                         fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      _career.playerDivision == SuperLeagueDivision.first
+                                          ? 'Трофей первого дивизиона'
+                                          : 'Трофей второго дивизиона',
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ],
@@ -626,7 +657,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 13),
+                      const SizedBox(height: 35),
                       SizedBox(
                         height: 50,
                         child: ElevatedButton.icon(
@@ -684,13 +715,23 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
       _error = null;
     });
     try {
-      var completed = _recordSeasonSummary(_career);
+      var completed = _recordSeasonSummary(_career.completeRemainingFixtures());
       final standings = completed.standings;
       final wonLeague =
           standings.isNotEmpty && standings.first.club == completed.player.club;
-      if (wonLeague && !completed.championSeasons.contains(completed.season)) {
+      if (wonLeague && completed.playerDivision == SuperLeagueDivision.first &&
+          !completed.championSeasons.contains(completed.season)) {
         completed = completed.copyWith(
           championSeasons: [...completed.championSeasons, completed.season],
+        );
+      } else if (wonLeague &&
+          completed.playerDivision == SuperLeagueDivision.second &&
+          !completed.secondDivisionChampionSeasons.contains(completed.season)) {
+        completed = completed.copyWith(
+          secondDivisionChampionSeasons: [
+            ...completed.secondDivisionChampionSeasons,
+            completed.season,
+          ],
         );
       }
       await SuperLeagueStorage.saveCareer(completed);
@@ -767,7 +808,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
       _error = null;
     });
     try {
-      var completed = _recordSeasonSummary(_career);
+      var completed = _recordSeasonSummary(_career.completeRemainingFixtures());
       final standings = completed.standings;
       final wonLeague =
           standings.isNotEmpty && standings.first.club == completed.player.club;

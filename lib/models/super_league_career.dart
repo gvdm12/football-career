@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/match.dart';
+import 'package:flutter_football/models/super_league_division.dart';
 
 class SuperLeagueFixture {
   final int round;
@@ -145,7 +146,10 @@ class SuperLeagueCareer {
   final int developmentPoints;
   final int developmentPointsAwardedSeason;
   final List<int> championSeasons;
+  final List<int> secondDivisionChampionSeasons;
   final List<SuperLeagueSeasonSummary> history;
+  final List<String> firstDivision;
+  final List<String> secondDivision;
 
   const SuperLeagueCareer({
     required this.player,
@@ -154,50 +158,72 @@ class SuperLeagueCareer {
     this.developmentPoints = 0,
     this.developmentPointsAwardedSeason = 0,
     this.championSeasons = const [],
+    this.secondDivisionChampionSeasons = const [],
     this.history = const [],
+    this.firstDivision = SuperLeagueDivisionConfig.firstDivisionClubs,
+    this.secondDivision = SuperLeagueDivisionConfig.secondDivisionClubs,
   });
 
-  static const List<String> clubNames = [
-    'Barcelona', 'Real Madrid', 'Atletico Madrid', 'Inter', 'Napoli',
-    'AC Milan', 'Juventus', 'Roma', 'Liverpool', 'Manchester City',
-    'Arsenal', 'Chelsea', 'Manchester United', 'Tottenham',
-    'Bayern Munich', 'Bayer Leverkusen', 'Borussia Dortmund', 'PSG',
-    'Monaco', 'Marseille',
-  ];
+  /// Legacy alias kept for older screens; use [currentDivisionClubNames] for the active league.
+  static const List<String> clubNames = SuperLeagueDivisionConfig.firstDivisionClubs;
 
-  factory SuperLeagueCareer.newCareer(Player player) {
-    final firstLeg = <SuperLeagueFixture>[];
-    final teams = List<String>.from(clubNames);
-    // Round-robin circle method: every club plays once per round.
-    for (var round = 1; round <= teams.length - 1; round++) {
-      for (var i = 0; i < teams.length ~/ 2; i++) {
-        final first = teams[i];
-        final second = teams[teams.length - 1 - i];
-        final home = round.isEven ? second : first;
-        final away = round.isEven ? first : second;
-        firstLeg.add(SuperLeagueFixture(
-          round: round,
-          homeTeam: home,
-          awayTeam: away,
-        ));
+  SuperLeagueDivision get playerDivision => secondDivision.contains(player.club)
+      ? SuperLeagueDivision.second
+      : SuperLeagueDivision.first;
+
+  List<String> get currentDivisionClubNames =>
+      playerDivision == SuperLeagueDivision.second ? secondDivision : firstDivision;
+
+  factory SuperLeagueCareer.newCareer(
+    Player player, {
+    List<String> firstDivisionClubs = SuperLeagueDivisionConfig.firstDivisionClubs,
+    List<String> secondDivisionClubs = SuperLeagueDivisionConfig.secondDivisionClubs,
+  }) {
+    List<SuperLeagueFixture> buildCalendar(List<String> clubNames) {
+      final teams = List<String>.from(clubNames);
+      final firstLeg = <SuperLeagueFixture>[];
+      for (var round = 1; round <= teams.length - 1; round++) {
+        for (var i = 0; i < teams.length ~/ 2; i++) {
+          final first = teams[i];
+          final second = teams[teams.length - 1 - i];
+          final home = round.isEven ? second : first;
+          final away = round.isEven ? first : second;
+          firstLeg.add(SuperLeagueFixture(
+            round: round,
+            homeTeam: home,
+            awayTeam: away,
+          ));
+        }
+        final fixed = teams.first;
+        final rotating = teams.sublist(1);
+        rotating.insert(0, rotating.removeLast());
+        teams
+          ..clear()
+          ..add(fixed)
+          ..addAll(rotating);
       }
-      final fixed = teams.first;
-      final rotating = teams.sublist(1);
-      rotating.insert(0, rotating.removeLast());
-      teams
-        ..clear()
-        ..add(fixed)
-        ..addAll(rotating);
+      return <SuperLeagueFixture>[
+        ...firstLeg,
+        ...firstLeg.map((fixture) => SuperLeagueFixture(
+          round: fixture.round + clubNames.length - 1,
+          homeTeam: fixture.awayTeam,
+          awayTeam: fixture.homeTeam,
+        )),
+      ];
     }
+
     final fixtures = <SuperLeagueFixture>[
-      ...firstLeg,
-      ...firstLeg.map((fixture) => SuperLeagueFixture(
-        round: fixture.round + 19,
-        homeTeam: fixture.awayTeam,
-        awayTeam: fixture.homeTeam,
-      )),
+      ...buildCalendar(firstDivisionClubs),
+      ...buildCalendar(secondDivisionClubs),
     ];
-    return SuperLeagueCareer(player: player, season: 1, fixtures: fixtures, developmentPoints: 0);
+    return SuperLeagueCareer(
+      player: player,
+      season: 1,
+      fixtures: fixtures,
+      developmentPoints: 0,
+      firstDivision: List<String>.from(firstDivisionClubs),
+      secondDivision: List<String>.from(secondDivisionClubs),
+    );
   }
 
   int get playedMatches => fixtures.where((fixture) => fixture.isPlayed && (fixture.homeTeam == player.club || fixture.awayTeam == player.club)).length;
@@ -219,17 +245,25 @@ class SuperLeagueCareer {
     return null;
   }
 
-  List<SuperLeagueStanding> get standings {
+  List<SuperLeagueStanding> get standings => standingsFor(playerDivision);
+
+  List<SuperLeagueStanding> standingsFor(SuperLeagueDivision division) {
+    final divisionClubs = division == SuperLeagueDivision.first
+        ? firstDivision
+        : secondDivision;
+    final clubSet = divisionClubs.toSet();
     final stats = {
-      for (final club in clubNames)
+      for (final club in divisionClubs)
         club: <String, int>{
           'played': 0, 'wins': 0, 'draws': 0, 'losses': 0,
           'gf': 0, 'ga': 0,
         },
     };
-    for (final fixture in fixtures.where((f) => f.isPlayed)) {
-      final home = stats[fixture.homeTeam]!;
-      final away = stats[fixture.awayTeam]!;
+    for (final fixture in fixtures.where((f) =>
+        f.isPlayed && clubSet.contains(f.homeTeam) && clubSet.contains(f.awayTeam))) {
+      final home = stats[fixture.homeTeam];
+      final away = stats[fixture.awayTeam];
+      if (home == null || away == null) continue;
       final hg = fixture.homeGoals!;
       final ag = fixture.awayGoals!;
       home['played'] = home['played']! + 1;
@@ -278,7 +312,10 @@ class SuperLeagueCareer {
     int? developmentPoints,
     int? developmentPointsAwardedSeason,
     List<int>? championSeasons,
+    List<int>? secondDivisionChampionSeasons,
     List<SuperLeagueSeasonSummary>? history,
+    List<String>? firstDivision,
+    List<String>? secondDivision,
   }) => SuperLeagueCareer(
     player: player ?? this.player,
     season: season ?? this.season,
@@ -286,7 +323,10 @@ class SuperLeagueCareer {
     developmentPoints: developmentPoints ?? this.developmentPoints,
     developmentPointsAwardedSeason: developmentPointsAwardedSeason ?? this.developmentPointsAwardedSeason,
     championSeasons: championSeasons ?? this.championSeasons,
+    secondDivisionChampionSeasons: secondDivisionChampionSeasons ?? this.secondDivisionChampionSeasons,
     history: history ?? this.history,
+    firstDivision: firstDivision ?? this.firstDivision,
+    secondDivision: secondDivision ?? this.secondDivision,
   );
 
   int get developmentPointsForSeason {
@@ -333,7 +373,10 @@ class SuperLeagueCareer {
       developmentPoints: developmentPoints,
       developmentPointsAwardedSeason: developmentPointsAwardedSeason,
       championSeasons: championSeasons,
+      secondDivisionChampionSeasons: secondDivisionChampionSeasons,
       history: history,
+      firstDivision: firstDivision,
+      secondDivision: secondDivision,
     );
   }
 
@@ -349,6 +392,40 @@ class SuperLeagueCareer {
     return goals;
   }
 
+  SuperLeagueCareer completeRemainingFixtures() {
+    final random = Random();
+    final completedFixtures = fixtures.map((fixture) {
+      if (fixture.isPlayed) return fixture;
+      final isPlayerFixture = fixture.homeTeam == player.club ||
+          fixture.awayTeam == player.club;
+      if (isPlayerFixture) {
+        final isHome = fixture.homeTeam == player.club;
+        final opponent = isHome ? fixture.awayTeam : fixture.homeTeam;
+        final match = Match.generate(
+          player: player,
+          opponent: opponent,
+          isHome: isHome,
+        );
+        return fixture.copyWith(
+          homeGoals: match.homeGoals,
+          awayGoals: match.awayGoals,
+          playerGoals: match.playerGoals,
+          playerAssists: match.playerAssists,
+          playerRating: match.playerRating,
+          playerPlayed: match.playerPlayed,
+        );
+      }
+      final homeClub = Clubs.getByName(fixture.homeTeam);
+      final awayClub = Clubs.getByName(fixture.awayTeam);
+      final difference = homeClub.strength - awayClub.strength;
+      return fixture.copyWith(
+        homeGoals: _goalsFor(1.35 + difference * 0.035 + 0.18, random),
+        awayGoals: _goalsFor(1.10 - difference * 0.035, random),
+      );
+    }).toList();
+    return copyWith(fixtures: completedFixtures);
+  }
+
   SuperLeagueCareer nextSeason({String? newClub}) {
     final nextSeasonNumber = season + 1;
     final nextPlayer = player.copyWith(
@@ -356,7 +433,26 @@ class SuperLeagueCareer {
       season: nextSeasonNumber,
       club: newClub ?? player.club,
     );
-    final freshSeason = SuperLeagueCareer.newCareer(nextPlayer);
+
+    // Complete the remaining second-division rounds before calculating promotions.
+    final completedSeason = completeRemainingFixtures();
+    final firstStandings = completedSeason.standingsFor(SuperLeagueDivision.first);
+    final secondStandings = completedSeason.standingsFor(SuperLeagueDivision.second);
+    final relegated = firstStandings.skip(15).take(5).map((entry) => entry.club).toList();
+    final promoted = secondStandings.take(5).map((entry) => entry.club).toList();
+    final nextFirst = <String>[
+      ...firstDivision.where((club) => !relegated.contains(club)),
+      ...promoted,
+    ];
+    final nextSecond = <String>[
+      ...secondDivision.where((club) => !promoted.contains(club)),
+      ...relegated,
+    ];
+    final freshSeason = SuperLeagueCareer.newCareer(
+      nextPlayer,
+      firstDivisionClubs: nextFirst,
+      secondDivisionClubs: nextSecond,
+    );
     return SuperLeagueCareer(
       player: nextPlayer,
       season: nextSeasonNumber,
@@ -364,7 +460,10 @@ class SuperLeagueCareer {
       developmentPoints: developmentPoints,
       developmentPointsAwardedSeason: developmentPointsAwardedSeason,
       championSeasons: championSeasons,
+      secondDivisionChampionSeasons: secondDivisionChampionSeasons,
       history: history,
+      firstDivision: nextFirst,
+      secondDivision: nextSecond,
     );
   }
 
@@ -375,23 +474,71 @@ class SuperLeagueCareer {
     'developmentPoints': developmentPoints,
     'developmentPointsAwardedSeason': developmentPointsAwardedSeason,
     'championSeasons': championSeasons,
+    'secondDivisionChampionSeasons': secondDivisionChampionSeasons,
     'history': history.map((item) => item.toJson()).toList(),
+    'firstDivision': firstDivision,
+    'secondDivision': secondDivision,
   };
 
   factory SuperLeagueCareer.fromJson(Map<String, dynamic> json) {
+    final player = Player.fromJson(
+      Map<String, dynamic>.from(json['player'] as Map),
+    );
+    final firstDivision = (json['firstDivision'] as List?)
+            ?.map((value) => value as String)
+            .toList() ??
+        SuperLeagueDivisionConfig.firstDivisionClubs;
+    final secondDivision = (json['secondDivision'] as List?)
+            ?.map((value) => value as String)
+            .toList() ??
+        SuperLeagueDivisionConfig.secondDivisionClubs;
     final rawFixtures = json['fixtures'];
+    final fixtures = rawFixtures is List
+        ? rawFixtures
+            .map((item) => SuperLeagueFixture.fromJson(
+                  Map<String, dynamic>.from(item as Map),
+                ))
+            .toList()
+        : <SuperLeagueFixture>[];
+
+    // Migrate old saves that only stored the original 20-club calendar.
+    final hasSecondDivisionFixtures = fixtures.any((fixture) =>
+        secondDivision.contains(fixture.homeTeam) &&
+        secondDivision.contains(fixture.awayTeam));
+    if (!hasSecondDivisionFixtures && json['secondDivision'] == null) {
+      final generated = SuperLeagueCareer.newCareer(
+        player,
+        firstDivisionClubs: firstDivision,
+        secondDivisionClubs: secondDivision,
+      ).fixtures.where((fixture) =>
+          secondDivision.contains(fixture.homeTeam) &&
+          secondDivision.contains(fixture.awayTeam));
+      fixtures.addAll(generated);
+    }
+
     return SuperLeagueCareer(
-      player: Player.fromJson(Map<String, dynamic>.from(json['player'] as Map)),
+      player: player,
       season: (json['season'] as num?)?.toInt() ?? 1,
-      fixtures: rawFixtures is List
-          ? rawFixtures.map((item) => SuperLeagueFixture.fromJson(
-              Map<String, dynamic>.from(item as Map),
-            )).toList()
-          : [],
+      fixtures: fixtures,
       developmentPoints: (json['developmentPoints'] as num?)?.toInt() ?? 0,
-      developmentPointsAwardedSeason: (json['developmentPointsAwardedSeason'] as num?)?.toInt() ?? 0,
-      championSeasons: (json['championSeasons'] as List?)?.map((value) => (value as num).toInt()).toList() ?? const [],
-      history: (json['history'] as List?)?.map((item) => SuperLeagueSeasonSummary.fromJson(Map<String, dynamic>.from(item as Map))).toList() ?? const [],
+      developmentPointsAwardedSeason:
+          (json['developmentPointsAwardedSeason'] as num?)?.toInt() ?? 0,
+      championSeasons: (json['championSeasons'] as List?)
+              ?.map((value) => (value as num).toInt())
+              .toList() ??
+          const [],
+      secondDivisionChampionSeasons: (json['secondDivisionChampionSeasons'] as List?)
+              ?.map((value) => (value as num).toInt())
+              .toList() ??
+          const [],
+      history: (json['history'] as List?)
+              ?.map((item) => SuperLeagueSeasonSummary.fromJson(
+                    Map<String, dynamic>.from(item as Map),
+                  ))
+              .toList() ??
+          const [],
+      firstDivision: firstDivision,
+      secondDivision: secondDivision,
     );
   }
 }
