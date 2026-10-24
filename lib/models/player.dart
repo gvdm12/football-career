@@ -70,7 +70,7 @@ class PlayerSkills {
         return PlayerSkills(
           pace: randomValue(59, 67),
           physical: randomValue(59, 67),
-          passing: randomValue(64, 68),
+          passing: randomValue(64, 70),
           shooting: randomValue(61, 66),
           defending: randomValue(53, 59),
           dribbling: randomValue(60, 67),
@@ -83,9 +83,9 @@ class PlayerSkills {
           pace: randomValue(64, 70),
           physical: randomValue(61, 67),
           passing: randomValue(62, 68),
-          shooting: randomValue(66, 69),
-          defending: randomValue(44, 56),
-          dribbling: randomValue(65, 68),
+          shooting: randomValue(67, 69),
+          defending: randomValue(45, 56),
+          dribbling: randomValue(65, 69),
           heading: randomValue(65, 72),
           vision: randomValue(60, 68),
         );

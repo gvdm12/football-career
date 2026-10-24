@@ -1227,7 +1227,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
         icon: const Icon(Icons.calendar_month_rounded),
         label: const Text('КАЛЕНДАРЬ СЕЗОНА'),
         style: OutlinedButton.styleFrom(
-          foregroundColor: const Color(0xFF8BE07F),
+          foregroundColor: const Color.fromARGB(255, 3, 3, 3),
+          backgroundColor: const Color.fromARGB(255, 189, 177, 177),
           side: const BorderSide(color: Color(0xFF24552C)),
           padding: const EdgeInsets.symmetric(vertical: 14),
           shape: RoundedRectangleBorder(
@@ -1282,15 +1283,15 @@ class _SeasonScreenState extends State<SeasonScreen> {
           actions: [
             if (!widget.calendarOnly)
               IconButton(
-              tooltip: AppStrings.leagueTableTooltip,
-              onPressed: _openLeagueTable,
-              icon: SvgPicture.asset(
-                'assets/icons/table.svg',
-                width: 34,
-                height: 34,
-                color: Colors.white,
+                tooltip: AppStrings.leagueTableTooltip,
+                onPressed: _openLeagueTable,
+                icon: SvgPicture.asset(
+                  'assets/icons/table.svg',
+                  width: 34,
+                  height: 34,
+                  color: Colors.white,
+                ),
               ),
-            ),
           ],
         ),
         body: Stack(
@@ -2538,7 +2539,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         onPressed: isSaving || seasonFinishing ? null : _finishSeason,
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF8BE07F),
-          foregroundColor: const Color(0xFF082A12),
+          foregroundColor: const Color.fromARGB(255, 0, 0, 0),
           padding: const EdgeInsets.symmetric(vertical: 15),
         ),
         child: Text(

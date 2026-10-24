@@ -247,12 +247,12 @@ class _DevelopmentScreenState extends State<DevelopmentScreen> {
       ),
       child: Row(
         children: [
-          const SizedBox(width: 2),
+          const SizedBox(width: 4),
           Expanded(
-            flex: 5,
+            flex: 6,
             child: Text(
               player.name,
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: Colors.white,
@@ -275,7 +275,7 @@ class _DevelopmentScreenState extends State<DevelopmentScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 18),
           Flexible(
             flex: 4,
             child: Text(
@@ -285,7 +285,7 @@ class _DevelopmentScreenState extends State<DevelopmentScreen> {
               textAlign: TextAlign.end,
               style: const TextStyle(
                 color: Color(0xFFFFD75A),
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: FontWeight.w800,
               ),
             ),

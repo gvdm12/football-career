@@ -207,12 +207,12 @@ class Clubs {
     Club(name: 'Newcastle United', league: League.england, strength: 80),
     Club(name: 'Nottingham Forest', league: League.england, strength: 76),
     Club(name: 'Sunderland', league: League.england, strength: 74),
-    Club(name: 'Tottenham', league: League.england, strength: 81),
+    Club(name: 'Tottenham', league: League.england, strength: 82),
 
     // =====================================================
     // ИСПАНИЯ — LA LIGA 2026/27 (20)
     // =====================================================
-    Club(name: 'Athletic Bilbao', league: League.spain, strength: 81),
+    Club(name: 'Athletic Bilbao', league: League.spain, strength: 80),
     Club(name: 'Atletico Madrid', league: League.spain, strength: 85),
     Club(name: 'Barcelona', league: League.spain, strength: 90),
     Club(name: 'Celta Vigo', league: League.spain, strength: 75),
@@ -222,13 +222,13 @@ class Clubs {
     Club(name: 'Espanyol', league: League.spain, strength: 74),
     Club(name: 'Getafe', league: League.spain, strength: 75),
     Club(name: 'Levante', league: League.spain, strength: 72),
-    Club(name: 'Malaga', league: League.spain, strength: 72),
+    Club(name: 'Malaga', league: League.spain, strength: 71),
     Club(name: 'Osasuna', league: League.spain, strength: 76),
     Club(name: 'Racing Santander', league: League.spain, strength: 71),
     Club(name: 'Rayo Vallecano', league: League.spain, strength: 73),
     Club(name: 'Real Betis', league: League.spain, strength: 81),
     Club(name: 'Real Madrid', league: League.spain, strength: 89),
-    Club(name: 'Real Sociedad', league: League.spain, strength: 79),
+    Club(name: 'Real Sociedad', league: League.spain, strength: 80),
     Club(name: 'Sevilla', league: League.spain, strength: 78),
     Club(name: 'Valencia', league: League.spain, strength: 77),
     Club(name: 'Villarreal', league: League.spain, strength: 81),
