@@ -40,11 +40,16 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
   }
 
   SuperLeagueCareer _normalizeCareer(SuperLeagueCareer career) {
-    if (SuperLeagueCareer.clubNames.contains(career.player.club)) return career;
+    if (career.firstDivision.contains(career.player.club) ||
+        career.secondDivision.contains(career.player.club)) {
+      return career;
+    }
 
     final oldClub = Clubs.getByName(career.player.club);
-    final eligibleClubs =
-        SuperLeagueCareer.clubNames.map(Clubs.getByName).toList()..sort(
+    final eligibleClubs = [
+      ...career.firstDivision,
+      ...career.secondDivision,
+    ].map(Clubs.getByName).toList()..sort(
           (a, b) => (a.strength - oldClub.strength).abs().compareTo(
             (b.strength - oldClub.strength).abs(),
           ),
