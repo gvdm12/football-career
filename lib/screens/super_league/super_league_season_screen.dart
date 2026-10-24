@@ -73,11 +73,21 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
       var updated = _career.playNextMatch();
       if (updated.nextFixture == null &&
           updated.standings.isNotEmpty &&
-          updated.standings.first.club == updated.player.club &&
-          !updated.championSeasons.contains(updated.season)) {
-        updated = updated.copyWith(
-          championSeasons: [...updated.championSeasons, updated.season],
-        );
+          updated.standings.first.club == updated.player.club) {
+        if (updated.playerDivision == SuperLeagueDivision.first &&
+            !updated.championSeasons.contains(updated.season)) {
+          updated = updated.copyWith(
+            championSeasons: [...updated.championSeasons, updated.season],
+          );
+        } else if (updated.playerDivision == SuperLeagueDivision.second &&
+            !updated.secondDivisionChampionSeasons.contains(updated.season)) {
+          updated = updated.copyWith(
+            secondDivisionChampionSeasons: [
+              ...updated.secondDivisionChampionSeasons,
+              updated.season,
+            ],
+          );
+        }
       }
       await SuperLeagueStorage.saveCareer(updated);
       if (!mounted) return;
@@ -695,9 +705,19 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
       final standings = completed.standings;
       final wonLeague =
           standings.isNotEmpty && standings.first.club == completed.player.club;
-      if (wonLeague && !completed.championSeasons.contains(completed.season)) {
+      if (wonLeague && completed.playerDivision == SuperLeagueDivision.first &&
+          !completed.championSeasons.contains(completed.season)) {
         completed = completed.copyWith(
           championSeasons: [...completed.championSeasons, completed.season],
+        );
+      } else if (wonLeague &&
+          completed.playerDivision == SuperLeagueDivision.second &&
+          !completed.secondDivisionChampionSeasons.contains(completed.season)) {
+        completed = completed.copyWith(
+          secondDivisionChampionSeasons: [
+            ...completed.secondDivisionChampionSeasons,
+            completed.season,
+          ],
         );
       }
       await SuperLeagueStorage.saveCareer(completed);
