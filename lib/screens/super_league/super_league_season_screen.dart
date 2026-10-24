@@ -511,21 +511,35 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                                     color: const Color(0xFFFFC857),
                                   ),
                                 ),
-                                child: const Column(
+                                child: Column(
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.emoji_events_rounded,
                                       color: Color(0xFFFFC857),
                                       size: 40,
                                     ),
-                                    SizedBox(height: 5),
+                                    const SizedBox(height: 5),
                                     Text(
-                                      'ЧЕМПИОН СУПЕРЛИГИ!',
+                                      _career.playerDivision == SuperLeagueDivision.first
+                                          ? 'ЧЕМПИОН СУПЕРЛИГИ · 1-Й ДИВИЗИОН!'
+                                          : 'ЧЕМПИОН СУПЕРЛИГИ · 2-Й ДИВИЗИОН!',
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Color(0xFFFFD778),
                                         fontSize: 16,
                                         fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      _career.playerDivision == SuperLeagueDivision.first
+                                          ? 'Трофей первого дивизиона'
+                                          : 'Трофей второго дивизиона',
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ],
