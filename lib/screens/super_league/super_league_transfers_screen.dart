@@ -32,7 +32,7 @@ class _SuperLeagueTransfersScreenState
     final candidates = Clubs.all
         .where(
           (club) =>
-              SuperLeagueDivisionConfig.containsClub(club.name) &&
+              (_career.firstDivision.contains(club.name) || _career.secondDivision.contains(club.name)) &&
               club.name != _career.player.club &&
               club.strength <= maxStrength &&
               club.strength >= (current.strength - 12),
@@ -43,7 +43,7 @@ class _SuperLeagueTransfersScreenState
   }
 
   void _accept(Club club) {
-    if (!SuperLeagueDivisionConfig.containsClub(club.name)) return;
+    if (!_career.firstDivision.contains(club.name) && !_career.secondDivision.contains(club.name)) return;
     final next = _career.copyWith(
       player: _career.player.copyWith(club: club.name),
     );
@@ -232,7 +232,7 @@ class _SuperLeagueTransfersScreenState
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      'Суперлига · ${SuperLeagueDivisionConfig.divisionOf(club.name).displayName}',
+                      'Суперлига · ${_career.secondDivision.contains(club.name) ? SuperLeagueDivision.second.displayName : SuperLeagueDivision.first.displayName}',
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 11,
