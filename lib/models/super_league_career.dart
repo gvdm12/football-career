@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/match.dart';
+import 'package:flutter_football/models/super_league_division.dart';
 
 class SuperLeagueFixture {
   final int round;
@@ -157,17 +158,22 @@ class SuperLeagueCareer {
     this.history = const [],
   });
 
-  static const List<String> clubNames = [
-    'Barcelona', 'Real Madrid', 'Atletico Madrid', 'Inter', 'Napoli',
-    'AC Milan', 'Juventus', 'Roma', 'Liverpool', 'Manchester City',
-    'Arsenal', 'Chelsea', 'Manchester United', 'Tottenham',
-    'Bayern Munich', 'Bayer Leverkusen', 'Borussia Dortmund', 'PSG',
-    'Monaco', 'Marseille',
-  ];
+  /// Legacy alias kept for older screens; use [currentDivisionClubNames] for the active league.
+  static const List<String> clubNames = SuperLeagueDivisionConfig.firstDivisionClubs;
+
+  SuperLeagueDivision get playerDivision =>
+      SuperLeagueDivisionConfig.divisionOf(player.club);
+
+  List<String> get currentDivisionClubNames =>
+      SuperLeagueDivisionConfig.clubsFor(playerDivision);
 
   factory SuperLeagueCareer.newCareer(Player player) {
     final firstLeg = <SuperLeagueFixture>[];
-    final teams = List<String>.from(clubNames);
+    final teams = List<String>.from(
+      SuperLeagueDivisionConfig.clubsFor(
+        SuperLeagueDivisionConfig.divisionOf(player.club),
+      ),
+    );
     // Round-robin circle method: every club plays once per round.
     for (var round = 1; round <= teams.length - 1; round++) {
       for (var i = 0; i < teams.length ~/ 2; i++) {
@@ -192,7 +198,7 @@ class SuperLeagueCareer {
     final fixtures = <SuperLeagueFixture>[
       ...firstLeg,
       ...firstLeg.map((fixture) => SuperLeagueFixture(
-        round: fixture.round + 19,
+        round: fixture.round + teams.length - 1,
         homeTeam: fixture.awayTeam,
         awayTeam: fixture.homeTeam,
       )),
@@ -221,15 +227,16 @@ class SuperLeagueCareer {
 
   List<SuperLeagueStanding> get standings {
     final stats = {
-      for (final club in clubNames)
+      for (final club in currentDivisionClubNames)
         club: <String, int>{
           'played': 0, 'wins': 0, 'draws': 0, 'losses': 0,
           'gf': 0, 'ga': 0,
         },
     };
     for (final fixture in fixtures.where((f) => f.isPlayed)) {
-      final home = stats[fixture.homeTeam]!;
-      final away = stats[fixture.awayTeam]!;
+      final home = stats[fixture.homeTeam];
+      final away = stats[fixture.awayTeam];
+      if (home == null || away == null) continue;
       final hg = fixture.homeGoals!;
       final ag = fixture.awayGoals!;
       home['played'] = home['played']! + 1;
