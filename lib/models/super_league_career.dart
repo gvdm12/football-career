@@ -146,6 +146,7 @@ class SuperLeagueCareer {
   final int developmentPoints;
   final int developmentPointsAwardedSeason;
   final List<int> championSeasons;
+  final List<int> secondDivisionChampionSeasons;
   final List<SuperLeagueSeasonSummary> history;
   final List<String> firstDivision;
   final List<String> secondDivision;
@@ -157,6 +158,7 @@ class SuperLeagueCareer {
     this.developmentPoints = 0,
     this.developmentPointsAwardedSeason = 0,
     this.championSeasons = const [],
+    this.secondDivisionChampionSeasons = const [],
     this.history = const [],
     this.firstDivision = SuperLeagueDivisionConfig.firstDivisionClubs,
     this.secondDivision = SuperLeagueDivisionConfig.secondDivisionClubs,
@@ -310,6 +312,7 @@ class SuperLeagueCareer {
     int? developmentPoints,
     int? developmentPointsAwardedSeason,
     List<int>? championSeasons,
+    List<int>? secondDivisionChampionSeasons,
     List<SuperLeagueSeasonSummary>? history,
     List<String>? firstDivision,
     List<String>? secondDivision,
@@ -320,6 +323,7 @@ class SuperLeagueCareer {
     developmentPoints: developmentPoints ?? this.developmentPoints,
     developmentPointsAwardedSeason: developmentPointsAwardedSeason ?? this.developmentPointsAwardedSeason,
     championSeasons: championSeasons ?? this.championSeasons,
+    secondDivisionChampionSeasons: secondDivisionChampionSeasons ?? this.secondDivisionChampionSeasons,
     history: history ?? this.history,
     firstDivision: firstDivision ?? this.firstDivision,
     secondDivision: secondDivision ?? this.secondDivision,
@@ -369,6 +373,7 @@ class SuperLeagueCareer {
       developmentPoints: developmentPoints,
       developmentPointsAwardedSeason: developmentPointsAwardedSeason,
       championSeasons: championSeasons,
+      secondDivisionChampionSeasons: secondDivisionChampionSeasons,
       history: history,
       firstDivision: firstDivision,
       secondDivision: secondDivision,
@@ -468,6 +473,7 @@ class SuperLeagueCareer {
     'developmentPoints': developmentPoints,
     'developmentPointsAwardedSeason': developmentPointsAwardedSeason,
     'championSeasons': championSeasons,
+    'secondDivisionChampionSeasons': secondDivisionChampionSeasons,
     'history': history.map((item) => item.toJson()).toList(),
     'firstDivision': firstDivision,
     'secondDivision': secondDivision,
@@ -517,6 +523,10 @@ class SuperLeagueCareer {
       developmentPointsAwardedSeason:
           (json['developmentPointsAwardedSeason'] as num?)?.toInt() ?? 0,
       championSeasons: (json['championSeasons'] as List?)
+              ?.map((value) => (value as num).toInt())
+              .toList() ??
+          const [],
+      secondDivisionChampionSeasons: (json['secondDivisionChampionSeasons'] as List?)
               ?.map((value) => (value as num).toInt())
               .toList() ??
           const [],
