@@ -247,17 +247,17 @@ class _DevelopmentScreenState extends State<DevelopmentScreen> {
       ),
       child: Row(
         children: [
-          SizedBox(width: 5),
+          SizedBox(width: 2),
           Text(
             player.name,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 20,
+              fontSize: 14,
               fontWeight: FontWeight.w900,
             ),
           ),
-          const SizedBox(width: 35),
+          const SizedBox(width: 20),
           Text(
             'OVERALL ${player.overall}',
             style: const TextStyle(
