@@ -46,10 +46,11 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
     }
 
     final oldClub = Clubs.getByName(career.player.club);
-    final eligibleClubs = [
-      ...career.firstDivision,
-      ...career.secondDivision,
-    ].map(Clubs.getByName).toList()..sort(
+    final eligibleClubs =
+        [
+          ...career.firstDivision,
+          ...career.secondDivision,
+        ].map(Clubs.getByName).toList()..sort(
           (a, b) => (a.strength - oldClub.strength).abs().compareTo(
             (b.strength - oldClub.strength).abs(),
           ),
@@ -631,7 +632,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 13),
+                      const SizedBox(height: 35),
                       SizedBox(
                         height: 50,
                         child: ElevatedButton.icon(
@@ -689,9 +690,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
       _error = null;
     });
     try {
-      var completed = _recordSeasonSummary(
-        _career.completeRemainingFixtures(),
-      );
+      var completed = _recordSeasonSummary(_career.completeRemainingFixtures());
       final standings = completed.standings;
       final wonLeague =
           standings.isNotEmpty && standings.first.club == completed.player.club;
@@ -774,9 +773,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
       _error = null;
     });
     try {
-      var completed = _recordSeasonSummary(
-        _career.completeRemainingFixtures(),
-      );
+      var completed = _recordSeasonSummary(_career.completeRemainingFixtures());
       final standings = completed.standings;
       final wonLeague =
           standings.isNotEmpty && standings.first.club == completed.player.club;
