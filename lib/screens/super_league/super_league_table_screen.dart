@@ -14,7 +14,13 @@ class SuperLeagueTableScreen extends StatefulWidget {
 
 class _SuperLeagueTableScreenState extends State<SuperLeagueTableScreen> {
   static const Color green = Color(0xFF8BE07F);
-  SuperLeagueDivision _selectedDivision = SuperLeagueDivision.first;
+  late SuperLeagueDivision _selectedDivision;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDivision = widget.career.playerDivision;
+  }
 
   @override
   Widget build(BuildContext context) {
