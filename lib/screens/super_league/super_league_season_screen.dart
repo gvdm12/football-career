@@ -689,7 +689,9 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
       _error = null;
     });
     try {
-      var completed = _recordSeasonSummary(_career);
+      var completed = _recordSeasonSummary(
+        _career.completeRemainingFixtures(),
+      );
       final standings = completed.standings;
       final wonLeague =
           standings.isNotEmpty && standings.first.club == completed.player.club;
