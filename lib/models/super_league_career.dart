@@ -147,6 +147,8 @@ class SuperLeagueCareer {
   final int developmentPointsAwardedSeason;
   final List<int> championSeasons;
   final List<SuperLeagueSeasonSummary> history;
+  final List<String> firstDivision;
+  final List<String> secondDivision;
 
   const SuperLeagueCareer({
     required this.player,
@@ -156,18 +158,25 @@ class SuperLeagueCareer {
     this.developmentPointsAwardedSeason = 0,
     this.championSeasons = const [],
     this.history = const [],
+    this.firstDivision = SuperLeagueDivisionConfig.firstDivisionClubs,
+    this.secondDivision = SuperLeagueDivisionConfig.secondDivisionClubs,
   });
 
   /// Legacy alias kept for older screens; use [currentDivisionClubNames] for the active league.
   static const List<String> clubNames = SuperLeagueDivisionConfig.firstDivisionClubs;
 
-  SuperLeagueDivision get playerDivision =>
-      SuperLeagueDivisionConfig.divisionOf(player.club);
+  SuperLeagueDivision get playerDivision => secondDivision.contains(player.club)
+      ? SuperLeagueDivision.second
+      : SuperLeagueDivision.first;
 
   List<String> get currentDivisionClubNames =>
-      SuperLeagueDivisionConfig.clubsFor(playerDivision);
+      playerDivision == SuperLeagueDivision.second ? secondDivision : firstDivision;
 
-  factory SuperLeagueCareer.newCareer(Player player) {
+  factory SuperLeagueCareer.newCareer(
+    Player player, {
+    List<String> firstDivisionClubs = SuperLeagueDivisionConfig.firstDivisionClubs,
+    List<String> secondDivisionClubs = SuperLeagueDivisionConfig.secondDivisionClubs,
+  }) {
     List<SuperLeagueFixture> buildCalendar(List<String> clubNames) {
       final teams = List<String>.from(clubNames);
       final firstLeg = <SuperLeagueFixture>[];
@@ -202,14 +211,16 @@ class SuperLeagueCareer {
     }
 
     final fixtures = <SuperLeagueFixture>[
-      ...buildCalendar(SuperLeagueDivisionConfig.firstDivisionClubs),
-      ...buildCalendar(SuperLeagueDivisionConfig.secondDivisionClubs),
+      ...buildCalendar(firstDivisionClubs),
+      ...buildCalendar(secondDivisionClubs),
     ];
     return SuperLeagueCareer(
       player: player,
       season: 1,
       fixtures: fixtures,
       developmentPoints: 0,
+      firstDivision: List<String>.from(firstDivisionClubs),
+      secondDivision: List<String>.from(secondDivisionClubs),
     );
   }
 
@@ -235,7 +246,9 @@ class SuperLeagueCareer {
   List<SuperLeagueStanding> get standings => standingsFor(playerDivision);
 
   List<SuperLeagueStanding> standingsFor(SuperLeagueDivision division) {
-    final divisionClubs = SuperLeagueDivisionConfig.clubsFor(division);
+    final divisionClubs = division == SuperLeagueDivision.first
+        ? firstDivision
+        : secondDivision;
     final clubSet = divisionClubs.toSet();
     final stats = {
       for (final club in divisionClubs)
@@ -353,6 +366,8 @@ class SuperLeagueCareer {
       developmentPointsAwardedSeason: developmentPointsAwardedSeason,
       championSeasons: championSeasons,
       history: history,
+      firstDivision: firstDivision,
+      secondDivision: secondDivision,
     );
   }
 
@@ -375,7 +390,23 @@ class SuperLeagueCareer {
       season: nextSeasonNumber,
       club: newClub ?? player.club,
     );
-    final freshSeason = SuperLeagueCareer.newCareer(nextPlayer);
+    final firstStandings = standingsFor(SuperLeagueDivision.first);
+    final secondStandings = standingsFor(SuperLeagueDivision.second);
+    final relegated = firstStandings.skip(15).take(5).map((entry) => entry.club).toList();
+    final promoted = secondStandings.take(5).map((entry) => entry.club).toList();
+    final nextFirst = <String>[
+      ...firstDivision.where((club) => !relegated.contains(club)),
+      ...promoted,
+    ];
+    final nextSecond = <String>[
+      ...secondDivision.where((club) => !promoted.contains(club)),
+      ...relegated,
+    ];
+    final freshSeason = SuperLeagueCareer.newCareer(
+      nextPlayer,
+      firstDivisionClubs: nextFirst,
+      secondDivisionClubs: nextSecond,
+    );
     return SuperLeagueCareer(
       player: nextPlayer,
       season: nextSeasonNumber,
@@ -384,6 +415,8 @@ class SuperLeagueCareer {
       developmentPointsAwardedSeason: developmentPointsAwardedSeason,
       championSeasons: championSeasons,
       history: history,
+      firstDivision: nextFirst,
+      secondDivision: nextSecond,
     );
   }
 
@@ -395,6 +428,8 @@ class SuperLeagueCareer {
     'developmentPointsAwardedSeason': developmentPointsAwardedSeason,
     'championSeasons': championSeasons,
     'history': history.map((item) => item.toJson()).toList(),
+    'firstDivision': firstDivision,
+    'secondDivision': secondDivision,
   };
 
   factory SuperLeagueCareer.fromJson(Map<String, dynamic> json) {
@@ -411,6 +446,10 @@ class SuperLeagueCareer {
       developmentPointsAwardedSeason: (json['developmentPointsAwardedSeason'] as num?)?.toInt() ?? 0,
       championSeasons: (json['championSeasons'] as List?)?.map((value) => (value as num).toInt()).toList() ?? const [],
       history: (json['history'] as List?)?.map((item) => SuperLeagueSeasonSummary.fromJson(Map<String, dynamic>.from(item as Map))).toList() ?? const [],
+      firstDivision: (json['firstDivision'] as List?)?.map((value) => value as String).toList() ??
+          SuperLeagueDivisionConfig.firstDivisionClubs,
+      secondDivision: (json['secondDivision'] as List?)?.map((value) => value as String).toList() ??
+          SuperLeagueDivisionConfig.secondDivisionClubs,
     );
   }
 }
