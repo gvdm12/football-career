@@ -311,6 +311,8 @@ class SuperLeagueCareer {
     int? developmentPointsAwardedSeason,
     List<int>? championSeasons,
     List<SuperLeagueSeasonSummary>? history,
+    List<String>? firstDivision,
+    List<String>? secondDivision,
   }) => SuperLeagueCareer(
     player: player ?? this.player,
     season: season ?? this.season,
@@ -319,6 +321,8 @@ class SuperLeagueCareer {
     developmentPointsAwardedSeason: developmentPointsAwardedSeason ?? this.developmentPointsAwardedSeason,
     championSeasons: championSeasons ?? this.championSeasons,
     history: history ?? this.history,
+    firstDivision: firstDivision ?? this.firstDivision,
+    secondDivision: secondDivision ?? this.secondDivision,
   );
 
   int get developmentPointsForSeason {
