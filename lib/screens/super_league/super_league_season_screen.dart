@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/club_colors.dart';
+import 'package:flutter_football/models/super_league_division.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_football/models/super_league_career.dart';
 import 'package:flutter_football/screens/super_league/super_league_table_screen.dart';
@@ -121,7 +122,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                   f.awayTeam == _career.player.club),
         )
         .length;
-    const total = 38;
+    final total = _career.playerDivision.clubCount == 22 ? 42 : 38;
     return PopScope<SuperLeagueCareer>(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
