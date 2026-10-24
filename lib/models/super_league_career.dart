@@ -460,6 +460,7 @@ class SuperLeagueCareer {
       developmentPoints: developmentPoints,
       developmentPointsAwardedSeason: developmentPointsAwardedSeason,
       championSeasons: championSeasons,
+      secondDivisionChampionSeasons: secondDivisionChampionSeasons,
       history: history,
       firstDivision: nextFirst,
       secondDivision: nextSecond,
