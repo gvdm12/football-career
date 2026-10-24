@@ -193,7 +193,16 @@ class _SuperLeagueTableScreenState extends State<SuperLeagueTableScreen> {
   );
 
   Widget _buildRow(int position, SuperLeagueStanding entry) {
-    final isPlayerClub = entry.club == career.player.club;
+    final isPlayerClub = entry.club == widget.career.player.club;
+    final isRelegationZone =
+        _selectedDivision == SuperLeagueDivision.first && position >= 16;
+    final isPromotionZone =
+        _selectedDivision == SuperLeagueDivision.second && position <= 5;
+    final zoneColor = isRelegationZone
+        ? const Color(0xFFFF5555)
+        : isPromotionZone
+            ? const Color(0xFF22C55E)
+            : null;
     final difference = entry.goalDifference;
     final primary = ClubColors.primary(entry.club);
     final secondary = ClubColors.secondary(entry.club);
