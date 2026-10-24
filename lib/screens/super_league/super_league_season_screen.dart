@@ -398,7 +398,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                                 ),
                               ),
                               Text(
-                                '${_career.championSeasons.length}',
+                                '${_career.championSeasons.length + _career.secondDivisionChampionSeasons.length}',
                                 style: const TextStyle(
                                   color: Color(0xFFFFD778),
                                   fontSize: 16,
