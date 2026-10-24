@@ -4,6 +4,7 @@ import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/super_league_career.dart';
+import 'package:flutter_football/models/super_league_division.dart';
 import 'package:flutter_football/screens/super_league/super_league_create_player_screen.dart';
 import 'package:flutter_football/screens/super_league/super_league_career_screen.dart';
 import 'package:flutter_football/services/super_league_storage.dart';
@@ -21,30 +22,10 @@ class _SuperLeagueClubSelectionScreenState
   static const Color _green = Color(0xFF22C55E);
   static const Color _background = Color(0xFF061B0C);
 
-  static const List<String> _clubNames = [
-    'Barcelona',
-    'Real Madrid',
-    'Atletico Madrid',
-    'Inter',
-    'Napoli',
-    'AC Milan',
-    'Juventus',
-    'Roma',
-    'Liverpool',
-    'Manchester City',
-    'Arsenal',
-    'Chelsea',
-    'Manchester United',
-    'Tottenham',
-    'Bayern Munich',
-    'Bayer Leverkusen',
-    'Borussia Dortmund',
-    'PSG',
-    'Monaco',
-    'Marseille',
-  ];
+  SuperLeagueDivision _selectedDivision = SuperLeagueDivision.first;
 
-  late final List<Club> _clubs = _clubNames
+  List<Club> get _clubs => SuperLeagueDivisionConfig
+      .clubsFor(_selectedDivision)
       .map(Clubs.getByName)
       .toList(growable: false);
 
@@ -97,12 +78,48 @@ class _SuperLeagueClubSelectionScreenState
                       // const SizedBox(height: 14),
                       Row(
                         children: [
-                          _infoChip('20 ${AppStrings.clubsUpper}'),
+                          _infoChip('${_selectedDivision.clubCount} ${AppStrings.clubsUpper}'),
                           const SizedBox(width: 8),
                           _infoChip('10 ${AppStrings.seasonsUpper}'),
                           const SizedBox(width: 8),
                           _infoChip('${AppStrings.overallUpper} 75'),
                         ],
+                      ),
+                      const SizedBox(height: 14),
+                      Row(
+                        children: SuperLeagueDivision.values.map((division) {
+                          final selected = division == _selectedDivision;
+                          return Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                right: division == SuperLeagueDivision.first ? 8 : 0,
+                              ),
+                              child: OutlinedButton(
+                                onPressed: () => setState(() {
+                                  _selectedDivision = division;
+                                  _selectedClubName = null;
+                                }),
+                                style: OutlinedButton.styleFrom(
+                                  backgroundColor: selected
+                                      ? const Color(0xFF16401E)
+                                      : const Color(0xFF0A2110),
+                                  foregroundColor: selected ? _green : Colors.white70,
+                                  side: BorderSide(
+                                    color: selected ? _green : const Color(0xFF14401E),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: Text(
+                                  division.displayName,
+                                  style: const TextStyle(fontWeight: FontWeight.w900),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ],
                   ),
