@@ -387,16 +387,7 @@ class SuperLeagueCareer {
     return goals;
   }
 
-  SuperLeagueCareer nextSeason({String? newClub}) {
-    final nextSeasonNumber = season + 1;
-    final nextPlayer = player.copyWith(
-      age: player.age + 1,
-      season: nextSeasonNumber,
-      club: newClub ?? player.club,
-    );
-
-    // The first division has 38 rounds and the second has 42.
-    // Complete the remaining second-division rounds before calculating promotions.
+  SuperLeagueCareer completeRemainingFixtures() {
     final random = Random();
     final completedFixtures = fixtures.map((fixture) {
       if (fixture.isPlayed) return fixture;
@@ -427,7 +418,19 @@ class SuperLeagueCareer {
         awayGoals: _goalsFor(1.10 - difference * 0.035, random),
       );
     }).toList();
-    final completedSeason = copyWith(fixtures: completedFixtures);
+    return copyWith(fixtures: completedFixtures);
+  }
+
+  SuperLeagueCareer nextSeason({String? newClub}) {
+    final nextSeasonNumber = season + 1;
+    final nextPlayer = player.copyWith(
+      age: player.age + 1,
+      season: nextSeasonNumber,
+      club: newClub ?? player.club,
+    );
+
+    // Complete the remaining second-division rounds before calculating promotions.
+    final completedSeason = completeRemainingFixtures();
     final firstStandings = completedSeason.standingsFor(SuperLeagueDivision.first);
     final secondStandings = completedSeason.standingsFor(SuperLeagueDivision.second);
     final relegated = firstStandings.skip(15).take(5).map((entry) => entry.club).toList();
