@@ -262,10 +262,10 @@ class Clubs {
     // =====================================================
     Club(name: 'Augsburg', league: League.germany, strength: 75),
     Club(name: 'Bayern Munich', league: League.germany, strength: 90),
-    Club(name: 'Bayer Leverkusen', league: League.germany, strength: 83),
+    Club(name: 'Bayer Leverkusen', league: League.germany, strength: 82),
     Club(name: 'Borussia Dortmund', league: League.germany, strength: 83),
     Club(name: 'Monchengladbach', league: League.germany, strength: 76),
-    Club(name: 'Eintracht Frankfurt', league: League.germany, strength: 77),
+    Club(name: 'Eintracht Frankfurt', league: League.germany, strength: 78),
     Club(name: 'Elversberg', league: League.germany, strength: 69),
     Club(name: 'Hamburger SV', league: League.germany, strength: 74),
     Club(name: 'Hoffenheim', league: League.germany, strength: 75),
@@ -274,10 +274,10 @@ class Clubs {
     Club(name: 'RB Leipzig', league: League.germany, strength: 82),
     Club(name: 'Schalke 04', league: League.germany, strength: 74),
     Club(name: 'SC Freiburg', league: League.germany, strength: 78),
-    Club(name: 'Union Berlin', league: League.germany, strength: 75),
+    Club(name: 'Union Berlin', league: League.germany, strength: 76),
     Club(name: 'VfB Stuttgart', league: League.germany, strength: 82),
     Club(name: 'Werder Bremen', league: League.germany, strength: 74),
-    Club(name: 'FC Koln', league: League.germany, strength: 73),
+    Club(name: 'FC Koln', league: League.germany, strength: 72),
 
     // =====================================================
     // ФРАНЦИЯ — LIGUE 1 2026/27 (18)
