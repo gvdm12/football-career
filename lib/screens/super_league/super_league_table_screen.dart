@@ -209,12 +209,17 @@ class _SuperLeagueTableScreenState extends State<SuperLeagueTableScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: isPlayerClub ? const Color(0xB414401E) : const Color(0x72665353),
+        color: zoneColor != null
+            ? zoneColor.withValues(alpha: 0.16)
+            : isPlayerClub
+                ? const Color(0xB414401E)
+                : const Color(0x72665353),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isPlayerClub
-              ? const Color(0xFF4F9F59)
-              : const Color(0xFF14401E),
+          color: zoneColor ??
+              (isPlayerClub
+                  ? const Color(0xFF4F9F59)
+                  : const Color(0xFF14401E)),
         ),
       ),
       child: Row(
