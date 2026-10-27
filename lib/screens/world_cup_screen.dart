@@ -191,7 +191,8 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
                     ),
                   ],
-                  if (playerCanPlay) ...[
+                  if (tournament.isPlayerCalledUp &&
+                      tournament.participants.contains(career.player.nationality)) ...[
                     const SizedBox(height: 14),
                     const Divider(color: Colors.white24),
                     const Text(
