@@ -84,6 +84,27 @@ class _SeasonScreenState extends State<SeasonScreen> {
       }
     }
 
+    final europa = career.europaLeague;
+    if (europa != null &&
+        europa.stage != EuropaLeagueStage.completed) {
+      final playerTie = europa.ties.where(
+        (tie) => tie.homeTeam == club || tie.awayTeam == club,
+      );
+      for (final tie in playerTie) {
+        if (europa.stage == EuropaLeagueStage.finalMatch) {
+          if (!tie.isFinalPlayed) return false;
+        } else if (!tie.isCompleted) {
+          return false;
+        }
+      }
+      if (playerTie.isNotEmpty &&
+          playerTie.every((tie) => tie.winner == club) &&
+          europa.stage != EuropaLeagueStage.finalMatch &&
+          europa.ties.every((tie) => tie.isCompleted)) {
+        return false;
+      }
+    }
+
     final cup = career.domesticCup;
     if (cup == null) return true;
 
@@ -168,6 +189,28 @@ class _SeasonScreenState extends State<SeasonScreen> {
     }
 
     return !tie.isFirstLegPlayed || !tie.isSecondLegPlayed;
+  }
+
+  int? get currentEuropaLeagueTieIndex {
+    final tournament = career.europaLeague;
+    if (tournament == null ||
+        tournament.stage == EuropaLeagueStage.completed) {
+      return null;
+    }
+
+    final club = career.player.club;
+    for (var i = 0; i < tournament.ties.length; i++) {
+      final tie = tournament.ties[i];
+      if (tie.homeTeam != club && tie.awayTeam != club) continue;
+
+      if (tournament.stage == EuropaLeagueStage.finalMatch) {
+        if (!tie.isFinalPlayed) return i;
+      } else if (!tie.isCompleted &&
+          (!tie.isFirstLegPlayed || !tie.isSecondLegPlayed)) {
+        return i;
+      }
+    }
+    return null;
   }
 
   SeasonMatch? get currentMatch {
@@ -1843,10 +1886,16 @@ class _SeasonScreenState extends State<SeasonScreen> {
     final uclPosition = nextUclIndex == null
         ? double.infinity
         : _championsLeagueScheduledPosition();
+    final nextEuropaIndex = currentEuropaLeagueTieIndex;
+    final europaPosition = nextEuropaIndex == null
+        ? double.infinity
+        : _europaLeagueScheduledPosition();
 
-    final showUcl = uclPosition <= leaguePosition && uclPosition <= cupPosition;
-
-    final showCup = !showUcl && cupPosition < leaguePosition;
+    final showUcl = uclPosition <= leaguePosition &&
+        uclPosition <= cupPosition && uclPosition <= europaPosition;
+    final showEuropa = !showUcl &&
+        europaPosition <= leaguePosition && europaPosition <= cupPosition;
+    final showCup = !showUcl && !showEuropa && cupPosition < leaguePosition;
 
     return PopScope<Career>(
       canPop: false,
@@ -1921,6 +1970,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
                                 ),
                               if (!seasonFinished && showUcl)
                                 _buildNextChampionsLeagueMatchCard()
+                              else if (!seasonFinished && showEuropa)
+                                _buildNextEuropaLeagueMatchCard()
                               else if (!seasonFinished &&
                                   showCup &&
                                   nextCupMatch != null)
@@ -2276,6 +2327,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
         championsLeague.stage == ChampionsLeagueStage.completed &&
         championsLeague.champion == career.player.club) {
       trophies.add('Лига чемпионов');
+    }
+
+    // Лига Европы
+    final europaLeague = career.europaLeague;
+    if (europaLeague != null &&
+        europaLeague.stage == EuropaLeagueStage.completed &&
+        europaLeague.champion == career.player.club) {
+      trophies.add('Лига Европы');
     }
 
     final league = Clubs.leagueOf(career.player.club);
