@@ -237,6 +237,15 @@ class WorldCup {
     return copyWith(matches: nextMatches, stage: nextStage);
   }
 
+  WorldCup playCurrentRound({String? playerTeam}) {
+    if (isCompleted) return this;
+    final currentRound = matches
+        .map((match) => match.isPlayed ? match : match.play())
+        .toList();
+    final updated = copyWith(matches: currentRound);
+    return updated._advanceRound();
+  }
+
   WorldCup simulateRemainingMatches() {
     var tournament = this;
     while (!tournament.isCompleted) {
