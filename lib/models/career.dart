@@ -992,6 +992,21 @@ class Career {
     // Проверка нужна, чтобы не потерять историю при старых сохранениях.
     final alreadyArchived = history.any((stats) => stats.season == season);
 
+    final cupStats = worldCup != null &&
+            worldCup.season == season &&
+            worldCup.isPlayerCalledUp
+        ? worldCup
+        : null;
+    final cupMatches = cupStats?.playerMatches ?? 0;
+    final cupGoals = cupStats?.playerGoals ?? 0;
+    final cupAssists = cupStats?.playerAssists ?? 0;
+    final combinedMatches = matches + cupMatches;
+    final combinedRating = combinedMatches == 0
+        ? null
+        : ((averageRating ?? 0) * matches +
+                  (cupStats?.playerAverageRating ?? 0) * cupMatches) /
+              combinedMatches;
+
     final newHistory = alreadyArchived
         ? history
         : [
@@ -999,42 +1014,14 @@ class Career {
             SeasonStats(
               season: season,
               club: player.club,
-              matches: matches +
-                  (worldCup != null &&
-                          worldCup.season == season &&
-                          worldCup.isPlayerCalledUp
-                      ? worldCup.playerMatches
-                      : 0),
-              goals: goals +
-                  (worldCup != null &&
-                          worldCup.season == season &&
-                          worldCup.isPlayerCalledUp
-                      ? worldCup.playerGoals
-                      : 0),
-              assists: assists +
-                  (worldCup != null &&
-                          worldCup.season == season &&
-                          worldCup.isPlayerCalledUp
-                      ? worldCup.playerAssists
-                      : 0),
+              matches: matches + cupMatches,
+              goals: goals + cupGoals,
+              assists: assists + cupAssists,
               yellowCards: yellowCards,
               redCards: redCards,
-              averageRating: (() {
-                final cup = worldCup != null &&
-                        worldCup.season == season &&
-                        worldCup.isPlayerCalledUp
-                    ? worldCup
-                    : null;
-                final cupMatches = cup?.playerMatches ?? 0;
-                final totalMatches = matches + cupMatches;
-                if (totalMatches == 0) return null;
-                final totalRating =
-                    (averageRating ?? 0) * matches +
-                    (cup?.playerAverageRating ?? 0) * cupMatches;
-                return double.parse(
-                  (totalRating / totalMatches).toStringAsFixed(2),
-                );
-              })(),
+              averageRating: combinedRating == null
+                  ? null
+                  : double.parse(combinedRating.toStringAsFixed(2)),
             ),
           ];
 

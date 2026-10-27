@@ -194,7 +194,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                     'В финальной части участвуют ${tournament.participants.length} из ${worldCupNationalTeams.length} сборных.',
                     style: const TextStyle(color: Colors.white70),
                   ),
-                  if (playerCanPlay && playerMatch != null) ...[
+                  if (playerCanPlay) ...[
                     const SizedBox(height: 14),
                     Text(
                       'Матч сборной: ${playerMatch.homeTeam} '
