@@ -1066,6 +1066,21 @@ class Career {
       season: newSeason,
     );
 
+    final previousStats = previousSeasonStats.isNotEmpty
+        ? previousSeasonStats.last
+        : null;
+    final WorldCup? newWorldCup = newSeason % 4 == 0
+        ? WorldCup.create(
+            season: newSeason,
+            nationality: newPlayer.nationality,
+            overall: newPlayer.overall,
+            age: newPlayer.age,
+            goals: previousStats?.goals ?? 0,
+            assists: previousStats?.assists ?? 0,
+            averageRating: previousStats?.averageRating,
+          )
+        : null;
+
     return Career(
       player: newPlayer,
       season: newSeason,
@@ -1089,6 +1104,7 @@ class Career {
       europeanLeagueStandings: newEuropeanLeagueStandings,
       championsLeague: newChampionsLeague,
       europaLeague: newEuropaLeague,
+      worldCup: newWorldCup,
     );
   }
 }
