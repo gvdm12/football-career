@@ -80,7 +80,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
     'Венесуэла': 'VE',
     'Палестина': 'PS',
     'Венгрия': 'HU',
-    'Босния и Герцеговина': 'BA',
+    'Босния': 'BA',
     'Албания': 'AL',
     'Австралия': 'AU',
   };
@@ -134,7 +134,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
     'Венесуэла',
     'Палестина',
     'Венгрия',
-    'Босния и Герцеговина',
+    'Босния',
     'Албания',
     'Австралия',
   ];
@@ -184,7 +184,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
     'Венесуэла': 'Venezuela',
     'Палестина': 'Palestine',
     'Венгрия': 'Hungary',
-    'Босния и Герцеговина': 'Bosnia and Herzegovina',
+    'Босния': 'Bosnia',
     'Албания': 'Albania',
     'Австралия': 'Australia',
   };
