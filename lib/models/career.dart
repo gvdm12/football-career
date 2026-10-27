@@ -368,9 +368,15 @@ class Career {
         : null;
 
     final rawEuropaLeague = json['europaLeague'];
+    final currentSeason = (json['season'] as num?)?.toInt() ?? 1;
     final europaLeague = rawEuropaLeague is Map
         ? EuropaLeague.fromJson(Map<String, dynamic>.from(rawEuropaLeague))
-        : null;
+        : EuropaLeague.create(
+            season: currentSeason,
+            participants: LeagueSeasonSimulator.getEuropaLeagueClubs(
+              europeanLeagueStandings,
+            ),
+          );
 
     return Career(
       player: loadedPlayer,
