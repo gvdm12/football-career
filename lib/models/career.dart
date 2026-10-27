@@ -374,9 +374,10 @@ class Career {
     final rawEuropaLeague = json['europaLeague'];
     final rawWorldCup = json['worldCup'];
     final currentSeason = (json['season'] as num?)?.toInt() ?? 1;
-    final europaStandings = LeagueSeasonSimulator.europaLeagueSlots.keys.every(
-      europeanLeagueStandings.containsKey,
-    )
+    final europaStandings =
+        LeagueSeasonSimulator.europaLeagueSlots.keys.every(
+          europeanLeagueStandings.containsKey,
+        )
         ? europeanLeagueStandings
         : LeagueSeasonSimulator.simulateAll(season: currentSeason);
     final europaLeague = rawEuropaLeague is Map
@@ -690,7 +691,8 @@ class Career {
     // В итогах сезона объединяем клубную статистику и личные показатели
     // игрока за сборную. Поля Career.matches/goals/assists остаются клубными,
     // чтобы матчи сборной не влияли на таблицу лиги и клубное развитие.
-    final worldCupStats = worldCup != null &&
+    final worldCupStats =
+        worldCup != null &&
             worldCup.season == season &&
             worldCup.isPlayerCalledUp
         ? worldCup
@@ -992,20 +994,14 @@ class Career {
     // Проверка нужна, чтобы не потерять историю при старых сохранениях.
     final alreadyArchived = history.any((stats) => stats.season == season);
 
-    final cupStats = worldCup != null &&
-            worldCup.season == season &&
-            worldCup.isPlayerCalledUp
-        ? worldCup
+    final currentWorldCup = worldCup;
+
+    final cup =
+        currentWorldCup != null &&
+            currentWorldCup.season == season &&
+            currentWorldCup.isPlayerCalledUp
+        ? currentWorldCup
         : null;
-    final cupMatches = cupStats?.playerMatches ?? 0;
-    final cupGoals = cupStats?.playerGoals ?? 0;
-    final cupAssists = cupStats?.playerAssists ?? 0;
-    final combinedMatches = matches + cupMatches;
-    final combinedRating = combinedMatches == 0
-        ? null
-        : ((averageRating ?? 0) * matches +
-                  (cupStats?.playerAverageRating ?? 0) * cupMatches) /
-              combinedMatches;
 
     final newHistory = alreadyArchived
         ? history
@@ -1014,14 +1010,25 @@ class Career {
             SeasonStats(
               season: season,
               club: player.club,
-              matches: matches + cupMatches,
-              goals: goals + cupGoals,
-              assists: assists + cupAssists,
+              matches: matches + (cup?.playerMatches ?? 0),
+              goals: goals + (cup?.playerGoals ?? 0),
+              assists: assists + (cup?.playerAssists ?? 0),
               yellowCards: yellowCards,
               redCards: redCards,
-              averageRating: combinedRating == null
-                  ? null
-                  : double.parse(combinedRating.toStringAsFixed(2)),
+              averageRating: (() {
+                final cupMatches = cup?.playerMatches ?? 0;
+                final totalMatches = matches + cupMatches;
+
+                if (totalMatches == 0) return null;
+
+                final totalRating =
+                    (averageRating ?? 0) * matches +
+                    (cup?.playerAverageRating ?? 0) * cupMatches;
+
+                return double.parse(
+                  (totalRating / totalMatches).toStringAsFixed(2),
+                );
+              })(),
             ),
           ];
 

@@ -44,7 +44,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
   void initState() {
     super.initState();
     career = widget.career;
-
   }
 
   bool get worldCupBlocksSeason {
@@ -75,16 +74,15 @@ class _SeasonScreenState extends State<SeasonScreen> {
     final status = tournament.isCompleted
         ? 'Турнир завершён · чемпион: ${tournament.champion ?? 'не определён'}'
         : tournament.isPlayerCalledUp
-            ? 'Вас вызвали в сборную — сыграйте чемпионат мира перед клубным сезоном'
-            : 'Чемпионат мира проходит параллельно с клубным сезоном';
-    final nationalMatches = [
-      ...tournament.matchHistory,
-      ...tournament.matches,
-    ].where(
-      (match) =>
-          match.homeTeam == career.player.nationality ||
-          match.awayTeam == career.player.nationality,
-    ).toList();
+        ? 'Вас вызвали в сборную — сыграйте чемпионат мира перед клубным сезоном'
+        : 'Чемпионат мира проходит параллельно с клубным сезоном';
+    final nationalMatches = [...tournament.matchHistory, ...tournament.matches]
+        .where(
+          (match) =>
+              match.homeTeam == career.player.nationality ||
+              match.awayTeam == career.player.nationality,
+        )
+        .toList();
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -148,7 +146,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
                   : '— : —';
               return Container(
                 margin: const EdgeInsets.only(top: 5),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF061B0C),
                   borderRadius: BorderRadius.circular(8),
@@ -213,27 +214,21 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   int get _worldCupMatchesForSeason {
     final cup = career.worldCup;
-    return cup != null &&
-            cup.season == career.season &&
-            cup.isPlayerCalledUp
+    return cup != null && cup.season == career.season && cup.isPlayerCalledUp
         ? cup.playerMatches
         : 0;
   }
 
   int get _worldCupGoalsForSeason {
     final cup = career.worldCup;
-    return cup != null &&
-            cup.season == career.season &&
-            cup.isPlayerCalledUp
+    return cup != null && cup.season == career.season && cup.isPlayerCalledUp
         ? cup.playerGoals
         : 0;
   }
 
   int get _worldCupAssistsForSeason {
     final cup = career.worldCup;
-    return cup != null &&
-            cup.season == career.season &&
-            cup.isPlayerCalledUp
+    return cup != null && cup.season == career.season && cup.isPlayerCalledUp
         ? cup.playerAssists
         : 0;
   }
@@ -249,12 +244,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
   double? get _seasonAverageRatingForDisplay {
     final totalMatches = _seasonMatchesForDisplay;
     if (totalMatches == 0) return null;
-    final cup = career.worldCup != null &&
+    final cup =
+        career.worldCup != null &&
             career.worldCup!.season == career.season &&
             career.worldCup!.isPlayerCalledUp
         ? career.worldCup
         : null;
-    final totalRating = (career.averageRating ?? 0) * career.matches +
+    final totalRating =
+        (career.averageRating ?? 0) * career.matches +
         (cup?.playerAverageRating ?? 0) * _worldCupMatchesForSeason;
     return totalRating / totalMatches;
   }
@@ -947,7 +944,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
   Future<void> _playMatch(SeasonMatch seasonMatch) async {
     if (isSaving || seasonFinishing || seasonMatch.isPlayed) return;
 
-<<<<<<< HEAD
     final worldCup = career.worldCup;
     if (worldCup != null && !worldCup.isCompleted) {
       final updatedCareer = await Navigator.push<Career>(
@@ -960,8 +956,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
       return;
     }
 
-=======
->>>>>>> e327a98dac996909972e01e8cf4c81cd992f868f
     final nextMatch = currentMatch;
 
     if (nextMatch == null || nextMatch.number != seasonMatch.number) {
