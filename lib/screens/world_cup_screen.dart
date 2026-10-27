@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/services/career_storage.dart';
@@ -154,7 +155,18 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
         backgroundColor: const Color(0xFF0B3A1A),
         foregroundColor: Colors.white,
         automaticallyImplyLeading: false,
-        title: const Text('Чемпионат мира'),
+        title: Row(
+          children: [
+            SvgPicture.asset(
+              'assets/icons/worldcup.svg',
+              width: 28,
+              height: 28,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 10),
+            const Text('Чемпионат мира'),
+          ],
+        ),
       ),
       body: SafeArea(
         child: ListView(
