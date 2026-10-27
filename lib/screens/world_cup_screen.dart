@@ -255,6 +255,13 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                 ),
                 child: Row(
                   children: [
+                    SvgPicture.asset(
+                      'assets/icons/worldcup.svg',
+                      width: 20,
+                      height: 20,
+                      fit: BoxFit.contain,
+                    ),
+                    const SizedBox(width: 6),
                     _teamLabel(match.homeTeam),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
