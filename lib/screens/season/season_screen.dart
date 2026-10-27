@@ -77,6 +77,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
         : tournament.isPlayerCalledUp
             ? 'Вас вызвали в сборную — сыграйте чемпионат мира перед клубным сезоном'
             : 'Чемпионат мира проходит параллельно с клубным сезоном';
+    final nationalMatches = [
+      ...tournament.matchHistory,
+      ...tournament.matches,
+    ].where(
+      (match) =>
+          match.homeTeam == career.player.nationality ||
+          match.awayTeam == career.player.nationality,
+    ).toList();
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -121,6 +129,61 @@ class _SeasonScreenState extends State<SeasonScreen> {
           ),
           const SizedBox(height: 8),
           Text(status, style: const TextStyle(color: Colors.white70)),
+          if (nationalMatches.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            const Text(
+              'Матчи вашей сборной',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 6),
+            ...nationalMatches.map((match) {
+              final isPlayed = match.isPlayed;
+              final isHome = match.homeTeam == career.player.nationality;
+              final opponent = isHome ? match.awayTeam : match.homeTeam;
+              final score = isPlayed
+                  ? '${match.homeGoals} : ${match.awayGoals}'
+                  : '— : —';
+              return Container(
+                margin: const EdgeInsets.only(top: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF061B0C),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.sports_soccer,
+                      color: Color(0xFF8BE07F),
+                      size: 17,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '${isHome ? 'Дома' : 'В гостях'}: $opponent',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      score,
+                      style: TextStyle(
+                        color: isPlayed
+                            ? const Color(0xFF8BE07F)
+                            : Colors.white54,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
           if (!tournament.isCompleted) ...[
             const SizedBox(height: 10),
             SizedBox(
@@ -1996,7 +2059,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                               const SizedBox(height: 12),
                               _buildCalendarButton(),
                               const SizedBox(height: 10),
-                              _buildSeasonButton(),
+                              if (!worldCupBlocksSeason) _buildSeasonButton(),
                             ],
                           ),
                   ),
