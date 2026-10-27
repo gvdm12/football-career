@@ -211,6 +211,54 @@ class _SeasonScreenState extends State<SeasonScreen> {
   int get playedMatches =>
       career.seasonMatches.where((match) => match.isPlayed).length;
 
+  int get _worldCupMatchesForSeason {
+    final cup = career.worldCup;
+    return cup != null &&
+            cup.season == career.season &&
+            cup.isPlayerCalledUp
+        ? cup.playerMatches
+        : 0;
+  }
+
+  int get _worldCupGoalsForSeason {
+    final cup = career.worldCup;
+    return cup != null &&
+            cup.season == career.season &&
+            cup.isPlayerCalledUp
+        ? cup.playerGoals
+        : 0;
+  }
+
+  int get _worldCupAssistsForSeason {
+    final cup = career.worldCup;
+    return cup != null &&
+            cup.season == career.season &&
+            cup.isPlayerCalledUp
+        ? cup.playerAssists
+        : 0;
+  }
+
+  int get _seasonMatchesForDisplay =>
+      career.matches + _worldCupMatchesForSeason;
+
+  int get _seasonGoalsForDisplay => career.goals + _worldCupGoalsForSeason;
+
+  int get _seasonAssistsForDisplay =>
+      career.assists + _worldCupAssistsForSeason;
+
+  double? get _seasonAverageRatingForDisplay {
+    final totalMatches = _seasonMatchesForDisplay;
+    if (totalMatches == 0) return null;
+    final cup = career.worldCup != null &&
+            career.worldCup!.season == career.season &&
+            career.worldCup!.isPlayerCalledUp
+        ? career.worldCup
+        : null;
+    final totalRating = (career.averageRating ?? 0) * career.matches +
+        (cup?.playerAverageRating ?? 0) * _worldCupMatchesForSeason;
+    return totalRating / totalMatches;
+  }
+
   bool get seasonFinished {
     final leagueFinished =
         career.seasonMatches.isNotEmpty &&
@@ -2348,9 +2396,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
           const SizedBox(height: 6),
           Row(
             children: [
-              _statItem(AppStrings.matchesLabel, '${career.matches}'),
-              _statItem(AppStrings.goalsStat, '${career.goals}'),
-              _statItem(AppStrings.assistsStat, '${career.assists}'),
+              _statItem(AppStrings.matchesLabel, '${_seasonMatchesForDisplay}'),
+              _statItem(AppStrings.goalsStat, '${_seasonGoalsForDisplay}'),
+              _statItem(AppStrings.assistsStat, '${_seasonAssistsForDisplay}'),
             ],
           ),
           const SizedBox(height: 5),
@@ -2360,7 +2408,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
               _statItem(AppStrings.redStat, '${career.redCards}'),
               _statItem(
                 AppStrings.ratingStat,
-                career.averageRating?.toStringAsFixed(1) ?? '—',
+                _seasonAverageRatingForDisplay?.toStringAsFixed(1) ?? '—',
               ),
             ],
           ),
