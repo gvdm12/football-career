@@ -159,16 +159,16 @@ class WorldCupMatch {
     // Игрок высокого уровня усиливает сборную, а слабый состав не получает
     // искусственный бонус. Максимальный бонус ограничен, чтобы один игрок
     // не гарантировал победу.
-    final playerBoost = ((playerOverall - 70) * 0.12).clamp(0.0, 3.5);
+    final playerBoost = ((playerOverall - 70) * 0.12).clamp(0.0, 3.5).toDouble();
     if (playerTeam == homeTeam) homeStrength += playerBoost;
     if (playerTeam == awayTeam) awayStrength += playerBoost;
     final strengthDifference = homeStrength - awayStrength;
 
     // Сила влияет на среднее число голов, но не гарантирует победу.
     final homeExpectedGoals =
-        (1.30 + strengthDifference * 0.035 + 0.12).clamp(0.30, 2.65);
+        (1.30 + strengthDifference * 0.035 + 0.12).clamp(0.30, 2.65).toDouble();
     final awayExpectedGoals =
-        (1.30 - strengthDifference * 0.035).clamp(0.30, 2.65);
+        (1.30 - strengthDifference * 0.035).clamp(0.30, 2.65).toDouble();
 
     var home = homeScore ?? _randomGoals(homeExpectedGoals, random);
     var away = awayScore ?? _randomGoals(awayExpectedGoals, random);
@@ -214,7 +214,7 @@ class WorldCupMatch {
               scoredByPlayer * 0.65 +
               assistedByPlayer * 0.35 +
               (random.nextDouble() * 0.8 - 0.4))
-          .clamp(4.5, 10.0);
+           .clamp(4.5, 10.0).toDouble();
       rating = double.parse(rating.toStringAsFixed(1));
     }
 
