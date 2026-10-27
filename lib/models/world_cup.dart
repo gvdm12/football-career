@@ -126,6 +126,9 @@ class WorldCupMatch {
   final int? awayGoals;
   final bool isPlayed;
   final String? winner;
+  final int playerGoals;
+  final int playerAssists;
+  final double? playerRating;
 
   const WorldCupMatch({
     required this.homeTeam,
@@ -134,12 +137,31 @@ class WorldCupMatch {
     this.awayGoals,
     this.isPlayed = false,
     this.winner,
+    this.playerGoals = 0,
+    this.playerAssists = 0,
+    this.playerRating,
   });
 
-  WorldCupMatch play({int? homeScore, int? awayScore}) {
+  WorldCupMatch play({
+    int? homeScore,
+    int? awayScore,
+    String? playerTeam,
+    int playerOverall = 70,
+    String playerPosition = 'forward',
+    int playerShooting = 60,
+    int playerPassing = 60,
+    int playerDribbling = 60,
+  }) {
     final random = Random();
-    final homeStrength = worldCupStrengthOf(homeTeam);
-    final awayStrength = worldCupStrengthOf(awayTeam);
+    var homeStrength = worldCupStrengthOf(homeTeam).toDouble();
+    var awayStrength = worldCupStrengthOf(awayTeam).toDouble();
+
+    // Игрок высокого уровня усиливает сборную, а слабый состав не получает
+    // искусственный бонус. Максимальный бонус ограничен, чтобы один игрок
+    // не гарантировал победу.
+    final playerBoost = ((playerOverall - 70) * 0.12).clamp(0.0, 3.5);
+    if (playerTeam == homeTeam) homeStrength += playerBoost;
+    if (playerTeam == awayTeam) awayStrength += playerBoost;
     final strengthDifference = homeStrength - awayStrength;
 
     // Сила влияет на среднее число голов, но не гарантирует победу.
@@ -160,6 +182,42 @@ class WorldCupMatch {
       }
     }
 
+    var scoredByPlayer = 0;
+    var assistedByPlayer = 0;
+    double? rating;
+
+    if (playerTeam == homeTeam || playerTeam == awayTeam) {
+      final playerTeamGoals = playerTeam == homeTeam ? home : away;
+      final positionGoalFactor = switch (playerPosition) {
+        'forward' => 0.30,
+        'midfielder' => 0.16,
+        'defender' => 0.055,
+        'goalkeeper' => 0.005,
+        _ => 0.15,
+      };
+      final goalChance = (positionGoalFactor +
+              (playerOverall - 70) * 0.006 +
+              (playerShooting - 60) * 0.003 +
+              (playerDribbling - 60) * 0.001)
+          .clamp(0.02, 0.65);
+      for (var i = 0; i < playerTeamGoals; i++) {
+        if (random.nextDouble() < goalChance) scoredByPlayer++;
+      }
+      final assistChance =
+          (0.10 + (playerPassing - 50) * 0.004).clamp(0.04, 0.40);
+      for (var i = 0; i < playerTeamGoals - scoredByPlayer; i++) {
+        if (random.nextDouble() < assistChance) assistedByPlayer++;
+      }
+      rating = (6.0 +
+              (playerOverall - 70) * 0.035 +
+              (playerTeamGoals - (playerTeam == homeTeam ? away : home)) * 0.35 +
+              scoredByPlayer * 0.65 +
+              assistedByPlayer * 0.35 +
+              (random.nextDouble() * 0.8 - 0.4))
+          .clamp(4.5, 10.0);
+      rating = double.parse(rating.toStringAsFixed(1));
+    }
+
     return WorldCupMatch(
       homeTeam: homeTeam,
       awayTeam: awayTeam,
@@ -167,6 +225,9 @@ class WorldCupMatch {
       awayGoals: away,
       isPlayed: true,
       winner: home > away ? homeTeam : awayTeam,
+      playerGoals: scoredByPlayer,
+      playerAssists: assistedByPlayer,
+      playerRating: rating,
     );
   }
 
@@ -189,6 +250,9 @@ class WorldCupMatch {
     'awayGoals': awayGoals,
     'isPlayed': isPlayed,
     'winner': winner,
+    'playerGoals': playerGoals,
+    'playerAssists': playerAssists,
+    'playerRating': playerRating,
   };
 
   factory WorldCupMatch.fromJson(Map<String, dynamic> json) => WorldCupMatch(
@@ -198,6 +262,9 @@ class WorldCupMatch {
     awayGoals: (json['awayGoals'] as num?)?.toInt(),
     isPlayed: json['isPlayed'] as bool? ?? false,
     winner: json['winner'] as String?,
+    playerGoals: (json['playerGoals'] as num?)?.toInt() ?? 0,
+    playerAssists: (json['playerAssists'] as num?)?.toInt() ?? 0,
+    playerRating: (json['playerRating'] as num?)?.toDouble(),
   );
 }
 
@@ -208,6 +275,10 @@ class WorldCup {
   final WorldCupStage stage;
   final String? champion;
   final String playerCallUpStatus;
+  final int playerMatches;
+  final int playerGoals;
+  final int playerAssists;
+  final double? playerAverageRating;
 
   const WorldCup({
     required this.season,
@@ -216,6 +287,10 @@ class WorldCup {
     required this.stage,
     this.champion,
     required this.playerCallUpStatus,
+    this.playerMatches = 0,
+    this.playerGoals = 0,
+    this.playerAssists = 0,
+    this.playerAverageRating,
   });
 
   bool get isPlayerCalledUp => playerCallUpStatus == 'called';
@@ -308,12 +383,58 @@ class WorldCup {
     return copyWith(matches: nextMatches, stage: nextStage);
   }
 
-  WorldCup playCurrentRound({String? playerTeam}) {
+  WorldCup playCurrentRound({
+    String? playerTeam,
+    int playerOverall = 70,
+    String playerPosition = 'forward',
+    int playerShooting = 60,
+    int playerPassing = 60,
+    int playerDribbling = 60,
+  }) {
     if (isCompleted) return this;
-    final currentRound = matches
-        .map((match) => match.isPlayed ? match : match.play())
-        .toList();
-    final updated = copyWith(matches: currentRound);
+    var roundPlayerMatches = 0;
+    var roundGoals = 0;
+    var roundAssists = 0;
+    var ratingTotal = 0.0;
+    final currentRound = matches.map((match) {
+      if (match.isPlayed) return match;
+      final hasPlayer = playerTeam != null &&
+          (match.homeTeam == playerTeam || match.awayTeam == playerTeam);
+      final played = match.play(
+        playerTeam: hasPlayer ? playerTeam : null,
+        playerOverall: playerOverall,
+        playerPosition: playerPosition,
+        playerShooting: playerShooting,
+        playerPassing: playerPassing,
+        playerDribbling: playerDribbling,
+      );
+      if (hasPlayer && played.playerRating != null) {
+        roundPlayerMatches++;
+        roundGoals += played.playerGoals;
+        roundAssists += played.playerAssists;
+        ratingTotal += played.playerRating!;
+      }
+      return played;
+    }).toList();
+
+    final newPlayerMatches = playerMatches + roundPlayerMatches;
+    final newPlayerGoals = playerGoals + roundGoals;
+    final newPlayerAssists = playerAssists + roundAssists;
+    final newAverage = roundPlayerMatches == 0
+        ? playerAverageRating
+        : playerAverageRating == null
+            ? ratingTotal / roundPlayerMatches
+            : ((playerAverageRating! * playerMatches) + ratingTotal) /
+                newPlayerMatches;
+    final updated = copyWith(
+      matches: currentRound,
+      playerMatches: newPlayerMatches,
+      playerGoals: newPlayerGoals,
+      playerAssists: newPlayerAssists,
+      playerAverageRating: newAverage == null
+          ? null
+          : double.parse(newAverage.toStringAsFixed(2)),
+    );
     return updated._advanceRound();
   }
 
@@ -334,6 +455,10 @@ class WorldCup {
     WorldCupStage? stage,
     String? champion,
     String? playerCallUpStatus,
+    int? playerMatches,
+    int? playerGoals,
+    int? playerAssists,
+    double? playerAverageRating,
   }) => WorldCup(
     season: season,
     participants: participants ?? this.participants,
@@ -341,6 +466,10 @@ class WorldCup {
     stage: stage ?? this.stage,
     champion: champion ?? this.champion,
     playerCallUpStatus: playerCallUpStatus ?? this.playerCallUpStatus,
+    playerMatches: playerMatches ?? this.playerMatches,
+    playerGoals: playerGoals ?? this.playerGoals,
+    playerAssists: playerAssists ?? this.playerAssists,
+    playerAverageRating: playerAverageRating ?? this.playerAverageRating,
   );
 
   Map<String, dynamic> toJson() => {
@@ -350,6 +479,10 @@ class WorldCup {
     'stage': stage.name,
     'champion': champion,
     'playerCallUpStatus': playerCallUpStatus,
+    'playerMatches': playerMatches,
+    'playerGoals': playerGoals,
+    'playerAssists': playerAssists,
+    'playerAverageRating': playerAverageRating,
   };
 
   factory WorldCup.fromJson(Map<String, dynamic> json) {
@@ -371,6 +504,10 @@ class WorldCup {
       ),
       champion: json['champion'] as String?,
       playerCallUpStatus: json['playerCallUpStatus'] as String? ?? 'not_called',
+      playerMatches: (json['playerMatches'] as num?)?.toInt() ?? 0,
+      playerGoals: (json['playerGoals'] as num?)?.toInt() ?? 0,
+      playerAssists: (json['playerAssists'] as num?)?.toInt() ?? 0,
+      playerAverageRating: (json['playerAverageRating'] as num?)?.toDouble(),
     );
   }
 }
