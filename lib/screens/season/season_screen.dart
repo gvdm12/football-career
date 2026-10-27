@@ -11,10 +11,12 @@ import 'package:flutter_football/models/league_match.dart';
 import 'package:flutter_football/models/league_table.dart';
 import 'package:flutter_football/models/match.dart';
 import 'package:flutter_football/models/season_match.dart';
+import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/screens/development_screen.dart';
 import 'package:flutter_football/screens/league_table/league_table_screen.dart';
 import 'package:flutter_football/screens/match/match_screen.dart';
 import 'package:flutter_football/screens/transfers/transfer_screen.dart';
+import 'package:flutter_football/screens/world_cup_screen.dart';
 import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/services/career_storage.dart';
 import 'package:flutter_football/screens/career_end_screen.dart';
@@ -737,6 +739,20 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Future<void> _playMatch(SeasonMatch seasonMatch) async {
     if (isSaving || seasonFinishing || seasonMatch.isPlayed) return;
+
+    final worldCup = career.worldCup;
+    if (worldCup != null && !worldCup.isCompleted) {
+      final updatedCareer = await Navigator.push<Career>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => WorldCupScreen(career: career),
+        ),
+      );
+      if (!mounted || updatedCareer == null) return;
+      setState(() => career = updatedCareer);
+      await _saveCareer(updatedCareer);
+      return;
+    }
 
     final nextMatch = currentMatch;
 
