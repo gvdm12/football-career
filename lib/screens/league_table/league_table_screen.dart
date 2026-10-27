@@ -45,6 +45,8 @@ class LeagueTableScreen extends StatelessWidget {
                 children: [
                   _buildHeader(),
                   const SizedBox(height: 8),
+                  _buildQualificationLegend(),
+                  const SizedBox(height: 8),
                   ...List.generate(table.length, (index) {
                     final entry = table[index];
 
@@ -59,6 +61,42 @@ class LeagueTableScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildQualificationLegend() {
+    return Wrap(
+      spacing: 12,
+      runSpacing: 6,
+      children: [
+        _legendItem(const Color(0xFF42A5F5), 'Лига чемпионов'),
+        _legendItem(const Color(0xFFFFA726), 'Лига Европы'),
+      ],
+    );
+  }
+
+  Widget _legendItem(Color color, String label) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(3),
+          ),
+        ),
+        const SizedBox(width: 5),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 
@@ -141,12 +179,22 @@ class LeagueTableScreen extends StatelessWidget {
         : LeagueSeasonSimulator.qualificationSlots[league] ?? 0;
 
     final qualifiesForChampionsLeague = position <= qualificationSlots;
+    final europaSlots = league == null
+        ? null
+        : LeagueSeasonSimulator.europaLeagueSlots[league];
+    final qualifiesForEuropaLeague =
+        !qualifiesForChampionsLeague &&
+        europaSlots != null &&
+        position >= europaSlots.$1 &&
+        position < europaSlots.$1 + europaSlots.$2;
 
-    final positionColor = isPlayerClub
-        ? green
-        : qualifiesForChampionsLeague
+    final qualificationColor = qualifiesForChampionsLeague
         ? const Color(0xFF42A5F5)
+        : qualifiesForEuropaLeague
+        ? const Color(0xFFFFA726)
         : Colors.white70;
+
+    final positionColor = isPlayerClub ? green : qualificationColor;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -155,13 +203,17 @@ class LeagueTableScreen extends StatelessWidget {
             ? const Color.fromARGB(184, 86, 81, 7)
             : qualifiesForChampionsLeague
             ? const Color.fromARGB(205, 22, 59, 98)
+            : qualifiesForEuropaLeague
+            ? const Color.fromARGB(205, 112, 67, 18)
             : const Color.fromARGB(114, 86, 83, 83),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isPlayerClub
               ? const Color(0xFF4F9F59)
               : qualifiesForChampionsLeague
-              ? const Color.fromARGB(255, 255, 255, 255)
+              ? const Color(0xFF42A5F5)
+              : qualifiesForEuropaLeague
+              ? const Color(0xFFFFA726)
               : const Color(0xFF14401E),
         ),
       ),
