@@ -593,7 +593,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
           SizedBox(
             width: 46,
             child: SvgPicture.asset(
-              'assets/icons/ucl.svg',
+              'assets/icons/europaleague.svg',
               width: 28,
               height: 28,
               fit: BoxFit.contain,
@@ -706,7 +706,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
           SizedBox(
             width: 46,
             child: SvgPicture.asset(
-              'assets/icons/ucl.svg',
+              'assets/icons/europaleague.svg',
               width: 28,
               height: 28,
               fit: BoxFit.contain,
@@ -2261,6 +2261,15 @@ class _SeasonScreenState extends State<SeasonScreen> {
       trophies.add('Лига Европы');
     }
 
+    final worldCup = career.worldCup;
+    if (worldCup != null &&
+        worldCup.season == career.season &&
+        worldCup.isCompleted &&
+        worldCup.isPlayerCalledUp &&
+        worldCup.champion == career.player.nationality) {
+      trophies.add('Чемпион мира');
+    }
+
     final league = Clubs.leagueOf(career.player.club);
 
     if (league != null && career.goals >= league.goldenBootGoalThreshold) {
@@ -2300,12 +2309,23 @@ class _SeasonScreenState extends State<SeasonScreen> {
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Row(
                         children: [
-                          Image.asset(
-                            trophy == 'Лига чемпионов'
-                                ? 'assets/icons/uclphoto.png'
-                                : trophy == 'Золотая бутса'
-                                ? 'assets/icons/boot.png'
-                                : 'assets/icons/cup1.png',
+                          if (trophy == 'Лига Европы' ||
+                              trophy == 'Чемпион мира')
+                            SvgPicture.asset(
+                              trophy == 'Лига Европы'
+                                  ? 'assets/icons/europaleague.svg'
+                                  : 'assets/icons/worldcup.svg',
+                              width: 24,
+                              height: 24,
+                              fit: BoxFit.contain,
+                            )
+                          else
+                            Image.asset(
+                              trophy == 'Лига чемпионов'
+                                  ? 'assets/icons/uclphoto.png'
+                                  : trophy == 'Золотая бутса'
+                                  ? 'assets/icons/boot.png'
+                                  : 'assets/icons/cup1.png',
                             width: 24,
                             height: 24,
                             fit: BoxFit.contain,
