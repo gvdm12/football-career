@@ -240,17 +240,6 @@ class Career {
       europeanLeagueStandings: europeanLeagueStandings,
       championsLeague: championsLeague,
       europaLeague: europaLeague,
-      worldCup: season % 4 == 0
-          ? WorldCup.create(
-              season: season,
-              nationality: player.nationality,
-              overall: player.overall,
-              age: player.age,
-              goals: goals,
-              assists: assists,
-              averageRating: averageRating,
-            )
-          : null,
     );
   }
 
