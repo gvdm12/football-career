@@ -248,14 +248,14 @@ class Clubs {
     Club(name: 'Juventus', league: League.italy, strength: 84),
     Club(name: 'Lazio', league: League.italy, strength: 77),
     Club(name: 'Lecce', league: League.italy, strength: 71),
-    Club(name: 'Monza', league: League.italy, strength: 74),
+    Club(name: 'Monza', league: League.italy, strength: 73),
     Club(name: 'Napoli', league: League.italy, strength: 85),
     Club(name: 'Parma', league: League.italy, strength: 74),
     Club(name: 'Roma', league: League.italy, strength: 84),
     Club(name: 'Sassuolo', league: League.italy, strength: 75),
     Club(name: 'Torino', league: League.italy, strength: 76),
     Club(name: 'Udinese', league: League.italy, strength: 74),
-    Club(name: 'Venezia', league: League.italy, strength: 73),
+    Club(name: 'Venezia', league: League.italy, strength: 72),
 
     // =====================================================
     // ГЕРМАНИЯ — BUNDESLIGA 2026/27 (18)
