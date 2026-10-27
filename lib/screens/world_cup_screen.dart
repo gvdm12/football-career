@@ -51,7 +51,9 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
       return;
     }
     if (updatedTournament.isCompleted && mounted) {
-      Navigator.pop(context, updatedCareer);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) Navigator.pop(context, updatedCareer);
+      });
     }
   }
 
