@@ -687,15 +687,9 @@ class Career {
         worldCup.isPlayerCalledUp &&
         worldCup.matches.isNotEmpty &&
         worldCup.matches.first.winner != player.nationality &&
-        worldCup.matches.first.homeTeam != player.nationality &&
-        worldCup.matches.first.awayTeam != player.nationality) {
-      // Финалист определяется по финальному матчу в истории турнира,
-      // если сборная игрока дошла до решающей игры.
-      final finalMatch = worldCup.matches.first;
-      if (finalMatch.homeTeam == player.nationality ||
-          finalMatch.awayTeam == player.nationality) {
-        achievements.add('Финалист чемпионата мира');
-      }
+        (worldCup.matches.first.homeTeam == player.nationality ||
+            worldCup.matches.first.awayTeam == player.nationality)) {
+      achievements.add('Финалист чемпионата мира');
     }
 
     final league = Clubs.leagueOf(player.club);
