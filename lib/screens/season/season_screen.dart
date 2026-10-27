@@ -107,8 +107,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
     }
 
     final europa = career.europaLeague;
-    if (europa != null &&
-        europa.stage != EuropaLeagueStage.completed) {
+    if (europa != null && europa.stage != EuropaLeagueStage.completed) {
       final playerTie = europa.ties.where(
         (tie) => tie.homeTeam == club || tie.awayTeam == club,
       );
@@ -179,8 +178,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   EuropaLeagueTie? get currentEuropaLeagueTie {
     final tournament = career.europaLeague;
-    if (tournament == null ||
-        tournament.stage == EuropaLeagueStage.completed) {
+    if (tournament == null || tournament.stage == EuropaLeagueStage.completed) {
       return null;
     }
 
@@ -215,8 +213,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   int? get currentEuropaLeagueTieIndex {
     final tournament = career.europaLeague;
-    if (tournament == null ||
-        tournament.stage == EuropaLeagueStage.completed) {
+    if (tournament == null || tournament.stage == EuropaLeagueStage.completed) {
       return null;
     }
 
@@ -569,8 +566,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     String? outcomeLabel;
 
-    if (match.stage == EuropaLeagueStage.finalMatch &&
-        match.winner != null) {
+    if (match.stage == EuropaLeagueStage.finalMatch && match.winner != null) {
       outcomeLabel = AppStrings.tournamentWinner(match.winner!);
     } else if (match.leg == 2 && match.winner != null) {
       outcomeLabel = match.winner == club
@@ -764,9 +760,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
     if (worldCup != null && !worldCup.isCompleted) {
       final updatedCareer = await Navigator.push<Career>(
         context,
-        MaterialPageRoute(
-          builder: (_) => WorldCupScreen(career: career),
-        ),
+        MaterialPageRoute(builder: (_) => WorldCupScreen(career: career)),
       );
       if (!mounted || updatedCareer == null) return;
       setState(() => career = updatedCareer);
@@ -1815,10 +1809,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
         ? double.infinity
         : _europaLeagueScheduledPosition();
 
-    final showUcl = uclPosition <= leaguePosition &&
-        uclPosition <= cupPosition && uclPosition <= europaPosition;
-    final showEuropa = !showUcl &&
-        europaPosition <= leaguePosition && europaPosition <= cupPosition;
+    final showUcl =
+        uclPosition <= leaguePosition &&
+        uclPosition <= cupPosition &&
+        uclPosition <= europaPosition;
+    final showEuropa =
+        !showUcl &&
+        europaPosition <= leaguePosition &&
+        europaPosition <= cupPosition;
     final showCup = !showUcl && !showEuropa && cupPosition < leaguePosition;
 
     return PopScope<Career>(
@@ -2326,10 +2324,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
                                   : trophy == 'Золотая бутса'
                                   ? 'assets/icons/boot.png'
                                   : 'assets/icons/cup1.png',
-                            width: 24,
-                            height: 24,
-                            fit: BoxFit.contain,
-                          ),
+                              width: 24,
+                              height: 24,
+                              fit: BoxFit.contain,
+                            ),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
@@ -3019,7 +3017,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
             Positioned.fill(
               child: Opacity(
                 opacity: 0.5, // Меняй от 0.0 до 1.0
-                child: Image.asset('assets/images/fon2.png'),
+                child: Image.asset('assets/images/uelfon.png'),
               ),
             ),
 
@@ -3056,7 +3054,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.emoji_events_rounded, color: Color(0xFFFFC857), size: 28),
+                      const Icon(
+                        Icons.emoji_events_rounded,
+                        color: Color(0xFFFFC857),
+                        size: 28,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
