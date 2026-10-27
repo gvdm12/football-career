@@ -260,6 +260,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
   }
 
   bool get seasonFinished {
+    if (worldCupBlocksSeason) return false;
+
     final leagueFinished =
         career.seasonMatches.isNotEmpty &&
         career.seasonMatches.every((match) => match.isPlayed);
