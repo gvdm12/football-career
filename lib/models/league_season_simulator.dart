@@ -21,6 +21,49 @@ class LeagueSeasonSimulator {
     League.portugal: 2,
   };
 
+  /// Места в Лиге Европы по итогам национальных чемпионатов.
+  static const Map<League, (int start, int count)> europaLeagueSlots = {
+    League.england: (5, 2),
+    League.spain: (5, 3),
+    League.italy: (5, 3),
+    League.germany: (5, 3),
+    League.france: (5, 3),
+    League.russia: (4, 3),
+    League.turkey: (4, 3),
+    League.portugal: (3, 4),
+    League.netherlands: (3, 4),
+    League.belgium: (3, 4),
+  };
+
+  /// Возвращает 32 клуба Лиги Европы по местам в таблицах.
+  static List<String> getEuropaLeagueClubs(
+    Map<League, List<LeagueTableEntry>> standings,
+  ) {
+    final qualified = <String>[];
+
+    for (final entry in europaLeagueSlots.entries) {
+      final table = standings[entry.key];
+      final (start, count) = entry.value;
+
+      if (table == null || table.length < start + count - 1) {
+        throw StateError('Нет полной итоговой таблицы лиги ${entry.key.name}');
+      }
+
+      qualified.addAll(
+        table.skip(start - 1).take(count).map((club) => club.club),
+      );
+    }
+
+    if (qualified.length != 32 || qualified.toSet().length != 32) {
+      throw StateError(
+        'Ожидалось 32 уникальных участника Лиги Европы, '
+        'получено: ${qualified.length}',
+      );
+    }
+
+    return List<String>.unmodifiable(qualified);
+  }
+
   /// Симулирует все чемпионаты.
   ///
   /// При одинаковом номере сезона результаты будут одинаковыми.
