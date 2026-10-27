@@ -400,7 +400,7 @@ class TransferService {
       double refusalChance;
 
       if (currentClub.strength >= 85) {
-        refusalChance = 0.28;
+        refusalChance = 0.35;
       } else if (currentClub.strength >= 80) {
         refusalChance = 0.18;
       } else {
@@ -408,8 +408,8 @@ class TransferService {
       }
 
       if (age >= 32 && age <= 33) refusalChance += 0.08;
-      if (age >= 34 && age <= 35) refusalChance += 0.20;
-      if (age >= 36) refusalChance += 0.30;
+      if (age >= 33 && age <= 35) refusalChance += 0.20;
+      if (age >= 36) refusalChance += 0.35;
       if (rating > 0 && rating < 6.5) refusalChance += 0.25;
       if (rating >= 6.5 && rating < 7.0) refusalChance += 0.12;
 

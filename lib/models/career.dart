@@ -636,7 +636,7 @@ class Career {
       achievements: achievements,
     );
 
-    final pointsToAdd = season <= 5
+    final pointsToAdd = season <= 4
         ? 3
         : season <= 12
         ? 6
@@ -646,7 +646,7 @@ class Career {
       history: [...history, seasonStats],
       developmentPoints: pointsToAdd,
     );
-    // Развитие навыков только со 2-го по 15-й сезон
+    // Развитие навыков только со 2-го по 13-й сезон
     // и при достаточном количестве матчей.
     if (matches < 5 || season > 13) {
       return updatedCareer;
