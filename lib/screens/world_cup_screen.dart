@@ -28,8 +28,12 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
   Future<void> _continueTournament() async {
     if (busy || tournament.isCompleted) return;
     setState(() => busy = true);
-    final playerCanPlay = tournament.isPlayerCalledUp &&
-        tournament.participants.contains(career.player.nationality);
+    final playerHasMatch = tournament.matches.any(
+      (match) =>
+          match.homeTeam == career.player.nationality ||
+          match.awayTeam == career.player.nationality,
+    );
+    final playerCanPlay = tournament.isPlayerCalledUp && playerHasMatch;
     final player = career.player;
     final updatedTournament = playerCanPlay
         ? tournament.playCurrentRound(
@@ -135,13 +139,12 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final playerCanPlay = tournament.isPlayerCalledUp &&
-        tournament.participants.contains(career.player.nationality);
     final playerMatches = tournament.matches.where(
       (match) => match.homeTeam == career.player.nationality ||
           match.awayTeam == career.player.nationality,
     ).toList();
     final playerMatch = playerMatches.isEmpty ? null : playerMatches.first;
+    final playerCanPlay = tournament.isPlayerCalledUp && playerMatch != null;
 
     return PopScope<Career>(
       canPop: tournament.isCompleted,
@@ -263,7 +266,11 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                 onPressed: busy ? null : _continueTournament,
                 style: FilledButton.styleFrom(backgroundColor: green, foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 14)),
                 child: Text(
-                  busy ? 'Симуляция...' : playerCanPlay ? 'Сыграть матч сборной' : 'Симулировать чемпионат мира',
+                  busy
+                      ? 'Симуляция...'
+                      : playerCanPlay
+                          ? 'Сыграть матч сборной'
+                          : 'Продолжить чемпионат мира',
                 ),
               ),
           ],
