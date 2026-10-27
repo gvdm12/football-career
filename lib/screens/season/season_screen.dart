@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/champions_league.dart';
+import 'package:flutter_football/models/europa_league.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/cup_match.dart';
@@ -127,6 +128,42 @@ class _SeasonScreenState extends State<SeasonScreen> {
     final tournament = career.championsLeague!;
 
     if (tournament.stage == ChampionsLeagueStage.finalMatch) {
+      return !tie.isFinalPlayed;
+    }
+
+    return !tie.isFirstLegPlayed || !tie.isSecondLegPlayed;
+  }
+
+  EuropaLeagueTie? get currentEuropaLeagueTie {
+    final tournament = career.europaLeague;
+    if (tournament == null ||
+        tournament.stage == EuropaLeagueStage.completed) {
+      return null;
+    }
+
+    for (final tie in tournament.ties) {
+      if (tie.homeTeam != career.player.club &&
+          tie.awayTeam != career.player.club) {
+        continue;
+      }
+
+      if (tournament.stage == EuropaLeagueStage.finalMatch) {
+        if (!tie.isFinalPlayed) return tie;
+      } else if (!tie.isCompleted) {
+        return tie;
+      }
+    }
+
+    return null;
+  }
+
+  bool get isEuropaLeagueMatchAvailable {
+    final tie = currentEuropaLeagueTie;
+    if (tie == null) return false;
+
+    final tournament = career.europaLeague!;
+
+    if (tournament.stage == EuropaLeagueStage.finalMatch) {
       return !tie.isFinalPlayed;
     }
 
@@ -380,6 +417,379 @@ class _SeasonScreenState extends State<SeasonScreen> {
         ],
       ),
     );
+  }
+
+  double _europaLeagueScheduledPosition() {
+    final tournament = career.europaLeague;
+    final index = currentEuropaLeagueTieIndex;
+
+    if (tournament == null || index == null) {
+      return double.infinity;
+    }
+
+    final tie = tournament.ties[index];
+    final isFinal = tournament.stage == EuropaLeagueStage.finalMatch;
+    final isSecondLeg = !isFinal && tie.isFirstLegPlayed;
+
+    final progress = switch (tournament.stage) {
+      EuropaLeagueStage.roundOf32 => isSecondLeg ? 0.18 : 0.10,
+      EuropaLeagueStage.roundOf16 => isSecondLeg ? 0.38 : 0.30,
+      EuropaLeagueStage.quarterFinal => isSecondLeg ? 0.58 : 0.50,
+      EuropaLeagueStage.semiFinal => isSecondLeg ? 0.78 : 0.70,
+      EuropaLeagueStage.finalMatch => 0.92,
+      EuropaLeagueStage.completed => 1.0,
+    };
+
+    return (career.seasonMatches.length * progress).clamp(
+      1.0,
+      career.seasonMatches.length.toDouble(),
+    );
+  }
+
+  double _europaLeagueHistoryPosition(EuropaLeagueMatchHistory match) {
+    final progress = switch (match.stage) {
+      EuropaLeagueStage.roundOf32 => match.leg == 1 ? 0.10 : 0.18,
+      EuropaLeagueStage.roundOf16 => match.leg == 1 ? 0.30 : 0.38,
+      EuropaLeagueStage.quarterFinal => match.leg == 1 ? 0.50 : 0.58,
+      EuropaLeagueStage.semiFinal => match.leg == 1 ? 0.70 : 0.78,
+      EuropaLeagueStage.finalMatch => 0.92,
+      EuropaLeagueStage.completed => 1.0,
+    };
+
+    final totalMatches = career.seasonMatches.length;
+
+    if (totalMatches == 0) return 1.0;
+
+    return (totalMatches * progress).clamp(1.0, totalMatches.toDouble());
+  }
+
+  Widget _buildEuropaLeagueHistoryRow(EuropaLeagueMatchHistory match) {
+    final club = career.player.club;
+    final isHome = match.homeTeam == club;
+    final opponent = isHome ? match.awayTeam : match.homeTeam;
+
+    final playerGoals = isHome ? match.homeGoals : match.awayGoals;
+    final opponentGoals = isHome ? match.awayGoals : match.homeGoals;
+
+    final playerPenalties = isHome ? match.homePenalties : match.awayPenalties;
+    final opponentPenalties = isHome
+        ? match.awayPenalties
+        : match.homePenalties;
+
+    final hasPenalties = playerPenalties != null && opponentPenalties != null;
+
+    // Определяем результат с учётом пенальти.
+    final won = hasPenalties
+        ? playerPenalties > opponentPenalties
+        : playerGoals > opponentGoals;
+
+    final drawn = playerGoals == opponentGoals && !hasPenalties;
+
+    final resultColor = won
+        ? const Color(0xFF8BE07F)
+        : drawn
+        ? Colors.orangeAccent
+        : Colors.redAccent;
+
+    final matchTitle = match.stage == EuropaLeagueStage.finalMatch
+        ? AppStrings.finalStage
+        : match.leg == 1
+        ? AppStrings.firstLegLabel
+        : AppStrings.secondLegLabel;
+
+    final score = hasPenalties
+        ? '$playerGoals : $opponentGoals '
+              '${AppStrings.penaltiesShort} $playerPenalties:$opponentPenalties'
+        : '$playerGoals : $opponentGoals';
+
+    String? outcomeLabel;
+
+    if (match.stage == EuropaLeagueStage.finalMatch &&
+        match.winner != null) {
+      outcomeLabel = AppStrings.tournamentWinner(match.winner!);
+    } else if (match.leg == 2 && match.winner != null) {
+      outcomeLabel = match.winner == club
+          ? AppStrings.advancedToNextRound
+          : AppStrings.winnerAdvancedToNextRound(match.winner!);
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0A2110),
+        borderRadius: BorderRadius.circular(10),
+        border: const Border(
+          left: BorderSide(color: Color(0xFF8DB8FF), width: 4),
+        ),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 46,
+            child: SvgPicture.asset(
+              'assets/icons/ucl.svg',
+              width: 28,
+              height: 28,
+              fit: BoxFit.contain,
+            ),
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${AppStrings.europaLeague} · ${AppStrings.tournamentStageName(match.stage.title)}',
+                  style: const TextStyle(
+                    color: Color(0xFF8DB8FF),
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '$matchTitle · ${isHome ? AppStrings.homeVenue : AppStrings.awayVenue}: $opponent',
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                ),
+                if (outcomeLabel != null) ...[
+                  const SizedBox(height: 5),
+                  Text(
+                    outcomeLabel,
+                    style: TextStyle(
+                      color: match.stage == EuropaLeagueStage.finalMatch
+                          ? const Color(0xFFFFD54F)
+                          : const Color(0xFF8BE07F),
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              score,
+              textAlign: TextAlign.end,
+              style: TextStyle(
+                color: resultColor,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEuropaLeagueMatchRow() {
+    final tournament = career.europaLeague;
+    final index = currentEuropaLeagueTieIndex;
+
+    if (tournament == null || index == null) {
+      return const SizedBox.shrink();
+    }
+
+    final tie = tournament.ties[index];
+    final club = career.player.club;
+    final isFinal = tournament.stage == EuropaLeagueStage.finalMatch;
+    final isFirstLeg = !isFinal && !tie.isFirstLegPlayed;
+
+    final isHome = isFinal || isFirstLeg
+        ? tie.homeTeam == club
+        : tie.awayTeam == club;
+
+    final opponent = tie.homeTeam == club ? tie.awayTeam : tie.homeTeam;
+
+    final isPlayed = isFinal
+        ? tie.isFinalPlayed
+        : isFirstLeg
+        ? tie.isFirstLegPlayed
+        : tie.isSecondLegPlayed;
+
+    String result = AppStrings.pendingResult;
+    if (isPlayed) {
+      final homeGoals = isFinal
+          ? tie.finalHomeGoals
+          : isFirstLeg
+          ? tie.firstLegHomeGoals
+          : tie.secondLegHomeGoals;
+
+      final awayGoals = isFinal
+          ? tie.finalAwayGoals
+          : isFirstLeg
+          ? tie.firstLegAwayGoals
+          : tie.secondLegAwayGoals;
+
+      result = isHome ? '$homeGoals : $awayGoals' : '$awayGoals : $homeGoals';
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0A2110),
+        borderRadius: BorderRadius.circular(10),
+        border: const Border(
+          left: BorderSide(color: Color(0xFF8DB8FF), width: 4),
+        ),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 46,
+            child: SvgPicture.asset(
+              'assets/icons/ucl.svg',
+              width: 28,
+              height: 28,
+              fit: BoxFit.contain,
+            ),
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${AppStrings.europaLeague} · ${AppStrings.tournamentStageName(tournament.stage.title)}',
+                  style: const TextStyle(
+                    color: Color(0xFF8DB8FF),
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${isHome ? AppStrings.homeVenue : AppStrings.awayVenue}: $opponent',
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            result,
+            style: TextStyle(
+              color: isPlayed ? const Color(0xFF8BE07F) : Colors.white54,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _saveCareer(Career value) async {
+    try {
+      await CareerStorage.save(value);
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppStrings.matchCalendarError)));
+    }
+  }
+
+  Future<void> _playMatch(SeasonMatch seasonMatch) async {
+    if (isSaving || seasonFinishing || seasonMatch.isPlayed) return;
+
+    final nextMatch = currentMatch;
+
+    if (nextMatch == null || nextMatch.number != seasonMatch.number) {
+      return;
+    }
+
+    final match = Match.generate(
+      player: career.player,
+      career: career,
+      opponent: seasonMatch.opponent,
+      isHome: seasonMatch.isHome,
+    );
+
+    final updatedCareer = await Navigator.push<Career>(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            MatchScreen(career: career, match: match, isCupMatch: true),
+      ),
+    );
+
+    if (!mounted || updatedCareer == null) return;
+
+    // Проверяем, что матч соответствует клубу игрока и сопернику.
+    final expectedHomeTeam = seasonMatch.isHome
+        ? career.player.club
+        : seasonMatch.opponent;
+    final expectedAwayTeam = seasonMatch.isHome
+        ? seasonMatch.opponent
+        : career.player.club;
+
+    if (match.homeTeam != expectedHomeTeam ||
+        match.awayTeam != expectedAwayTeam) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppStrings.matchCalendarError)));
+      return;
+    }
+
+    // Сохраняем результат матча в календаре игрока.
+    final updatedSeasonMatches = updatedCareer.seasonMatches.map((item) {
+      if (item.number == seasonMatch.number && !item.isPlayed) {
+        return item.copyWith(result: match);
+      }
+
+      return item;
+    }).toList();
+
+    // Сохраняем результат в общем календаре лиги.
+    final updatedLeagueMatches = updatedCareer.leagueMatches.map((fixture) {
+      final isSameMatch =
+          fixture.round == seasonMatch.number &&
+          fixture.homeTeam == match.homeTeam &&
+          fixture.awayTeam == match.awayTeam;
+
+      if (isSameMatch && !fixture.isPlayed) {
+        return fixture.copyWith(
+          homeGoals: match.homeGoals,
+          awayGoals: match.awayGoals,
+        );
+      }
+
+      return fixture;
+    }).toList();
+
+    // Симулируем только ещё не сыгранные матчи этого тура.
+    final completedLeagueMatches = _simulateBackgroundRound(
+      updatedLeagueMatches,
+      seasonMatch.number,
+    );
+
+    // Полностью пересчитываем таблицу по сохранённым результатам.
+    final updatedTable = _rebuildLeagueTable(
+      updatedCareer.player.club,
+      completedLeagueMatches,
+    );
+
+    final completeCareer = updatedCareer.copyWith(
+      seasonMatches: updatedSeasonMatches,
+      leagueMatches: completedLeagueMatches,
+      leagueTable: updatedTable,
+    );
+
+    setState(() {
+      career = completeCareer;
+      isSaving = true;
+    });
+
+    await _saveCareer(completeCareer);
+
+    if (!mounted) return;
+
+    setState(() {
+      isSaving = false;
+    });
   }
 
   Widget _buildChampionsLeagueMatchRow() {
@@ -753,6 +1163,185 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     final resultCareer = updatedCareer.copyWith(
       championsLeague: updatedTournament,
+    );
+
+    setState(() {
+      career = resultCareer;
+      isSaving = true;
+    });
+
+    await _saveCareer(resultCareer);
+
+    if (!mounted) return;
+
+    setState(() {
+      isSaving = false;
+    });
+  }
+
+  Future<void> _playEuropaLeagueMatch() async {
+    if (isSaving || seasonFinishing) return;
+
+    final tournament = career.europaLeague;
+    final tieIndex = currentEuropaLeagueTieIndex;
+
+    if (tournament == null || tieIndex == null) return;
+
+    final tie = tournament.ties[tieIndex];
+    final club = career.player.club;
+    final isFinal = tournament.stage == EuropaLeagueStage.finalMatch;
+    final isFirstLeg = !isFinal && !tie.isFirstLegPlayed;
+
+    // Определяем, на какой стороне поля играет клуб игрока.
+    final isHome = isFinal || isFirstLeg
+        ? tie.homeTeam == club
+        : tie.awayTeam == club;
+
+    final opponent = tie.homeTeam == club ? tie.awayTeam : tie.homeTeam;
+
+    final generatedMatch = Match.generate(
+      player: career.player,
+      career: career,
+      opponent: opponent,
+      isHome: isHome,
+    );
+
+    final homeGoals = generatedMatch.homeGoals;
+    final awayGoals = generatedMatch.awayGoals;
+
+    int? homePenalties;
+    int? awayPenalties;
+
+    // Проверяем, нужна ли серия пенальти.
+    bool needsPenalties = false;
+
+    if (isFinal) {
+      // В финале пенальти нужны при ничьей.
+      needsPenalties = homeGoals == awayGoals;
+    } else if (!isFirstLeg) {
+      // В ответном матче сравниваем общий счёт двух встреч.
+      final homeTeamAggregate = tie.firstLegHomeGoals! + awayGoals;
+
+      final awayTeamAggregate = tie.firstLegAwayGoals! + homeGoals;
+
+      needsPenalties = homeTeamAggregate == awayTeamAggregate;
+    }
+
+    // Генерируем пенальти ДО открытия экрана матча.
+    if (needsPenalties) {
+      final random = Random();
+
+      homePenalties = 3 + random.nextInt(3);
+      awayPenalties = 3 + random.nextInt(3);
+
+      while (homePenalties == awayPenalties) {
+        awayPenalties = 3 + random.nextInt(3);
+      }
+    }
+
+    // Создаём матч с уже готовым счётом пенальти.
+    final match = Match(
+      homeTeam: generatedMatch.homeTeam,
+      awayTeam: generatedMatch.awayTeam,
+      homeGoals: generatedMatch.homeGoals,
+      awayGoals: generatedMatch.awayGoals,
+      playerGoals: generatedMatch.playerGoals,
+      playerAssists: generatedMatch.playerAssists,
+      yellowCards: generatedMatch.yellowCards,
+      redCards: generatedMatch.redCards,
+      playerRating: generatedMatch.playerRating,
+      playerPlayed: generatedMatch.playerPlayed,
+      homePenalties: homePenalties,
+      awayPenalties: awayPenalties,
+    );
+
+    final updatedCareer = await Navigator.push<Career>(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            MatchScreen(career: career, match: match, isCupMatch: true),
+      ),
+    );
+
+    if (!mounted || updatedCareer == null) return;
+
+    var updatedTournament = updatedCareer.europaLeague ?? tournament;
+
+    if (isFinal) {
+      updatedTournament = updatedTournament.playFinal(
+        homeGoals: match.homeGoals,
+        awayGoals: match.awayGoals,
+        homePenalties: match.homePenalties,
+        awayPenalties: match.awayPenalties,
+      );
+    } else {
+      updatedTournament = updatedTournament.playLeg(
+        tieIndex: tieIndex,
+        isFirstLeg: isFirstLeg,
+        homeGoals: match.homeGoals,
+        awayGoals: match.awayGoals,
+        homePenalties: match.homePenalties,
+        awayPenalties: match.awayPenalties,
+      );
+
+      // Симулируем остальные пары этого игрового дня.
+      final random = Random();
+
+      for (var i = 0; i < updatedTournament.ties.length; i++) {
+        if (i == tieIndex) continue;
+
+        final otherTie = updatedTournament.ties[i];
+
+        if (isFirstLeg) {
+          if (otherTie.isFirstLegPlayed || otherTie.isCompleted) {
+            continue;
+          }
+        } else {
+          if (!otherTie.isFirstLegPlayed ||
+              otherTie.isSecondLegPlayed ||
+              otherTie.isCompleted) {
+            continue;
+          }
+        }
+
+        final actualHome = isFirstLeg ? otherTie.homeTeam : otherTie.awayTeam;
+
+        final actualAway = isFirstLeg ? otherTie.awayTeam : otherTie.homeTeam;
+
+        final homeStrength = _effectiveClubStrength(actualHome);
+        final awayStrength = _effectiveClubStrength(actualAway);
+
+        final simulatedHomeGoals = _simulateGoals(
+          homeStrength,
+          awayStrength,
+          random,
+          homeAdvantage: true,
+        );
+
+        final simulatedAwayGoals = _simulateGoals(
+          awayStrength,
+          homeStrength,
+          random,
+        );
+
+        updatedTournament = updatedTournament.playLeg(
+          tieIndex: i,
+          isFirstLeg: isFirstLeg,
+          homeGoals: simulatedHomeGoals,
+          awayGoals: simulatedAwayGoals,
+        );
+      }
+    }
+
+    // Автоматически переходим к следующей стадии.
+    if (!isFinal &&
+        updatedTournament.ties.isNotEmpty &&
+        updatedTournament.ties.every((tie) => tie.isCompleted)) {
+      updatedTournament = updatedTournament.advanceStage();
+    }
+
+    final resultCareer = updatedCareer.copyWith(
+      europaLeague: updatedTournament,
     );
 
     setState(() {
@@ -2350,6 +2939,134 @@ class _SeasonScreenState extends State<SeasonScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF8DB8FF),
                         foregroundColor: const Color(0xFF071526),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: Text(
+                        AppStrings.playMatchUpper,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNextEuropaLeagueMatchCard() {
+    final tournament = career.europaLeague;
+    final index = currentEuropaLeagueTieIndex;
+
+    if (tournament == null || index == null) {
+      return const SizedBox.shrink();
+    }
+
+    final tie = tournament.ties[index];
+    final club = career.player.club;
+    final isFinal = tournament.stage == EuropaLeagueStage.finalMatch;
+    final isFirstLeg = !isFinal && !tie.isFirstLegPlayed;
+    final isHome = isFinal || isFirstLeg
+        ? tie.homeTeam == club
+        : tie.awayTeam == club;
+    final opponent = tie.homeTeam == club ? tie.awayTeam : tie.homeTeam;
+
+    final matchTitle = isFinal
+        ? AppStrings.finalStage
+        : isFirstLeg
+        ? AppStrings.firstLegLabel
+        : AppStrings.secondLegLabel;
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFFFC857)),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          children: [
+            // Фоновое фото с прозрачностью
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.5, // Меняй от 0.0 до 1.0
+                child: Image.asset('assets/images/fon2.png'),
+              ),
+            ),
+
+            // Градиент поверх фото
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFF493714).withValues(alpha: 0.65),
+                      const Color.fromARGB(
+                        255,
+                        13,
+                        31,
+                        60,
+                      ).withValues(alpha: 0.65),
+                      const Color.fromARGB(
+                        255,
+                        16,
+                        19,
+                        43,
+                      ).withValues(alpha: 0.65),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Содержимое карточки
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.emoji_events_rounded, color: Color(0xFFFFC857), size: 28),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${AppStrings.nextMatchUpper} · ${AppStrings.europaLeague.toUpperCase()}',
+                          style: TextStyle(
+                            color: Color(0xFFFFC857),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${AppStrings.tournamentStageName(tournament.stage.title)} · $matchTitle',
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    isHome ? '$club — $opponent' : '$opponent — $club',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: isSaving || seasonFinishing
+                          ? null
+                          : _playEuropaLeagueMatch,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFFC857),
+                        foregroundColor: const Color(0xFF1A1204),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       child: Text(
