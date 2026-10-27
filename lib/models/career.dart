@@ -240,9 +240,6 @@ class Career {
       europeanLeagueStandings: europeanLeagueStandings,
       championsLeague: championsLeague,
       europaLeague: europaLeague,
-      worldCup: rawWorldCup is Map
-          ? WorldCup.fromJson(Map<String, dynamic>.from(rawWorldCup))
-          : null,
       worldCup: season % 4 == 0
           ? WorldCup.create(
               season: season,
@@ -425,6 +422,9 @@ class Career {
       europeanLeagueStandings: europeanLeagueStandings,
       championsLeague: championsLeague,
       europaLeague: europaLeague,
+      worldCup: rawWorldCup is Map
+          ? WorldCup.fromJson(Map<String, dynamic>.from(rawWorldCup))
+          : null,
     );
   }
 
