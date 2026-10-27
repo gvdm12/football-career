@@ -72,10 +72,11 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
   Widget build(BuildContext context) {
     final playerCanPlay = tournament.isPlayerCalledUp &&
         tournament.participants.contains(career.player.nationality);
-    final playerMatch = tournament.matches.where(
+    final playerMatches = tournament.matches.where(
       (match) => match.homeTeam == career.player.nationality ||
           match.awayTeam == career.player.nationality,
-    ).firstOrNull;
+    ).toList();
+    final playerMatch = playerMatches.isEmpty ? null : playerMatches.first;
 
     return Scaffold(
       backgroundColor: background,
