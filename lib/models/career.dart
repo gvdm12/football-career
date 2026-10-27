@@ -1019,7 +1019,22 @@ class Career {
                       : 0),
               yellowCards: yellowCards,
               redCards: redCards,
-              averageRating: averageRating,
+              averageRating: (() {
+                final cup = worldCup != null &&
+                        worldCup.season == season &&
+                        worldCup.isPlayerCalledUp
+                    ? worldCup
+                    : null;
+                final cupMatches = cup?.playerMatches ?? 0;
+                final totalMatches = matches + cupMatches;
+                if (totalMatches == 0) return null;
+                final totalRating =
+                    (averageRating ?? 0) * matches +
+                    (cup?.playerAverageRating ?? 0) * cupMatches;
+                return double.parse(
+                  (totalRating / totalMatches).toStringAsFixed(2),
+                );
+              })(),
             ),
           ];
 
