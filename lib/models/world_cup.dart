@@ -142,6 +142,7 @@ class WorldCupMatch {
   final int playerGoals;
   final int playerAssists;
   final double? playerRating;
+  final WorldCupStage? stage;
 
   const WorldCupMatch({
     required this.homeTeam,
@@ -153,6 +154,7 @@ class WorldCupMatch {
     this.playerGoals = 0,
     this.playerAssists = 0,
     this.playerRating,
+    this.stage,
   });
 
   WorldCupMatch play({
@@ -251,6 +253,7 @@ class WorldCupMatch {
       playerGoals: scoredByPlayer,
       playerAssists: assistedByPlayer,
       playerRating: rating,
+      stage: stage,
     );
   }
 
@@ -276,6 +279,7 @@ class WorldCupMatch {
     'playerGoals': playerGoals,
     'playerAssists': playerAssists,
     'playerRating': playerRating,
+    'stage': stage?.name,
   };
 
   factory WorldCupMatch.fromJson(Map<String, dynamic> json) => WorldCupMatch(
@@ -288,6 +292,7 @@ class WorldCupMatch {
     playerGoals: (json['playerGoals'] as num?)?.toInt() ?? 0,
     playerAssists: (json['playerAssists'] as num?)?.toInt() ?? 0,
     playerRating: (json['playerRating'] as num?)?.toDouble(),
+    stage: WorldCupStage.values.where((value) => value.name == json['stage']).firstOrNull,
   );
 }
 
@@ -295,6 +300,8 @@ class WorldCup {
   final int season;
   final List<String> participants;
   final List<WorldCupMatch> matches;
+  /// Результаты завершённых раундов, чтобы они не исчезали после перехода дальше.
+  final List<WorldCupMatch> matchHistory;
   final WorldCupStage stage;
   final String? champion;
   final String playerCallUpStatus;
@@ -307,6 +314,7 @@ class WorldCup {
     required this.season,
     required this.participants,
     required this.matches,
+    this.matchHistory = const [],
     required this.stage,
     this.champion,
     required this.playerCallUpStatus,
@@ -353,7 +361,11 @@ class WorldCup {
     final matches = <WorldCupMatch>[];
     for (var i = 0; i < shuffled.length; i += 2) {
       matches.add(
-        WorldCupMatch(homeTeam: shuffled[i], awayTeam: shuffled[i + 1]),
+        WorldCupMatch(
+          homeTeam: shuffled[i],
+          awayTeam: shuffled[i + 1],
+          stage: WorldCupStage.roundOf32,
+        ),
       );
     }
 
@@ -380,21 +392,17 @@ class WorldCup {
 
   WorldCup _advanceRound() {
     if (!matches.every((match) => match.isPlayed)) return this;
+    final completedHistory = [...matchHistory, ...matches];
+
     if (stage == WorldCupStage.finalMatch) {
       return copyWith(
         stage: WorldCupStage.completed,
         champion: matches.isEmpty ? null : matches.first.winner,
+        matchHistory: completedHistory,
       );
     }
 
     final winners = matches.map((match) => match.winner!).toList();
-    final nextMatches = <WorldCupMatch>[];
-    for (var i = 0; i < winners.length; i += 2) {
-      nextMatches.add(
-        WorldCupMatch(homeTeam: winners[i], awayTeam: winners[i + 1]),
-      );
-    }
-
     final nextStage = switch (stage) {
       WorldCupStage.roundOf32 => WorldCupStage.roundOf16,
       WorldCupStage.roundOf16 => WorldCupStage.quarterFinal,
@@ -402,7 +410,21 @@ class WorldCup {
       WorldCupStage.semiFinal => WorldCupStage.finalMatch,
       WorldCupStage.finalMatch || WorldCupStage.completed => stage,
     };
-    return copyWith(matches: nextMatches, stage: nextStage);
+    final nextMatches = <WorldCupMatch>[];
+    for (var i = 0; i < winners.length; i += 2) {
+      nextMatches.add(
+        WorldCupMatch(
+          homeTeam: winners[i],
+          awayTeam: winners[i + 1],
+          stage: nextStage,
+        ),
+      );
+    }
+    return copyWith(
+      matches: nextMatches,
+      stage: nextStage,
+      matchHistory: completedHistory,
+    );
   }
 
   WorldCup playCurrentRound({
@@ -475,6 +497,7 @@ class WorldCup {
   WorldCup copyWith({
     List<String>? participants,
     List<WorldCupMatch>? matches,
+    List<WorldCupMatch>? matchHistory,
     WorldCupStage? stage,
     String? champion,
     String? playerCallUpStatus,
@@ -486,6 +509,7 @@ class WorldCup {
     season: season,
     participants: participants ?? this.participants,
     matches: matches ?? this.matches,
+    matchHistory: matchHistory ?? this.matchHistory,
     stage: stage ?? this.stage,
     champion: champion ?? this.champion,
     playerCallUpStatus: playerCallUpStatus ?? this.playerCallUpStatus,
@@ -499,6 +523,7 @@ class WorldCup {
     'season': season,
     'participants': participants,
     'matches': matches.map((match) => match.toJson()).toList(),
+    'matchHistory': matchHistory.map((match) => match.toJson()).toList(),
     'stage': stage.name,
     'champion': champion,
     'playerCallUpStatus': playerCallUpStatus,
@@ -510,6 +535,7 @@ class WorldCup {
 
   factory WorldCup.fromJson(Map<String, dynamic> json) {
     final rawMatches = json['matches'];
+    final rawHistory = json['matchHistory'];
     final rawParticipants = json['participants'];
     final stageName = json['stage'] as String? ?? 'roundOf32';
     return WorldCup(
@@ -519,6 +545,15 @@ class WorldCup {
           : const [],
       matches: rawMatches is List
           ? rawMatches
+                .whereType<Map>()
+                .map(
+                  (item) =>
+                      WorldCupMatch.fromJson(Map<String, dynamic>.from(item)),
+                )
+                .toList()
+          : const [],
+      matchHistory: rawHistory is List
+          ? rawHistory
                 .whereType<Map>()
                 .map(
                   (item) =>
