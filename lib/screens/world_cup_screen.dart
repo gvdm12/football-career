@@ -171,24 +171,6 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                 height: 28,
                 fit: BoxFit.contain,
               ),
-<<<<<<< Updated upstream
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Чемпионат мира · сезон ${tournament.season}',
-                    style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(_callUpMessage, style: const TextStyle(color: Color(0xFF8BE07F))),
-                  const SizedBox(height: 8),
-                  Text(
-                    'В финальной части участвуют ${tournament.participants.length} из ${worldCupNationalTeams.length} сборных.',
-                    style: const TextStyle(color: Colors.white70),
-                  ),
-                  if (playerCanPlay) ...[
-                    const SizedBox(height: 14),
-=======
               const SizedBox(width: 10),
               const Text('Чемпионат мира'),
             ],
@@ -208,7 +190,6 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
->>>>>>> Stashed changes
                     Text(
                       'Чемпионат мира · сезон ${tournament.season}',
                       style: const TextStyle(
