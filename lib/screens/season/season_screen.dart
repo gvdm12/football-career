@@ -11,7 +11,6 @@ import 'package:flutter_football/models/league_match.dart';
 import 'package:flutter_football/models/league_table.dart';
 import 'package:flutter_football/models/match.dart';
 import 'package:flutter_football/models/season_match.dart';
-import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/screens/development_screen.dart';
 import 'package:flutter_football/screens/league_table/league_table_screen.dart';
 import 'package:flutter_football/screens/match/match_screen.dart';
@@ -45,6 +44,27 @@ class _SeasonScreenState extends State<SeasonScreen> {
   void initState() {
     super.initState();
     career = widget.career;
+
+    if (career.worldCup != null && !career.worldCup!.isCompleted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _openWorldCupBeforeSeason();
+      });
+    }
+  }
+
+  Future<void> _openWorldCupBeforeSeason() async {
+    if (!mounted || career.worldCup == null || career.worldCup!.isCompleted) {
+      return;
+    }
+
+    final updatedCareer = await Navigator.push<Career>(
+      context,
+      MaterialPageRoute(builder: (_) => WorldCupScreen(career: career)),
+    );
+
+    if (!mounted || updatedCareer == null) return;
+    setState(() => career = updatedCareer);
+    await _saveCareer(updatedCareer);
   }
 
   int get playedMatches =>
