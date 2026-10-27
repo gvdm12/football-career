@@ -43,6 +43,54 @@ const List<String> worldCupNationalTeams = [
   'Тунис',
 ];
 
+
+/// Силы сборных для симуляции чемпионата мира.
+/// Значения — игровые рейтинги, а не официальные рейтинги FIFA.
+const Map<String, int> worldCupTeamStrength = {
+  'Бразилия': 90,
+  'Франция': 90,
+  'Аргентина': 89,
+  'Испания': 89,
+  'Англия': 88,
+  'Германия': 87,
+  'Португалия': 86,
+  'Нидерланды': 86,
+  'Италия': 85,
+  'Бельгия': 84,
+  'Хорватия': 83,
+  'Уругвай': 83,
+  'Колумбия': 82,
+  'Дания': 81,
+  'Марокко': 81,
+  'Швейцария': 80,
+  'Мексика': 80,
+  'Сенегал': 80,
+  'США': 79,
+  'Япония': 79,
+  'Турция': 79,
+  'Норвегия': 78,
+  'Польша': 78,
+  'Украина': 78,
+  'Австрия': 78,
+  'Нигерия': 78,
+  'Россия': 77,
+  'Алжир': 77,
+  'Египет': 77,
+  'Южная Корея': 77,
+  'Иран': 76,
+  'Чили': 76,
+  'Канада': 76,
+  'Камерун': 76,
+  'Греция': 75,
+  'Шотландия': 75,
+  'Тунис': 74,
+  'Ирландия': 73,
+  'Саудовская Аравия': 72,
+  'Катар': 70,
+};
+
+int worldCupStrengthOf(String team) => worldCupTeamStrength[team] ?? 70;
+
 enum WorldCupStage {
   roundOf32,
   roundOf16,
@@ -90,9 +138,20 @@ class WorldCupMatch {
 
   WorldCupMatch play({int? homeScore, int? awayScore}) {
     final random = Random();
-    var home = homeScore ?? random.nextInt(4);
-    var away = awayScore ?? random.nextInt(4);
+    final homeStrength = worldCupStrengthOf(homeTeam);
+    final awayStrength = worldCupStrengthOf(awayTeam);
+    final strengthDifference = homeStrength - awayStrength;
 
+    // Сила влияет на среднее число голов, но не гарантирует победу.
+    final homeExpectedGoals =
+        (1.30 + strengthDifference * 0.035 + 0.12).clamp(0.30, 2.65);
+    final awayExpectedGoals =
+        (1.30 - strengthDifference * 0.035).clamp(0.30, 2.65);
+
+    var home = homeScore ?? _randomGoals(homeExpectedGoals, random);
+    var away = awayScore ?? _randomGoals(awayExpectedGoals, random);
+
+    // В плей-офф ничья решается в дополнительное время/серии пенальти.
     if (home == away) {
       if (random.nextBool()) {
         home++;
@@ -109,6 +168,18 @@ class WorldCupMatch {
       isPlayed: true,
       winner: home > away ? homeTeam : awayTeam,
     );
+  }
+
+  static int _randomGoals(double expectedGoals, Random random) {
+    // Приближение распределения Пуассона.
+    final limit = exp(-expectedGoals);
+    var product = 1.0;
+    var goals = 0;
+    do {
+      goals++;
+      product *= random.nextDouble();
+    } while (product > limit && goals < 8);
+    return goals - 1;
   }
 
   Map<String, dynamic> toJson() => {
