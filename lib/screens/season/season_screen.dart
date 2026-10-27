@@ -2847,6 +2847,30 @@ class _SeasonScreenState extends State<SeasonScreen> {
           );
         }
       }
+
+      final europa = career.europaLeague;
+      if (europa != null && europa.participants.contains(playerClub)) {
+        for (final match in europa.matchHistory) {
+          if (match.homeTeam != playerClub && match.awayTeam != playerClub) {
+            continue;
+          }
+          calendarItems.add(
+            MapEntry(
+              _europaLeagueHistoryPosition(match),
+              _buildEuropaLeagueHistoryRow(match),
+            ),
+          );
+        }
+
+        if (currentEuropaLeagueTieIndex != null) {
+          calendarItems.add(
+            MapEntry(
+              _europaLeagueScheduledPosition(),
+              _buildEuropaLeagueMatchRow(),
+            ),
+          );
+        }
+      }
     }
 
     calendarItems.sort((a, b) => a.key.compareTo(b.key));
