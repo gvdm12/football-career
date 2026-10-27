@@ -76,6 +76,13 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
     'Сенегал': 'SN',
     'Египет': 'EG',
     'Тунис': 'TN',
+    'Швеция': 'SE',
+    'Венесуэла': 'VE',
+    'Палестина': 'PS',
+    'Венгрия': 'HU',
+    'Босния и Герцеговина': 'BA',
+    'Албания': 'AL',
+    'Австралия': 'AU',
   };
 
   String _nationalityCode(String nationality) {
@@ -123,6 +130,13 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
     'Сенегал',
     'Египет',
     'Тунис',
+    'Швеция',
+    'Венесуэла',
+    'Палестина',
+    'Венгрия',
+    'Босния и Герцеговина',
+    'Албания',
+    'Австралия',
   ];
 
   final Map<String, String> _nationalityNamesEn = {
@@ -166,6 +180,13 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
     'Сенегал': 'Senegal',
     'Египет': 'Egypt',
     'Тунис': 'Tunisia',
+    'Швеция': 'Sweden',
+    'Венесуэла': 'Venezuela',
+    'Палестина': 'Palestine',
+    'Венгрия': 'Hungary',
+    'Босния и Герцеговина': 'Bosnia and Herzegovina',
+    'Албания': 'Albania',
+    'Австралия': 'Australia',
   };
 
   String _nationalityLabel(String nationality) {
