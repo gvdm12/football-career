@@ -100,14 +100,17 @@ class SuperLeagueEndScreen extends StatelessWidget {
                   ),
                 ]),
                 const SizedBox(height: 8),
-                _section('🏆 ' + AppStrings.superLeagueTrophies, [
+                _section('🏆 ${AppStrings.superLeagueTrophies}', [
                   _stat(AppStrings.totalTrophies, '$titles'),
                 ]),
                 const SizedBox(height: 8),
                 _section(AppStrings.careerClubs.toUpperCase(), [
                   if (clubs.isEmpty) _stat(AppStrings.club, career.player.club),
                   ...clubs.asMap().entries.map(
-                    (entry) => _stat(AppStrings.clubNumber(entry.key + 1), entry.value),
+                    (entry) => _stat(
+                      AppStrings.clubNumber(entry.key + 1),
+                      entry.value,
+                    ),
                   ),
                 ]),
                 const SizedBox(height: 8),
@@ -115,7 +118,11 @@ class SuperLeagueEndScreen extends StatelessWidget {
                   ...career.history.reversed.map(
                     (item) => _stat(
                       '${AppStrings.seasonNumber(item.season)} • ${item.club}${item.champion ? ' 🏆' : ''}',
-                      AppStrings.seasonSummaryStats(item.matches, item.goals, item.assists),
+                      AppStrings.seasonSummaryStats(
+                        item.matches,
+                        item.goals,
+                        item.assists,
+                      ),
                     ),
                   ),
                 ]),

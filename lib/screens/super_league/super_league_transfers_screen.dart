@@ -45,8 +45,9 @@ class _SuperLeagueTransfersScreenState
 
   void _accept(Club club) {
     if (!_career.firstDivision.contains(club.name) &&
-        !_career.secondDivision.contains(club.name))
+        !_career.secondDivision.contains(club.name)) {
       return;
+    }
     final next = _career.copyWith(
       player: _career.player.copyWith(club: club.name),
     );

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/super_league_career.dart';
 import 'package:flutter_football/models/super_league_division.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class SuperLeagueTableScreen extends StatefulWidget {
   final SuperLeagueCareer career;

@@ -944,6 +944,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
   Future<void> _playMatch(SeasonMatch seasonMatch) async {
     if (isSaving || seasonFinishing || seasonMatch.isPlayed) return;
 
+<<<<<<< Updated upstream
     final worldCup = career.worldCup;
     if (worldCup != null && !worldCup.isCompleted) {
       final updatedCareer = await Navigator.push<Career>(
@@ -956,6 +957,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
       return;
     }
 
+=======
+>>>>>>> Stashed changes
     final nextMatch = currentMatch;
 
     if (nextMatch == null || nextMatch.number != seasonMatch.number) {
@@ -2407,9 +2410,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
           const SizedBox(height: 6),
           Row(
             children: [
-              _statItem(AppStrings.matchesLabel, '${_seasonMatchesForDisplay}'),
-              _statItem(AppStrings.goalsStat, '${_seasonGoalsForDisplay}'),
-              _statItem(AppStrings.assistsStat, '${_seasonAssistsForDisplay}'),
+              _statItem(AppStrings.matchesLabel, '$_seasonMatchesForDisplay'),
+              _statItem(AppStrings.goalsStat, '$_seasonGoalsForDisplay'),
+              _statItem(AppStrings.assistsStat, '$_seasonAssistsForDisplay'),
             ],
           ),
           const SizedBox(height: 5),
@@ -2893,7 +2896,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            '${stage} · ${isHome ? AppStrings.homeVenue : AppStrings.awayVenue}',
+            '$stage · ${isHome ? AppStrings.homeVenue : AppStrings.awayVenue}',
             style: const TextStyle(color: Colors.white),
           ),
           const SizedBox(height: 6),

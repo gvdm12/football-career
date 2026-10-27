@@ -1002,7 +1002,10 @@ class Career {
             currentWorldCup.isPlayerCalledUp
         ? currentWorldCup
         : null;
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
     final newHistory = alreadyArchived
         ? history
         : [
