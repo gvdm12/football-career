@@ -43,9 +43,9 @@ class LeagueTableScreen extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
-                  _buildHeader(),
-                  const SizedBox(height: 8),
                   _buildQualificationLegend(),
+                  const SizedBox(height: 8),
+                  _buildHeader(),
                   const SizedBox(height: 8),
                   ...List.generate(table.length, (index) {
                     final entry = table[index];
@@ -92,7 +92,7 @@ class LeagueTableScreen extends StatelessWidget {
           label,
           style: const TextStyle(
             color: Colors.white70,
-            fontSize: 11,
+            fontSize: 9,
             fontWeight: FontWeight.w600,
           ),
         ),

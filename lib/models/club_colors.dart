@@ -19,7 +19,7 @@ class ClubColors {
     'Fulham': [Color(0xFF000000), Color(0xFFFFFFFF)],
     'Hull City': [Color.fromARGB(255, 221, 140, 10), Color(0xFF000000)],
     'Ipswich Town': [Color(0xFF0057B8), Color(0xFFFFFFFF)],
-    'Leeds United': [Color(0xFFFFFFFF), Color(0xFFFFCD00)],
+    'Leeds United': [Color.fromARGB(255, 230, 185, 5), Color(0xFFFFFFFF)],
     'Liverpool': [Color(0xFFC8102E), Color(0xFFFFFFFF)],
     'Manchester City': [Color(0xFF6CABDD), Color(0xFFFFFFFF)],
     'Manchester United': [Color(0xFFDA291C), Color(0xFFFFFFFF)],
