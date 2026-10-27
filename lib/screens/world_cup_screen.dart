@@ -30,8 +30,16 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
     setState(() => busy = true);
     final playerCanPlay = tournament.isPlayerCalledUp &&
         tournament.participants.contains(career.player.nationality);
+    final player = career.player;
     final updatedTournament = playerCanPlay
-        ? tournament.playCurrentRound(playerTeam: career.player.nationality)
+        ? tournament.playCurrentRound(
+            playerTeam: player.nationality,
+            playerOverall: player.overall,
+            playerPosition: player.position.name,
+            playerShooting: player.skills.shooting,
+            playerPassing: player.skills.passing,
+            playerDribbling: player.skills.dribbling,
+          )
         : tournament.simulateRemainingMatches();
     final updatedCareer = career.copyWith(worldCup: updatedTournament);
     try {
@@ -68,6 +76,30 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
       default:
         return 'Вас не вызвали в сборную на этот чемпионат мира.';
     }
+  }
+
+  Widget _playerStat(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF123A1D),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(color: Colors.white60, fontSize: 11)),
+          const SizedBox(height: 3),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _teamLabel(String team, {bool alignEnd = false}) {
@@ -154,6 +186,31 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                       '${playerMatch.isPlayed ? playerMatch.awayGoals : '-'} '
                       '${playerMatch.awayTeam}',
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                  if (playerCanPlay) ...[
+                    const SizedBox(height: 14),
+                    const Divider(color: Colors.white24),
+                    const Text(
+                      'Ваша статистика за сборную',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 14,
+                      runSpacing: 8,
+                      children: [
+                        _playerStat('Матчи', '${tournament.playerMatches}'),
+                        _playerStat('Голы', '${tournament.playerGoals}'),
+                        _playerStat('Ассисты', '${tournament.playerAssists}'),
+                        _playerStat(
+                          'Средняя оценка',
+                          tournament.playerAverageRating?.toStringAsFixed(1) ?? '—',
+                        ),
+                      ],
                     ),
                   ],
                   if (tournament.champion != null) ...[
