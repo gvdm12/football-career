@@ -42,13 +42,30 @@ class CareerEndScreen extends StatelessWidget {
         item.achievements.where((a) => a == 'Победитель Лиги чемпионов').length,
   );
 
+  int get europaLeagueTitles => career.history.fold(
+    0,
+    (sum, item) => sum +
+        item.achievements.where((a) => a == 'Победитель Лиги Европы').length,
+  );
+
+  int get worldCupTitles => career.history.fold(
+    0,
+    (sum, item) =>
+        sum + item.achievements.where((a) => a == 'Чемпион мира').length,
+  );
+
   int get goldenBoots => career.history.fold(
     0,
     (sum, item) =>
         sum + item.achievements.where((a) => a == 'Золотая бутса').length,
   );
 
-  int get totalTrophies => leagueTitles + nationalCups + championsLeagueTitles;
+  int get totalTrophies =>
+      leagueTitles +
+      nationalCups +
+      championsLeagueTitles +
+      europaLeagueTitles +
+      worldCupTitles;
 
   double? get careerAverageRating {
     var ratingSum = 0.0;
@@ -151,6 +168,11 @@ class CareerEndScreen extends StatelessWidget {
                   _stat(AppStrings.nationalChampionships, leagueTitles.toString()),
                   _stat(AppStrings.nationalCups, nationalCups.toString()),
                   _stat(AppStrings.championsLeague, championsLeagueTitles.toString()),
+                  _stat(AppStrings.europaLeague, europaLeagueTitles.toString()),
+                  _stat(
+                    AppStrings.isEnglish ? 'World Cup' : 'Чемпионат мира',
+                    worldCupTitles.toString(),
+                  ),
                   const Divider(color: Color(0xFF24552C)),
                   _stat(AppStrings.goldenBootTrophy, goldenBoots.toString()),
                 ]),
