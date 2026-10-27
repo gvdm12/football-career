@@ -1,5 +1,6 @@
 import 'package:flutter_football/models/career_news.dart';
 import 'package:flutter_football/models/champions_league.dart';
+import 'package:flutter_football/models/europa_league.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/league_match.dart';
 import 'package:flutter_football/models/league_season_simulator.dart';
@@ -33,6 +34,7 @@ class Career {
   final bool isCareerFinished;
   final DomesticCup? domesticCup;
   final ChampionsLeague? championsLeague;
+  final EuropaLeague? europaLeague;
 
   /// Все матчи чемпионата, включая матчи других клубов.
   final List<LeagueMatch> leagueMatches;
@@ -64,6 +66,7 @@ class Career {
     this.domesticCup,
     required this.europeanLeagueStandings,
     this.championsLeague,
+    this.europaLeague,
   });
 
   // ============================================================
@@ -205,6 +208,12 @@ class Career {
       season: 1,
       participants: qualifiedClubs,
     );
+    final europaLeague = EuropaLeague.create(
+      season: 1,
+      participants: LeagueSeasonSimulator.getEuropaLeagueClubs(
+        europeanLeagueStandings,
+      ),
+    );
 
     return Career(
       player: player,
@@ -227,6 +236,7 @@ class Career {
       domesticCup: cup,
       europeanLeagueStandings: europeanLeagueStandings,
       championsLeague: championsLeague,
+      europaLeague: europaLeague,
     );
   }
 
@@ -260,6 +270,7 @@ class Career {
           entry.key.name: entry.value.map((club) => club.toJson()).toList(),
       },
       'championsLeague': championsLeague?.toJson(),
+      'europaLeague': europaLeague?.toJson(),
     };
   }
 
@@ -356,6 +367,11 @@ class Career {
           )
         : null;
 
+    final rawEuropaLeague = json['europaLeague'];
+    final europaLeague = rawEuropaLeague is Map
+        ? EuropaLeague.fromJson(Map<String, dynamic>.from(rawEuropaLeague))
+        : null;
+
     return Career(
       player: loadedPlayer,
       season: (json['season'] as num?)?.toInt() ?? 1,
@@ -378,6 +394,7 @@ class Career {
       domesticCup: restoredCup,
       europeanLeagueStandings: europeanLeagueStandings,
       championsLeague: championsLeague,
+      europaLeague: europaLeague,
     );
   }
 
@@ -407,6 +424,7 @@ class Career {
     DomesticCup? domesticCup,
     Map<League, List<LeagueTableEntry>>? europeanLeagueStandings,
     ChampionsLeague? championsLeague,
+    EuropaLeague? europaLeague,
   }) {
     return Career(
       player: player ?? this.player,
@@ -431,6 +449,7 @@ class Career {
       europeanLeagueStandings:
           europeanLeagueStandings ?? this.europeanLeagueStandings,
       championsLeague: championsLeague ?? this.championsLeague,
+      europaLeague: europaLeague ?? this.europaLeague,
     );
   }
 
@@ -616,6 +635,13 @@ class Career {
         championsLeague.stage == ChampionsLeagueStage.completed &&
         championsLeague.champion == player.club) {
       achievements.add('Победитель Лиги чемпионов');
+    }
+
+    final europaLeague = this.europaLeague;
+    if (europaLeague != null &&
+        europaLeague.stage == EuropaLeagueStage.completed &&
+        europaLeague.champion == player.club) {
+      achievements.add('Победитель Лиги Европы');
     }
 
     final league = Clubs.leagueOf(player.club);
@@ -995,6 +1021,12 @@ class Career {
       season: newSeason,
       participants: qualifiedClubs,
     );
+    final newEuropaLeague = EuropaLeague.create(
+      season: newSeason,
+      participants: LeagueSeasonSimulator.getEuropaLeagueClubs(
+        qualificationStandings,
+      ),
+    );
 
     // Таблицы нового сезона создаются отдельно и не влияют
     // на квалификацию, которая уже определена по прошлому сезону.
@@ -1024,6 +1056,7 @@ class Career {
       domesticCup: newDomesticCup,
       europeanLeagueStandings: newEuropeanLeagueStandings,
       championsLeague: newChampionsLeague,
+      europaLeague: newEuropaLeague,
     );
   }
 }
