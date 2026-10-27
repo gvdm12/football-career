@@ -488,6 +488,8 @@ class AppStrings {
   static String get nationalCupTrophy => _en ? 'National cup' : 'Кубок страны';
   static String get championsLeagueTrophy =>
       _en ? 'Champions League' : 'Лига чемпионов';
+  static String get europaLeagueTrophy =>
+      _en ? 'Europa League' : 'Лига Европы';
   static String get goldenBootTrophy => _en ? 'Golden Boot' : 'Золотая бутса';
   static String get seasonTrophies => _en ? 'SEASON TROPHIES' : 'ТРОФЕИ СЕЗОНА';
   static String get noSeasonTrophies =>
@@ -501,6 +503,7 @@ class AppStrings {
   static String get nationalCup => _en ? 'National Cup' : 'Кубок страны';
   static String get championsLeague =>
       _en ? 'Champions League' : 'Лига чемпионов';
+  static String get europaLeague => _en ? 'Europa League' : 'Лига Европы';
   static String get winnerOfTournament =>
       _en ? 'Tournament winner: ' : 'Победитель турнира: ';
   static String get progressedToNextRound =>
@@ -542,6 +545,8 @@ class AppStrings {
       'Обладатель кубка страны': 'National Cup Winner',
       'кубок страны': 'National Cup Winner',
       'Победитель Лиги чемпионов': 'Champions League Winner',
+      'Победитель Лиги Европы': 'Europa League Winner',
+      'Лига Европы': 'Europa League',
       'Лига чемпионов': 'Champions League',
       'Золотая бутса': 'Golden Boot',
       'Лучший бомбардир': 'Top Scorer',
