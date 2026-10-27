@@ -687,15 +687,37 @@ class Career {
       achievements.add('Золотая бутса');
     }
 
+    // В итогах сезона объединяем клубную статистику и личные показатели
+    // игрока за сборную. Поля Career.matches/goals/assists остаются клубными,
+    // чтобы матчи сборной не влияли на таблицу лиги и клубное развитие.
+    final worldCupStats = worldCup != null &&
+            worldCup.season == season &&
+            worldCup.isPlayerCalledUp
+        ? worldCup
+        : null;
+    final nationalMatches = worldCupStats?.playerMatches ?? 0;
+    final nationalGoals = worldCupStats?.playerGoals ?? 0;
+    final nationalAssists = worldCupStats?.playerAssists ?? 0;
+    final totalSeasonMatches = matches + nationalMatches;
+    final totalSeasonGoals = goals + nationalGoals;
+    final totalSeasonAssists = assists + nationalAssists;
+    final totalSeasonRating = totalSeasonMatches == 0
+        ? null
+        : ((averageRating ?? 0) * matches +
+                  (worldCupStats?.playerAverageRating ?? 0) * nationalMatches) /
+              totalSeasonMatches;
+
     final seasonStats = SeasonStats(
       season: season,
       club: player.club,
-      matches: matches,
-      goals: goals,
-      assists: assists,
+      matches: totalSeasonMatches,
+      goals: totalSeasonGoals,
+      assists: totalSeasonAssists,
       yellowCards: yellowCards,
       redCards: redCards,
-      averageRating: averageRating,
+      averageRating: totalSeasonRating == null
+          ? null
+          : double.parse(totalSeasonRating.toStringAsFixed(2)),
       achievements: achievements,
     );
 
@@ -977,9 +999,24 @@ class Career {
             SeasonStats(
               season: season,
               club: player.club,
-              matches: matches,
-              goals: goals,
-              assists: assists,
+              matches: matches +
+                  (worldCup != null &&
+                          worldCup.season == season &&
+                          worldCup.isPlayerCalledUp
+                      ? worldCup.playerMatches
+                      : 0),
+              goals: goals +
+                  (worldCup != null &&
+                          worldCup.season == season &&
+                          worldCup.isPlayerCalledUp
+                      ? worldCup.playerGoals
+                      : 0),
+              assists: assists +
+                  (worldCup != null &&
+                          worldCup.season == season &&
+                          worldCup.isPlayerCalledUp
+                      ? worldCup.playerAssists
+                      : 0),
               yellowCards: yellowCards,
               redCards: redCards,
               averageRating: averageRating,
