@@ -39,7 +39,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
     final cup = career.worldCup;
     return cup != null &&
             cup.season == career.season &&
-            cup.isPlayerCalledUp
+            cup.isPlayerCalledUp &&
+            !career.history.any((season) => season.season == career.season)
         ? cup.playerMatches
         : 0;
   }
@@ -48,7 +49,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
     final cup = career.worldCup;
     return cup != null &&
             cup.season == career.season &&
-            cup.isPlayerCalledUp
+            cup.isPlayerCalledUp &&
+            !career.history.any((season) => season.season == career.season)
         ? cup.playerGoals
         : 0;
   }
@@ -57,7 +59,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
     final cup = career.worldCup;
     return cup != null &&
             cup.season == career.season &&
-            cup.isPlayerCalledUp
+            cup.isPlayerCalledUp &&
+            !career.history.any((season) => season.season == career.season)
         ? cup.playerAssists
         : 0;
   }
@@ -105,6 +108,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
     if (worldCup != null &&
         worldCup.season == career.season &&
         worldCup.isPlayerCalledUp &&
+        !career.history.any((season) => season.season == career.season) &&
         worldCup.playerAverageRating != null &&
         worldCup.playerMatches > 0) {
       totalRating += worldCup.playerAverageRating! * worldCup.playerMatches;
