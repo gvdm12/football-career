@@ -292,7 +292,9 @@ class WorldCupMatch {
     playerGoals: (json['playerGoals'] as num?)?.toInt() ?? 0,
     playerAssists: (json['playerAssists'] as num?)?.toInt() ?? 0,
     playerRating: (json['playerRating'] as num?)?.toDouble(),
-    stage: WorldCupStage.values.where((value) => value.name == json['stage']).firstOrNull,
+    stage: WorldCupStage.values
+        .where((value) => value.name == json['stage'])
+        .fold<WorldCupStage?>(null, (_, value) => value),
   );
 }
 
