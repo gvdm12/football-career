@@ -70,6 +70,37 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
     }
   }
 
+  Widget _teamLabel(String team, {bool alignEnd = false}) {
+    final strength = worldCupStrengthOf(team);
+    return Expanded(
+      child: Column(
+        crossAxisAlignment:
+            alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Text(
+            team,
+            textAlign: alignEnd ? TextAlign.end : TextAlign.start,
+            style: const TextStyle(color: Colors.white),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            'Сила: $strength',
+            textAlign: alignEnd ? TextAlign.end : TextAlign.start,
+            style: TextStyle(
+              color: strength >= 85
+                  ? const Color(0xFFFFD54F)
+                  : strength >= 80
+                      ? green
+                      : Colors.white60,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final playerCanPlay = tournament.isPlayerCalledUp &&
@@ -151,12 +182,20 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                 ),
                 child: Row(
                   children: [
-                    Expanded(child: Text(match.homeTeam, style: const TextStyle(color: Colors.white))),
-                    Text(
-                      match.isPlayed ? '${match.homeGoals} : ${match.awayGoals}' : '— : —',
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    _teamLabel(match.homeTeam),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(
+                        match.isPlayed
+                            ? '${match.homeGoals} : ${match.awayGoals}'
+                            : '— : —',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                    Expanded(child: Text(match.awayTeam, textAlign: TextAlign.end, style: const TextStyle(color: Colors.white))),
+                    _teamLabel(match.awayTeam, alignEnd: true),
                   ],
                 ),
               );
