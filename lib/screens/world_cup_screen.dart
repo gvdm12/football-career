@@ -58,11 +58,11 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
   String get _callUpMessage {
     switch (tournament.playerCallUpStatus) {
       case 'called':
-        return 'Вас вызвали в сборную \${career.player.nationality}!';
+        return 'Вас вызвали в сборную ${career.player.nationality}!';
       case 'reserve':
-        return 'Вы в резерве сборной \${career.player.nationality}.';
+        return 'Вы в резерве сборной ${career.player.nationality}.';
       case 'country_not_qualified':
-        return 'Сборная \${career.player.nationality} не прошла на этот чемпионат мира.';
+        return 'Сборная ${career.player.nationality} не прошла на этот чемпионат мира.';
       default:
         return 'Вас не вызвали в сборную на этот чемпионат мира.';
     }
@@ -100,30 +100,30 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Чемпионат мира · сезон \${tournament.season}',
+                    'Чемпионат мира · сезон ${tournament.season}',
                     style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
                   Text(_callUpMessage, style: const TextStyle(color: Color(0xFF8BE07F))),
                   const SizedBox(height: 8),
                   Text(
-                    'В финальной части участвуют \${tournament.participants.length} из \${worldCupNationalTeams.length} сборных.',
+                    'В финальной части участвуют ${tournament.participants.length} из ${worldCupNationalTeams.length} сборных.',
                     style: const TextStyle(color: Colors.white70),
                   ),
                   if (playerCanPlay && playerMatch != null) ...[
                     const SizedBox(height: 14),
                     Text(
-                      'Матч сборной: \${playerMatch.homeTeam} '
-                      '\${playerMatch.isPlayed ? playerMatch.homeGoals : '-'} : '
-                      '\${playerMatch.isPlayed ? playerMatch.awayGoals : '-'} '
-                      '\${playerMatch.awayTeam}',
+                      'Матч сборной: ${playerMatch.homeTeam} '
+                      '${playerMatch.isPlayed ? playerMatch.homeGoals : '-'} : '
+                      '${playerMatch.isPlayed ? playerMatch.awayGoals : '-'} '
+                      '${playerMatch.awayTeam}',
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
                     ),
                   ],
                   if (tournament.champion != null) ...[
                     const SizedBox(height: 12),
                     Text(
-                      'Чемпион мира: \${tournament.champion}',
+                      'Чемпион мира: ${tournament.champion}',
                       style: const TextStyle(color: Color(0xFFFFD54F), fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -148,7 +148,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                   children: [
                     Expanded(child: Text(match.homeTeam, style: const TextStyle(color: Colors.white))),
                     Text(
-                      match.isPlayed ? '\${match.homeGoals} : \${match.awayGoals}' : '— : —',
+                      match.isPlayed ? '${match.homeGoals} : ${match.awayGoals}' : '— : —',
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                     Expanded(child: Text(match.awayTeam, textAlign: TextAlign.end, style: const TextStyle(color: Colors.white))),
