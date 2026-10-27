@@ -203,16 +203,49 @@ class WorldCup {
     final match = updated[index];
     if (match.isPlayed) return this;
     updated[index] = match.play(homeScore: homeGoals, awayScore: awayGoals);
-    return copyWith(matches: updated);
+    final updatedCup = copyWith(matches: updated);
+    return updatedCup.matches.every((item) => item.isPlayed)
+        ? updatedCup._advanceRound()
+        : updatedCup;
+  }
+
+  WorldCup _advanceRound() {
+    if (!matches.every((match) => match.isPlayed)) return this;
+    if (stage == WorldCupStage.finalMatch) {
+      return copyWith(
+        stage: WorldCupStage.completed,
+        champion: matches.isEmpty ? null : matches.first.winner,
+      );
+    }
+
+    final winners = matches.map((match) => match.winner!).toList();
+    final nextMatches = <WorldCupMatch>[];
+    for (var i = 0; i < winners.length; i += 2) {
+      nextMatches.add(WorldCupMatch(
+        homeTeam: winners[i],
+        awayTeam: winners[i + 1],
+      ));
+    }
+
+    final nextStage = switch (stage) {
+      WorldCupStage.roundOf32 => WorldCupStage.roundOf16,
+      WorldCupStage.roundOf16 => WorldCupStage.quarterFinal,
+      WorldCupStage.quarterFinal => WorldCupStage.semiFinal,
+      WorldCupStage.semiFinal => WorldCupStage.finalMatch,
+      WorldCupStage.finalMatch || WorldCupStage.completed => stage,
+    };
+    return copyWith(matches: nextMatches, stage: nextStage);
   }
 
   WorldCup simulateRemainingMatches() {
-    if (isCompleted) return this;
-    return copyWith(
-      matches: matches
+    var tournament = this;
+    while (!tournament.isCompleted) {
+      final playedMatches = tournament.matches
           .map((match) => match.isPlayed ? match : match.play())
-          .toList(),
-    );
+          .toList();
+      tournament = tournament.copyWith(matches: playedMatches)._advanceRound();
+    }
+    return tournament;
   }
 
   WorldCup copyWith({
