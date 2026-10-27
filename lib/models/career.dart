@@ -1,6 +1,7 @@
 import 'package:flutter_football/models/career_news.dart';
 import 'package:flutter_football/models/champions_league.dart';
 import 'package:flutter_football/models/europa_league.dart';
+import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/league_match.dart';
 import 'package:flutter_football/models/league_season_simulator.dart';
@@ -35,6 +36,7 @@ class Career {
   final DomesticCup? domesticCup;
   final ChampionsLeague? championsLeague;
   final EuropaLeague? europaLeague;
+  final WorldCup? worldCup;
 
   /// Все матчи чемпионата, включая матчи других клубов.
   final List<LeagueMatch> leagueMatches;
@@ -67,6 +69,7 @@ class Career {
     required this.europeanLeagueStandings,
     this.championsLeague,
     this.europaLeague,
+    this.worldCup,
   });
 
   // ============================================================
@@ -237,6 +240,20 @@ class Career {
       europeanLeagueStandings: europeanLeagueStandings,
       championsLeague: championsLeague,
       europaLeague: europaLeague,
+      worldCup: rawWorldCup is Map
+          ? WorldCup.fromJson(Map<String, dynamic>.from(rawWorldCup))
+          : null,
+      worldCup: season % 4 == 0
+          ? WorldCup.create(
+              season: season,
+              nationality: player.nationality,
+              overall: player.overall,
+              age: player.age,
+              goals: goals,
+              assists: assists,
+              averageRating: averageRating,
+            )
+          : null,
     );
   }
 
@@ -271,6 +288,7 @@ class Career {
       },
       'championsLeague': championsLeague?.toJson(),
       'europaLeague': europaLeague?.toJson(),
+      'worldCup': worldCup?.toJson(),
     };
   }
 
@@ -368,6 +386,7 @@ class Career {
         : null;
 
     final rawEuropaLeague = json['europaLeague'];
+    final rawWorldCup = json['worldCup'];
     final currentSeason = (json['season'] as num?)?.toInt() ?? 1;
     final europaStandings = LeagueSeasonSimulator.europaLeagueSlots.keys.every(
       europeanLeagueStandings.containsKey,
@@ -436,6 +455,7 @@ class Career {
     Map<League, List<LeagueTableEntry>>? europeanLeagueStandings,
     ChampionsLeague? championsLeague,
     EuropaLeague? europaLeague,
+    WorldCup? worldCup,
   }) {
     return Career(
       player: player ?? this.player,
@@ -461,6 +481,7 @@ class Career {
           europeanLeagueStandings ?? this.europeanLeagueStandings,
       championsLeague: championsLeague ?? this.championsLeague,
       europaLeague: europaLeague ?? this.europaLeague,
+      worldCup: worldCup ?? this.worldCup,
     );
   }
 
