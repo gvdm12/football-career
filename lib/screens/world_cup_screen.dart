@@ -78,7 +78,9 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
     ).toList();
     final playerMatch = playerMatches.isEmpty ? null : playerMatches.first;
 
-    return Scaffold(
+    return PopScope<Career>(
+      canPop: tournament.isCompleted,
+      child: Scaffold(
       backgroundColor: background,
       appBar: AppBar(
         backgroundColor: const Color(0xFF0B3A1A),
@@ -169,6 +171,6 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 }
