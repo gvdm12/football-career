@@ -43,50 +43,49 @@ const List<String> worldCupNationalTeams = [
   'Тунис',
 ];
 
-
 /// Силы сборных для симуляции чемпионата мира.
 /// Значения — игровые рейтинги, а не официальные рейтинги FIFA.
 const Map<String, int> worldCupTeamStrength = {
-  'Бразилия': 90,
-  'Франция': 90,
-  'Аргентина': 89,
+  'Бразилия': 87,
+  'Франция': 88,
+  'Аргентина': 86,
   'Испания': 89,
   'Англия': 88,
-  'Германия': 87,
+  'Германия': 86,
   'Португалия': 86,
-  'Нидерланды': 86,
-  'Италия': 85,
+  'Нидерланды': 85,
+  'Италия': 84,
   'Бельгия': 84,
   'Хорватия': 83,
   'Уругвай': 83,
   'Колумбия': 82,
   'Дания': 81,
-  'Марокко': 81,
-  'Швейцария': 80,
-  'Мексика': 80,
+  'Марокко': 85,
+  'Швейцария': 82,
+  'Мексика': 81,
   'Сенегал': 80,
   'США': 79,
-  'Япония': 79,
-  'Турция': 79,
-  'Норвегия': 78,
+  'Япония': 80,
+  'Турция': 80,
+  'Норвегия': 82,
   'Польша': 78,
   'Украина': 78,
   'Австрия': 78,
   'Нигерия': 78,
-  'Россия': 77,
+  'Россия': 76,
   'Алжир': 77,
   'Египет': 77,
   'Южная Корея': 77,
   'Иран': 76,
   'Чили': 76,
-  'Канада': 76,
-  'Камерун': 76,
+  'Канада': 79,
+  'Камерун': 78,
   'Греция': 75,
-  'Шотландия': 75,
+  'Шотландия': 78,
   'Тунис': 74,
-  'Ирландия': 73,
-  'Саудовская Аравия': 72,
-  'Катар': 70,
+  'Ирландия': 77,
+  'Саудовская Аравия': 74,
+  'Катар': 73,
 };
 
 int worldCupStrengthOf(String team) => worldCupTeamStrength[team] ?? 70;
@@ -159,16 +158,20 @@ class WorldCupMatch {
     // Игрок высокого уровня усиливает сборную, а слабый состав не получает
     // искусственный бонус. Максимальный бонус ограничен, чтобы один игрок
     // не гарантировал победу.
-    final playerBoost = ((playerOverall - 70) * 0.12).clamp(0.0, 3.5).toDouble();
+    final playerBoost = ((playerOverall - 70) * 0.12)
+        .clamp(0.0, 3.5)
+        .toDouble();
     if (playerTeam == homeTeam) homeStrength += playerBoost;
     if (playerTeam == awayTeam) awayStrength += playerBoost;
     final strengthDifference = homeStrength - awayStrength;
 
     // Сила влияет на среднее число голов, но не гарантирует победу.
-    final homeExpectedGoals =
-        (1.30 + strengthDifference * 0.035 + 0.12).clamp(0.30, 2.65).toDouble();
-    final awayExpectedGoals =
-        (1.30 - strengthDifference * 0.035).clamp(0.30, 2.65).toDouble();
+    final homeExpectedGoals = (1.30 + strengthDifference * 0.035 + 0.12)
+        .clamp(0.30, 2.65)
+        .toDouble();
+    final awayExpectedGoals = (1.30 - strengthDifference * 0.035)
+        .clamp(0.30, 2.65)
+        .toDouble();
 
     var home = homeScore ?? _randomGoals(homeExpectedGoals, random);
     var away = awayScore ?? _randomGoals(awayExpectedGoals, random);
@@ -195,26 +198,32 @@ class WorldCupMatch {
         'goalkeeper' => 0.005,
         _ => 0.15,
       };
-      final goalChance = (positionGoalFactor +
-              (playerOverall - 70) * 0.006 +
-              (playerShooting - 60) * 0.003 +
-              (playerDribbling - 60) * 0.001)
-          .clamp(0.02, 0.65);
+      final goalChance =
+          (positionGoalFactor +
+                  (playerOverall - 70) * 0.006 +
+                  (playerShooting - 60) * 0.003 +
+                  (playerDribbling - 60) * 0.001)
+              .clamp(0.02, 0.65);
       for (var i = 0; i < playerTeamGoals; i++) {
         if (random.nextDouble() < goalChance) scoredByPlayer++;
       }
-      final assistChance =
-          (0.10 + (playerPassing - 50) * 0.004).clamp(0.04, 0.40);
+      final assistChance = (0.10 + (playerPassing - 50) * 0.004).clamp(
+        0.04,
+        0.40,
+      );
       for (var i = 0; i < playerTeamGoals - scoredByPlayer; i++) {
         if (random.nextDouble() < assistChance) assistedByPlayer++;
       }
-      rating = (6.0 +
-              (playerOverall - 70) * 0.035 +
-              (playerTeamGoals - (playerTeam == homeTeam ? away : home)) * 0.35 +
-              scoredByPlayer * 0.65 +
-              assistedByPlayer * 0.35 +
-              (random.nextDouble() * 0.8 - 0.4))
-           .clamp(4.5, 10.0).toDouble();
+      rating =
+          (6.0 +
+                  (playerOverall - 70) * 0.035 +
+                  (playerTeamGoals - (playerTeam == homeTeam ? away : home)) *
+                      0.35 +
+                  scoredByPlayer * 0.65 +
+                  assistedByPlayer * 0.35 +
+                  (random.nextDouble() * 0.8 - 0.4))
+              .clamp(4.5, 10.0)
+              .toDouble();
       rating = double.parse(rating.toStringAsFixed(1));
     }
 
@@ -309,7 +318,8 @@ class WorldCup {
     final teams = [...worldCupNationalTeams]..shuffle(random);
     final participants = teams.take(32).toList()..sort();
 
-    final formScore = (goals + assists) * 0.35 +
+    final formScore =
+        (goals + assists) * 0.35 +
         (averageRating ?? 6.0) * 1.5 +
         overall * 0.35 +
         (age <= 21 ? 2 : 0);
@@ -320,18 +330,17 @@ class WorldCup {
     final status = !eligible
         ? 'country_not_qualified'
         : called
-            ? 'called'
-            : random.nextDouble() < 0.35
-                ? 'reserve'
-                : 'not_called';
+        ? 'called'
+        : random.nextDouble() < 0.35
+        ? 'reserve'
+        : 'not_called';
 
     final shuffled = [...participants]..shuffle(random);
     final matches = <WorldCupMatch>[];
     for (var i = 0; i < shuffled.length; i += 2) {
-      matches.add(WorldCupMatch(
-        homeTeam: shuffled[i],
-        awayTeam: shuffled[i + 1],
-      ));
+      matches.add(
+        WorldCupMatch(homeTeam: shuffled[i], awayTeam: shuffled[i + 1]),
+      );
     }
 
     return WorldCup(
@@ -367,10 +376,9 @@ class WorldCup {
     final winners = matches.map((match) => match.winner!).toList();
     final nextMatches = <WorldCupMatch>[];
     for (var i = 0; i < winners.length; i += 2) {
-      nextMatches.add(WorldCupMatch(
-        homeTeam: winners[i],
-        awayTeam: winners[i + 1],
-      ));
+      nextMatches.add(
+        WorldCupMatch(homeTeam: winners[i], awayTeam: winners[i + 1]),
+      );
     }
 
     final nextStage = switch (stage) {
@@ -398,7 +406,8 @@ class WorldCup {
     var ratingTotal = 0.0;
     final currentRound = matches.map((match) {
       if (match.isPlayed) return match;
-      final hasPlayer = playerTeam != null &&
+      final hasPlayer =
+          playerTeam != null &&
           (match.homeTeam == playerTeam || match.awayTeam == playerTeam);
       final played = match.play(
         playerTeam: hasPlayer ? playerTeam : null,
@@ -423,9 +432,9 @@ class WorldCup {
     final newAverage = roundPlayerMatches == 0
         ? playerAverageRating
         : playerAverageRating == null
-            ? ratingTotal / roundPlayerMatches
-            : ((playerAverageRating! * playerMatches) + ratingTotal) /
-                newPlayerMatches;
+        ? ratingTotal / roundPlayerMatches
+        : ((playerAverageRating! * playerMatches) + ratingTotal) /
+              newPlayerMatches;
     final updated = copyWith(
       matches: currentRound,
       playerMatches: newPlayerMatches,
@@ -495,8 +504,13 @@ class WorldCup {
           ? rawParticipants.whereType<String>().toList()
           : const [],
       matches: rawMatches is List
-          ? rawMatches.whereType<Map>().map((item) =>
-              WorldCupMatch.fromJson(Map<String, dynamic>.from(item))).toList()
+          ? rawMatches
+                .whereType<Map>()
+                .map(
+                  (item) =>
+                      WorldCupMatch.fromJson(Map<String, dynamic>.from(item)),
+                )
+                .toList()
           : const [],
       stage: WorldCupStage.values.firstWhere(
         (value) => value.name == stageName,
