@@ -45,17 +45,18 @@ class _SeasonScreenState extends State<SeasonScreen> {
     super.initState();
     career = widget.career;
 
-    if (career.worldCup != null && !career.worldCup!.isCompleted) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _openWorldCupBeforeSeason();
-      });
-    }
   }
 
-  Future<void> _openWorldCupBeforeSeason() async {
-    if (!mounted || career.worldCup == null || career.worldCup!.isCompleted) {
-      return;
-    }
+  bool get worldCupBlocksSeason {
+    final tournament = career.worldCup;
+    return tournament != null &&
+        !tournament.isCompleted &&
+        tournament.isPlayerCalledUp;
+  }
+
+  Future<void> _openWorldCup() async {
+    final tournament = career.worldCup;
+    if (!mounted || tournament == null || tournament.isCompleted) return;
 
     final updatedCareer = await Navigator.push<Career>(
       context,
@@ -67,10 +68,200 @@ class _SeasonScreenState extends State<SeasonScreen> {
     await _saveCareer(updatedCareer);
   }
 
+  Widget _buildWorldCupCalendarSection({required bool blocksSeason}) {
+    final tournament = career.worldCup;
+    if (tournament == null) return const SizedBox.shrink();
+
+    final status = tournament.isCompleted
+        ? 'Турнир завершён · чемпион: ${tournament.champion ?? 'не определён'}'
+        : tournament.isPlayerCalledUp
+            ? 'Вас вызвали в сборную — сыграйте чемпионат мира перед клубным сезоном'
+            : 'Чемпионат мира проходит параллельно с клубным сезоном';
+    final nationalMatches = [
+      ...tournament.matchHistory,
+      ...tournament.matches,
+    ].where(
+      (match) =>
+          match.homeTeam == career.player.nationality ||
+          match.awayTeam == career.player.nationality,
+    ).toList();
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0A2110),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: blocksSeason
+              ? const Color(0xFF22C55E)
+              : const Color(0xFF24552C),
+          width: blocksSeason ? 2 : 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              SvgPicture.asset(
+                'assets/icons/worldcup.svg',
+                width: 32,
+                height: 32,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Text(
+                  'Чемпионат мира',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Text(
+                '${tournament.season}/22',
+                style: const TextStyle(color: Colors.white60),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(status, style: const TextStyle(color: Colors.white70)),
+          if (nationalMatches.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            const Text(
+              'Матчи вашей сборной',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 6),
+            ...nationalMatches.map((match) {
+              final isPlayed = match.isPlayed;
+              final isHome = match.homeTeam == career.player.nationality;
+              final opponent = isHome ? match.awayTeam : match.homeTeam;
+              final score = isPlayed
+                  ? '${match.homeGoals} : ${match.awayGoals}'
+                  : '— : —';
+              return Container(
+                margin: const EdgeInsets.only(top: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF061B0C),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.sports_soccer,
+                      color: Color(0xFF8BE07F),
+                      size: 17,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '${isHome ? 'Дома' : 'В гостях'}: $opponent',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      score,
+                      style: TextStyle(
+                        color: isPlayed
+                            ? const Color(0xFF8BE07F)
+                            : Colors.white54,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
+          if (!tournament.isCompleted) ...[
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: isSaving ? null : _openWorldCup,
+                icon: const Icon(Icons.sports_soccer),
+                label: Text(
+                  tournament.isPlayerCalledUp
+                      ? 'Открыть матчи сборной'
+                      : 'Открыть чемпионат мира',
+                ),
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF22C55E),
+                  foregroundColor: Colors.black,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   int get playedMatches =>
       career.seasonMatches.where((match) => match.isPlayed).length;
 
+  int get _worldCupMatchesForSeason {
+    final cup = career.worldCup;
+    return cup != null &&
+            cup.season == career.season &&
+            cup.isPlayerCalledUp
+        ? cup.playerMatches
+        : 0;
+  }
+
+  int get _worldCupGoalsForSeason {
+    final cup = career.worldCup;
+    return cup != null &&
+            cup.season == career.season &&
+            cup.isPlayerCalledUp
+        ? cup.playerGoals
+        : 0;
+  }
+
+  int get _worldCupAssistsForSeason {
+    final cup = career.worldCup;
+    return cup != null &&
+            cup.season == career.season &&
+            cup.isPlayerCalledUp
+        ? cup.playerAssists
+        : 0;
+  }
+
+  int get _seasonMatchesForDisplay =>
+      career.matches + _worldCupMatchesForSeason;
+
+  int get _seasonGoalsForDisplay => career.goals + _worldCupGoalsForSeason;
+
+  int get _seasonAssistsForDisplay =>
+      career.assists + _worldCupAssistsForSeason;
+
+  double? get _seasonAverageRatingForDisplay {
+    final totalMatches = _seasonMatchesForDisplay;
+    if (totalMatches == 0) return null;
+    final cup = career.worldCup != null &&
+            career.worldCup!.season == career.season &&
+            career.worldCup!.isPlayerCalledUp
+        ? career.worldCup
+        : null;
+    final totalRating = (career.averageRating ?? 0) * career.matches +
+        (cup?.playerAverageRating ?? 0) * _worldCupMatchesForSeason;
+    return totalRating / totalMatches;
+  }
+
   bool get seasonFinished {
+    if (worldCupBlocksSeason) return false;
+
     final leagueFinished =
         career.seasonMatches.isNotEmpty &&
         career.seasonMatches.every((match) => match.isPlayed);
@@ -756,6 +947,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
   Future<void> _playMatch(SeasonMatch seasonMatch) async {
     if (isSaving || seasonFinishing || seasonMatch.isPlayed) return;
 
+<<<<<<< HEAD
     final worldCup = career.worldCup;
     if (worldCup != null && !worldCup.isCompleted) {
       final updatedCareer = await Navigator.push<Career>(
@@ -768,6 +960,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
       return;
     }
 
+=======
+>>>>>>> e327a98dac996909972e01e8cf4c81cd992f868f
     final nextMatch = currentMatch;
 
     if (nextMatch == null || nextMatch.number != seasonMatch.number) {
@@ -1871,9 +2065,23 @@ class _SeasonScreenState extends State<SeasonScreen> {
                         ? ListView(
                             padding: const EdgeInsets.all(16),
                             children: [
-                              _buildSeasonMatches(),
-                              const SizedBox(height: 16),
-                              _buildSeasonButton(),
+                              if (career.worldCup != null)
+                                _buildWorldCupCalendarSection(
+                                  blocksSeason: worldCupBlocksSeason,
+                                ),
+                              if (!worldCupBlocksSeason) ...[
+                                _buildSeasonMatches(),
+                                const SizedBox(height: 16),
+                                _buildSeasonButton(),
+                              ] else
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 18),
+                                  child: Text(
+                                    'Календарь лиги будет доступен после завершения чемпионата мира.',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(color: Colors.white70),
+                                  ),
+                                ),
                             ],
                           )
                         : ListView(
@@ -1890,7 +2098,20 @@ class _SeasonScreenState extends State<SeasonScreen> {
                                     ),
                                   ),
                                 ),
-                              if (!seasonFinished && showUcl)
+                              if (career.worldCup != null)
+                                _buildWorldCupCalendarSection(
+                                  blocksSeason: worldCupBlocksSeason,
+                                ),
+                              if (worldCupBlocksSeason)
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 18),
+                                  child: Text(
+                                    'Клубные матчи откроются после завершения чемпионата мира.',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(color: Colors.white70),
+                                  ),
+                                )
+                              else if (!seasonFinished && showUcl)
                                 _buildNextChampionsLeagueMatchCard()
                               else if (!seasonFinished && showEuropa)
                                 _buildNextEuropaLeagueMatchCard()
@@ -1903,7 +2124,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                               const SizedBox(height: 12),
                               _buildCalendarButton(),
                               const SizedBox(height: 10),
-                              _buildSeasonButton(),
+                              if (!worldCupBlocksSeason) _buildSeasonButton(),
                             ],
                           ),
                   ),
@@ -2192,9 +2413,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
           const SizedBox(height: 6),
           Row(
             children: [
-              _statItem(AppStrings.matchesLabel, '${career.matches}'),
-              _statItem(AppStrings.goalsStat, '${career.goals}'),
-              _statItem(AppStrings.assistsStat, '${career.assists}'),
+              _statItem(AppStrings.matchesLabel, '${_seasonMatchesForDisplay}'),
+              _statItem(AppStrings.goalsStat, '${_seasonGoalsForDisplay}'),
+              _statItem(AppStrings.assistsStat, '${_seasonAssistsForDisplay}'),
             ],
           ),
           const SizedBox(height: 5),
@@ -2204,7 +2425,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
               _statItem(AppStrings.redStat, '${career.redCards}'),
               _statItem(
                 AppStrings.ratingStat,
-                career.averageRating?.toStringAsFixed(1) ?? '—',
+                _seasonAverageRatingForDisplay?.toStringAsFixed(1) ?? '—',
               ),
             ],
           ),

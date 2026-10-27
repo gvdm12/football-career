@@ -35,17 +35,50 @@ class _PlayerScreenState extends State<PlayerScreen> {
     );
   }
 
+  int get currentWorldCupMatches {
+    final cup = career.worldCup;
+    return cup != null &&
+            cup.season == career.season &&
+            cup.isPlayerCalledUp &&
+            !career.history.any((season) => season.season == career.season)
+        ? cup.playerMatches
+        : 0;
+  }
+
+  int get currentWorldCupGoals {
+    final cup = career.worldCup;
+    return cup != null &&
+            cup.season == career.season &&
+            cup.isPlayerCalledUp &&
+            !career.history.any((season) => season.season == career.season)
+        ? cup.playerGoals
+        : 0;
+  }
+
+  int get currentWorldCupAssists {
+    final cup = career.worldCup;
+    return cup != null &&
+            cup.season == career.season &&
+            cup.isPlayerCalledUp &&
+            !career.history.any((season) => season.season == career.season)
+        ? cup.playerAssists
+        : 0;
+  }
+
   int get careerMatches =>
       career.history.fold(0, (sum, season) => sum + season.matches) +
-      career.matches;
+      career.matches +
+      currentWorldCupMatches;
 
   int get careerGoals =>
       career.history.fold(0, (sum, season) => sum + season.goals) +
-      career.goals;
+      career.goals +
+      currentWorldCupGoals;
 
   int get careerAssists =>
       career.history.fold(0, (sum, season) => sum + season.assists) +
-      career.assists;
+      career.assists +
+      currentWorldCupAssists;
 
   int get careerYellowCards =>
       career.history.fold(0, (sum, season) => sum + season.yellowCards) +
@@ -69,6 +102,17 @@ class _PlayerScreenState extends State<PlayerScreen> {
     if (career.averageRating != null && career.matches > 0) {
       totalRating += career.averageRating! * career.matches;
       totalMatches += career.matches;
+    }
+
+    final worldCup = career.worldCup;
+    if (worldCup != null &&
+        worldCup.season == career.season &&
+        worldCup.isPlayerCalledUp &&
+        !career.history.any((season) => season.season == career.season) &&
+        worldCup.playerAverageRating != null &&
+        worldCup.playerMatches > 0) {
+      totalRating += worldCup.playerAverageRating! * worldCup.playerMatches;
+      totalMatches += worldCup.playerMatches;
     }
 
     return totalMatches == 0 ? null : totalRating / totalMatches;

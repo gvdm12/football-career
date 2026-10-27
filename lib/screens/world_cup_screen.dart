@@ -36,16 +36,17 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
     );
     final playerCanPlay = tournament.isPlayerCalledUp && playerHasMatch;
     final player = career.player;
-    final updatedTournament = playerCanPlay
-        ? tournament.playCurrentRound(
-            playerTeam: player.nationality,
-            playerOverall: player.overall,
-            playerPosition: player.position.name,
-            playerShooting: player.skills.shooting,
-            playerPassing: player.skills.passing,
-            playerDribbling: player.skills.dribbling,
-          )
-        : tournament.simulateRemainingMatches();
+    // Продвигаем только один раунд за нажатие, даже если сборная
+    // игрока уже вылетела или игрок не был вызван. Так результаты
+    // каждого этапа остаются на экране и доступны в календаре.
+    final updatedTournament = tournament.playCurrentRound(
+      playerTeam: playerCanPlay ? player.nationality : null,
+      playerOverall: player.overall,
+      playerPosition: player.position.name,
+      playerShooting: player.skills.shooting,
+      playerPassing: player.skills.passing,
+      playerDribbling: player.skills.dribbling,
+    );
     final updatedCareer = career.copyWith(worldCup: updatedTournament);
     try {
       await CareerStorage.save(updatedCareer);
@@ -239,8 +240,74 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                 ],
               ),
             ),
+            if (tournament.matchHistory.isNotEmpty) ...[
+              const SizedBox(height: 18),
+              const Text(
+                'Результаты сыгранных матчей',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              ...tournament.matchHistory.map((match) {
+                final isPlayerTeam =
+                    match.homeTeam == career.player.nationality ||
+                    match.awayTeam == career.player.nationality;
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 7),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isPlayerTeam
+                        ? const Color(0xFF123A1D)
+                        : const Color(0xFF0A2110),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: isPlayerTeam ? green : Colors.white12,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        match.stage?.title ?? 'Завершённый раунд',
+                        style: const TextStyle(
+                          color: Colors.white54,
+                          fontSize: 11,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          _teamLabel(match.homeTeam),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Text(
+                              '${match.homeGoals} : ${match.awayGoals}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          _teamLabel(match.awayTeam, alignEnd: true),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ],
             const SizedBox(height: 18),
-            Text(tournament.stage.title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(
+              tournament.stage.title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 8),
             ...tournament.matches.map((match) {
               final isPlayerTeam = match.homeTeam == career.player.nationality ||
