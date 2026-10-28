@@ -232,7 +232,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                     if (career.isInjured) ...[
                       const SizedBox(height: 8),
                       Text(
-                        'Вы травмированы: ${career.injuryName ?? 'повреждение'}. Пропущено будет ещё ${career.injuryMatchesRemaining} матч(а/ей).',
+                        'Вы травмированы: ${career.injuryName ?? 'повреждение'}. До восстановления осталось матчей: ${career.injuryMatchesRemaining}.',
                         style: const TextStyle(
                           color: Color(0xFFFF7777),
                           fontSize: 12,
