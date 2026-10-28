@@ -23,7 +23,7 @@ class FootballCareerApp extends StatelessWidget {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Football Career',
-          theme: AppTheme.darkTheme.copyWith(platform: TargetPlatform.iOS),
+          theme: AppTheme.darkTheme,
           locale: locale,
           supportedLocales: const [Locale('ru'), Locale('en')],
           localizationsDelegates: const [
