@@ -424,7 +424,10 @@ class Career {
       worldCup: rawWorldCup is Map
           ? WorldCup.fromJson(Map<String, dynamic>.from(rawWorldCup))
           : null,
-      injuryMatchesRemaining: ((json['injuryMatchesRemaining'] as num?)?.toInt() ?? 0).clamp(0, 10).toInt(),
+      injuryMatchesRemaining:
+          ((json['injuryMatchesRemaining'] as num?)?.toInt() ?? 0)
+              .clamp(0, 10)
+              .toInt(),
       injuryName: json['injuryName'] as String?,
     );
   }
@@ -486,7 +489,8 @@ class Career {
       championsLeague: championsLeague ?? this.championsLeague,
       europaLeague: europaLeague ?? this.europaLeague,
       worldCup: worldCup ?? this.worldCup,
-      injuryMatchesRemaining: injuryMatchesRemaining ?? this.injuryMatchesRemaining,
+      injuryMatchesRemaining:
+          injuryMatchesRemaining ?? this.injuryMatchesRemaining,
       injuryName: clearInjury ? null : injuryName ?? this.injuryName,
     );
   }
@@ -560,7 +564,7 @@ class Career {
       );
     }
 
-    if (!playerParticipated || Random().nextDouble() >= 0.035) return this;
+    if (!playerParticipated || Random().nextDouble() >= 0.030) return this;
 
     const injuries = [
       'Растяжение мышц',
