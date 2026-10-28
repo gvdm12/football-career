@@ -84,7 +84,7 @@ class MatchScreen extends StatelessWidget {
                       border: Border.all(color: const Color(0xFFFF7777)),
                     ),
                     child: Text(
-                      'Вы пропускаете матч из-за травмы: ${career.injuryName ?? 'повреждение'}. До восстановления — ${career.injuryMatchesRemaining} матч(а/ей).',
+                      'Вы пропускаете матч из-за травмы: ${career.injuryName ?? 'повреждение'}. До восстановления осталось матчей: ${career.injuryMatchesRemaining}.',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: Color(0xFFFF9999),
