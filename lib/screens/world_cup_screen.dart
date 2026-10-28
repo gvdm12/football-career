@@ -39,7 +39,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
     // Продвигаем только один раунд за нажатие, даже если сборная
     // игрока уже вылетела или игрок не был вызван. Так результаты
     // каждого этапа остаются на экране и доступны в календаре.
-    final updatedTournament = tournament.playCurrentRound(
+    var updatedTournament = tournament.playCurrentRound(
       playerTeam: playerCanPlay ? player.nationality : null,
       playerOverall: player.overall,
       playerPosition: player.position.name,
@@ -47,6 +47,18 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
       playerPassing: player.skills.passing,
       playerDribbling: player.skills.dribbling,
     );
+
+    // Если сборная игрока вылетела, автоматически доигрываем турнир до финала.
+    final playerTeamStillInTournament = updatedTournament.matches.any(
+      (match) =>
+          match.homeTeam == player.nationality ||
+          match.awayTeam == player.nationality,
+    );
+    if (!updatedTournament.isCompleted &&
+        (!playerCanPlay || !playerTeamStillInTournament)) {
+      updatedTournament = updatedTournament.simulateRemainingMatches();
+    }
+
     final updatedCareer = career.copyWith(worldCup: updatedTournament);
     try {
       await CareerStorage.save(updatedCareer);
@@ -63,11 +75,6 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
         const SnackBar(content: Text('Не удалось сохранить чемпионат мира')),
       );
       return;
-    }
-    if (updatedTournament.isCompleted && mounted) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) Navigator.pop(context, updatedCareer);
-      });
     }
   }
 
@@ -398,7 +405,23 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                         ? 'Сыграть матч сборной'
                         : 'Продолжить чемпионат мира',
                   ),
+                )
+              else ...[
+                const SizedBox(height: 4),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => Navigator.pop(context, career),
+                    icon: const Icon(Icons.arrow_back),
+                    label: const Text('Вернуться в карьеру'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: const BorderSide(color: green),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                  ),
                 ),
+              ],
             ],
           ),
         ),
