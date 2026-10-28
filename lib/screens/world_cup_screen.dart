@@ -93,7 +93,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
 
   Widget _playerStat(String label, String value) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
         color: const Color(0xFF123A1D),
         borderRadius: BorderRadius.circular(8),
@@ -103,7 +103,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
         children: [
           Text(
             label,
-            style: const TextStyle(color: Colors.white60, fontSize: 11),
+            style: const TextStyle(color: Colors.white60, fontSize: 9),
           ),
           const SizedBox(height: 3),
           Text(
@@ -123,15 +123,15 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
     return Expanded(
       child: Column(
         crossAxisAlignment: alignEnd
-            ? CrossAxisAlignment.end
-            : CrossAxisAlignment.start,
+            ? CrossAxisAlignment.center
+            : CrossAxisAlignment.center,
         children: [
           Text(
             team,
             textAlign: alignEnd ? TextAlign.end : TextAlign.start,
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white, fontSize: 12),
           ),
-          const SizedBox(height: 3),
+          const SizedBox(height: 1),
           Text(
             'Сила: $strength',
             textAlign: alignEnd ? TextAlign.end : TextAlign.start,
@@ -141,7 +141,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                   : strength >= 80
                   ? green
                   : Colors.white60,
-              fontSize: 11,
+              fontSize: 8,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -201,20 +201,19 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                       'Чемпионат мира · сезон ${tournament.season}',
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 20,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 5),
                     Text(
                       _callUpMessage,
-                      style: const TextStyle(color: Color(0xFF8BE07F)),
+                      style: const TextStyle(
+                        color: Color(0xFF8BE07F),
+                        fontSize: 12,
+                      ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'В финальной части участвуют ${tournament.participants.length} из ${worldCupNationalTeams.length} сборных.',
-                      style: const TextStyle(color: Colors.white70),
-                    ),
+                    const SizedBox(height: 1),
                     if (playerCanPlay) ...[
                       const SizedBox(height: 14),
                       Text(
@@ -239,11 +238,12 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
+                          fontSize: 11,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                       Wrap(
-                        spacing: 14,
+                        spacing: 10,
                         runSpacing: 8,
                         children: [
                           _playerStat('Матчи', '${tournament.playerMatches}'),
@@ -260,12 +260,13 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                       ),
                     ],
                     if (tournament.champion != null) ...[
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 6),
                       Text(
                         'Чемпион мира: ${tournament.champion}',
                         style: const TextStyle(
                           color: Color(0xFFFFD54F),
                           fontWeight: FontWeight.bold,
+                          fontSize: 12,
                         ),
                       ),
                     ],
@@ -273,12 +274,12 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                 ),
               ),
               if (tournament.matchHistory.isNotEmpty) ...[
-                const SizedBox(height: 18),
+                const SizedBox(height: 13),
                 const Text(
                   'Результаты сыгранных матчей',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -288,8 +289,8 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                       match.homeTeam == career.player.nationality ||
                       match.awayTeam == career.player.nationality;
                   return Container(
-                    margin: const EdgeInsets.only(bottom: 7),
-                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 4),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: isPlayerTeam
                           ? const Color(0xFF123A1D)
@@ -300,13 +301,13 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                       ),
                     ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
                           match.stage?.title ?? 'Завершённый раунд',
                           style: const TextStyle(
-                            color: Colors.white54,
-                            fontSize: 11,
+                            color: Colors.white70,
+                            fontSize: 10,
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -333,62 +334,63 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                   );
                 }),
               ],
-              const SizedBox(height: 18),
+              const SizedBox(height: 6),
               Text(
                 tournament.stage.title,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 8),
-              if (!tournament.isCompleted) ...tournament.matches.map((match) {
-                final isPlayerTeam =
-                    match.homeTeam == career.player.nationality ||
-                    match.awayTeam == career.player.nationality;
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 7),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 11,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isPlayerTeam
-                        ? const Color(0xFF123A1D)
-                        : const Color(0xFF0A2110),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: isPlayerTeam ? green : Colors.white12,
+              if (!tournament.isCompleted)
+                ...tournament.matches.map((match) {
+                  final isPlayerTeam =
+                      match.homeTeam == career.player.nationality ||
+                      match.awayTeam == career.player.nationality;
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 7),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 11,
                     ),
-                  ),
-                  child: Row(
-                    children: [
-                      SvgPicture.asset(
-                        'assets/icons/worldcup.svg',
-                        width: 20,
-                        height: 20,
-                        fit: BoxFit.contain,
+                    decoration: BoxDecoration(
+                      color: isPlayerTeam
+                          ? const Color(0xFF123A1D)
+                          : const Color(0xFF0A2110),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: isPlayerTeam ? green : Colors.white12,
                       ),
-                      const SizedBox(width: 6),
-                      _teamLabel(match.homeTeam),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Text(
-                          match.isPlayed
-                              ? '${match.homeGoals} : ${match.awayGoals}'
-                              : '— : —',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                    ),
+                    child: Row(
+                      children: [
+                        SvgPicture.asset(
+                          'assets/icons/worldcup.svg',
+                          width: 20,
+                          height: 20,
+                          fit: BoxFit.contain,
+                        ),
+                        const SizedBox(width: 6),
+                        _teamLabel(match.homeTeam),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Text(
+                            match.isPlayed
+                                ? '${match.homeGoals} : ${match.awayGoals}'
+                                : '— : —',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                      _teamLabel(match.awayTeam, alignEnd: true),
-                    ],
-                  ),
-                );
-              }),
+                        _teamLabel(match.awayTeam, alignEnd: true),
+                      ],
+                    ),
+                  );
+                }),
               const SizedBox(height: 12),
               if (!tournament.isCompleted)
                 FilledButton(

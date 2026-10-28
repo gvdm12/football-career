@@ -11,6 +11,7 @@ import 'package:flutter_football/models/league_match.dart';
 import 'package:flutter_football/models/league_table.dart';
 import 'package:flutter_football/models/match.dart';
 import 'package:flutter_football/models/season_match.dart';
+import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/screens/development_screen.dart';
 import 'package:flutter_football/screens/league_table/league_table_screen.dart';
 import 'package:flutter_football/screens/match/match_screen.dart';
@@ -85,8 +86,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
         .toList();
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: const Color(0xFF0A2110),
         borderRadius: BorderRadius.circular(14),
@@ -104,8 +105,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
             children: [
               SvgPicture.asset(
                 'assets/icons/worldcup.svg',
-                width: 32,
-                height: 32,
+                width: 30,
+                height: 30,
                 fit: BoxFit.contain,
               ),
               const SizedBox(width: 10),
@@ -114,29 +115,33 @@ class _SeasonScreenState extends State<SeasonScreen> {
                   'Чемпионат мира',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
               Text(
-                '${tournament.season}/22',
+                '${tournament.season}/20',
                 style: const TextStyle(color: Colors.white60),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(status, style: const TextStyle(color: Colors.white70)),
+          const SizedBox(height: 4),
+          Text(
+            status,
+            style: const TextStyle(color: Colors.white70, fontSize: 12),
+          ),
           if (nationalMatches.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 4),
             const Text(
               'Матчи вашей сборной',
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
+                fontSize: 11,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 2),
             ...nationalMatches.map((match) {
               final isPlayed = match.isPlayed;
               final isHome = match.homeTeam == career.player.nationality;
@@ -147,8 +152,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
               return Container(
                 margin: const EdgeInsets.only(top: 5),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 8,
+                  horizontal: 12,
+                  vertical: 4,
                 ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF061B0C),
@@ -159,9 +164,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
                     const Icon(
                       Icons.sports_soccer,
                       color: Color(0xFF8BE07F),
-                      size: 17,
+                      size: 13,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 7),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,7 +175,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                             match.stage?.title ?? 'Стадия не указана',
                             style: const TextStyle(
                               color: Color(0xFF8BE07F),
-                              fontSize: 10,
+                              fontSize: 8,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -179,7 +184,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                             '${isHome ? 'Дома' : 'В гостях'}: $opponent',
                             style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 12,
+                              fontSize: 8,
                             ),
                           ),
                         ],
@@ -192,6 +197,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                             ? const Color(0xFF8BE07F)
                             : Colors.white54,
                         fontWeight: FontWeight.bold,
+                        fontSize: 11,
                       ),
                     ),
                   ],
@@ -199,8 +205,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
               );
             }),
           ],
-          const SizedBox(height: 10),
+          const SizedBox(height: 4),
           SizedBox(
+            height: 34,
             width: double.infinity,
             child: FilledButton.icon(
               onPressed: isSaving ? null : _openWorldCup,
@@ -210,6 +217,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                     : Icons.sports_soccer,
               ),
               label: Text(
+                style: TextStyle(fontSize: 13),
                 tournament.isCompleted
                     ? 'Смотреть итоги и статистику'
                     : tournament.isPlayerCalledUp
@@ -2100,7 +2108,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                             padding: const EdgeInsets.all(16),
                             children: [
                               _buildProgressCard(),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 8),
                               if (isSaving)
                                 const Padding(
                                   padding: EdgeInsets.all(12),
