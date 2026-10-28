@@ -1206,6 +1206,10 @@ class Career {
       championsLeague: newChampionsLeague,
       europaLeague: newEuropaLeague,
       worldCup: newWorldCup,
+      // Травма сохраняется при переходе на новый сезон,
+      // независимо от того, остался игрок в клубе или сменил его.
+      injuryMatchesRemaining: injuryMatchesRemaining,
+      injuryName: injuryName,
     );
   }
 }
