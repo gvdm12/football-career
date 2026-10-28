@@ -55,7 +55,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Future<void> _openWorldCup() async {
     final tournament = career.worldCup;
-    if (!mounted || tournament == null || tournament.isCompleted) return;
+    if (!mounted || tournament == null) return;
 
     final updatedCareer = await Navigator.push<Career>(
       context,
@@ -163,12 +163,26 @@ class _SeasonScreenState extends State<SeasonScreen> {
                     ),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: Text(
-                        '${isHome ? 'Дома' : 'В гостях'}: $opponent',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            match.stage?.title ?? 'Стадия не указана',
+                            style: const TextStyle(
+                              color: Color(0xFF8BE07F),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${isHome ? 'Дома' : 'В гостях'}: $opponent',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     Text(
@@ -185,25 +199,29 @@ class _SeasonScreenState extends State<SeasonScreen> {
               );
             }),
           ],
-          if (!tournament.isCompleted) ...[
-            const SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: isSaving ? null : _openWorldCup,
-                icon: const Icon(Icons.sports_soccer),
-                label: Text(
-                  tournament.isPlayerCalledUp
-                      ? 'Открыть матчи сборной'
-                      : 'Открыть чемпионат мира',
-                ),
-                style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF22C55E),
-                  foregroundColor: Colors.black,
-                ),
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: isSaving ? null : _openWorldCup,
+              icon: Icon(
+                tournament.isCompleted
+                    ? Icons.emoji_events
+                    : Icons.sports_soccer,
+              ),
+              label: Text(
+                tournament.isCompleted
+                    ? 'Смотреть итоги и статистику'
+                    : tournament.isPlayerCalledUp
+                    ? 'Открыть матчи сборной'
+                    : 'Открыть чемпионат мира',
+              ),
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFF22C55E),
+                foregroundColor: Colors.black,
               ),
             ),
-          ],
+          ),
         ],
       ),
     );
