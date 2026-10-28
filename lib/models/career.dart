@@ -424,7 +424,7 @@ class Career {
       worldCup: rawWorldCup is Map
           ? WorldCup.fromJson(Map<String, dynamic>.from(rawWorldCup))
           : null,
-      injuryMatchesRemaining: ((json['injuryMatchesRemaining'] as num?)?.toInt() ?? 0).clamp(0, 10),
+      injuryMatchesRemaining: ((json['injuryMatchesRemaining'] as num?)?.toInt() ?? 0).clamp(0, 10).toInt(),
       injuryName: json['injuryName'] as String?,
     );
   }
@@ -553,7 +553,7 @@ class Career {
   /// Новая травма появляется только после матча, в котором игрок участвовал.
   Career advanceAfterCompetitionMatch({required bool playerParticipated}) {
     if (isInjured) {
-      final remaining = (injuryMatchesRemaining - 1).clamp(0, 10);
+      final remaining = (injuryMatchesRemaining - 1).clamp(0, 10).toInt();
       return copyWith(
         injuryMatchesRemaining: remaining,
         clearInjury: remaining == 0,
