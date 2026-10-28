@@ -506,6 +506,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 _buildHeader(context),
                 const SizedBox(height: 12),
                 _buildPlayerCard(),
+                if (career.isInjured) ...[
+                  const SizedBox(height: 10),
+                  _buildInjuryCard(),
+                ],
                 const SizedBox(height: 10),
                 _buildStatisticsCard(),
                 const SizedBox(height: 10),
@@ -640,6 +644,46 @@ class _PlayerScreenState extends State<PlayerScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => CareerEndScreen(career: career)),
+    );
+  }
+
+  Widget _buildInjuryCard() {
+    final remaining = career.injuryMatchesRemaining;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFF351717),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFFF7777).withValues(alpha: 0.65)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.healing, color: Color(0xFFFF7777), size: 28),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Травма',
+                  style: TextStyle(color: Color(0xFFFF7777), fontWeight: FontWeight.w900, fontSize: 15),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  career.injuryName ?? 'Повреждение',
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  'До восстановления: $remaining ${remaining == 1 ? 'матч' : remaining < 5 ? 'матча' : 'матчей'}',
+                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
