@@ -279,17 +279,32 @@ class MatchScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 1),
-          _StatRow(
-            title: AppStrings.rating,
-            value: match.playerRating.toStringAsFixed(1),
-          ),
-          _StatRow(title: AppStrings.goals, value: '${match.playerGoals}'),
-          _StatRow(title: AppStrings.assists, value: '${match.playerAssists}'),
-          _StatRow(
-            title: AppStrings.yellowCards,
-            value: '${match.yellowCards}',
-          ),
-          _StatRow(title: AppStrings.redCards, value: '${match.redCards}'),
+          if (!match.playerPlayed)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 10),
+              child: Text(
+                'Игрок не участвовал в матче',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            )
+          else ...[
+            _StatRow(
+              title: AppStrings.rating,
+              value: match.playerRating.toStringAsFixed(1),
+            ),
+            _StatRow(title: AppStrings.goals, value: '${match.playerGoals}'),
+            _StatRow(title: AppStrings.assists, value: '${match.playerAssists}'),
+            _StatRow(
+              title: AppStrings.yellowCards,
+              value: '${match.yellowCards}',
+            ),
+            _StatRow(title: AppStrings.redCards, value: '${match.redCards}'),
+          ],
         ],
       ),
     );
@@ -319,7 +334,7 @@ class MatchScreen extends StatelessWidget {
           const SizedBox(height: 1),
           _StatRow(
             title: AppStrings.totalMatches,
-            value: '${career.matches + 1}',
+            value: '${career.matches + (match.playerPlayed ? 1 : 0)}',
           ),
           _StatRow(
             title: AppStrings.totalGoals,
