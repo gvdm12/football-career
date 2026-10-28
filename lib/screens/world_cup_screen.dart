@@ -34,7 +34,15 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
           match.homeTeam == career.player.nationality ||
           match.awayTeam == career.player.nationality,
     );
-    final playerCanPlay = tournament.isPlayerCalledUp && playerHasMatch;
+    final playerCanPlay =
+        tournament.isPlayerCalledUp && playerHasMatch && !career.isInjured;
+    final playerNationalTeamHasMatch = tournament.isPlayerCalledUp &&
+        tournament.matches.any(
+          (match) =>
+              !match.isPlayed &&
+              (match.homeTeam == player.nationality ||
+                  match.awayTeam == player.nationality),
+        );
     final player = career.player;
     // Продвигаем только один раунд за нажатие, даже если сборная
     // игрока уже вылетела или игрок не был вызван. Так результаты
@@ -59,7 +67,14 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
       updatedTournament = updatedTournament.simulateRemainingMatches();
     }
 
-    final updatedCareer = career.copyWith(worldCup: updatedTournament);
+    final careerAfterMatch = playerNationalTeamHasMatch
+        ? career.advanceAfterCompetitionMatch(
+            playerParticipated: playerCanPlay,
+          )
+        : career;
+    final updatedCareer = careerAfterMatch.copyWith(
+      worldCup: updatedTournament,
+    );
     try {
       await CareerStorage.save(updatedCareer);
       if (!mounted) return;
