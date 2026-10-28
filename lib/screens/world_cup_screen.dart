@@ -63,7 +63,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
           match.awayTeam == player.nationality,
     );
     if (!updatedTournament.isCompleted &&
-        (!playerCanPlay || !playerTeamStillInTournament)) {
+        (!tournament.isPlayerCalledUp || !playerTeamStillInTournament)) {
       updatedTournament = updatedTournament.simulateRemainingMatches();
     }
 
