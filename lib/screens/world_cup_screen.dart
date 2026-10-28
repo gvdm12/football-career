@@ -336,7 +336,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              ...tournament.matches.map((match) {
+              if (!tournament.isCompleted) ...tournament.matches.map((match) {
                 final isPlayerTeam =
                     match.homeTeam == career.player.nationality ||
                     match.awayTeam == career.player.nationality;
