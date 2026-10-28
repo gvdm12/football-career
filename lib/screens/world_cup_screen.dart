@@ -175,7 +175,8 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
         )
         .toList();
     final playerMatch = playerMatches.isEmpty ? null : playerMatches.first;
-    final playerCanPlay = tournament.isPlayerCalledUp && playerMatch != null;
+    final playerCanPlay =
+        tournament.isPlayerCalledUp && playerMatch != null && !career.isInjured;
 
     return PopScope<Career>(
       canPop: tournament.isCompleted,
@@ -228,6 +229,17 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                         fontSize: 12,
                       ),
                     ),
+                    if (career.isInjured) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        'Вы травмированы: ${career.injuryName ?? 'повреждение'}. Пропущено будет ещё ${career.injuryMatchesRemaining} матч(а/ей).',
+                        style: const TextStyle(
+                          color: Color(0xFFFF7777),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 1),
                     if (playerCanPlay) ...[
                       const SizedBox(height: 14),
