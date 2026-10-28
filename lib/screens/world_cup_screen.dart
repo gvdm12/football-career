@@ -34,6 +34,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
           match.homeTeam == career.player.nationality ||
           match.awayTeam == career.player.nationality,
     );
+    final player = career.player;
     final playerCanPlay =
         tournament.isPlayerCalledUp && playerHasMatch && !career.isInjured;
     final playerNationalTeamHasMatch = tournament.isPlayerCalledUp &&
@@ -43,7 +44,6 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
               (match.homeTeam == player.nationality ||
                   match.awayTeam == player.nationality),
         );
-    final player = career.player;
     // Продвигаем только один раунд за нажатие, даже если сборная
     // игрока уже вылетела или игрок не был вызван. Так результаты
     // каждого этапа остаются на экране и доступны в календаре.
