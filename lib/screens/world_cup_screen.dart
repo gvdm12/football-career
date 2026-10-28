@@ -34,8 +34,16 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
           match.homeTeam == career.player.nationality ||
           match.awayTeam == career.player.nationality,
     );
-    final playerCanPlay = tournament.isPlayerCalledUp && playerHasMatch;
     final player = career.player;
+    final playerCanPlay =
+        tournament.isPlayerCalledUp && playerHasMatch && !career.isInjured;
+    final playerNationalTeamHasMatch = tournament.isPlayerCalledUp &&
+        tournament.matches.any(
+          (match) =>
+              !match.isPlayed &&
+              (match.homeTeam == player.nationality ||
+                  match.awayTeam == player.nationality),
+        );
     // Продвигаем только один раунд за нажатие, даже если сборная
     // игрока уже вылетела или игрок не был вызван. Так результаты
     // каждого этапа остаются на экране и доступны в календаре.
@@ -55,11 +63,18 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
           match.awayTeam == player.nationality,
     );
     if (!updatedTournament.isCompleted &&
-        (!playerCanPlay || !playerTeamStillInTournament)) {
+        (!tournament.isPlayerCalledUp || !playerTeamStillInTournament)) {
       updatedTournament = updatedTournament.simulateRemainingMatches();
     }
 
-    final updatedCareer = career.copyWith(worldCup: updatedTournament);
+    final careerAfterMatch = playerNationalTeamHasMatch
+        ? career.advanceAfterCompetitionMatch(
+            playerParticipated: playerCanPlay,
+          )
+        : career;
+    final updatedCareer = careerAfterMatch.copyWith(
+      worldCup: updatedTournament,
+    );
     try {
       await CareerStorage.save(updatedCareer);
       if (!mounted) return;
@@ -160,7 +175,8 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
         )
         .toList();
     final playerMatch = playerMatches.isEmpty ? null : playerMatches.first;
-    final playerCanPlay = tournament.isPlayerCalledUp && playerMatch != null;
+    final playerCanPlay =
+        tournament.isPlayerCalledUp && playerMatch != null && !career.isInjured;
 
     return PopScope<Career>(
       canPop: tournament.isCompleted,
@@ -213,6 +229,17 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                         fontSize: 12,
                       ),
                     ),
+                    if (career.isInjured) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        'Вы травмированы: ${career.injuryName ?? 'повреждение'}. До восстановления осталось матчей: ${career.injuryMatchesRemaining}.',
+                        style: const TextStyle(
+                          color: Color(0xFFFF7777),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 1),
                     if (playerCanPlay) ...[
                       const SizedBox(height: 14),

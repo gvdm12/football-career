@@ -73,6 +73,27 @@ class MatchScreen extends StatelessWidget {
                     fontWeight: FontWeight.w900,
                   ),
                 ),
+                if (career.isInjured) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF351717),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: const Color(0xFFFF7777)),
+                    ),
+                    child: Text(
+                      'Вы пропускаете матч из-за травмы: ${career.injuryName ?? 'повреждение'}. До восстановления осталось матчей: ${career.injuryMatchesRemaining}.',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Color(0xFFFF9999),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 10),
                 _buildScoreCard(),
                 const SizedBox(height: 8),
@@ -258,17 +279,32 @@ class MatchScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 1),
-          _StatRow(
-            title: AppStrings.rating,
-            value: match.playerRating.toStringAsFixed(1),
-          ),
-          _StatRow(title: AppStrings.goals, value: '${match.playerGoals}'),
-          _StatRow(title: AppStrings.assists, value: '${match.playerAssists}'),
-          _StatRow(
-            title: AppStrings.yellowCards,
-            value: '${match.yellowCards}',
-          ),
-          _StatRow(title: AppStrings.redCards, value: '${match.redCards}'),
+          if (!match.playerPlayed)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 10),
+              child: Text(
+                'Игрок не участвовал в матче',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            )
+          else ...[
+            _StatRow(
+              title: AppStrings.rating,
+              value: match.playerRating.toStringAsFixed(1),
+            ),
+            _StatRow(title: AppStrings.goals, value: '${match.playerGoals}'),
+            _StatRow(title: AppStrings.assists, value: '${match.playerAssists}'),
+            _StatRow(
+              title: AppStrings.yellowCards,
+              value: '${match.yellowCards}',
+            ),
+            _StatRow(title: AppStrings.redCards, value: '${match.redCards}'),
+          ],
         ],
       ),
     );
@@ -298,7 +334,7 @@ class MatchScreen extends StatelessWidget {
           const SizedBox(height: 1),
           _StatRow(
             title: AppStrings.totalMatches,
-            value: '${career.matches + 1}',
+            value: '${career.matches + (match.playerPlayed ? 1 : 0)}',
           ),
           _StatRow(
             title: AppStrings.totalGoals,

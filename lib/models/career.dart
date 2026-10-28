@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter_football/models/career_news.dart';
 import 'package:flutter_football/models/champions_league.dart';
 import 'package:flutter_football/models/europa_league.dart';
@@ -37,6 +38,10 @@ class Career {
   final ChampionsLeague? championsLeague;
   final EuropaLeague? europaLeague;
   final WorldCup? worldCup;
+  final int injuryMatchesRemaining;
+  final String? injuryName;
+
+  bool get isInjured => injuryMatchesRemaining > 0;
 
   /// Все матчи чемпионата, включая матчи других клубов.
   final List<LeagueMatch> leagueMatches;
@@ -70,6 +75,8 @@ class Career {
     this.championsLeague,
     this.europaLeague,
     this.worldCup,
+    this.injuryMatchesRemaining = 0,
+    this.injuryName,
   });
 
   // ============================================================
@@ -275,6 +282,8 @@ class Career {
       'championsLeague': championsLeague?.toJson(),
       'europaLeague': europaLeague?.toJson(),
       'worldCup': worldCup?.toJson(),
+      'injuryMatchesRemaining': injuryMatchesRemaining,
+      'injuryName': injuryName,
     };
   }
 
@@ -415,6 +424,8 @@ class Career {
       worldCup: rawWorldCup is Map
           ? WorldCup.fromJson(Map<String, dynamic>.from(rawWorldCup))
           : null,
+      injuryMatchesRemaining: ((json['injuryMatchesRemaining'] as num?)?.toInt() ?? 0).clamp(0, 10).toInt(),
+      injuryName: json['injuryName'] as String?,
     );
   }
 
@@ -446,6 +457,9 @@ class Career {
     ChampionsLeague? championsLeague,
     EuropaLeague? europaLeague,
     WorldCup? worldCup,
+    int? injuryMatchesRemaining,
+    String? injuryName,
+    bool clearInjury = false,
   }) {
     return Career(
       player: player ?? this.player,
@@ -472,6 +486,8 @@ class Career {
       championsLeague: championsLeague ?? this.championsLeague,
       europaLeague: europaLeague ?? this.europaLeague,
       worldCup: worldCup ?? this.worldCup,
+      injuryMatchesRemaining: injuryMatchesRemaining ?? this.injuryMatchesRemaining,
+      injuryName: clearInjury ? null : injuryName ?? this.injuryName,
     );
   }
 
@@ -533,12 +549,42 @@ class Career {
   // ЗАВЕРШЕНИЕ МАТЧА
   // ============================================================
 
-  Career afterMatch(Match match) {
-    // Команда сыграла, но игрок не участвовал.
-    // Личная статистика игрока не меняется.
-    if (!match.playerPlayed) {
-      return this;
+  /// Продвигает восстановление после любого матча игрока — клубного или сборной.
+  /// Новая травма появляется только после матча, в котором игрок участвовал.
+  Career advanceAfterCompetitionMatch({required bool playerParticipated}) {
+    if (isInjured) {
+      final remaining = (injuryMatchesRemaining - 1).clamp(0, 10).toInt();
+      return copyWith(
+        injuryMatchesRemaining: remaining,
+        clearInjury: remaining == 0,
+      );
     }
+
+    if (!playerParticipated || Random().nextDouble() >= 0.035) return this;
+
+    const injuries = [
+      'Растяжение мышц',
+      'Ушиб',
+      'Повреждение голеностопа',
+      'Мышечная травма',
+      'Повреждение колена',
+    ];
+    final random = Random();
+    final duration = random.nextInt(10) + 1;
+    return copyWith(
+      injuryName: injuries[random.nextInt(injuries.length)],
+      injuryMatchesRemaining: duration,
+    );
+  }
+
+  Career afterMatch(Match match) {
+    // Травмированный игрок пропускает матч, но срок восстановления уменьшается.
+    if (isInjured) {
+      return advanceAfterCompetitionMatch(playerParticipated: false);
+    }
+
+    // Команда сыграла, но игрок не участвовал.
+    if (!match.playerPlayed) return this;
 
     final newMatches = matches + 1;
 
@@ -569,7 +615,7 @@ class Career {
       redCards: newRedCards,
       averageRating: double.parse(newAverageRating.toStringAsFixed(2)),
       news: [...news, ...matchNews],
-    );
+    ).advanceAfterCompetitionMatch(playerParticipated: true);
   }
 
   // ============================================================

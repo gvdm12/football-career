@@ -122,7 +122,9 @@ class Match {
         break;
     }
 
-    final playerPlayed = random.nextDouble() < playChance;
+    final playerPlayed = career?.isInjured == true
+        ? false
+        : random.nextDouble() < playChance;
 
     // ------------------------------------------------------------
     // 2. БАЗОВАЯ СИЛА АТАКИ
