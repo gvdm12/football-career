@@ -73,6 +73,27 @@ class MatchScreen extends StatelessWidget {
                     fontWeight: FontWeight.w900,
                   ),
                 ),
+                if (career.isInjured) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF351717),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: const Color(0xFFFF7777)),
+                    ),
+                    child: Text(
+                      'Вы пропускаете матч из-за травмы: ${career.injuryName ?? 'повреждение'}. До восстановления — ${career.injuryMatchesRemaining} матч(а/ей).',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Color(0xFFFF9999),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 10),
                 _buildScoreCard(),
                 const SizedBox(height: 8),
