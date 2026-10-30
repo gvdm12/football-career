@@ -211,6 +211,9 @@ class _Footballer {
   double facingX = 1;
   double facingY = 0;
   double kickTimer = 0;
+  double homeX;
+  double homeY;
+  double decisionTimer = 0;
 }
 
 class BroadcastFootballGame extends FlameGame {
@@ -240,6 +243,9 @@ class BroadcastFootballGame extends FlameGame {
   double _moveX = 0;
   double _moveY = 0;
   double _eventTimer = 3;
+  bool _opponentHasBall = false;
+  double _tackleCooldown = 0;
+  double _aiDecisionTimer = 0;
   double _matchClock = 0;
   bool _sprinting = false;
   bool _ballOwned = true;
@@ -275,6 +281,22 @@ class BroadcastFootballGame extends FlameGame {
   void stopMovement() { _moveX = 0; _moveY = 0; }
   void setSprint(bool value) { _sprinting = value; }
 
+  void tackle() {
+    if (_tackleCooldown > 0) return;
+    _tackleCooldown = .8;
+    final opponent = _players.where((p) => !p.home).reduce((a, b) =>
+      _distance(a.x, a.y, _playerX, _playerY) < _distance(b.x, b.y, _playerX, _playerY) ? a : b);
+    if (_distance(opponent.x, opponent.y, _playerX, _playerY) < .095 && _opponentHasBall) {
+      _opponentHasBall = false;
+      _ballOwned = true;
+      _ballX = _playerX + .035;
+      _ballY = _playerY;
+      _notify('Отбор! Мяч у тебя');
+    } else {
+      _notify('Подойди ближе к сопернику для отбора');
+    }
+  }
+
   double get _pace => (player?.skills.pace ?? 65) / 100;
   double get _dribbling => (player?.skills.dribbling ?? 65) / 100;
   double get _passing => (player?.skills.passing ?? 65) / 100;
@@ -289,6 +311,7 @@ class BroadcastFootballGame extends FlameGame {
     if (!_nearBall()) { _notify('Подойди к мячу, чтобы пробить'); return; }
     final power = 1.0 + _shooting * .45;
     _ballOwned = false;
+    _opponentHasBall = false;
     _players.firstWhere((p) => p.user).kickTimer = .32;
     _ballVx = power;
     _ballVy = (.5 - _ballY) * .42 + _moveY * .12;
@@ -304,6 +327,7 @@ class BroadcastFootballGame extends FlameGame {
     final length = math.max(.001, math.sqrt(dx * dx + dy * dy));
     final accuracy = .82 + _passing * .16;
     _ballOwned = false;
+    _opponentHasBall = false;
     _players.firstWhere((p) => p.user).kickTimer = .2;
     _ballVx = dx / length * .78 * accuracy;
     _ballVy = dy / length * .78 * accuracy;
@@ -332,17 +356,65 @@ class BroadcastFootballGame extends FlameGame {
     _playerY = (_playerY + user.vy * dt).clamp(.055, .945).toDouble();
     user.x = _playerX; user.y = _playerY;
 
+    if (_tackleCooldown > 0) _tackleCooldown = math.max(0, _tackleCooldown - dt).toDouble();
+    _aiDecisionTimer -= dt;
+
+    // Find the nearest opponent and teammate to the ball.
+    final opponents = _players.where((p) => !p.home).toList();
+    final teammates = _players.where((p) => p.home && !p.user).toList();
+    final nearestOpponent = opponents.reduce((a, b) =>
+      _distance(a.x, a.y, _ballX, _ballY) < _distance(b.x, b.y, _ballX, _ballY) ? a : b);
+    final nearestTeammate = teammates.reduce((a, b) =>
+      _distance(a.x, a.y, _ballX, _ballY) < _distance(b.x, b.y, _ballX, _ballY) ? a : b);
+
     for (final p in _players.where((p) => !p.user)) {
-      final targetX = p.home ? (_ballX < .55 ? p.x : math.max(.08, p.x - .08)) : (_ballX > .45 ? p.x : math.min(.92, p.x + .08));
-      final targetY = p.y + (_ballY - p.y) * (p.home ? .12 : .2);
-      final chase = (!p.home && _distance(p.x, p.y, _ballX, _ballY) < .22) ||
-          (p.home && _distance(p.x, p.y, _ballX, _ballY) < .12);
-      final tx = chase ? _ballX : targetX;
-      final ty = chase ? _ballY : targetY;
       final oldX = p.x, oldY = p.y;
+      double tx;
+      double ty;
+      double speed;
+
+      if (!p.home) {
+        final hasBall = _opponentHasBall && identical(p, nearestOpponent);
+        final isPressing = identical(p, nearestOpponent) && !_ballOwned;
+        if (hasBall) {
+          // Ball carrier attacks the left goal; nearby teammates spread for passing lanes.
+          tx = .12;
+          ty = .5 + (p.y - .5) * .35;
+          speed = .13;
+        } else if (isPressing || _opponentHasBall && _distance(p.x, p.y, _ballX, _ballY) < .25) {
+          tx = _ballX;
+          ty = _ballY;
+          speed = .19;
+        } else {
+          tx = .72 + (p.homeY - .5) * .16;
+          ty = p.homeY + (_ballY - .5) * .12;
+          speed = .075;
+        }
+      } else {
+        final support = identical(p, nearestTeammate) && !_ballOwned && !_opponentHasBall;
+        if (_opponentHasBall) {
+          // Team drops back and protects the central lane.
+          tx = math.max(.12, p.homeX - .12);
+          ty = p.homeY + (_ballY - p.homeY) * .35;
+          speed = .10;
+        } else if (_ballOwned) {
+          // Teammates make forward runs and offer passing options.
+          tx = math.min(.91, p.homeX + .10);
+          ty = p.homeY + (_ballY - p.homeY) * .25;
+          speed = .085;
+        } else if (support) {
+          tx = _ballX - .025;
+          ty = _ballY + (p.homeY < .5 ? -.07 : .07);
+          speed = .15;
+        } else {
+          tx = p.homeX + (_ballX - .5) * .10;
+          ty = p.homeY + (_ballY - .5) * .18;
+          speed = .065;
+        }
+      }
+
       final dx = tx - p.x, dy = ty - p.y;
       final len = math.max(.001, math.sqrt(dx * dx + dy * dy));
-      final speed = chase ? .24 : .07;
       p.x += (dx / len * math.min(len, speed * dt)).toDouble();
       p.y += (dy / len * math.min(len, speed * dt)).toDouble();
       p.vx = (p.x - oldX) / math.max(dt, .001);
@@ -350,26 +422,55 @@ class BroadcastFootballGame extends FlameGame {
       _animateFootballer(p, dt);
     }
 
-    if (_nearBall() && _ballVx.abs() + _ballVy.abs() < .42) {
+    // Opponent wins loose balls and carries them toward the opposite goal.
+    if (!_ballOwned && !_opponentHasBall &&
+        _distance(nearestOpponent.x, nearestOpponent.y, _ballX, _ballY) < .045 &&
+        _ballVx.abs() + _ballVy.abs() < .32) {
+      _opponentHasBall = true;
+      _notify('Соперник перехватил мяч!');
+    }
+    if (_opponentHasBall) {
+      _ballX = nearestOpponent.x - .028;
+      _ballY = nearestOpponent.y + .008;
+      _ballVx = -.10;
+      _ballVy = 0;
+      // AI occasionally releases a shot toward goal.
+      if (_aiDecisionTimer <= 0) {
+        _aiDecisionTimer = 1.8 + _random.nextDouble() * 1.4;
+        if (nearestOpponent.x < .32 && _random.nextDouble() < .35) {
+          _opponentHasBall = false;
+          _ballVx = -(.75 + _random.nextDouble() * .45);
+          _ballVy = (.5 - _ballY) * .42;
+          _notify('Соперник пробивает!');
+        }
+      }
+    } else if (!_ballOwned) {
+      _ballX += _ballVx * dt;
+      _ballY += _ballVy * dt;
+      final friction = math.pow(.18, dt).toDouble();
+      _ballVx *= friction;
+      _ballVy *= friction;
+    }
+
+    if (!_opponentHasBall && _nearBall() && !_ballOwned &&
+        _ballVx.abs() + _ballVy.abs() < .42) {
       _ballOwned = true;
     }
     if (_ballOwned && _nearBall()) {
       _ballX = _playerX + .035;
       _ballY = _playerY + .008;
-      _ballVx = 0; _ballVy = 0;
-    } else {
-      _ballX += _ballVx * dt;
-      _ballY += _ballVy * dt;
-      final friction = math.pow(.18, dt).toDouble();
-      _ballVx *= friction; _ballVy *= friction;
+      _ballVx = 0;
+      _ballVy = 0;
     }
 
     if (_ballX > .985 && _ballY > .39 && _ballY < .61) {
       _homeGoals++; scoreText.value = '$_homeGoals : $_awayGoals';
+      _opponentHasBall = false; _ballOwned = false;
       _notify('ГОЛ! Отличная атака!');
       _resetAfterGoal();
     } else if (_ballX < .015 && _ballY > .39 && _ballY < .61) {
       _awayGoals++; scoreText.value = '$_homeGoals : $_awayGoals';
+      _opponentHasBall = false; _ballOwned = false;
       _notify('Соперник забил');
       _resetAfterGoal();
     }
@@ -400,7 +501,7 @@ class BroadcastFootballGame extends FlameGame {
   }
 
   void _resetAfterGoal() {
-    _ballX = .5; _ballY = .5; _ballVx = 0; _ballVy = 0; _ballOwned = false;
+    _ballX = .5; _ballY = .5; _ballVx = 0; _ballVy = 0; _ballOwned = false; _opponentHasBall = false;
     _playerX = .38; _playerY = .5;
     final user = _players.firstWhere((p) => p.user);
     user.x = _playerX; user.y = _playerY;
