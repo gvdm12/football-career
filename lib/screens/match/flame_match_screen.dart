@@ -48,6 +48,7 @@ class _FlameMatchScreenState extends State<FlameMatchScreen> {
     game.shotTypeText.dispose();
     game.clockText.dispose();
     game.isFinished.dispose();
+    game.stamina.dispose();
     super.dispose();
   }
 
@@ -219,9 +220,28 @@ class _FlameMatchScreenState extends State<FlameMatchScreen> {
                       onLongPressStart: (_) => game.setSprint(true),
                       onLongPressEnd: (_) => game.setSprint(false),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
-                        decoration: BoxDecoration(color: const Color(0xCC10291B), borderRadius: BorderRadius.circular(22), border: Border.all(color: Colors.white54)),
-                        child: const Text('УСКОРЕНИЕ', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900)),
+                        width: 112,
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        decoration: BoxDecoration(color: const Color(0xCC10291B), borderRadius: BorderRadius.circular(18), border: Border.all(color: Colors.white54)),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text('УСКОРЕНИЕ', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900)),
+                            const SizedBox(height: 5),
+                            ValueListenableBuilder<double>(
+                              valueListenable: game.stamina,
+                              builder: (_, value, __) => ClipRRect(
+                                borderRadius: BorderRadius.circular(5),
+                                child: LinearProgressIndicator(
+                                  value: value,
+                                  minHeight: 5,
+                                  backgroundColor: Colors.white24,
+                                  valueColor: AlwaysStoppedAnimation(value < .2 ? const Color(0xFFE45B55) : const Color(0xFF8BE07F)),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -294,6 +314,7 @@ class BroadcastFootballGame extends FlameGame {
   final ValueNotifier<String> shotTypeText = ValueNotifier('ОБЫЧНЫЙ');
   final ValueNotifier<String> clockText = ValueNotifier('0′');
   final ValueNotifier<bool> isFinished = ValueNotifier(false);
+  final ValueNotifier<double> stamina = ValueNotifier(1.0);
   final List<_Footballer> _players = [];
   final math.Random _random = math.Random();
 
@@ -317,6 +338,7 @@ class BroadcastFootballGame extends FlameGame {
   double _aiTackleTimer = 0;
   double _matchClock = 0;
   bool _sprinting = false;
+  double _stamina = 1.0;
   bool _ballOwned = true;
   int _homeGoals = 0;
   int _awayGoals = 0;
@@ -354,7 +376,7 @@ class BroadcastFootballGame extends FlameGame {
 
   void setMovement(double x, double y) { _moveX = x; _moveY = y; }
   void stopMovement() { _moveX = 0; _moveY = 0; }
-  void setSprint(bool value) { _sprinting = value; }
+  void setSprint(bool value) { _sprinting = value && _stamina > .04; }
 
   void tackle() {
     if (_tackleCooldown > 0) return;
@@ -432,8 +454,19 @@ class BroadcastFootballGame extends FlameGame {
 
   void pass() {
     if (!_nearBall()) { _notify('Сначала доберись до мяча'); return; }
-    final teammate = _players.where((p) => p.home && !p.user && !p.isGoalkeeper)
-      .reduce((a, b) => _distance(a.x, a.y, _ballX, _ballY) < _distance(b.x, b.y, _ballX, _ballY) ? a : b);
+    final options = _players.where((p) => p.home && !p.user && !p.isGoalkeeper).toList();
+    // Prefer a forward passing lane, but avoid heavily marked teammates.
+    final teammate = options.reduce((a, b) {
+      double score(_Footballer candidate) {
+        final nearestMarker = _players.where((p) => !p.home && !p.isGoalkeeper)
+            .map((p) => _distance(candidate.x, candidate.y, p.x, p.y))
+            .reduce((x, y) => x < y ? x : y);
+        final forward = candidate.x - _ballX;
+        final distance = _distance(candidate.x, candidate.y, _ballX, _ballY);
+        return forward * .85 + nearestMarker * .45 - distance * .18;
+      }
+      return score(a) > score(b) ? a : b;
+    });
     final dx = teammate.x - _ballX;
     final dy = teammate.y - _ballY;
     final length = math.max(.001, math.sqrt(dx * dx + dy * dy));
@@ -445,8 +478,8 @@ class BroadcastFootballGame extends FlameGame {
     _assistPending = true;
     _playerShotInFlight = false;
     _players.firstWhere((p) => p.user).kickTimer = .2;
-    _ballVx = dx / length * .78 * accuracy;
-    _ballVy = dy / length * .78 * accuracy;
+    _ballVx = dx / length * (.72 + _passing * .18) * accuracy;
+    _ballVy = dy / length * (.72 + _passing * .18) * accuracy;
     _ballHeight = 0;
     _ballHeightVelocity = 0;
     _ballSpin = (dy / length) * .08 * (1 - _passing);
@@ -464,7 +497,14 @@ class BroadcastFootballGame extends FlameGame {
   void update(double dt) {
     super.update(dt);
     if (isFinished.value) return;
-    final pace = (.32 + _pace * .22) * (_sprinting ? 1.42 : 1);
+    if (_sprinting && (_moveX != 0 || _moveY != 0)) {
+      _stamina = math.max(0, _stamina - dt * .19).toDouble();
+      if (_stamina <= .01) _sprinting = false;
+    } else {
+      _stamina = math.min(1, _stamina + dt * .085).toDouble();
+    }
+    stamina.value = _stamina;
+    final pace = (.32 + _pace * .22) * (_sprinting ? 1.42 : 1) * (.78 + _stamina * .22);
     final targetVx = _moveX * pace;
     final targetVy = _moveY * pace;
     final smoothing = math.min(1.0, dt * 8);
