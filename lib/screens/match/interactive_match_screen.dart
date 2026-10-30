@@ -76,6 +76,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       isHome: widget.isHome,
     );
     _playerPlayed = baseMatch.playerPlayed;
+    _playerAssists = baseMatch.playerAssists;
     // Сохраняем командные голы обычной модели, но заменяем
     // заранее сгенерированные голы игрока интерактивными эпизодами.
     _homeGoals = baseMatch.homeGoals - (widget.isHome ? baseMatch.playerGoals : 0);
@@ -97,6 +98,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       overall: _player.overall,
       clubName: _player.club,
     );
+    if (status == PlayerStatus.substitute) _minute = 55 + _random.nextInt(11);
     _maxActions = status == PlayerStatus.substitute
         ? 5 + _random.nextInt(2)
         : 7 + _random.nextInt(3);
@@ -121,6 +123,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         return s.vision * 0.35 + s.defending * 0.40 + s.pace * 0.15 + s.passing * 0.10;
       case 'block':
         return s.physical * 0.35 + s.defending * 0.45 + s.heading * 0.20;
+      case 'keeper':
+        return _skills.defending * 0.42 + _skills.physical * 0.24 + _skills.vision * 0.22 + _skills.pace * 0.12;
       case 'defend':
       case 'tackle':
       case 'contain':
@@ -213,7 +217,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     }
     if (_phase == 'goalkeeper') {
       return [
-        _actionButton('Отразить удар', 'defend'),
+        _actionButton('Отразить удар', 'keeper'),
         _actionButton('Перехватить навес', 'intercept'),
         _actionButton('Начать атаку передачей', 'pass'),
       ];
@@ -239,7 +243,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         ];
       case PlayerPosition.goalkeeper:
         return [
-          _actionButton('Отразить удар', 'defend'),
+          _actionButton('Отразить удар', 'keeper'),
           _actionButton('Перехватить навес', 'intercept'),
         ];
     }
@@ -278,6 +282,19 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         message = _random.nextBool()
             ? 'Промах! Мяч прошёл рядом со штангой.'
             : 'Защитник успел заблокировать удар.';
+      }
+    } else if (action == 'keeper') {
+      if (success) {
+        _rating += 0.48;
+        _phase = 'buildUp';
+        message = _random.nextBool()
+            ? 'СЕЙВ! Вы отбили сложный удар и спасли команду.'
+            : 'Отличная реакция! Вы поймали мяч и быстро начали атаку.';
+      } else {
+        if (widget.isHome) { _awayGoals++; } else { _homeGoals++; }
+        _rating -= 0.35;
+        _phase = 'buildUp';
+        message = 'Гол соперника. На этот раз удар оказался слишком точным.';
       }
     } else if (action == 'pass' || action == 'throughPass' || action == 'cross') {
       if (success) {
