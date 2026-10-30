@@ -35,6 +35,7 @@ class _FlameMatchScreenState extends State<FlameMatchScreen> {
   @override
   void dispose() {
     game.pauseEngine();
+    game.scoreText.dispose();
     super.dispose();
   }
 
@@ -272,8 +273,8 @@ class PrototypeFootballGame extends FlameGame {
   @override
   void update(double dt) {
     super.update(dt);
-    playerX = (playerX + moveX * 0.42 * dt).clamp(0.06, 0.94);
-    playerY = (playerY + moveY * 0.42 * dt).clamp(0.08, 0.92);
+    playerX = (playerX + moveX * 0.42 * dt).clamp(0.06, 0.94).toDouble();
+    playerY = (playerY + moveY * 0.42 * dt).clamp(0.08, 0.92).toDouble();
 
     final dx = ballX - opponentX;
     final dy = ballY - opponentY;
@@ -304,7 +305,7 @@ class PrototypeFootballGame extends FlameGame {
     }
 
     if (ballY < 0.04 || ballY > 0.96) {
-      ballY = ballY.clamp(0.04, 0.96);
+      ballY = ballY.clamp(0.04, 0.96).toDouble();
       ballVelocityY = -ballVelocityY * 0.55;
     }
 
