@@ -3295,10 +3295,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 children: [
                   Row(
                     children: [
-                      const Icon(
-                        Icons.emoji_events_rounded,
-                        color: Color(0xFFFFC857),
-                        size: 28,
+                      SvgPicture.asset(
+                        'assets/icons/europaleague.svg',
+                        width: 28,
+                        height: 28,
+                        fit: BoxFit.contain,
                       ),
                       const SizedBox(width: 8),
                       Expanded(
