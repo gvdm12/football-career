@@ -78,7 +78,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     _awayGoals = baseMatch.awayGoals - (widget.isHome ? 0 : baseMatch.playerGoals);
     _yellowCards = baseMatch.yellowCards;
     _redCards = baseMatch.redCards;
-    _rating = baseMatch.playerRating;
+    _rating = 6.0;
 
     if (!_playerPlayed) {
       _minute = 90;
@@ -125,35 +125,53 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   }
 
   List<Widget> _positionActions() {
+    if (_phase == 'attack') {
+      return [
+        _actionButton('Пробить по воротам', 'shoot'),
+        _actionButton('Отдать пас партнёру', 'pass'),
+        _actionButton('Обыграть соперника', 'dribble'),
+        if (_player.skills.heading >= 55)
+          _actionButton('Сыграть головой', 'header'),
+      ];
+    }
+    if (_phase == 'midfield') {
+      return [
+        _actionButton('Разрезающий пас', 'throughPass'),
+        _actionButton('Продвинуться с мячом', 'dribble'),
+        _actionButton('Удар издали', 'longShot'),
+        _actionButton('Сохранить владение', 'pass'),
+      ];
+    }
+    if (_phase == 'goalkeeper') {
+      return [
+        _actionButton('Отразить удар', 'defend'),
+        _actionButton('Перехватить навес', 'intercept'),
+        _actionButton('Начать атаку передачей', 'pass'),
+      ];
+    }
     switch (_player.position) {
       case PlayerPosition.forward:
         return [
-          _actionButton('Пробить по воротам', 'shoot'),
-          _actionButton('Отдать пас', 'pass'),
-          _actionButton('Обыграть защитника', 'dribble'),
-          _actionButton('Пробить головой', 'header'),
+          _actionButton('Прессинговать соперника', 'contain'),
+          _actionButton('Попытаться отобрать мяч', 'defend'),
         ];
       case PlayerPosition.midfielder:
         return [
-          _actionButton('Разрезающий пас', 'throughPass'),
-          _actionButton('Удар издали', 'longShot'),
-          _actionButton('Продвинуться с мячом', 'dribble'),
-          _actionButton('Сохранить владение', 'pass'),
-          _actionButton('Помочь в обороне', 'defend'),
+          _actionButton('Перехватить передачу', 'intercept'),
+          _actionButton('Пойти в отбор', 'defend'),
+          _actionButton('Сдерживать соперника', 'contain'),
         ];
       case PlayerPosition.defender:
         return [
-          _actionButton('Пойти в отбор', 'tackle'),
+          _actionButton('Пойти в отбор', 'defend'),
           _actionButton('Перехватить передачу', 'intercept'),
           _actionButton('Заблокировать удар', 'block'),
-          _actionButton('Начать атаку пасом', 'pass'),
-          _actionButton('Подключиться на стандарт', 'header'),
+          _actionButton('Сдерживать соперника', 'contain'),
         ];
       case PlayerPosition.goalkeeper:
         return [
           _actionButton('Отразить удар', 'defend'),
           _actionButton('Перехватить навес', 'intercept'),
-          _actionButton('Начать атаку передачей', 'pass'),
         ];
     }
   }
