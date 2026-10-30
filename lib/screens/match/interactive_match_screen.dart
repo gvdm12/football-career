@@ -190,6 +190,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         _actionButton('Пробить по воротам', 'shoot'),
         _actionButton('Отдать пас партнёру', 'pass'),
         _actionButton('Обыграть соперника', 'dribble'),
+        _actionButton('Навесить в штрафную', 'cross'),
         if (_player.skills.heading >= 55)
           _actionButton('Сыграть головой', 'header'),
       ];
@@ -263,6 +264,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     String message;
 
     if (action == 'shoot' || action == 'longShot' || action == 'header') {
+      _shots++;
       if (success && _random.nextDouble() < (action == 'header' ? 0.36 : 0.43)) {
         if (widget.isHome) { _homeGoals++; } else { _awayGoals++; }
         _playerGoals++;
@@ -285,6 +287,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           if (widget.isHome) { _homeGoals++; } else { _awayGoals++; }
           _playerAssists++;
           message = 'ГОЛ ПАРТНЁРА! Ваша передача привела к голу.';
+          _phase = 'buildUp';
         } else {
           message = action == 'cross'
               ? 'Отличный навес! Партнёр выиграл верховую борьбу и готовится пробить.'
