@@ -34,7 +34,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   int _redCards = 0;
   int _actions = 0;\n  int _maxActions = 9;\n  String _momentTitle = '';\n  String _momentDescription = '';
   double _rating = 6.0;
-  bool _finished = false;
+  bool _finished = false;\n  bool _momentReady = false;
   String _event = 'Матч начинается! Ваша команда разыгрывает мяч.';
   String _phase = 'buildUp';
 
@@ -334,7 +334,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _rating = _rating.clamp(4.0, 10.0);
       message += '\nФинальный свисток!';
     }
-    setState(() => _event = message);
+    setState(() {\n      _event = message;\n      _momentReady = false;\n    });
     if (!_finished) {
       Future<void>.delayed(const Duration(milliseconds: 950), () {
         if (!mounted || _finished) return;
@@ -387,15 +387,49 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(color: const Color(0xFF123A1D), borderRadius: BorderRadius.circular(14)),
-                  child: Text(_event, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 16)),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF123A1D),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFF24552C)),
+                  ),
+                  child: Column(
+                    children: [
+                      if (_momentReady && !_finished) ...[
+                        Text(
+                          _momentTitle,
+                          style: const TextStyle(
+                            color: Color(0xFF8BE07F),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _momentDescription,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.white70),
+                        ),
+                      ] else
+                        Text(
+                          _event,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 18),
                 if (!_playerPlayed)
-                  const Text('Вы не попали в стартовый состав. Матч проходит без вашего участия.',
-                      textAlign: TextAlign.center, style: TextStyle(color: Colors.white70))
-                else if (!_finished) ...[
-                  const Text('Выберите действие', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  const Text(
+                    'Вы не попали в стартовый состав. Матч проходит без вашего участия.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white70),
+                  )
+                else if (!_finished && _momentReady) ...[
+                  const Text(
+                    'Выберите действие',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 12),
                   ..._positionActions(),
                 ],
