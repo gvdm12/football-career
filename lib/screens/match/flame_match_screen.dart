@@ -289,6 +289,7 @@ class _Footballer {
   double facingX = 1;
   double facingY = 0;
   double kickTimer = 0;
+  double fatigue = 0;
   double homeX;
   double homeY;
   double decisionTimer = 0;
@@ -531,6 +532,11 @@ class BroadcastFootballGame extends FlameGame {
     final user = _players.firstWhere((p) => p.user);
     user.vx += (targetVx - user.vx) * smoothing;
     user.vy += (targetVy - user.vy) * smoothing;
+    final userSpeed = math.sqrt(user.vx * user.vx + user.vy * user.vy);
+    if (userSpeed > .025) {
+      user.facingX = user.vx / userSpeed;
+      user.facingY = user.vy / userSpeed;
+    }
     _animateFootballer(user, dt);
     _playerX = (_playerX + user.vx * dt).clamp(.035, .965).toDouble();
     _playerY = (_playerY + user.vy * dt).clamp(.055, .945).toDouble();
@@ -581,9 +587,11 @@ class BroadcastFootballGame extends FlameGame {
           ty = _ballY;
           speed = .19;
         } else {
-          tx = .72 + (p.homeY - .5) * .16;
-          ty = p.homeY + (_ballY - .5) * .12;
-          speed = .075;
+          final forwardRole = p.homeX < .48;
+          tx = forwardRole ? .68 + (p.homeX - .5) * .18 : .78 + (p.homeX - .5) * .10;
+          ty = (p.homeY + (_ballY - .5) * (forwardRole ? .28 : .14) +
+              (p.number.isEven ? -.035 : .035)).clamp(.08, .92).toDouble();
+          speed = forwardRole ? .09 : .065;
         }
       } else {
         final support = identical(p, nearestTeammate) && !_ballOwned && !_opponentHasBall;
@@ -593,10 +601,13 @@ class BroadcastFootballGame extends FlameGame {
           ty = p.homeY + (_ballY - p.homeY) * .35;
           speed = .10;
         } else if (_ballOwned) {
-          // Teammates make forward runs and offer passing options.
-          tx = math.min(.91, p.homeX + .10);
-          ty = p.homeY + (_ballY - p.homeY) * .25;
-          speed = .085;
+          // Forwards attack space behind the defence; deeper players support the build-up.
+          final forwardRole = p.homeX > .52;
+          final lane = p.number.isEven ? -.045 : .045;
+          tx = (p.homeX + (forwardRole ? .17 : .075)).clamp(.08, .92).toDouble();
+          ty = (p.homeY + (_ballY - .5) * (forwardRole ? .18 : .30) + lane)
+              .clamp(.08, .92).toDouble();
+          speed = forwardRole ? .12 : .085;
         } else if (support) {
           tx = _ballX - .025;
           ty = _ballY + (p.homeY < .5 ? -.07 : .07);
@@ -626,10 +637,18 @@ class BroadcastFootballGame extends FlameGame {
       ty = (ty + separationY * .055).clamp(.055, .945).toDouble();
       final dx = tx - p.x, dy = ty - p.y;
       final len = math.max(.001, math.sqrt(dx * dx + dy * dy));
-      p.x += (dx / len * math.min(len, speed * dt)).toDouble();
-      p.y += (dy / len * math.min(len, speed * dt)).toDouble();
+      final adjustedSpeed = speed * (1 - p.fatigue);
+      p.x += (dx / len * math.min(len, adjustedSpeed * dt)).toDouble();
+      p.y += (dy / len * math.min(len, adjustedSpeed * dt)).toDouble();
       p.vx = (p.x - oldX) / math.max(dt, .001);
       p.vy = (p.y - oldY) / math.max(dt, .001);
+      final aiSpeed = math.sqrt(p.vx * p.vx + p.vy * p.vy);
+      if (aiSpeed > .015) {
+        p.facingX = p.vx / aiSpeed;
+        p.facingY = p.vy / aiSpeed;
+      }
+      p.fatigue = (p.fatigue + (aiSpeed > .10 ? dt * .012 : -dt * .004))
+          .clamp(0.0, .28).toDouble();
       if (p.diveTimer > 0) p.diveTimer = math.max(0, p.diveTimer - dt).toDouble();
       _animateFootballer(p, dt);
     }
