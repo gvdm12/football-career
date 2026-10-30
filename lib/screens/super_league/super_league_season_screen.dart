@@ -805,6 +805,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
 
   Future<void> _startNextSeason() async {
     if (_career.season >= 10 || _isPlaying) return;
+    final navigator = Navigator.of(context);
     setState(() {
       _isPlaying = true;
       _error = null;
@@ -834,8 +835,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
         _isPlaying = false;
       });
 
-      final developmentResult = await Navigator.push<SuperLeagueCareer>(
-        context,
+      final developmentResult = await navigator.push<SuperLeagueCareer>(
         MaterialPageRoute(
           builder: (_) => SuperLeagueDevelopmentScreen(career: _career),
         ),
@@ -846,8 +846,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
         await SuperLeagueStorage.saveCareer(developmentResult);
       }
 
-      final transferResult = await Navigator.push<SuperLeagueCareer>(
-        context,
+      final transferResult = await navigator.push<SuperLeagueCareer>(
         MaterialPageRoute(
           builder: (_) => SuperLeagueTransfersScreen(career: _career),
         ),
