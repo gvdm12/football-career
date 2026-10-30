@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/club.dart';
+import 'package:flutter_football/models/league_season_simulator.dart';
 import 'package:flutter_football/services/app_strings.dart';
 
 class LeagueTableScreen extends StatelessWidget {
