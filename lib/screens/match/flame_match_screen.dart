@@ -207,6 +207,10 @@ class _Footballer {
   final int number;
   double vx = 0;
   double vy = 0;
+  double animationPhase = 0;
+  double facingX = 1;
+  double facingY = 0;
+  double kickTimer = 0;
 }
 
 class BroadcastFootballGame extends FlameGame {
@@ -285,6 +289,7 @@ class BroadcastFootballGame extends FlameGame {
     if (!_nearBall()) { _notify('Подойди к мячу, чтобы пробить'); return; }
     final power = 1.0 + _shooting * .45;
     _ballOwned = false;
+    _players.firstWhere((p) => p.user).kickTimer = .32;
     _ballVx = power;
     _ballVy = (.5 - _ballY) * .42 + _moveY * .12;
     _notify('Удар по воротам!');
@@ -299,6 +304,7 @@ class BroadcastFootballGame extends FlameGame {
     final length = math.max(.001, math.sqrt(dx * dx + dy * dy));
     final accuracy = .82 + _passing * .16;
     _ballOwned = false;
+    _players.firstWhere((p) => p.user).kickTimer = .2;
     _ballVx = dx / length * .78 * accuracy;
     _ballVy = dy / length * .78 * accuracy;
     _notify('Передача партнёру');
@@ -321,6 +327,7 @@ class BroadcastFootballGame extends FlameGame {
     final user = _players.firstWhere((p) => p.user);
     user.vx += (targetVx - user.vx) * smoothing;
     user.vy += (targetVy - user.vy) * smoothing;
+    _animateFootballer(user, dt);
     _playerX = (_playerX + user.vx * dt).clamp(.035, .965).toDouble();
     _playerY = (_playerY + user.vy * dt).clamp(.055, .945).toDouble();
     user.x = _playerX; user.y = _playerY;
@@ -332,11 +339,15 @@ class BroadcastFootballGame extends FlameGame {
           (p.home && _distance(p.x, p.y, _ballX, _ballY) < .12);
       final tx = chase ? _ballX : targetX;
       final ty = chase ? _ballY : targetY;
+      final oldX = p.x, oldY = p.y;
       final dx = tx - p.x, dy = ty - p.y;
       final len = math.max(.001, math.sqrt(dx * dx + dy * dy));
       final speed = chase ? .24 : .07;
       p.x += (dx / len * math.min(len, speed * dt)).toDouble();
       p.y += (dy / len * math.min(len, speed * dt)).toDouble();
+      p.vx = (p.x - oldX) / math.max(dt, .001);
+      p.vy = (p.y - oldY) / math.max(dt, .001);
+      _animateFootballer(p, dt);
     }
 
     if (_nearBall() && _ballVx.abs() + _ballVy.abs() < .42) {
@@ -374,6 +385,18 @@ class BroadcastFootballGame extends FlameGame {
       if (_random.nextDouble() < .3) _notify('$minute’ • Команды борются за контроль мяча');
     }
     if (_eventTimer > 0) _eventTimer -= dt;
+  }
+
+  void _animateFootballer(_Footballer p, double dt) {
+    final speed = math.sqrt(p.vx * p.vx + p.vy * p.vy);
+    if (speed > .012) {
+      p.facingX = p.vx / speed;
+      p.facingY = p.vy / speed;
+      p.animationPhase += dt * (7 + speed * 24);
+    } else {
+      p.animationPhase += dt * 1.4;
+    }
+    if (p.kickTimer > 0) p.kickTimer = math.max(0, p.kickTimer - dt).toDouble();
   }
 
   void _resetAfterGoal() {
@@ -429,22 +452,55 @@ class BroadcastFootballGame extends FlameGame {
     final scale = .72 + player.y * .55;
     final radius = size.y * .022 * scale;
     final color = player.home ? _homeColor : _awayColor;
-    canvas.drawOval(Rect.fromCenter(center: Offset(x, y + radius * 1.45), width: radius * 2.5, height: radius * .85),
-        Paint()..color = Colors.black.withValues(alpha: .34));
-    // Legs with a tiny stride offset.
-    final leg = Paint()..color = const Color(0xFF18212A)..strokeWidth = radius * .38..strokeCap = StrokeCap.round;
-    canvas.drawLine(Offset(x - radius * .25, y + radius * .55), Offset(x - radius * .38, y + radius * 1.25), leg);
-    canvas.drawLine(Offset(x + radius * .25, y + radius * .55), Offset(x + radius * .38, y + radius * 1.25), leg);
-    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(x, y), width: radius * 1.75, height: radius * 1.5), Radius.circular(radius * .42)),
-        Paint()..shader = LinearGradient(colors: [color.withValues(alpha: .75), color, color.withValues(alpha: .7)], begin: Alignment.topLeft, end: Alignment.bottomRight).createShader(Rect.fromCenter(center: Offset(x, y), width: radius * 1.75, height: radius * 1.5)));
-    canvas.drawCircle(Offset(x, y - radius * .82), radius * .43, Paint()..color = const Color(0xFFE2B995));
-    canvas.drawCircle(Offset(x, y - radius * .82), radius * .43, Paint()..color = Colors.black.withValues(alpha: .18)..style = PaintingStyle.stroke..strokeWidth = .7);
+    final speed = math.sqrt(player.vx * player.vx + player.vy * player.vy);
+    final running = (speed > .025 || player.user && (_moveX != 0 || _moveY != 0));
+    final stride = running ? math.sin(player.animationPhase) : 0.0;
+    final armSwing = running ? math.cos(player.animationPhase) * .28 : 0.0;
+    final kick = player.kickTimer > 0 ? (player.kickTimer / .32) : 0.0;
+    final bodyTilt = (player.facingX * .12).clamp(-.12, .12).toDouble();
+
+    // Ground shadow and moving limbs make the footballer read as an animated figure.
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(x, y + radius * 1.48), width: radius * 2.8, height: radius * .9),
+      Paint()..color = Colors.black.withValues(alpha: .38),
+    );
+    final limb = Paint()..color = const Color(0xFF202A32)..strokeWidth = radius * .34..strokeCap = StrokeCap.round;
+    final leftHip = Offset(x - radius * .22, y + radius * .48);
+    final rightHip = Offset(x + radius * .22, y + radius * .48);
+    final leftFoot = Offset(x - radius * (.32 + stride * .42) + kick * radius * .8, y + radius * (1.28 - stride * .2 - kick * .12));
+    final rightFoot = Offset(x + radius * (.32 - stride * .42), y + radius * (1.28 + stride * .2));
+    canvas.drawLine(leftHip, leftFoot, limb);
+    canvas.drawLine(rightHip, rightFoot, limb);
+
+    final arm = Paint()..color = color.withValues(alpha: .95)..strokeWidth = radius * .3..strokeCap = StrokeCap.round;
+    canvas.drawLine(Offset(x - radius * .55, y - radius * .25), Offset(x - radius * (.78 + armSwing), y + radius * .35), arm);
+    canvas.drawLine(Offset(x + radius * .55, y - radius * .25), Offset(x + radius * (.78 - armSwing), y + radius * .35), arm);
+
+    final torso = Rect.fromCenter(center: Offset(x + bodyTilt * radius, y), width: radius * 1.72, height: radius * 1.48);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(torso, Radius.circular(radius * .42)),
+      Paint()..shader = LinearGradient(
+        colors: [color.withValues(alpha: .72), color, color.withValues(alpha: .72)],
+        begin: Alignment.topLeft, end: Alignment.bottomRight,
+      ).createShader(torso),
+    );
+    canvas.drawLine(Offset(x, y - radius * .58), Offset(x, y + radius * .55),
+      Paint()..color = Colors.white.withValues(alpha: .22)..strokeWidth = radius * .12);
+    canvas.drawCircle(Offset(x - bodyTilt * radius, y - radius * .82), radius * .43,
+      Paint()..shader = const RadialGradient(colors: [Color(0xFFF3D2B2), Color(0xFFB98260)]).createShader(Rect.fromCircle(center: Offset(x, y - radius * .82), radius: radius * .43)));
     if (player.user) {
-      canvas.drawCircle(Offset(x, y), radius * 1.55, Paint()..color = const Color(0xFFB7FFCA)..style = PaintingStyle.stroke..strokeWidth = 1.5);
-      final name = TextPainter(text: TextSpan(text: playerName, style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900, shadows: [Shadow(color: Colors.black, blurRadius: 4)])), textDirection: TextDirection.ltr)..layout(maxWidth: 90);
+      canvas.drawCircle(Offset(x, y), radius * 1.58,
+        Paint()..color = const Color(0xFFB7FFCA)..style = PaintingStyle.stroke..strokeWidth = 1.5);
+      final name = TextPainter(
+        text: TextSpan(text: playerName, style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900, shadows: [Shadow(color: Colors.black, blurRadius: 4)])),
+        textDirection: TextDirection.ltr,
+      )..layout(maxWidth: 90);
       name.paint(canvas, Offset(x - name.width / 2, y - radius * 2.1 - name.height));
     }
-    final number = TextPainter(text: TextSpan(text: '${player.number}', style: TextStyle(color: Colors.white, fontSize: math.max(5, radius * .48), fontWeight: FontWeight.w900)), textDirection: TextDirection.ltr)..layout();
+    final number = TextPainter(
+      text: TextSpan(text: '${player.number}', style: TextStyle(color: Colors.white, fontSize: math.max(5, radius * .48), fontWeight: FontWeight.w900)),
+      textDirection: TextDirection.ltr,
+    )..layout();
     number.paint(canvas, Offset(x - number.width / 2, y - number.height / 2));
   }
 
