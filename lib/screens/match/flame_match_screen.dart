@@ -1076,6 +1076,16 @@ class BroadcastFootballGame extends FlameGame {
     final r = size.y * .012;
     final drawY = y - _ballHeight * size.y * .12;
     canvas.drawOval(Rect.fromCenter(center: Offset(x + r * .5, y + r * 1.8), width: r * 3.2, height: r * 1.1), Paint()..color = Colors.black.withValues(alpha: .38));
+    final ballSpeed = math.sqrt(_ballVx * _ballVx + _ballVy * _ballVy);
+    if (ballSpeed > .12) {
+      final trailLength = (ballSpeed * size.x * .018).clamp(2.0, r * 3.8).toDouble();
+      final direction = Offset(-_ballVx / ballSpeed, -_ballVy / ballSpeed);
+      for (var i = 3; i >= 1; i--) {
+        final alpha = .055 * (4 - i);
+        final trailCenter = Offset(x, drawY) + direction * (trailLength * i / 3);
+        canvas.drawCircle(trailCenter, r * (1.0 - i * .12), Paint()..color = Colors.white.withValues(alpha: alpha));
+      }
+    }
     canvas.drawCircle(Offset(x, drawY), r, Paint()..shader = const RadialGradient(colors: [Colors.white, Color(0xFFD5D9D6), Color(0xFF858B88)], center: Alignment(-.3, -.4)).createShader(Rect.fromCircle(center: Offset(x, drawY), radius: r)));
     canvas.drawCircle(Offset(x, drawY), r, Paint()..color = Colors.black54..style = PaintingStyle.stroke..strokeWidth = .7);
     canvas.save();
