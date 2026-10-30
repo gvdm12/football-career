@@ -548,6 +548,22 @@ class BroadcastFootballGame extends FlameGame {
         }
       }
 
+      // Separation steering prevents teammates from stacking on the same point.
+      var separationX = 0.0;
+      var separationY = 0.0;
+      for (final other in _players) {
+        if (identical(other, p)) continue;
+        final ox = p.x - other.x;
+        final oy = p.y - other.y;
+        final distance = math.sqrt(ox * ox + oy * oy);
+        if (distance > .001 && distance < .062) {
+          final force = (.062 - distance) / .062;
+          separationX += ox / distance * force;
+          separationY += oy / distance * force;
+        }
+      }
+      tx = (tx + separationX * .055).clamp(.035, .965).toDouble();
+      ty = (ty + separationY * .055).clamp(.055, .945).toDouble();
       final dx = tx - p.x, dy = ty - p.y;
       final len = math.max(.001, math.sqrt(dx * dx + dy * dy));
       p.x += (dx / len * math.min(len, speed * dt)).toDouble();
