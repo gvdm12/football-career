@@ -2181,7 +2181,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                   'assets/icons/table.svg',
                   width: 34,
                   height: 34,
-                  color: Colors.white,
+                  colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
               ),
           ],
@@ -2551,9 +2551,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
           const SizedBox(height: 6),
           Row(
             children: [
-              _statItem(AppStrings.matchesLabel, '${_seasonMatchesForDisplay}'),
-              _statItem(AppStrings.goalsStat, '${_seasonGoalsForDisplay}'),
-              _statItem(AppStrings.assistsStat, '${_seasonAssistsForDisplay}'),
+              _statItem(AppStrings.matchesLabel, '$_seasonMatchesForDisplay'),
+              _statItem(AppStrings.goalsStat, '$_seasonGoalsForDisplay'),
+              _statItem(AppStrings.assistsStat, '$_seasonAssistsForDisplay'),
             ],
           ),
           const SizedBox(height: 5),
@@ -3037,7 +3037,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            '${stage} · ${isHome ? AppStrings.homeVenue : AppStrings.awayVenue}',
+            '$stage · ${isHome ? AppStrings.homeVenue : AppStrings.awayVenue}',
             style: const TextStyle(color: Colors.white),
           ),
           const SizedBox(height: 6),

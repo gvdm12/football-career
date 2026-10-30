@@ -253,6 +253,8 @@ class _SuperLeagueClubSelectionScreenState
                       onPressed: _selectedClubName == null
                           ? null
                           : () async {
+                              final navigator = Navigator.of(context);
+                              final messenger = ScaffoldMessenger.of(context);
                               final club = Clubs.getByName(_selectedClubName!);
                               final player = await Navigator.push<Player>(
                                 context,
@@ -270,8 +272,7 @@ class _SuperLeagueClubSelectionScreenState
                                 );
                                 await SuperLeagueStorage.saveCareer(career);
                                 if (!mounted) return;
-                                Navigator.pushReplacement(
-                                  context,
+                                navigator.pushReplacement(
                                   MaterialPageRoute(
                                     builder: (_) =>
                                         SuperLeagueCareerScreen(career: career),
@@ -279,7 +280,7 @@ class _SuperLeagueClubSelectionScreenState
                                 );
                               } catch (error) {
                                 if (!mounted) return;
-                                ScaffoldMessenger.of(context).showSnackBar(
+                                messenger.showSnackBar(
                                   SnackBar(
                                     content: Text(
                                       AppStrings.superLeagueSaveCareerError,

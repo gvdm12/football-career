@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/club.dart';
-import 'package:flutter_football/models/league_season_simulator.dart';
 import 'package:flutter_football/services/app_strings.dart';
 
 class LeagueTableScreen extends StatelessWidget {
@@ -14,10 +13,6 @@ class LeagueTableScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final table = career.leagueTable;
-    int getChampionsLeagueSlots(League league) {
-      return LeagueSeasonSimulator.qualificationSlots[league] ?? 0;
-    }
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(82, 81, 84, 82),
