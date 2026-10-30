@@ -580,6 +580,7 @@ class BroadcastFootballGame extends FlameGame {
       }
     }
     if (_opponentHasBall) {
+      _assistPending = false;
       _teammateCarrier = null;
       _passTarget = null;
       _ballX = nearestOpponent.x - .028;
@@ -638,6 +639,7 @@ class BroadcastFootballGame extends FlameGame {
       _ballOwned = true;
     }
     if (_ballOwned && _nearBall()) {
+      _assistPending = false;
       _teammateCarrier = null;
       _passTarget = null;
       _ballX = _playerX + .035;
@@ -766,7 +768,7 @@ class BroadcastFootballGame extends FlameGame {
   }
 
   void _resetAfterGoal() {
-    _ballX = .5; _ballY = .5; _ballVx = 0; _ballVy = 0; _ballSpin = 0; _ballHeight = 0; _ballHeightVelocity = 0; _ballBounce = 0; _ballOwned = false; _opponentHasBall = false; _teammateCarrier = null; _passTarget = null;
+    _ballX = .5; _ballY = .5; _ballVx = 0; _ballVy = 0; _ballSpin = 0; _ballHeight = 0; _ballHeightVelocity = 0; _ballBounce = 0; _ballOwned = false; _opponentHasBall = false; _teammateCarrier = null; _passTarget = null; _assistPending = false;
     _playerX = .38; _playerY = .5;
     final user = _players.firstWhere((p) => p.user);
     user.x = _playerX; user.y = _playerY;
