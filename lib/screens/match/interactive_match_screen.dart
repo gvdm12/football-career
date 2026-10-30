@@ -32,9 +32,13 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   int _playerAssists = 0;
   int _yellowCards = 0;
   int _redCards = 0;
-  int _actions = 0;\n  int _maxActions = 9;\n  String _momentTitle = '';\n  String _momentDescription = '';
+  int _actions = 0;
+  int _maxActions = 9;
+  String _momentTitle = '';
+  String _momentDescription = '';
   double _rating = 6.0;
-  bool _finished = false;\n  bool _momentReady = false;
+  bool _finished = false;
+  bool _momentReady = false;
   String _event = 'Матч начинается! Ваша команда разыгрывает мяч.';
   String _phase = 'buildUp';
 
@@ -93,9 +97,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       overall: _player.overall,
       clubName: _player.club,
     );
-    _actions = status == PlayerStatus.substitute
-        ? 2 + _random.nextInt(2)
-        : 3 + _random.nextInt(3);
+    _maxActions = status == PlayerStatus.substitute
+        ? 5 + _random.nextInt(2)
+        : 7 + _random.nextInt(3);
+    _createMoment();
   }
 
   double _skill(String action) {
@@ -105,6 +110,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         return s.dribbling * 0.48 + s.pace * 0.30 + s.physical * 0.12 + s.vision * 0.10;
       case 'pass':
       case 'throughPass':
+      case 'cross':
         return s.passing * 0.55 + s.vision * 0.30 + s.dribbling * 0.15;
       case 'shoot':
       case 'longShot':
@@ -125,6 +131,12 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   }
 
   void _createMoment() {
+    if (_phase == 'chance') {
+      _momentTitle = 'Шанс забить!';
+      _momentDescription = 'Вы прошли первую линию обороны. Можно пробить, обыграть вратаря или вывести партнёра на удар.';
+      _momentReady = true;
+      return;
+    }
     final roll = _random.nextDouble();
     final position = _player.position;
     final attackChance = switch (position) {
@@ -143,12 +155,20 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     if (roll < attackChance) {
       _phase = 'attack';
       _momentTitle = 'Атака вашей команды';
-      _momentDescription = 'Вы получили возможность обострить игру у штрафной соперника.';
+      _momentDescription = _random.nextInt(3) == 0
+          ? 'Вы ворвались в штрафную с фланга. Защитник пытается закрыть прострел.'
+          : _random.nextBool()
+              ? 'Вы получили мяч у штрафной. Защитник закрывает удар, партнёр открывается справа.'
+              : 'Команда быстро вышла из обороны. Вы получили мяч перед последней линией соперника.';
       _event = '$_minute-я минута. Ваша команда переходит в атаку!';
     } else if (roll < attackChance + midfieldChance) {
       _phase = 'midfield';
       _momentTitle = 'Борьба в центре поля';
-      _momentDescription = 'У вас есть пространство для передачи, продвижения или удара издали.';
+      _momentDescription = _random.nextInt(3) == 0
+          ? 'Соперник не успел перестроиться. Можно начать быструю контратаку.'
+          : _random.nextBool()
+              ? 'Перед вами свободная зона. Решите, ускорить атаку или придержать мяч.'
+              : 'Партнёры открываются между линиями. Один точный пас может создать голевой момент.';
       _event = '$_minute-я минута. Мяч оказывается у вас в центре поля.';
     } else if (position == PlayerPosition.goalkeeper) {
       _phase = 'goalkeeper';
@@ -161,6 +181,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _momentDescription = 'Соперник развивает атаку. Вы можете вступить в отбор, перехватить пас или закрыть удар.';
       _event = '$_minute-я минута. Соперник атакует!';
     }
+    _momentReady = true;
   }
 
   List<Widget> _positionActions() {
@@ -171,6 +192,14 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         _actionButton('Обыграть соперника', 'dribble'),
         if (_player.skills.heading >= 55)
           _actionButton('Сыграть головой', 'header'),
+      ];
+    }
+    if (_phase == 'chance') {
+      return [
+        _actionButton('Пробить по воротам', 'shoot'),
+        _actionButton('Попытаться обыграть вратаря', 'dribble'),
+        _actionButton('Отдать пас свободному партнёру', 'throughPass'),
+        _actionButton('Пробить головой', 'header'),
       ];
     }
     if (_phase == 'midfield') {
@@ -219,7 +248,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     if (_finished) return;
     final skill = _skill(action);
     final isAttackingAction = [
-      'shoot', 'longShot', 'header', 'pass', 'throughPass', 'dribble'
+      'shoot', 'longShot', 'header', 'pass', 'throughPass', 'cross', 'dribble'
     ].contains(action);
     final difficulty = action == 'longShot' ? 0.27
         : action == 'throughPass' ? 0.16
@@ -248,16 +277,18 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
             ? 'Промах! Мяч прошёл рядом со штангой.'
             : 'Защитник успел заблокировать удар.';
       }
-    } else if (action == 'pass' || action == 'throughPass') {
+    } else if (action == 'pass' || action == 'throughPass' || action == 'cross') {
       if (success) {
         _phase = 'chance';
         _rating += 0.25;
-        if (_random.nextDouble() < 0.32) {
+        if (_random.nextDouble() < (action == 'cross' ? 0.22 : 0.32)) {
           if (widget.isHome) { _homeGoals++; } else { _awayGoals++; }
           _playerAssists++;
           message = 'ГОЛ ПАРТНЁРА! Ваша передача привела к голу.';
         } else {
-          message = 'Точная передача! Партнёр получил мяч в опасной позиции.';
+          message = action == 'cross'
+              ? 'Отличный навес! Партнёр выиграл верховую борьбу и готовится пробить.'
+              : 'Точная передача! Партнёр получил мяч в опасной позиции.';
         }
       } else {
         _phase = 'defend';
@@ -268,7 +299,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       if (success) {
         _phase = 'chance';
         _rating += 0.25;
-        message = 'Удачная обводка! Вы прошли соперника.';
+        message = 'Удачная обводка! Вы прошли соперника и приблизились к воротам.';
         if (_random.nextDouble() < 0.20) {
           if (widget.isHome) { _homeGoals++; } else { _awayGoals++; }
           _playerGoals++;
@@ -314,7 +345,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     _minute = min(90, _minute + 7 + _random.nextInt(4));
     if (_random.nextDouble() < 0.24) {
       final opponentChance =
-          (0.28 + (_awayStrength - _homeStrength) * 0.004).clamp(0.12, 0.65);
+          (0.22 + (_opponentTeamStrength - _playerTeamStrength) * 0.005).clamp(0.08, 0.55);
       if (_random.nextDouble() < opponentChance) {
         if (_random.nextDouble() < 0.24) {
           if (widget.isHome) {
@@ -331,10 +362,13 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     if (_minute >= 90 || _actions >= _maxActions) {
       _minute = 90;
       _finished = true;
-      _rating = _rating.clamp(4.0, 10.0);
+      _rating = _rating.clamp(4.0, 10.0).toDouble();
       message += '\nФинальный свисток!';
     }
-    setState(() {\n      _event = message;\n      _momentReady = false;\n    });
+    setState(() {
+      _event = message;
+      _momentReady = false;
+    });
     if (!_finished) {
       Future<void>.delayed(const Duration(milliseconds: 950), () {
         if (!mounted || _finished) return;
@@ -361,8 +395,6 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final teamGoals = widget.isHome ? _homeGoals : _awayGoals;
-    final opponentGoals = widget.isHome ? _awayGoals : _homeGoals;
     return PopScope<Match>(
       canPop: false,
       child: Scaffold(
