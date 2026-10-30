@@ -161,19 +161,6 @@ class _SuperLeagueCreatePlayerScreenState
     super.dispose();
   }
 
-  String _positionLabel(PlayerPosition position) {
-    switch (position) {
-      case PlayerPosition.goalkeeper:
-        return AppStrings.goalkeeper;
-      case PlayerPosition.defender:
-        return AppStrings.defender;
-      case PlayerPosition.midfielder:
-        return AppStrings.midfielder;
-      case PlayerPosition.forward:
-        return AppStrings.striker;
-    }
-  }
-
   Widget _buildPositionButton({
     required String shortName,
     required String fullName,
