@@ -246,6 +246,8 @@ class BroadcastFootballGame extends FlameGame {
   double _ballY = .52;
   double _ballVx = 0;
   double _ballVy = 0;
+  double _ballSpin = 0;
+  double _ballBounce = 0;
   double _moveX = 0;
   double _moveY = 0;
   double _eventTimer = 3;
@@ -319,8 +321,11 @@ class BroadcastFootballGame extends FlameGame {
     _ballOwned = false;
     _opponentHasBall = false;
     _players.firstWhere((p) => p.user).kickTimer = .32;
-    _ballVx = power;
+    final direction = _players.firstWhere((p) => p.user).facingX >= 0 ? 1.0 : -1.0;
+    _ballVx = power * direction;
     _ballVy = (.5 - _ballY) * .42 + _moveY * .12;
+    _ballSpin = (_moveY * .75 + _players.firstWhere((p) => p.user).facingY * .25) *
+        (.25 + _dribbling * .55);
     _notify('Удар по воротам!');
   }
 
@@ -337,6 +342,7 @@ class BroadcastFootballGame extends FlameGame {
     _players.firstWhere((p) => p.user).kickTimer = .2;
     _ballVx = dx / length * .78 * accuracy;
     _ballVy = dy / length * .78 * accuracy;
+    _ballSpin = (dy / length) * .08 * (1 - _passing);
     _notify('Передача партнёру');
   }
 
@@ -446,22 +452,48 @@ class BroadcastFootballGame extends FlameGame {
       _ballY = nearestOpponent.y + .008;
       _ballVx = -.10;
       _ballVy = 0;
+      _ballSpin = 0;
       // AI occasionally releases a shot toward goal.
       if (_aiDecisionTimer <= 0) {
         _aiDecisionTimer = 1.8 + _random.nextDouble() * 1.4;
         if (nearestOpponent.x < .32 && _random.nextDouble() < .35) {
           _opponentHasBall = false;
           _ballVx = -(.75 + _random.nextDouble() * .45);
-          _ballVy = (.5 - _ballY) * .42;
+          _ballVy = (.5 - _ballY) * .42 + (_random.nextDouble() - .5) * .12;
+          _ballSpin = (_random.nextDouble() - .5) * .22;
           _notify('Соперник пробивает!');
         }
       }
     } else if (!_ballOwned) {
+      // Spin bends the flight path; air resistance gradually reduces speed and curl.
+      _ballVy += _ballSpin * _ballVx.abs() * dt;
       _ballX += _ballVx * dt;
       _ballY += _ballVy * dt;
-      final friction = math.pow(.18, dt).toDouble();
+      final friction = math.pow(.30, dt).toDouble();
       _ballVx *= friction;
       _ballVy *= friction;
+      _ballSpin *= math.pow(.42, dt).toDouble();
+
+      // Ball-to-player contact: controlled touches slow the ball, deflections keep it moving.
+      for (final p in _players) {
+        final d = _distance(p.x, p.y, _ballX, _ballY);
+        if (d < .026 && _ballVx.abs() + _ballVy.abs() > .10) {
+          final dx = _ballX - p.x;
+          final dy = _ballY - p.y;
+          final len = math.max(.001, math.sqrt(dx * dx + dy * dy));
+          _ballVx = (dx / len * _ballVx.abs() * .48).toDouble();
+          _ballVy = (dy / len * _ballVy.abs() * .48 + _ballVy * .25).toDouble();
+          if (p.home && !p.isGoalkeeper && d < .022 && _ballVx.abs() + _ballVy.abs() < .55) {
+            if (p.user) {
+              _ballOwned = true;
+            } else {
+              _ballOwned = false;
+              _opponentHasBall = false;
+            }
+          }
+          break;
+        }
+      }
     }
 
     if (!_opponentHasBall && _nearBall() && !_ballOwned &&
@@ -507,9 +539,28 @@ class BroadcastFootballGame extends FlameGame {
       _notify('Соперник забил');
       _resetAfterGoal();
     }
+    // Touchline/end-line rebounds and goal-post collisions.
     if (_ballY < .045 || _ballY > .955) {
-      _ballY = _ballY.clamp(.045, .955);
-      _ballVy = -_ballVy * .55;
+      _ballY = _ballY.clamp(.045, .955).toDouble();
+      _ballVy = -_ballVy * .62;
+      _ballSpin *= .55;
+      _notify('Мяч отскакивает от боковой линии');
+    }
+    final inGoalMouth = _ballY > .425 && _ballY < .575;
+    if ((_ballX > .972 && _ballY >= .405 && _ballY <= .425) ||
+        (_ballX > .972 && _ballY >= .575 && _ballY <= .595) ||
+        (_ballX < .028 && _ballY >= .405 && _ballY <= .425) ||
+        (_ballX < .028 && _ballY >= .575 && _ballY <= .595)) {
+      _ballVx = -_ballVx * .72;
+      _ballVy = -_ballVy * .65;
+      _ballX = _ballX > .5 ? .968 : .032;
+      _notify('Штанга!');
+    }
+    if (!inGoalMouth && (_ballX < .025 || _ballX > .975)) {
+      _ballX = _ballX.clamp(.025, .975).toDouble();
+      _ballVx = -_ballVx * .58;
+      _ballVy *= .82;
+      _notify('Мяч ушёл за пределы поля');
     }
 
     _matchClock += dt * 1.5;
@@ -534,7 +585,7 @@ class BroadcastFootballGame extends FlameGame {
   }
 
   void _resetAfterGoal() {
-    _ballX = .5; _ballY = .5; _ballVx = 0; _ballVy = 0; _ballOwned = false; _opponentHasBall = false;
+    _ballX = .5; _ballY = .5; _ballVx = 0; _ballVy = 0; _ballSpin = 0; _ballBounce = 0; _ballOwned = false; _opponentHasBall = false;
     _playerX = .38; _playerY = .5;
     final user = _players.firstWhere((p) => p.user);
     user.x = _playerX; user.y = _playerY;
@@ -650,9 +701,13 @@ class BroadcastFootballGame extends FlameGame {
     canvas.drawOval(Rect.fromCenter(center: Offset(x + r * .5, y + r * 1.8), width: r * 3.2, height: r * 1.1), Paint()..color = Colors.black.withValues(alpha: .38));
     canvas.drawCircle(Offset(x, y), r, Paint()..shader = const RadialGradient(colors: [Colors.white, Color(0xFFD5D9D6), Color(0xFF858B88)], center: Alignment(-.3, -.4)).createShader(Rect.fromCircle(center: Offset(x, y), radius: r)));
     canvas.drawCircle(Offset(x, y), r, Paint()..color = Colors.black54..style = PaintingStyle.stroke..strokeWidth = .7);
-    canvas.drawCircle(Offset(x, y), r * .28, Paint()..color = const Color(0xFF20252A));
+    canvas.save();
+    canvas.translate(x, y);
+    canvas.rotate(_matchClock * (_ballVx.abs() + _ballVy.abs()) * 3);
+    canvas.drawCircle(Offset.zero, r * .28, Paint()..color = const Color(0xFF20252A));
     final panel = Paint()..color = const Color(0xFF252B30)..style = PaintingStyle.stroke..strokeWidth = r * .12;
     canvas.drawLine(Offset(x - r * .65, y), Offset(x + r * .65, y), panel);
-    canvas.drawLine(Offset(x, y - r * .65), Offset(x, y + r * .65), panel);
+    canvas.drawLine(Offset(0, -r * .65), Offset(0, r * .65), panel);
+    canvas.restore();
   }
 }
