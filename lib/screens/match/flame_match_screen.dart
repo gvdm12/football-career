@@ -346,6 +346,7 @@ class BroadcastFootballGame extends FlameGame {
   bool _playerShotInFlight = false;
   _Footballer? _passTarget;
   _Footballer? _teammateCarrier;
+  _Footballer? _opponentPassTarget;
   bool _assistPending = false;
   int _playerAssists = 0;
   int _lastMinute = 0;
@@ -383,12 +384,29 @@ class BroadcastFootballGame extends FlameGame {
     _tackleCooldown = .8;
     final opponent = _players.where((p) => !p.home && !p.isGoalkeeper).reduce((a, b) =>
       _distance(a.x, a.y, _playerX, _playerY) < _distance(b.x, b.y, _playerX, _playerY) ? a : b);
-    if (_distance(opponent.x, opponent.y, _playerX, _playerY) < .095 && _opponentHasBall) {
-      _opponentHasBall = false;
-      _ballOwned = true;
-      _ballX = _playerX + .035;
-      _ballY = _playerY;
-      _notify('Отбор! Мяч у тебя');
+    final distance = _distance(opponent.x, opponent.y, _playerX, _playerY);
+    if (distance < .105 && _opponentHasBall) {
+      final chance = (.38 + _defending * .30 + _physical * .12 - distance * 1.8)
+          .clamp(.20, .78).toDouble();
+      if (_random.nextDouble() < chance) {
+        _opponentHasBall = false;
+        _ballOwned = true;
+        _opponentPassTarget = null;
+        _ballX = _playerX + .035;
+        _ballY = _playerY;
+        _ballVx = 0;
+        _ballVy = 0;
+        _players.firstWhere((p) => p.user).kickTimer = .2;
+        _notify('Чистый отбор! Мяч у тебя');
+      } else {
+        _ballOwned = false;
+        _opponentHasBall = false;
+        _ballX = (opponent.x + _playerX) / 2;
+        _ballY = (opponent.y + _playerY) / 2;
+        _ballVx = -.12;
+        _ballVy = (_random.nextDouble() - .5) * .16;
+        _notify('Соперник устоял в борьбе за мяч');
+      }
     } else {
       _notify('Подойди ближе к сопернику для отбора');
     }
@@ -398,6 +416,8 @@ class BroadcastFootballGame extends FlameGame {
   double get _dribbling => (player?.skills.dribbling ?? 65) / 100;
   double get _passing => (player?.skills.passing ?? 65) / 100;
   double get _shooting => (player?.skills.shooting ?? 65) / 100;
+  double get _defending => (player?.skills.defending ?? 50) / 100;
+  double get _physical => (player?.skills.physical ?? 60) / 100;
 
   void _notify(String text) {
     eventText.value = text;
@@ -619,7 +639,15 @@ class BroadcastFootballGame extends FlameGame {
         _distance(nearestOpponent.x, nearestOpponent.y, _ballX, _ballY) < .045 &&
         _ballVx.abs() + _ballVy.abs() < .32) {
       _opponentHasBall = true;
+      _opponentPassTarget = null;
       _notify('Соперник перехватил мяч!');
+    }
+    if (_opponentPassTarget != null &&
+        _distance(_opponentPassTarget!.x, _opponentPassTarget!.y, _ballX, _ballY) < .045 &&
+        !_ballOwned) {
+      _opponentHasBall = true;
+      _opponentPassTarget = null;
+      _notify('Соперник принимает передачу');
     }
     if (_passTarget != null && _distance(_passTarget!.x, _passTarget!.y, _ballX, _ballY) < .045 && !_opponentHasBall) {
       _teammateCarrier = _passTarget;
@@ -664,6 +692,28 @@ class BroadcastFootballGame extends FlameGame {
           _ballVy = (.5 - _ballY) * .42 + (_random.nextDouble() - .5) * .12;
           _ballSpin = (_random.nextDouble() - .5) * .22;
           _notify('Соперник пробивает!');
+        } else {
+          final receivers = opponents.where((p) =>
+            !identical(p, nearestOpponent) &&
+            p.x < nearestOpponent.x - .075 &&
+            p.x > .08).toList();
+          if (receivers.isNotEmpty && _random.nextDouble() < .58) {
+            final receiver = receivers.reduce((a, b) {
+              final scoreA = (nearestOpponent.x - a.x) +
+                  _distance(a.x, a.y, _ballX, _ballY) * .18;
+              final scoreB = (nearestOpponent.x - b.x) +
+                  _distance(b.x, b.y, _ballX, _ballY) * .18;
+              return scoreA < scoreB ? a : b;
+            });
+            final dx = receiver.x - _ballX;
+            final dy = receiver.y - _ballY;
+            final length = math.max(.001, math.sqrt(dx * dx + dy * dy));
+            _ballVx = dx / length * .68;
+            _ballVy = dy / length * .68;
+            _opponentHasBall = false;
+            _opponentPassTarget = receiver;
+            _notify('Соперник разыгрывает передачу');
+          }
         }
       }
     } else if (!_ballOwned) {
@@ -854,7 +904,7 @@ class BroadcastFootballGame extends FlameGame {
   }
 
   void _resetAfterGoal() {
-    _ballX = .5; _ballY = .5; _ballVx = 0; _ballVy = 0; _ballSpin = 0; _ballHeight = 0; _ballHeightVelocity = 0; _ballBounce = 0; _ballOwned = false; _opponentHasBall = false; _teammateCarrier = null; _passTarget = null; _assistPending = false;
+    _ballX = .5; _ballY = .5; _ballVx = 0; _ballVy = 0; _ballSpin = 0; _ballHeight = 0; _ballHeightVelocity = 0; _ballBounce = 0; _ballOwned = false; _opponentHasBall = false; _teammateCarrier = null; _passTarget = null; _opponentPassTarget = null; _assistPending = false;
     _playerX = .38; _playerY = .5;
     final user = _players.firstWhere((p) => p.user);
     user.x = _playerX; user.y = _playerY;
