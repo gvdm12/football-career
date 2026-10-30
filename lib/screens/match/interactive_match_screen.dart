@@ -32,7 +32,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   int _playerAssists = 0;
   int _yellowCards = 0;
   int _redCards = 0;
-  int _actions = 0;
+  int _actions = 0;\n  int _maxActions = 9;\n  String _momentTitle = '';\n  String _momentDescription = '';
   double _rating = 6.0;
   bool _finished = false;
   String _event = 'Матч начинается! Ваша команда разыгрывает мяч.';
@@ -121,6 +121,45 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         return s.defending * 0.55 + s.physical * 0.25 + s.pace * 0.20;
       default:
         return _player.overall.toDouble();
+    }
+  }
+
+  void _createMoment() {
+    final roll = _random.nextDouble();
+    final position = _player.position;
+    final attackChance = switch (position) {
+      PlayerPosition.forward => 0.72,
+      PlayerPosition.midfielder => 0.43,
+      PlayerPosition.defender => 0.17,
+      PlayerPosition.goalkeeper => 0.02,
+    };
+    final midfieldChance = switch (position) {
+      PlayerPosition.forward => 0.14,
+      PlayerPosition.midfielder => 0.34,
+      PlayerPosition.defender => 0.13,
+      PlayerPosition.goalkeeper => 0.08,
+    };
+
+    if (roll < attackChance) {
+      _phase = 'attack';
+      _momentTitle = 'Атака вашей команды';
+      _momentDescription = 'Вы получили возможность обострить игру у штрафной соперника.';
+      _event = '$_minute-я минута. Ваша команда переходит в атаку!';
+    } else if (roll < attackChance + midfieldChance) {
+      _phase = 'midfield';
+      _momentTitle = 'Борьба в центре поля';
+      _momentDescription = 'У вас есть пространство для передачи, продвижения или удара издали.';
+      _event = '$_minute-я минута. Мяч оказывается у вас в центре поля.';
+    } else if (position == PlayerPosition.goalkeeper) {
+      _phase = 'goalkeeper';
+      _momentTitle = 'Опасный удар по воротам';
+      _momentDescription = 'Соперник завершает атаку ударом. Нужно выбрать действие.';
+      _event = '$_minute-я минута. Соперник наносит удар!';
+    } else {
+      _phase = 'defend';
+      _momentTitle = 'Оборона';
+      _momentDescription = 'Соперник развивает атаку. Вы можете вступить в отбор, перехватить пас или закрыть удар.';
+      _event = '$_minute-я минута. Соперник атакует!';
     }
   }
 
@@ -289,13 +328,19 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         }
       }
     }
-    if (_minute >= 90 || _actions >= 14) {
+    if (_minute >= 90 || _actions >= _maxActions) {
       _minute = 90;
       _finished = true;
       _rating = _rating.clamp(4.0, 10.0);
       message += '\nФинальный свисток!';
     }
     setState(() => _event = message);
+    if (!_finished) {
+      Future<void>.delayed(const Duration(milliseconds: 950), () {
+        if (!mounted || _finished) return;
+        setState(_createMoment);
+      });
+    }
   }
 
   void _finish() {
