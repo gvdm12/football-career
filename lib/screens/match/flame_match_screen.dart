@@ -321,8 +321,8 @@ class BroadcastFootballGame extends FlameGame {
     final user = _players.firstWhere((p) => p.user);
     user.vx += (targetVx - user.vx) * smoothing;
     user.vy += (targetVy - user.vy) * smoothing;
-    _playerX = (_playerX + user.vx * dt).clamp(.035, .965);
-    _playerY = (_playerY + user.vy * dt).clamp(.055, .945);
+    _playerX = (_playerX + user.vx * dt).clamp(.035, .965).toDouble();
+    _playerY = (_playerY + user.vy * dt).clamp(.055, .945).toDouble();
     user.x = _playerX; user.y = _playerY;
 
     for (final p in _players.where((p) => !p.user)) {
@@ -335,8 +335,8 @@ class BroadcastFootballGame extends FlameGame {
       final dx = tx - p.x, dy = ty - p.y;
       final len = math.max(.001, math.sqrt(dx * dx + dy * dy));
       final speed = chase ? .24 : .07;
-      p.x += dx / len * math.min(len, speed * dt);
-      p.y += dy / len * math.min(len, speed * dt);
+      p.x += (dx / len * math.min(len, speed * dt)).toDouble();
+      p.y += (dy / len * math.min(len, speed * dt)).toDouble();
     }
 
     if (_nearBall() && _ballVx.abs() + _ballVy.abs() < .42) {
