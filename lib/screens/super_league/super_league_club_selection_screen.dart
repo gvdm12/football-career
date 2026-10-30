@@ -253,6 +253,8 @@ class _SuperLeagueClubSelectionScreenState
                       onPressed: _selectedClubName == null
                           ? null
                           : () async {
+                              final navigator = Navigator.of(context);
+                              final messenger = ScaffoldMessenger.of(context);
                               final club = Clubs.getByName(_selectedClubName!);
                               final player = await Navigator.push<Player>(
                                 context,
