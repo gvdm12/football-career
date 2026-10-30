@@ -3,12 +3,14 @@ import 'dart:math' as math;
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/player.dart';
+import 'package:flutter_football/models/match.dart';
 
 class FlameMatchScreen extends StatefulWidget {
   final String playerName;
   final String clubName;
   final String opponentName;
   final Player? player;
+  final bool isHome;
 
   const FlameMatchScreen({
     super.key,
@@ -16,6 +18,7 @@ class FlameMatchScreen extends StatefulWidget {
     required this.clubName,
     required this.opponentName,
     this.player,
+    this.isHome = true,
   });
 
   @override
@@ -33,6 +36,7 @@ class _FlameMatchScreenState extends State<FlameMatchScreen> {
       clubName: widget.clubName,
       opponentName: widget.opponentName,
       player: widget.player,
+      isHome: widget.isHome,
     );
   }
 
@@ -41,6 +45,9 @@ class _FlameMatchScreenState extends State<FlameMatchScreen> {
     game.pauseEngine();
     game.scoreText.dispose();
     game.eventText.dispose();
+    game.shotTypeText.dispose();
+    game.clockText.dispose();
+    game.isFinished.dispose();
     super.dispose();
   }
 
@@ -105,6 +112,7 @@ class _FlameMatchScreenState extends State<FlameMatchScreen> {
                     valueListenable: game.scoreText,
                     builder: (_, score, __) => Text(score, style: const TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.w900, letterSpacing: 2)),
                   ),
+                  ValueListenableBuilder<String>(valueListenable: game.clockText, builder: (_, clock, __) => Padding(padding: const EdgeInsets.symmetric(horizontal: 7), child: Text(clock, style: const TextStyle(color: Color(0xFF8BE07F), fontWeight: FontWeight.w900)))),
                   Expanded(child: Text(widget.opponentName, textAlign: TextAlign.end, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w700))),
                 ],
               ),
@@ -129,6 +137,30 @@ class _FlameMatchScreenState extends State<FlameMatchScreen> {
                         ),
                       ),
                     ),
+                  ),
+                  ValueListenableBuilder<bool>(
+                    valueListenable: game.isFinished,
+                    builder: (_, finished, __) => finished
+                        ? Positioned.fill(
+                            child: Container(
+                              color: Colors.black.withValues(alpha: .8),
+                              alignment: Alignment.center,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Text('ФИНАЛЬНЫЙ СВИСТОК', style: TextStyle(color: Color(0xFF8BE07F), fontWeight: FontWeight.w900)),
+                                  const SizedBox(height: 12),
+                                  Text(game.scoreText.value, style: const TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.w900)),
+                                  const SizedBox(height: 16),
+                                  ElevatedButton(
+                                    onPressed: () => Navigator.pop(context, game.buildMatchResult()),
+                                    child: const Text('ЗАВЕРШИТЬ МАТЧ'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
                   ),
                   Positioned(
                     bottom: 18,
@@ -248,16 +280,20 @@ class BroadcastFootballGame extends FlameGame {
     required this.clubName,
     required this.opponentName,
     required this.player,
+    required this.isHome,
   });
 
   final String playerName;
   final String clubName;
   final String opponentName;
   final Player? player;
+  final bool isHome;
 
   final ValueNotifier<String> scoreText = ValueNotifier('0 : 0');
   final ValueNotifier<String> eventText = ValueNotifier('Матч начался • Найди свободное пространство');
   final ValueNotifier<String> shotTypeText = ValueNotifier('ОБЫЧНЫЙ');
+  final ValueNotifier<String> clockText = ValueNotifier('0′');
+  final ValueNotifier<bool> isFinished = ValueNotifier(false);
   final List<_Footballer> _players = [];
   final math.Random _random = math.Random();
 
@@ -283,6 +319,8 @@ class BroadcastFootballGame extends FlameGame {
   bool _ballOwned = true;
   int _homeGoals = 0;
   int _awayGoals = 0;
+  int _playerGoals = 0;
+  bool _playerShotInFlight = false;
   int _lastMinute = 0;
 
   Color get _homeColor => const Color(0xFF20A85B);
@@ -381,6 +419,7 @@ class BroadcastFootballGame extends FlameGame {
     }
     _ballOwned = false;
     _opponentHasBall = false;
+    _playerShotInFlight = true;
     user.kickTimer = .32;
     _ballVx = power * direction;
     _ballVy = (.5 - _ballY) * .42 + _moveY * .12;
@@ -396,6 +435,7 @@ class BroadcastFootballGame extends FlameGame {
     final accuracy = .82 + _passing * .16;
     _ballOwned = false;
     _opponentHasBall = false;
+    _playerShotInFlight = false;
     _players.firstWhere((p) => p.user).kickTimer = .2;
     _ballVx = dx / length * .78 * accuracy;
     _ballVy = dy / length * .78 * accuracy;
@@ -415,6 +455,7 @@ class BroadcastFootballGame extends FlameGame {
   @override
   void update(double dt) {
     super.update(dt);
+    if (isFinished.value) return;
     final pace = (.32 + _pace * .22) * (_sprinting ? 1.42 : 1);
     final targetVx = _moveX * pace;
     final targetVy = _moveY * pace;
@@ -590,13 +631,18 @@ class BroadcastFootballGame extends FlameGame {
       }
     }
 
-    if (_ballX > .985 && _ballY > .39 && _ballY < .61) {
-      _homeGoals++; scoreText.value = '$_homeGoals : $_awayGoals';
+    if (_ballX > .985 && _ballY > .39 && _ballY < .61 && _ballHeight < .30) {
+      _homeGoals++;
+      if (_playerShotInFlight) _playerGoals++;
+      _playerShotInFlight = false;
+      scoreText.value = '$_homeGoals : $_awayGoals';
       _opponentHasBall = false; _ballOwned = false;
       _notify('ГОЛ! Отличная атака!');
       _resetAfterGoal();
-    } else if (_ballX < .015 && _ballY > .39 && _ballY < .61) {
-      _awayGoals++; scoreText.value = '$_homeGoals : $_awayGoals';
+    } else if (_ballX < .015 && _ballY > .39 && _ballY < .61 && _ballHeight < .30) {
+      _awayGoals++;
+      _playerShotInFlight = false;
+      scoreText.value = '$_homeGoals : $_awayGoals';
       _opponentHasBall = false; _ballOwned = false;
       _notify('Соперник забил');
       _resetAfterGoal();
@@ -625,11 +671,28 @@ class BroadcastFootballGame extends FlameGame {
       _notify('Мяч ушёл за пределы поля');
     }
 
-    _matchClock += dt * 1.5;
+    _matchClock += dt;
     final minute = _matchClock.floor();
-    if (minute > _lastMinute && minute % 5 == 0) {
+    clockText.value = '$minute′';
+    if (minute == 45 && _lastMinute < 45) {
+      _lastMinute = 45;
+      _notify('Перерыв • Второй тайм начинается');
+      _ballOwned = false;
+      _opponentHasBall = false;
+      _ballVx = 0;
+      _ballVy = 0;
+    } else if (minute > _lastMinute && minute % 5 == 0) {
       _lastMinute = minute;
-      if (_random.nextDouble() < .3) _notify('$minute’ • Команды борются за контроль мяча');
+      if (_random.nextDouble() < .3) _notify('$minute′ • Борьба за контроль мяча');
+    }
+    if (_matchClock >= 90) {
+      _matchClock = 90;
+      clockText.value = '90′';
+      stopMovement();
+      _sprinting = false;
+      _notify('Финальный свисток');
+      isFinished.value = true;
+      pauseEngine();
     }
     if (_eventTimer > 0) _eventTimer -= dt;
   }
@@ -644,6 +707,23 @@ class BroadcastFootballGame extends FlameGame {
       p.animationPhase += dt * 1.4;
     }
     if (p.kickTimer > 0) p.kickTimer = math.max(0, p.kickTimer - dt).toDouble();
+  }
+
+  Match buildMatchResult() {
+    final homeGoals = isHome ? _homeGoals : _awayGoals;
+    final awayGoals = isHome ? _awayGoals : _homeGoals;
+    return Match(
+      homeTeam: isHome ? clubName : opponentName,
+      awayTeam: isHome ? opponentName : clubName,
+      homeGoals: homeGoals,
+      awayGoals: awayGoals,
+      playerGoals: _playerGoals,
+      playerAssists: 0,
+      yellowCards: 0,
+      redCards: 0,
+      playerRating: (6.0 + _playerGoals * .8).clamp(4.0, 10.0).toDouble(),
+      playerPlayed: true,
+    );
   }
 
   void _resetAfterGoal() {
