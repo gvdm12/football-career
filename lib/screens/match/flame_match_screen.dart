@@ -951,6 +951,21 @@ class BroadcastFootballGame extends FlameGame {
     canvas.drawLine(Offset(w * .5, field.top), Offset(w * .5, field.bottom), line);
     canvas.drawCircle(Offset(w * .5, h * .5), h * .115, line);
     canvas.drawCircle(Offset(w * .5, h * .5), h * .004, Paint()..color = Colors.white);
+    // Penalty marks and corner arcs improve the broadcast-pitch reference points.
+    canvas.drawCircle(Offset(w * .115, h * .5), h * .004, Paint()..color = Colors.white);
+    canvas.drawCircle(Offset(w * .885, h * .5), h * .004, Paint()..color = Colors.white);
+    for (final corner in [
+      Offset(field.left, field.top), Offset(field.right, field.top),
+      Offset(field.left, field.bottom), Offset(field.right, field.bottom),
+    ]) {
+      canvas.drawCircle(corner, h * .012, line);
+    }
+    final netPaint = Paint()..color = Colors.white.withValues(alpha: .32)..style = PaintingStyle.stroke..strokeWidth = 1;
+    for (var i = 1; i < 5; i++) {
+      final y = h * (.425 + .15 * i / 5);
+      canvas.drawLine(Offset(w * .006, y), Offset(w * .028, y), netPaint);
+      canvas.drawLine(Offset(w * .972, y), Offset(w * .994, y), netPaint);
+    }
     canvas.drawRect(Rect.fromLTWH(field.left, h * .28, w * .145, h * .44), line);
     canvas.drawRect(Rect.fromLTWH(w * .83, h * .28, w * .145, h * .44), line);
     canvas.drawRect(Rect.fromLTWH(field.left, h * .39, w * .055, h * .22), line);
@@ -1018,9 +1033,22 @@ class BroadcastFootballGame extends FlameGame {
       canvas.drawLine(Offset(x - radius * .7, y + radius * .1), Offset(x - radius * 1.05, y + radius * .15), gloves);
       canvas.drawLine(Offset(x + radius * .7, y + radius * .1), Offset(x + radius * 1.05, y + radius * .15), gloves);
     }
+    final carriesBall = player.user && _ballOwned || identical(player, _teammateCarrier) ||
+        !player.home && _opponentHasBall && _distance(player.x, player.y, _ballX, _ballY) < .06;
+    if (carriesBall) {
+      canvas.drawOval(
+        Rect.fromCenter(center: Offset(x, y + radius * 1.42), width: radius * 3.1, height: radius * .92),
+        Paint()..color = const Color(0xFFFFE58A).withValues(alpha: .95)
+          ..style = PaintingStyle.stroke..strokeWidth = math.max(1.2, radius * .12),
+      );
+    }
     if (player.user) {
       canvas.drawCircle(Offset(x, y), radius * 1.58,
         Paint()..color = const Color(0xFFB7FFCA)..style = PaintingStyle.stroke..strokeWidth = 1.5);
+      final directionEnd = Offset(x + player.facingX * radius * 1.9, y + player.facingY * radius * 1.9);
+      canvas.drawLine(Offset(x, y), directionEnd,
+        Paint()..color = const Color(0xFFB7FFCA)..strokeWidth = math.max(1.2, radius * .13)..strokeCap = StrokeCap.round);
+      canvas.drawCircle(directionEnd, radius * .12, Paint()..color = const Color(0xFFB7FFCA));
       final name = TextPainter(
         text: TextSpan(text: playerName, style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900, shadows: [Shadow(color: Colors.black, blurRadius: 4)])),
         textDirection: TextDirection.ltr,
