@@ -39,7 +39,6 @@ class _SuperLeagueCareerScreenState extends State<SuperLeagueCareerScreen> {
 
   static const Color _green = Color(0xFF8BE07F);
   static const Color _border = Color(0xFF14401E);
-  static const Color _panel = Color(0x14FFFFFF);
 
   static const Map<String, String> _flagCodes = {
     'Россия': 'RU',
