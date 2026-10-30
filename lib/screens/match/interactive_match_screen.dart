@@ -33,6 +33,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   int _yellowCards = 0;
   int _redCards = 0;
   int _actions = 0;
+  int _shots = 0;
+  int _successfulActions = 0;
   int _maxActions = 9;
   String _momentTitle = '';
   String _momentDescription = '';
@@ -49,6 +51,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   late final String _awayTeam;
 
   Player get _player => widget.career.player;
+  int get _playerTeamStrength => widget.isHome ? _homeStrength : _awayStrength;
+  int get _opponentTeamStrength => widget.isHome ? _awayStrength : _homeStrength;
 
   @override
   void initState() {
@@ -76,7 +80,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       isHome: widget.isHome,
     );
     _playerPlayed = baseMatch.playerPlayed;
-    _playerAssists = baseMatch.playerAssists;
+    _playerAssists = 0;
     // Сохраняем командные голы обычной модели, но заменяем
     // заранее сгенерированные голы игрока интерактивными эпизодами.
     _homeGoals = baseMatch.homeGoals - (widget.isHome ? baseMatch.playerGoals : 0);
@@ -124,7 +128,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       case 'block':
         return s.physical * 0.35 + s.defending * 0.45 + s.heading * 0.20;
       case 'keeper':
-        return _skills.defending * 0.42 + _skills.physical * 0.24 + _skills.vision * 0.22 + _skills.pace * 0.12;
+        return s.defending * 0.42 + s.physical * 0.24 + s.vision * 0.22 + s.pace * 0.12;
       case 'defend':
       case 'tackle':
       case 'contain':
@@ -266,9 +270,11 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         .clamp(0.12, 0.91);
     final success = _random.nextDouble() < chance;
     if (success) _successfulActions++;
+    if (success) _successfulActions++;
     String message;
 
     if (action == 'shoot' || action == 'longShot' || action == 'header') {
+      _shots++;
       _shots++;
       if (success && _random.nextDouble() < (action == 'header' ? 0.36 : 0.43)) {
         if (widget.isHome) { _homeGoals++; } else { _awayGoals++; }
