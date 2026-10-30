@@ -5,6 +5,7 @@ import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/match.dart';
 import 'package:flutter_football/models/player.dart';
+import 'package:flutter_football/models/player_status.dart';
 
 class InteractiveMatchScreen extends StatefulWidget {
   final Career career;
@@ -64,86 +65,190 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
             playerClub: _player.club,
             playerOverall: _player.overall,
           );
-    final statusBonus = _player.overall >= 75 ? 0.90 : 0.65;
-    _playerPlayed = !widget.career.isInjured &&
-        _random.nextDouble() < statusBonus;
+    final baseMatch = Match.generate(
+      player: _player,
+      career: widget.career,
+      opponent: widget.opponent,
+      isHome: widget.isHome,
+    );
+    _playerPlayed = baseMatch.playerPlayed;
+    // Сохраняем командные голы обычной модели, но заменяем
+    // заранее сгенерированные голы игрока интерактивными эпизодами.
+    _homeGoals = baseMatch.homeGoals - (widget.isHome ? baseMatch.playerGoals : 0);
+    _awayGoals = baseMatch.awayGoals - (widget.isHome ? 0 : baseMatch.playerGoals);
+    _yellowCards = baseMatch.yellowCards;
+    _redCards = baseMatch.redCards;
+    _rating = baseMatch.playerRating;
+
+    if (!_playerPlayed) {
+      _minute = 90;
+      _finished = true;
+      _event = widget.career.isInjured
+          ? 'Вы пропускаете матч из-за травмы.'
+          : 'Тренер оставил вас в запасе. Матч проходит без вашего участия.';
+      return;
+    }
+
+    final status = PlayerStatusCalculator.calculate(
+      overall: _player.overall,
+      clubName: _player.club,
+    );
+    _actions = status == PlayerStatus.substitute
+        ? 2 + _random.nextInt(2)
+        : 3 + _random.nextInt(3);
   }
 
   double _skill(String action) {
-    final skills = _player.skills;
+    final s = _player.skills;
     switch (action) {
       case 'dribble':
-        return skills.dribbling * 0.65 + skills.pace * 0.35;
+        return s.dribbling * 0.48 + s.pace * 0.30 + s.physical * 0.12 + s.vision * 0.10;
       case 'pass':
-        return skills.passing * 0.65 + skills.vision * 0.35;
+      case 'throughPass':
+        return s.passing * 0.55 + s.vision * 0.30 + s.dribbling * 0.15;
       case 'shoot':
-        return skills.shooting * 0.75 + skills.heading * 0.25;
+      case 'longShot':
+        return s.shooting * 0.58 + s.dribbling * 0.12 + s.vision * 0.12 + s.physical * 0.10 + s.heading * 0.08;
+      case 'header':
+        return s.heading * 0.58 + s.physical * 0.18 + s.shooting * 0.24;
+      case 'intercept':
+        return s.vision * 0.35 + s.defending * 0.40 + s.pace * 0.15 + s.passing * 0.10;
+      case 'block':
+        return s.physical * 0.35 + s.defending * 0.45 + s.heading * 0.20;
       case 'defend':
-        return skills.defending * 0.65 + skills.physical * 0.35;
+      case 'tackle':
+      case 'contain':
+        return s.defending * 0.55 + s.physical * 0.25 + s.pace * 0.20;
       default:
         return _player.overall.toDouble();
+    }
+  }
+
+  List<Widget> _positionActions() {
+    switch (_player.position) {
+      case PlayerPosition.forward:
+        return [
+          _actionButton('Пробить по воротам', 'shoot'),
+          _actionButton('Отдать пас', 'pass'),
+          _actionButton('Обыграть защитника', 'dribble'),
+          _actionButton('Пробить головой', 'header'),
+        ];
+      case PlayerPosition.midfielder:
+        return [
+          _actionButton('Разрезающий пас', 'throughPass'),
+          _actionButton('Удар издали', 'longShot'),
+          _actionButton('Продвинуться с мячом', 'dribble'),
+          _actionButton('Сохранить владение', 'pass'),
+          _actionButton('Помочь в обороне', 'defend'),
+        ];
+      case PlayerPosition.defender:
+        return [
+          _actionButton('Пойти в отбор', 'tackle'),
+          _actionButton('Перехватить передачу', 'intercept'),
+          _actionButton('Заблокировать удар', 'block'),
+          _actionButton('Начать атаку пасом', 'pass'),
+          _actionButton('Подключиться на стандарт', 'header'),
+        ];
+      case PlayerPosition.goalkeeper:
+        return [
+          _actionButton('Отразить удар', 'defend'),
+          _actionButton('Перехватить навес', 'intercept'),
+          _actionButton('Начать атаку передачей', 'pass'),
+        ];
     }
   }
 
   void _choose(String action) {
     if (_finished) return;
     final skill = _skill(action);
-    final successChance = (0.38 + (skill - 50) * 0.006 +
-            (_homeStrength - _awayStrength) * 0.003)
-        .clamp(0.18, 0.88);
-    final success = _random.nextDouble() < successChance;
-    final attackingTeamHome = widget.isHome;
+    final isAttackingAction = [
+      'shoot', 'longShot', 'header', 'pass', 'throughPass', 'dribble'
+    ].contains(action);
+    final difficulty = action == 'longShot' ? 0.27
+        : action == 'throughPass' ? 0.16
+        : action == 'shoot' || action == 'header' ? 0.10
+        : 0.04;
+    final advantage = widget.isHome
+        ? (_homeStrength - _awayStrength) * 0.003
+        : (_awayStrength - _homeStrength) * 0.003;
+    final chance = (0.52 + (skill - 60) * 0.007 + advantage - difficulty)
+        .clamp(0.12, 0.91);
+    final success = _random.nextDouble() < chance;
     String message;
 
-    if (action == 'shoot') {
-      if (success && _random.nextDouble() < 0.58) {
-        if (attackingTeamHome) {
-          _homeGoals++;
-        } else {
-          _awayGoals++;
-        }
+    if (action == 'shoot' || action == 'longShot' || action == 'header') {
+      if (success && _random.nextDouble() < (action == 'header' ? 0.36 : 0.43)) {
+        if (widget.isHome) { _homeGoals++; } else { _awayGoals++; }
         _playerGoals++;
         _rating += 1.1;
-        message = 'ГОЛ! Отличный удар — вы отправляете мяч в сетку!';
+        message = 'ГОЛ! Отличное завершение атаки!';
+      } else if (success) {
+        _rating += 0.12;
+        message = 'Удар! Вратарь отбил мяч и спас свою команду.';
       } else {
-        message = success
-            ? 'Удар! Вратарь соперника спасает команду.'
-            : 'Удар не получился — защитник блокирует попытку.';
-        _rating += success ? 0.15 : -0.1;
+        _rating -= 0.12;
+        message = _random.nextBool()
+            ? 'Промах! Мяч прошёл рядом со штангой.'
+            : 'Защитник успел заблокировать удар.';
       }
-    } else if (action == 'pass') {
+    } else if (action == 'pass' || action == 'throughPass') {
       if (success) {
         _phase = 'chance';
-        _rating += 0.2;
-        message = 'Точная передача! Команда выходит на опасную позицию.';
-        if (_random.nextDouble() < 0.22) _playerAssists++;
+        _rating += 0.25;
+        if (_random.nextDouble() < 0.32) {
+          if (widget.isHome) { _homeGoals++; } else { _awayGoals++; }
+          _playerAssists++;
+          message = 'ГОЛ ПАРТНЁРА! Ваша передача привела к голу.';
+        } else {
+          message = 'Точная передача! Партнёр получил мяч в опасной позиции.';
+        }
       } else {
         _phase = 'defend';
-        message = 'Передача перехвачена. Соперник начинает контратаку!';
-        _rating -= 0.15;
+        _rating -= 0.16;
+        message = 'Передача перехвачена. Соперник начинает атаку.';
       }
     } else if (action == 'dribble') {
       if (success) {
         _phase = 'chance';
         _rating += 0.25;
-        message = 'Удачная обводка! Вы обыграли соперника и продвинулись вперёд.';
+        message = 'Удачная обводка! Вы прошли соперника.';
+        if (_random.nextDouble() < 0.20) {
+          if (widget.isHome) { _homeGoals++; } else { _awayGoals++; }
+          _playerGoals++;
+          message += ' Вы завершили проход голом!';
+          _rating += 0.8;
+        }
       } else {
         _phase = 'defend';
-        message = 'Соперник отобрал мяч. Нужно возвращаться в оборону.';
-        _rating -= 0.2;
+        _rating -= 0.20;
+        message = 'Соперник прочитал движение и отобрал мяч.';
       }
     } else {
       if (success) {
         _phase = 'buildUp';
-        _rating += 0.25;
-        message = 'Отличный отбор! Вы остановили атаку соперника.';
+        _rating += 0.28;
+        message = action == 'intercept'
+            ? 'Перехват! Вы прочитали передачу и остановили атаку.'
+            : action == 'block'
+                ? 'Отличная блокировка! Вы закрыли направление удара.'
+                : action == 'contain'
+                    ? 'Вы сдержали соперника и заставили его отдать мяч назад.'
+                    : 'Отличный отбор! Вы остановили опасную атаку.';
       } else {
         _phase = 'defend';
-        message = 'Неудачная попытка отбора. Соперник сохраняет мяч.';
-        _rating -= 0.25;
+        _rating -= 0.18;
+        message = 'Не удалось остановить атаку соперника.';
+        if (_random.nextDouble() < 0.20) {
+          if (widget.isHome) { _awayGoals++; } else { _homeGoals++; }
+          message += ' Соперник забивает!';
+        }
       }
     }
 
+    if (!isAttackingAction && _random.nextDouble() < 0.08) {
+      _yellowCards = min(2, _yellowCards + 1);
+      message += ' Судья показывает жёлтую карточку.';
+    }
     _advanceClock(message);
   }
 
@@ -229,10 +334,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                 else if (!_finished) ...[
                   const Text('Выберите действие', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
-                  _actionButton('Обвести соперника', 'dribble'),
-                  _actionButton('Отдать передачу', 'pass'),
-                  _actionButton('Пробить по воротам', 'shoot'),
-                  _actionButton('Пойти в отбор', 'defend'),
+                  ..._positionActions(),
                 ],
                 const Spacer(),
                 if (_finished || !_playerPlayed)
