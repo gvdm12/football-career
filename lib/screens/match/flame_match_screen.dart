@@ -681,7 +681,7 @@ class BroadcastFootballGame extends FlameGame {
       final keeper = _players.firstWhere((p) => p.home && p.isGoalkeeper);
       if (_distance(keeper.x, keeper.y, .055, _ballY) < .105 && _ballHeight < .78) {
         keeper.diveTimer = .55;
-        _ballHeightVelocity = math.max(_ballHeightVelocity, .22);
+        _ballHeightVelocity = math.max(_ballHeightVelocity, .22).toDouble();
         _ballVx = _ballVx.abs() * .48;
         _ballVy += (keeper.y - _ballY) * 1.6;
         _ballX = .105;
@@ -792,7 +792,7 @@ class BroadcastFootballGame extends FlameGame {
       playerAssists: _playerAssists,
       yellowCards: 0,
       redCards: 0,
-      playerRating: (6.0 + _playerGoals * .8).clamp(4.0, 10.0).toDouble(),
+      playerRating: (6.0 + _playerGoals * .8 + _playerAssists * .45).clamp(4.0, 10.0).toDouble(),
       playerPlayed: true,
     );
   }
