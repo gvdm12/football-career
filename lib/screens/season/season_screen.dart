@@ -1120,7 +1120,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     if (!mounted || match == null) return;
 
-    final updatedCareer = classicUpdatedCareer ?? career.afterMatch(match);
+    final playedMatch = match;
+    final updatedCareer = classicUpdatedCareer ?? career.afterMatch(playedMatch);
 
     // Проверяем, что матч соответствует клубу игрока и сопернику.
     final expectedHomeTeam = seasonMatch.isHome
@@ -1130,8 +1131,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
         ? seasonMatch.opponent
         : career.player.club;
 
-    if (match.homeTeam != expectedHomeTeam ||
-        match.awayTeam != expectedAwayTeam) {
+    if (playedMatch.homeTeam != expectedHomeTeam ||
+        playedMatch.awayTeam != expectedAwayTeam) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(AppStrings.matchCalendarError)));
@@ -1141,7 +1142,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
     // Сохраняем результат матча в календаре игрока.
     final updatedSeasonMatches = updatedCareer.seasonMatches.map((item) {
       if (item.number == seasonMatch.number && !item.isPlayed) {
-        return item.copyWith(result: match);
+        return item.copyWith(result: playedMatch);
       }
 
       return item;
@@ -1151,13 +1152,13 @@ class _SeasonScreenState extends State<SeasonScreen> {
     final updatedLeagueMatches = updatedCareer.leagueMatches.map((fixture) {
       final isSameMatch =
           fixture.round == seasonMatch.number &&
-          fixture.homeTeam == match.homeTeam &&
-          fixture.awayTeam == match.awayTeam;
+          fixture.homeTeam == playedMatch.homeTeam &&
+          fixture.awayTeam == playedMatch.awayTeam;
 
       if (isSameMatch && !fixture.isPlayed) {
         return fixture.copyWith(
-          homeGoals: match.homeGoals,
-          awayGoals: match.awayGoals,
+          homeGoals: playedMatch.homeGoals,
+          awayGoals: playedMatch.awayGoals,
         );
       }
 
@@ -2226,40 +2227,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
                             children: [
                               _buildProgressCard(),
                               const SizedBox(height: 8),
-                              Card(
-                                color: const Color(0xFF0A2110),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                  side: const BorderSide(
-                                    color: Color(0xFF22C55E),
-                                  ),
-                                ),
-                                child: ListTile(
-                                  leading: const Icon(
-                                    Icons.sports_soccer,
-                                    color: Color(0xFF8BE07F),
-                                    size: 30,
-                                  ),
-                                  title: const Text(
-                                    'Тестовый 2D-матч',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  subtitle: const Text(
-                                    'Проверь управление на игровом поле',
-                                    style: TextStyle(color: Colors.white70),
-                                  ),
-                                  trailing: const Icon(
-                                    Icons.play_arrow,
-                                    color: Color(0xFF8BE07F),
-                                  ),
-                                  onTap: isSaving || seasonFinishing
-                                      ? null
-                                      : _openFlamePrototype,
-                                ),
-                              ),
                               if (isSaving)
                                 const Padding(
                                   padding: EdgeInsets.all(12),
