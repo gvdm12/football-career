@@ -321,6 +321,10 @@ class BroadcastFootballGame extends FlameGame {
   int _awayGoals = 0;
   int _playerGoals = 0;
   bool _playerShotInFlight = false;
+  _Footballer? _passTarget;
+  _Footballer? _teammateCarrier;
+  bool _assistPending = false;
+  int _playerAssists = 0;
   int _lastMinute = 0;
 
   Color get _homeColor => const Color(0xFF20A85B);
@@ -435,6 +439,9 @@ class BroadcastFootballGame extends FlameGame {
     final accuracy = .82 + _passing * .16;
     _ballOwned = false;
     _opponentHasBall = false;
+    _teammateCarrier = null;
+    _passTarget = teammate;
+    _assistPending = true;
     _playerShotInFlight = false;
     _players.firstWhere((p) => p.user).kickTimer = .2;
     _ballVx = dx / length * .78 * accuracy;
@@ -547,7 +554,34 @@ class BroadcastFootballGame extends FlameGame {
       _opponentHasBall = true;
       _notify('Соперник перехватил мяч!');
     }
+    if (_passTarget != null && _distance(_passTarget!.x, _passTarget!.y, _ballX, _ballY) < .045 && !_opponentHasBall) {
+      _teammateCarrier = _passTarget;
+      _passTarget = null;
+      _notify('Партнёр принял передачу');
+    }
+    if (_teammateCarrier != null) {
+      final carrier = _teammateCarrier!;
+      _ballX = carrier.x + .028;
+      _ballY = carrier.y + .008;
+      _ballVx = 0;
+      _ballVy = 0;
+      if (_aiDecisionTimer <= 0) {
+        _aiDecisionTimer = 1.4;
+        if (carrier.x > .70 && _random.nextDouble() < .32) {
+          _teammateCarrier = null;
+          _ballVx = .88;
+          _ballVy = (.5 - _ballY) * .5;
+          _notify('Партнёр пробивает по воротам!');
+        } else if (_distance(_playerX, _playerY, carrier.x, carrier.y) < .10 && _random.nextDouble() < .45) {
+          _teammateCarrier = null;
+          _ballOwned = true;
+          _notify('Партнёр возвращает мяч тебе');
+        }
+      }
+    }
     if (_opponentHasBall) {
+      _teammateCarrier = null;
+      _passTarget = null;
       _ballX = nearestOpponent.x - .028;
       _ballY = nearestOpponent.y + .008;
       _ballVx = -.10;
@@ -604,6 +638,8 @@ class BroadcastFootballGame extends FlameGame {
       _ballOwned = true;
     }
     if (_ballOwned && _nearBall()) {
+      _teammateCarrier = null;
+      _passTarget = null;
       _ballX = _playerX + .035;
       _ballY = _playerY + .008;
       _ballVx = 0;
@@ -634,7 +670,10 @@ class BroadcastFootballGame extends FlameGame {
     if (_ballX > .985 && _ballY > .39 && _ballY < .61 && _ballHeight < .30) {
       _homeGoals++;
       if (_playerShotInFlight) _playerGoals++;
+      if (_assistPending) _playerAssists++;
+      _assistPending = false;
       _playerShotInFlight = false;
+      _assistPending = false;
       scoreText.value = '$_homeGoals : $_awayGoals';
       _opponentHasBall = false; _ballOwned = false;
       _notify('ГОЛ! Отличная атака!');
@@ -718,7 +757,7 @@ class BroadcastFootballGame extends FlameGame {
       homeGoals: homeGoals,
       awayGoals: awayGoals,
       playerGoals: _playerGoals,
-      playerAssists: 0,
+      playerAssists: _playerAssists,
       yellowCards: 0,
       redCards: 0,
       playerRating: (6.0 + _playerGoals * .8).clamp(4.0, 10.0).toDouble(),
@@ -727,7 +766,7 @@ class BroadcastFootballGame extends FlameGame {
   }
 
   void _resetAfterGoal() {
-    _ballX = .5; _ballY = .5; _ballVx = 0; _ballVy = 0; _ballSpin = 0; _ballHeight = 0; _ballHeightVelocity = 0; _ballBounce = 0; _ballOwned = false; _opponentHasBall = false;
+    _ballX = .5; _ballY = .5; _ballVx = 0; _ballVy = 0; _ballSpin = 0; _ballHeight = 0; _ballHeightVelocity = 0; _ballBounce = 0; _ballOwned = false; _opponentHasBall = false; _teammateCarrier = null; _passTarget = null;
     _playerX = .38; _playerY = .5;
     final user = _players.firstWhere((p) => p.user);
     user.x = _playerX; user.y = _playerY;
