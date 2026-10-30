@@ -28,7 +28,6 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
   String? _error;
 
   static const Color _bg = Color(0xFF061B0C);
-  static const Color _panel = Color(0xFF0B2813);
   static const Color _green = Color(0xFF22C55E);
 
   @override
@@ -169,7 +168,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                       'assets/icons/table.svg',
                       width: 32,
                       height: 32,
-                      color: Colors.white,
+                      colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                     ),
                     SizedBox(height: 2),
                     Text(
