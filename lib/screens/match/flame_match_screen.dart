@@ -314,6 +314,7 @@ class BroadcastFootballGame extends FlameGame {
   bool _opponentHasBall = false;
   double _tackleCooldown = 0;
   double _aiDecisionTimer = 0;
+  double _aiTackleTimer = 0;
   double _matchClock = 0;
   bool _sprinting = false;
   bool _ballOwned = true;
@@ -493,10 +494,20 @@ class BroadcastFootballGame extends FlameGame {
       double speed;
 
       if (p.isGoalkeeper) {
-        // Keepers stay close to their goal line and shift laterally with the ball.
-        tx = p.home ? .065 : .935;
-        ty = (.5 + (_ballY - .5) * .72).clamp(.34, .66).toDouble();
-        speed = .18;
+        // Goalkeepers read the ball's projected crossing point, not only its current lane.
+        final defendingLeft = p.home;
+        final goalX = defendingLeft ? .065 : .935;
+        final closingIn = defendingLeft ? _ballVx < -.08 : _ballVx > .08;
+        final timeToLine = closingIn
+            ? ((goalX - _ballX) / _ballVx).abs().clamp(0.0, .65).toDouble()
+            : 0.0;
+        final predictedY = (_ballY + _ballVy * timeToLine)
+            .clamp(.30, .70).toDouble();
+        tx = (goalX + (closingIn ? (defendingLeft ? .018 : -.018) : 0))
+            .clamp(.035, .965).toDouble();
+        ty = (.5 + (predictedY - .5) * (closingIn ? .92 : .68))
+            .clamp(.32, .68).toDouble();
+        speed = closingIn ? .27 : .16;
       } else if (!p.home) {
         final hasBall = _opponentHasBall && identical(p, nearestOpponent);
         final isPressing = identical(p, nearestOpponent) && !_ballOwned;
@@ -648,11 +659,29 @@ class BroadcastFootballGame extends FlameGame {
       _ballVy = 0;
     }
 
+    // AI defenders attempt timed tackles when the user carries the ball.
+    _aiTackleTimer = math.max(0, _aiTackleTimer - dt).toDouble();
+    if (_ballOwned && _aiTackleTimer <= 0) {
+      final marker = opponents.reduce((a, b) =>
+        _distance(a.x, a.y, _playerX, _playerY) < _distance(b.x, b.y, _playerX, _playerY) ? a : b);
+      if (_distance(marker.x, marker.y, _playerX, _playerY) < .052) {
+        _aiTackleTimer = 1.1 + _random.nextDouble() * .6;
+        final successChance = (.22 + (marker.number % 4) * .035 - _dribbling * .12).clamp(.08, .36);
+        if (_random.nextDouble() < successChance) {
+          _ballOwned = false;
+          _opponentHasBall = true;
+          _assistPending = false;
+          _notify('Соперник пытается отобрать мяч!');
+        }
+      }
+    }
+
     // Goalkeeper reactions: anticipate the shot, dive and parry it back into play.
     if (_ballVx < -0.18 && _ballX < .14 && _ballY > .30 && _ballY < .70) {
       final keeper = _players.firstWhere((p) => p.home && p.isGoalkeeper);
-      if (_distance(keeper.x, keeper.y, .055, _ballY) < .105) {
+      if (_distance(keeper.x, keeper.y, .055, _ballY) < .105 && _ballHeight < .78) {
         keeper.diveTimer = .55;
+        _ballHeightVelocity = math.max(_ballHeightVelocity, .22);
         _ballVx = _ballVx.abs() * .48;
         _ballVy += (keeper.y - _ballY) * 1.6;
         _ballX = .105;
@@ -660,8 +689,9 @@ class BroadcastFootballGame extends FlameGame {
       }
     } else if (_ballVx > 0.18 && _ballX > .86 && _ballY > .30 && _ballY < .70) {
       final keeper = _players.firstWhere((p) => !p.home && p.isGoalkeeper);
-      if (_distance(keeper.x, keeper.y, .945, _ballY) < .105) {
+      if (_distance(keeper.x, keeper.y, .945, _ballY) < .105 && _ballHeight < .78) {
         keeper.diveTimer = .55;
+        _ballHeightVelocity = math.max(_ballHeightVelocity, .22);
         _ballVx = -_ballVx.abs() * .48;
         _ballVy += (keeper.y - _ballY) * 1.6;
         _ballX = .895;
