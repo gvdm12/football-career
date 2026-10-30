@@ -152,6 +152,26 @@ class _FlameMatchScreenState extends State<FlameMatchScreen> {
                     right: 22,
                     child: Column(
                       children: [
+                        PopupMenuButton<String>(
+                          tooltip: 'Выбрать тип удара',
+                          onSelected: game.setShotType,
+                          color: const Color(0xFF173B27),
+                          itemBuilder: (_) => const [
+                            PopupMenuItem(value: 'normal', child: Text('Обычный удар', style: TextStyle(color: Colors.white))),
+                            PopupMenuItem(value: 'power', child: Text('Сильный удар', style: TextStyle(color: Colors.white))),
+                            PopupMenuItem(value: 'curl', child: Text('Удар с подкруткой', style: TextStyle(color: Colors.white))),
+                            PopupMenuItem(value: 'chip', child: Text('Удар с навесом', style: TextStyle(color: Colors.white))),
+                          ],
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(color: const Color(0xDD10291B), borderRadius: BorderRadius.circular(18), border: Border.all(color: Colors.white54)),
+                            child: ValueListenableBuilder<String>(
+                              valueListenable: game.shotTypeText,
+                              builder: (_, value, __) => Text(value, style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
                         _action('УДАР', Icons.sports_soccer, game.shoot, const Color(0xFF168B49)),
                         const SizedBox(height: 10),
                         _action('ПАС', Icons.swap_horiz, game.pass, const Color(0xFF2765A8)),
@@ -237,6 +257,7 @@ class BroadcastFootballGame extends FlameGame {
 
   final ValueNotifier<String> scoreText = ValueNotifier('0 : 0');
   final ValueNotifier<String> eventText = ValueNotifier('Матч начался • Найди свободное пространство');
+  final ValueNotifier<String> shotTypeText = ValueNotifier('ОБЫЧНЫЙ');
   final List<_Footballer> _players = [];
   final math.Random _random = math.Random();
 
@@ -247,6 +268,9 @@ class BroadcastFootballGame extends FlameGame {
   double _ballVx = 0;
   double _ballVy = 0;
   double _ballSpin = 0;
+  double _ballHeight = 0;
+  double _ballHeightVelocity = 0;
+  String _shotType = 'normal';
   double _ballBounce = 0;
   double _moveX = 0;
   double _moveY = 0;
@@ -315,18 +339,51 @@ class BroadcastFootballGame extends FlameGame {
     _eventTimer = 2.6;
   }
 
+  void setShotType(String type) {
+    _shotType = type;
+    shotTypeText.value = switch (type) {
+      'power' => 'СИЛЬНЫЙ',
+      'curl' => 'С ПОДКРУТКОЙ',
+      'chip' => 'НАВЕСОМ',
+      _ => 'ОБЫЧНЫЙ',
+    };
+  }
+
   void shoot() {
     if (!_nearBall()) { _notify('Подойди к мячу, чтобы пробить'); return; }
-    final power = 1.0 + _shooting * .45;
+    final user = _players.firstWhere((p) => p.user);
+    final direction = user.facingX >= 0 ? 1.0 : -1.0;
+    var power = 1.0 + _shooting * .45;
+    _ballHeight = 0;
+    _ballHeightVelocity = 0;
+    switch (_shotType) {
+      case 'power':
+        power *= 1.42;
+        _ballSpin = 0;
+        _notify('Мощный удар!');
+        break;
+      case 'curl':
+        power *= .88;
+        _ballSpin = (user.facingY == 0 ? -.55 : user.facingY.sign * .7) *
+            (.65 + _dribbling * .55);
+        _notify('Удар с подкруткой!');
+        break;
+      case 'chip':
+        power *= .78;
+        _ballHeightVelocity = .72 + _shooting * .35;
+        _ballSpin = _moveY * .12;
+        _notify('Удар с навесом!');
+        break;
+      default:
+        _ballSpin = (_moveY * .75 + user.facingY * .25) *
+            (.25 + _dribbling * .55);
+        _notify('Удар по воротам!');
+    }
     _ballOwned = false;
     _opponentHasBall = false;
-    _players.firstWhere((p) => p.user).kickTimer = .32;
-    final direction = _players.firstWhere((p) => p.user).facingX >= 0 ? 1.0 : -1.0;
+    user.kickTimer = .32;
     _ballVx = power * direction;
     _ballVy = (.5 - _ballY) * .42 + _moveY * .12;
-    _ballSpin = (_moveY * .75 + _players.firstWhere((p) => p.user).facingY * .25) *
-        (.25 + _dribbling * .55);
-    _notify('Удар по воротам!');
   }
 
   void pass() {
@@ -342,6 +399,8 @@ class BroadcastFootballGame extends FlameGame {
     _players.firstWhere((p) => p.user).kickTimer = .2;
     _ballVx = dx / length * .78 * accuracy;
     _ballVy = dy / length * .78 * accuracy;
+    _ballHeight = 0;
+    _ballHeightVelocity = 0;
     _ballSpin = (dy / length) * .08 * (1 - _passing);
     _notify('Передача партнёру');
   }
@@ -467,6 +526,9 @@ class BroadcastFootballGame extends FlameGame {
     } else if (!_ballOwned) {
       // Spin bends the flight path; air resistance gradually reduces speed and curl.
       _ballVy += _ballSpin * _ballVx.abs() * dt;
+      _ballHeight += _ballHeightVelocity * dt;
+      _ballHeightVelocity -= 1.8 * dt;
+      if (_ballHeight < 0) { _ballHeight = 0; _ballHeightVelocity = -_ballHeightVelocity * .28; if (_ballHeightVelocity.abs() < .12) _ballHeightVelocity = 0; }
       _ballX += _ballVx * dt;
       _ballY += _ballVy * dt;
       final friction = math.pow(.30, dt).toDouble();
@@ -585,7 +647,7 @@ class BroadcastFootballGame extends FlameGame {
   }
 
   void _resetAfterGoal() {
-    _ballX = .5; _ballY = .5; _ballVx = 0; _ballVy = 0; _ballSpin = 0; _ballBounce = 0; _ballOwned = false; _opponentHasBall = false;
+    _ballX = .5; _ballY = .5; _ballVx = 0; _ballVy = 0; _ballSpin = 0; _ballHeight = 0; _ballHeightVelocity = 0; _ballBounce = 0; _ballOwned = false; _opponentHasBall = false;
     _playerX = .38; _playerY = .5;
     final user = _players.firstWhere((p) => p.user);
     user.x = _playerX; user.y = _playerY;
@@ -698,15 +760,16 @@ class BroadcastFootballGame extends FlameGame {
 
   void _drawBall(Canvas canvas, double x, double y) {
     final r = size.y * .012;
+    final drawY = y - _ballHeight * size.y * .12;
     canvas.drawOval(Rect.fromCenter(center: Offset(x + r * .5, y + r * 1.8), width: r * 3.2, height: r * 1.1), Paint()..color = Colors.black.withValues(alpha: .38));
-    canvas.drawCircle(Offset(x, y), r, Paint()..shader = const RadialGradient(colors: [Colors.white, Color(0xFFD5D9D6), Color(0xFF858B88)], center: Alignment(-.3, -.4)).createShader(Rect.fromCircle(center: Offset(x, y), radius: r)));
-    canvas.drawCircle(Offset(x, y), r, Paint()..color = Colors.black54..style = PaintingStyle.stroke..strokeWidth = .7);
+    canvas.drawCircle(Offset(x, drawY), r, Paint()..shader = const RadialGradient(colors: [Colors.white, Color(0xFFD5D9D6), Color(0xFF858B88)], center: Alignment(-.3, -.4)).createShader(Rect.fromCircle(center: Offset(x, drawY), radius: r)));
+    canvas.drawCircle(Offset(x, drawY), r, Paint()..color = Colors.black54..style = PaintingStyle.stroke..strokeWidth = .7);
     canvas.save();
-    canvas.translate(x, y);
+    canvas.translate(x, drawY);
     canvas.rotate(_matchClock * (_ballVx.abs() + _ballVy.abs()) * 3);
     canvas.drawCircle(Offset.zero, r * .28, Paint()..color = const Color(0xFF20252A));
     final panel = Paint()..color = const Color(0xFF252B30)..style = PaintingStyle.stroke..strokeWidth = r * .12;
-    canvas.drawLine(Offset(x - r * .65, y), Offset(x + r * .65, y), panel);
+    canvas.drawLine(Offset(-r * .65, 0), Offset(r * .65, 0), panel);
     canvas.drawLine(Offset(0, -r * .65), Offset(0, r * .65), panel);
     canvas.restore();
   }
