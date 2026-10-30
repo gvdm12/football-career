@@ -15,6 +15,7 @@ import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/screens/development_screen.dart';
 import 'package:flutter_football/screens/league_table/league_table_screen.dart';
 import 'package:flutter_football/screens/match/match_screen.dart';
+import 'package:flutter_football/screens/match/flame_match_screen.dart';
 import 'package:flutter_football/screens/transfers/transfer_screen.dart';
 import 'package:flutter_football/screens/world_cup_screen.dart';
 import 'package:flutter_football/services/app_strings.dart';
@@ -2003,6 +2004,19 @@ class _SeasonScreenState extends State<SeasonScreen> {
     );
   }
 
+  Future<void> _openFlamePrototype() async {
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FlameMatchScreen(
+          playerName: career.player.name,
+          clubName: career.player.club,
+          opponentName: 'Соперник',
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final nextMatch = currentMatch;
@@ -2109,6 +2123,40 @@ class _SeasonScreenState extends State<SeasonScreen> {
                             children: [
                               _buildProgressCard(),
                               const SizedBox(height: 8),
+                              Card(
+                                color: const Color(0xFF0A2110),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                  side: const BorderSide(
+                                    color: Color(0xFF22C55E),
+                                  ),
+                                ),
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.sports_soccer,
+                                    color: Color(0xFF8BE07F),
+                                    size: 30,
+                                  ),
+                                  title: const Text(
+                                    'Тестовый 2D-матч',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  subtitle: const Text(
+                                    'Проверь управление на игровом поле',
+                                    style: TextStyle(color: Colors.white70),
+                                  ),
+                                  trailing: const Icon(
+                                    Icons.play_arrow,
+                                    color: Color(0xFF8BE07F),
+                                  ),
+                                  onTap: isSaving || seasonFinishing
+                                      ? null
+                                      : _openFlamePrototype,
+                                ),
+                              ),
                               if (isSaving)
                                 const Padding(
                                   padding: EdgeInsets.all(12),
