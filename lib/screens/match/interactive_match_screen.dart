@@ -80,7 +80,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       isHome: widget.isHome,
     );
     _playerPlayed = baseMatch.playerPlayed;
-    _playerAssists = 0;
+    _playerAssists = baseMatch.playerAssists;
     // Сохраняем командные голы обычной модели, но заменяем
     // заранее сгенерированные голы игрока интерактивными эпизодами.
     _homeGoals = baseMatch.homeGoals - (widget.isHome ? baseMatch.playerGoals : 0);
@@ -254,7 +254,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   }
 
   void _choose(String action) {
-    if (_finished) return;
+    if (_finished || !_momentReady) return;
     final skill = _skill(action);
     final isAttackingAction = [
       'shoot', 'longShot', 'header', 'pass', 'throughPass', 'cross', 'dribble'
@@ -270,11 +270,9 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         .clamp(0.12, 0.91);
     final success = _random.nextDouble() < chance;
     if (success) _successfulActions++;
-    if (success) _successfulActions++;
     String message;
 
     if (action == 'shoot' || action == 'longShot' || action == 'header') {
-      _shots++;
       _shots++;
       if (success && _random.nextDouble() < (action == 'header' ? 0.36 : 0.43)) {
         if (widget.isHome) { _homeGoals++; } else { _awayGoals++; }
