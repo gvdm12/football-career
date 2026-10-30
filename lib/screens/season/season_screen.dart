@@ -15,6 +15,7 @@ import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/screens/development_screen.dart';
 import 'package:flutter_football/screens/league_table/league_table_screen.dart';
 import 'package:flutter_football/screens/match/match_screen.dart';
+import 'package:flutter_football/screens/match/interactive_match_screen.dart';
 import 'package:flutter_football/screens/match/flame_match_screen.dart';
 import 'package:flutter_football/screens/transfers/transfer_screen.dart';
 import 'package:flutter_football/screens/world_cup_screen.dart';
@@ -989,22 +990,20 @@ class _SeasonScreenState extends State<SeasonScreen> {
       return;
     }
 
-    final match = Match.generate(
-      player: career.player,
-      career: career,
-      opponent: seasonMatch.opponent,
-      isHome: seasonMatch.isHome,
-    );
-
-    final updatedCareer = await Navigator.push<Career>(
+    final match = await Navigator.push<Match>(
       context,
       MaterialPageRoute(
-        builder: (_) =>
-            MatchScreen(career: career, match: match, isCupMatch: true),
+        builder: (_) => InteractiveMatchScreen(
+          career: career,
+          opponent: seasonMatch.opponent,
+          isHome: seasonMatch.isHome,
+        ),
       ),
     );
 
-    if (!mounted || updatedCareer == null) return;
+    if (!mounted || match == null) return;
+
+    final updatedCareer = career.afterMatch(match);
 
     // Проверяем, что матч соответствует клубу игрока и сопернику.
     final expectedHomeTeam = seasonMatch.isHome
