@@ -1086,6 +1086,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
     if (!mounted || matchMode == null) return;
 
     Match? match;
+    Career? classicUpdatedCareer;
     if (matchMode == 'interactive') {
       match = await Navigator.push<Match>(
         context,
@@ -1104,11 +1105,22 @@ class _SeasonScreenState extends State<SeasonScreen> {
         opponent: seasonMatch.opponent,
         isHome: seasonMatch.isHome,
       );
+
+      classicUpdatedCareer = await Navigator.push<Career>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MatchScreen(
+            career: career,
+            match: match!,
+            isCupMatch: false,
+          ),
+        ),
+      );
     }
 
     if (!mounted || match == null) return;
 
-    final updatedCareer = career.afterMatch(match);
+    final updatedCareer = classicUpdatedCareer ?? career.afterMatch(match);
 
     // Проверяем, что матч соответствует клубу игрока и сопернику.
     final expectedHomeTeam = seasonMatch.isHome
@@ -2103,19 +2115,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _openFlamePrototype() async {
-    await Navigator.push<void>(
-      context,
-      MaterialPageRoute(
-        builder: (_) => FlameMatchScreen(
-          playerName: career.player.name,
-          clubName: career.player.club,
-          opponentName: 'Соперник',
         ),
       ),
     );
