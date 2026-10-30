@@ -265,6 +265,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     final chance = (0.52 + (skill - 60) * 0.007 + advantage - difficulty)
         .clamp(0.12, 0.91);
     final success = _random.nextDouble() < chance;
+    if (success) _successfulActions++;
     String message;
 
     if (action == 'shoot' || action == 'longShot' || action == 'header') {
