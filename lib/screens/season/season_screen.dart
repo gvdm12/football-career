@@ -16,7 +16,6 @@ import 'package:flutter_football/screens/development_screen.dart';
 import 'package:flutter_football/screens/league_table/league_table_screen.dart';
 import 'package:flutter_football/screens/match/match_screen.dart';
 import 'package:flutter_football/screens/match/interactive_match_screen.dart';
-import 'package:flutter_football/screens/match/flame_match_screen.dart';
 import 'package:flutter_football/screens/transfers/transfer_screen.dart';
 import 'package:flutter_football/screens/world_cup_screen.dart';
 import 'package:flutter_football/services/app_strings.dart';
@@ -969,6 +968,56 @@ class _SeasonScreenState extends State<SeasonScreen> {
     }
   }
 
+  Widget _matchModeTile({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String description,
+    required String value,
+  }) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: () => Navigator.pop(context, value),
+      child: Ink(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: const Color(0xFF123A1D),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFF24552C)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: const Color(0xFF8BE07F), size: 28),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    description,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: Colors.white54),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _playMatch(SeasonMatch seasonMatch) async {
     if (isSaving || seasonFinishing || seasonMatch.isPlayed) return;
 
@@ -990,18 +1039,72 @@ class _SeasonScreenState extends State<SeasonScreen> {
       return;
     }
 
-    final match = await Navigator.push<Match>(
-      context,
-      MaterialPageRoute(
-        builder: (_) => FlameMatchScreen(
-          playerName: career.player.name,
-          clubName: career.player.club,
-          opponentName: seasonMatch.opponent,
-          player: career.player,
-          isHome: seasonMatch.isHome,
+    final matchMode = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: const Color(0xFF0B2111),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'Выберите режим матча',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 19,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              _matchModeTile(
+                context: sheetContext,
+                icon: Icons.fast_forward_rounded,
+                title: 'Обычная симуляция',
+                description: 'Матч рассчитывается автоматически, как раньше',
+                value: 'classic',
+              ),
+              const SizedBox(height: 10),
+              _matchModeTile(
+                context: sheetContext,
+                icon: Icons.sports_soccer_rounded,
+                title: 'Интерактивная симуляция',
+                description: 'Ход матча прерывается ключевыми игровыми моментами',
+                value: 'interactive',
+              ),
+            ],
+          ),
         ),
       ),
     );
+
+    if (!mounted || matchMode == null) return;
+
+    Match? match;
+    if (matchMode == 'interactive') {
+      match = await Navigator.push<Match>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => InteractiveMatchScreen(
+            career: career,
+            opponent: seasonMatch.opponent,
+            isHome: seasonMatch.isHome,
+          ),
+        ),
+      );
+    } else {
+      match = Match.generate(
+        player: career.player,
+        career: career,
+        opponent: seasonMatch.opponent,
+        isHome: seasonMatch.isHome,
+      );
+    }
 
     if (!mounted || match == null) return;
 
