@@ -323,6 +323,8 @@ class BroadcastFootballGame extends FlameGame {
   double _playerY = .52;
   double _ballX = .36;
   double _ballY = .52;
+  double _cameraX = .50;
+  double _cameraY = .50;
   double _ballVx = 0;
   double _ballVy = 0;
   double _ballSpin = 0;
@@ -541,6 +543,11 @@ class BroadcastFootballGame extends FlameGame {
     _playerX = (_playerX + user.vx * dt).clamp(.035, .965).toDouble();
     _playerY = (_playerY + user.vy * dt).clamp(.055, .945).toDouble();
     user.x = _playerX; user.y = _playerY;
+    final cameraTargetX = (_ballX * .72 + _playerX * .28).clamp(.24, .76).toDouble();
+    final cameraTargetY = (_ballY * .72 + _playerY * .28).clamp(.22, .78).toDouble();
+    final cameraSmoothing = (dt * 1.65).clamp(0.0, 1.0).toDouble();
+    _cameraX += (cameraTargetX - _cameraX) * cameraSmoothing;
+    _cameraY += (cameraTargetY - _cameraY) * cameraSmoothing;
 
     if (_tackleCooldown > 0) _tackleCooldown = math.max(0, _tackleCooldown - dt).toDouble();
     _aiDecisionTimer -= dt;
@@ -940,6 +947,9 @@ class BroadcastFootballGame extends FlameGame {
       begin: Alignment.topCenter, end: Alignment.bottomCenter,
       colors: [Color(0xFF101C22), Color(0xFF263B31), Color(0xFF101C22)],
     ).createShader(Rect.fromLTWH(0, 0, w, h)));
+    const cameraZoom = 1.10;
+    canvas.translate(w * .5 - _cameraX * w * cameraZoom, h * .5 - _cameraY * h * cameraZoom);
+    canvas.scale(cameraZoom);
     final field = Rect.fromLTWH(w * .025, h * .055, w * .95, h * .89);
     canvas.drawRRect(RRect.fromRectAndRadius(field, const Radius.circular(8)), Paint()..color = const Color(0xFF176B3A));
     for (var i = 0; i < 12; i++) {
