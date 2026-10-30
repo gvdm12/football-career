@@ -182,7 +182,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       homeGoals: _homeGoals,
       awayGoals: _awayGoals,
       playerGoals: _playerPlayed ? min(_playerGoals, widget.isHome ? _homeGoals : _awayGoals) : 0,
-      playerAssists: _playerPlayed ? min(_playerAssists, widget.isHome ? _homeGoals : _awayGoals) : 0,
+      playerAssists: _playerPlayed ? min(_playerAssists, max(0, (widget.isHome ? _homeGoals : _awayGoals) - _playerGoals)) : 0,
       yellowCards: _playerPlayed ? _yellowCards : 0,
       redCards: _playerPlayed ? _redCards : 0,
       playerRating: _playerPlayed ? double.parse(_rating.toStringAsFixed(1)) : 0,
@@ -239,13 +239,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _finished ? _finish : () {
-                        setState(() {
-                          _minute = 90;
-                          _finished = true;
-                          _event = 'Матч завершён. Вы не участвовали во встрече.';
-                        });
-                      },
+                      onPressed: _finish,
                       child: const Text('Завершить матч'),
                     ),
                   ),
