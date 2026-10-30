@@ -482,7 +482,9 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.white70),
                   )
-                else if (!_finished && _momentReady) ...[
+                else if (_finished) ...[
+                  _buildMatchSummary(),
+                ] else if (_momentReady) ...[
                   const Text(
                     'Выберите действие',
                     style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -508,6 +510,59 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildMatchSummary() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF102D19),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF24552C)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'СТАТИСТИКА МАТЧА',
+            style: TextStyle(
+              color: Color(0xFF8BE07F),
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
+          ),
+          const SizedBox(height: 10),
+          _summaryRow('Голы', '$_playerGoals'),
+          _summaryRow('Голевые передачи', '$_playerAssists'),
+          _summaryRow('Удары', '$_shots'),
+          _summaryRow('Успешные действия', '$_successfulActions'),
+          _summaryRow('Жёлтые карточки', '$_yellowCards'),
+          _summaryRow('Красные карточки', '$_redCards'),
+          _summaryRow('Оценка', _rating.clamp(4.0, 10.0).toStringAsFixed(1)),
+        ],
+      ),
+    );
+  }
+
+  Widget _summaryRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(label, style: const TextStyle(color: Colors.white70)),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }
