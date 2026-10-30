@@ -201,7 +201,7 @@ class _FlameMatchScreenState extends State<FlameMatchScreen> {
 }
 
 class _Footballer {
-  _Footballer(this.x, this.y, this.home, {this.user = false, this.number = 0})
+  _Footballer(this.x, this.y, this.home, {this.user = false, this.number = 0, this.isGoalkeeper = false})
       : homeX = x,
         homeY = y;
   double x;
@@ -209,6 +209,8 @@ class _Footballer {
   final bool home;
   final bool user;
   final int number;
+  final bool isGoalkeeper;
+  double diveTimer = 0;
   double vx = 0;
   double vy = 0;
   double animationPhase = 0;
@@ -273,11 +275,11 @@ class BroadcastFootballGame extends FlameGame {
       [.57, .24], [.57, .50], [.57, .76], [.42, .28], [.42, .72], [.67, .50],
     ];
     for (var i = 0; i < homeFormation.length; i++) {
-      _players.add(_Footballer(homeFormation[i][0], homeFormation[i][1], true, number: i + 2));
+      _players.add(_Footballer(homeFormation[i][0], homeFormation[i][1], true, number: i + 2, isGoalkeeper: i == 0));
     }
     _players.add(_Footballer(_playerX, _playerY, true, user: true, number: 10));
     for (var i = 0; i < awayFormation.length; i++) {
-      _players.add(_Footballer(awayFormation[i][0], awayFormation[i][1], false, number: i + 1));
+      _players.add(_Footballer(awayFormation[i][0], awayFormation[i][1], false, number: i + 1, isGoalkeeper: i == 0));
     }
   }
 
@@ -288,7 +290,7 @@ class BroadcastFootballGame extends FlameGame {
   void tackle() {
     if (_tackleCooldown > 0) return;
     _tackleCooldown = .8;
-    final opponent = _players.where((p) => !p.home).reduce((a, b) =>
+    final opponent = _players.where((p) => !p.home && !p.isGoalkeeper).reduce((a, b) =>
       _distance(a.x, a.y, _playerX, _playerY) < _distance(b.x, b.y, _playerX, _playerY) ? a : b);
     if (_distance(opponent.x, opponent.y, _playerX, _playerY) < .095 && _opponentHasBall) {
       _opponentHasBall = false;
@@ -324,7 +326,7 @@ class BroadcastFootballGame extends FlameGame {
 
   void pass() {
     if (!_nearBall()) { _notify('Сначала доберись до мяча'); return; }
-    final teammate = _players.where((p) => p.home && !p.user)
+    final teammate = _players.where((p) => p.home && !p.user && !p.isGoalkeeper)
       .reduce((a, b) => _distance(a.x, a.y, _ballX, _ballY) < _distance(b.x, b.y, _ballX, _ballY) ? a : b);
     final dx = teammate.x - _ballX;
     final dy = teammate.y - _ballY;
@@ -364,8 +366,8 @@ class BroadcastFootballGame extends FlameGame {
     _aiDecisionTimer -= dt;
 
     // Find the nearest opponent and teammate to the ball.
-    final opponents = _players.where((p) => !p.home).toList();
-    final teammates = _players.where((p) => p.home && !p.user).toList();
+    final opponents = _players.where((p) => !p.home && !p.isGoalkeeper).toList();
+    final teammates = _players.where((p) => p.home && !p.user && !p.isGoalkeeper).toList();
     final nearestOpponent = opponents.reduce((a, b) =>
       _distance(a.x, a.y, _ballX, _ballY) < _distance(b.x, b.y, _ballX, _ballY) ? a : b);
     final nearestTeammate = teammates.reduce((a, b) =>
@@ -377,7 +379,12 @@ class BroadcastFootballGame extends FlameGame {
       double ty;
       double speed;
 
-      if (!p.home) {
+      if (p.isGoalkeeper) {
+        // Keepers stay close to their goal line and shift laterally with the ball.
+        tx = p.home ? .065 : .935;
+        ty = (.5 + (_ballY - .5) * .72).clamp(.34, .66).toDouble();
+        speed = .18;
+      } else if (!p.home) {
         final hasBall = _opponentHasBall && identical(p, nearestOpponent);
         final isPressing = identical(p, nearestOpponent) && !_ballOwned;
         if (hasBall) {
@@ -423,6 +430,7 @@ class BroadcastFootballGame extends FlameGame {
       p.y += (dy / len * math.min(len, speed * dt)).toDouble();
       p.vx = (p.x - oldX) / math.max(dt, .001);
       p.vy = (p.y - oldY) / math.max(dt, .001);
+      if (p.diveTimer > 0) p.diveTimer = math.max(0, p.diveTimer - dt).toDouble();
       _animateFootballer(p, dt);
     }
 
@@ -465,6 +473,27 @@ class BroadcastFootballGame extends FlameGame {
       _ballY = _playerY + .008;
       _ballVx = 0;
       _ballVy = 0;
+    }
+
+    // Goalkeeper reactions: anticipate the shot, dive and parry it back into play.
+    if (_ballVx < -0.18 && _ballX < .14 && _ballY > .30 && _ballY < .70) {
+      final keeper = _players.firstWhere((p) => p.home && p.isGoalkeeper);
+      if (_distance(keeper.x, keeper.y, .055, _ballY) < .105) {
+        keeper.diveTimer = .55;
+        _ballVx = _ballVx.abs() * .48;
+        _ballVy += (keeper.y - _ballY) * 1.6;
+        _ballX = .105;
+        _notify('Вратарь отражает удар!');
+      }
+    } else if (_ballVx > 0.18 && _ballX > .86 && _ballY > .30 && _ballY < .70) {
+      final keeper = _players.firstWhere((p) => !p.home && p.isGoalkeeper);
+      if (_distance(keeper.x, keeper.y, .945, _ballY) < .105) {
+        keeper.diveTimer = .55;
+        _ballVx = -_ballVx.abs() * .48;
+        _ballVy += (keeper.y - _ballY) * 1.6;
+        _ballX = .895;
+        _notify('Вратарь соперника спасает команду!');
+      }
     }
 
     if (_ballX > .985 && _ballY > .39 && _ballY < .61) {
@@ -556,17 +585,19 @@ class BroadcastFootballGame extends FlameGame {
   void _drawPlayer(Canvas canvas, double x, double y, _Footballer player) {
     final scale = .72 + player.y * .55;
     final radius = size.y * .022 * scale;
-    final color = player.home ? _homeColor : _awayColor;
+    final color = player.isGoalkeeper ? const Color(0xFFF0C542) : (player.home ? _homeColor : _awayColor);
     final speed = math.sqrt(player.vx * player.vx + player.vy * player.vy);
     final running = (speed > .025 || player.user && (_moveX != 0 || _moveY != 0));
     final stride = running ? math.sin(player.animationPhase) : 0.0;
     final armSwing = running ? math.cos(player.animationPhase) * .28 : 0.0;
     final kick = player.kickTimer > 0 ? (player.kickTimer / .32) : 0.0;
     final bodyTilt = (player.facingX * .12).clamp(-.12, .12).toDouble();
+    final diving = player.diveTimer > 0;
+    final diveLean = diving ? (player.home ? -1.0 : 1.0) * .65 : 0.0;
 
     // Ground shadow and moving limbs make the footballer read as an animated figure.
     canvas.drawOval(
-      Rect.fromCenter(center: Offset(x, y + radius * 1.48), width: radius * 2.8, height: radius * .9),
+      Rect.fromCenter(center: Offset(x, y + radius * 1.48), width: radius * (diving ? 3.8 : 2.8), height: radius * .9),
       Paint()..color = Colors.black.withValues(alpha: .38),
     );
     final limb = Paint()..color = const Color(0xFF202A32)..strokeWidth = radius * .34..strokeCap = StrokeCap.round;
@@ -581,7 +612,7 @@ class BroadcastFootballGame extends FlameGame {
     canvas.drawLine(Offset(x - radius * .55, y - radius * .25), Offset(x - radius * (.78 + armSwing), y + radius * .35), arm);
     canvas.drawLine(Offset(x + radius * .55, y - radius * .25), Offset(x + radius * (.78 - armSwing), y + radius * .35), arm);
 
-    final torso = Rect.fromCenter(center: Offset(x + bodyTilt * radius, y), width: radius * 1.72, height: radius * 1.48);
+    final torso = Rect.fromCenter(center: Offset(x + (bodyTilt + diveLean) * radius, y + (diving ? radius * .25 : 0)), width: radius * (diving ? 2.05 : 1.72), height: radius * (diving ? 1.05 : 1.48));
     canvas.drawRRect(
       RRect.fromRectAndRadius(torso, Radius.circular(radius * .42)),
       Paint()..shader = LinearGradient(
@@ -591,8 +622,13 @@ class BroadcastFootballGame extends FlameGame {
     );
     canvas.drawLine(Offset(x, y - radius * .58), Offset(x, y + radius * .55),
       Paint()..color = Colors.white.withValues(alpha: .22)..strokeWidth = radius * .12);
-    canvas.drawCircle(Offset(x - bodyTilt * radius, y - radius * .82), radius * .43,
+    canvas.drawCircle(Offset(x + (diving ? diveLean * radius * 1.8 : -bodyTilt * radius), y - (diving ? radius * .25 : radius * .82)), radius * .43,
       Paint()..shader = const RadialGradient(colors: [Color(0xFFF3D2B2), Color(0xFFB98260)]).createShader(Rect.fromCircle(center: Offset(x, y - radius * .82), radius: radius * .43)));
+    if (player.isGoalkeeper) {
+      final gloves = Paint()..color = const Color(0xFFF5F5E8)..strokeWidth = radius * .38..strokeCap = StrokeCap.round;
+      canvas.drawLine(Offset(x - radius * .7, y + radius * .1), Offset(x - radius * 1.05, y + radius * .15), gloves);
+      canvas.drawLine(Offset(x + radius * .7, y + radius * .1), Offset(x + radius * 1.05, y + radius * .15), gloves);
+    }
     if (player.user) {
       canvas.drawCircle(Offset(x, y), radius * 1.58,
         Paint()..color = const Color(0xFFB7FFCA)..style = PaintingStyle.stroke..strokeWidth = 1.5);
@@ -615,5 +651,8 @@ class BroadcastFootballGame extends FlameGame {
     canvas.drawCircle(Offset(x, y), r, Paint()..shader = const RadialGradient(colors: [Colors.white, Color(0xFFD5D9D6), Color(0xFF858B88)], center: Alignment(-.3, -.4)).createShader(Rect.fromCircle(center: Offset(x, y), radius: r)));
     canvas.drawCircle(Offset(x, y), r, Paint()..color = Colors.black54..style = PaintingStyle.stroke..strokeWidth = .7);
     canvas.drawCircle(Offset(x, y), r * .28, Paint()..color = const Color(0xFF20252A));
+    final panel = Paint()..color = const Color(0xFF252B30)..style = PaintingStyle.stroke..strokeWidth = r * .12;
+    canvas.drawLine(Offset(x - r * .65, y), Offset(x + r * .65, y), panel);
+    canvas.drawLine(Offset(x, y - r * .65), Offset(x, y + r * .65), panel);
   }
 }
