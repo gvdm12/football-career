@@ -993,9 +993,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
     final match = await Navigator.push<Match>(
       context,
       MaterialPageRoute(
-        builder: (_) => InteractiveMatchScreen(
-          career: career,
-          opponent: seasonMatch.opponent,
+        builder: (_) => FlameMatchScreen(
+          playerName: career.player.name,
+          clubName: career.player.club,
+          opponentName: seasonMatch.opponent,
+          player: career.player,
           isHome: seasonMatch.isHome,
         ),
       ),
