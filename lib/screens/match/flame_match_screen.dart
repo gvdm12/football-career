@@ -153,8 +153,10 @@ class _FlameMatchScreenState extends State<FlameMatchScreen> {
                     child: Column(
                       children: [
                         _action('УДАР', Icons.sports_soccer, game.shoot, const Color(0xFF168B49)),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 10),
                         _action('ПАС', Icons.swap_horiz, game.pass, const Color(0xFF2765A8)),
+                        const SizedBox(height: 10),
+                        _action('ОТБОР', Icons.shield, game.tackle, const Color(0xFFB36A22)),
                       ],
                     ),
                   ),
@@ -199,7 +201,9 @@ class _FlameMatchScreenState extends State<FlameMatchScreen> {
 }
 
 class _Footballer {
-  _Footballer(this.x, this.y, this.home, {this.user = false, this.number = 0});
+  _Footballer(this.x, this.y, this.home, {this.user = false, this.number = 0})
+      : homeX = x,
+        homeY = y;
   double x;
   double y;
   final bool home;
