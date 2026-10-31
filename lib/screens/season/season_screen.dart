@@ -1249,6 +1249,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     final opponent = tie.homeTeam == club ? tie.awayTeam : tie.homeTeam;
 
+    if (interactive &&
+        !_canPlayInteractiveMatch(opponent: opponent, isHome: isHome)) {
+      return;
+    }
+
     Match generatedMatch;
     Career? interactiveCareer;
     if (interactive) {
@@ -1446,12 +1451,12 @@ class _SeasonScreenState extends State<SeasonScreen> {
         ? tie.homeTeam == club
         : tie.awayTeam == club;
 
+    final opponent = tie.homeTeam == club ? tie.awayTeam : tie.homeTeam;
+
     if (interactive &&
         !_canPlayInteractiveMatch(opponent: opponent, isHome: isHome)) {
       return;
     }
-
-    final opponent = tie.homeTeam == club ? tie.awayTeam : tie.homeTeam;
 
     Match generatedMatch;
     Career? interactiveCareer;
@@ -1687,11 +1692,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
         : cupMatch.homeTeam;
 
     final isHome = cupMatch.homeTeam == playerClub;
-
-    if (interactive &&
-        !_canPlayInteractiveMatch(opponent: opponent, isHome: isHome)) {
-      return;
-    }
 
     if (interactive &&
         !_canPlayInteractiveMatch(opponent: opponent, isHome: isHome)) {
