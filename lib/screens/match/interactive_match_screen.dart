@@ -215,7 +215,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     final roll = _random.nextDouble();
     final position = _player.position;
     final setPieceRoll = _random.nextDouble();
-    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.025) {
+    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.015) {
       _phase = 'penalty';
       _momentTitle = 'ПЕНАЛЬТИ!';
       _momentDescription = 'Судья указал на точку. Один удар может изменить ход матча.';
@@ -223,7 +223,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _momentReady = true;
       return;
     }
-    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.080) {
+    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.045) {
       _phase = 'oneOnOne';
       _momentTitle = 'Выход один на один';
       _momentDescription = 'Вы прорвались за линию защиты. Вратарь выходит навстречу — решите, как завершить атаку.';
@@ -231,7 +231,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _momentReady = true;
       return;
     }
-    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.400) {
+    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.120) {
       _phase = 'corner';
       _momentTitle = 'Угловой удар';
       _momentDescription = 'Партнёры заняли позиции в штрафной. Можно подать на ближнюю/дальнюю штангу или разыграть коротко.';
@@ -239,7 +239,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _momentReady = true;
       return;
     }
-    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.680) {
+    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.200) {
       _phase = 'freeKick';
       _momentTitle = 'Штрафной удар';
       _momentDescription = 'Мяч установлен у штрафной. Выберите прямой удар или передачу партнёру.';
@@ -458,6 +458,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
             ? 'Промах! Мяч прошёл рядом со штангой.'
             : 'Защитник успел заблокировать удар.';
       }
+      _phase = 'buildUp';
     } else if (action == 'keeper') {
       if (success) {
         _rating += 0.48;
@@ -531,6 +532,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         _yellowCards = 2;
         _redCards = 1;
         _playerUnavailable = true;
+        _playerOnPitch = false;
         _injuryName = null;
         message += ' Вторая жёлтая / прямая красная! Судья удаляет вас с поля.';
         _rating -= 0.65;
@@ -548,6 +550,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _injuryName = injuries[_random.nextInt(injuries.length)];
       _injuryMatchesRemaining = 1 + _random.nextInt(4);
       _playerUnavailable = true;
+      _playerOnPitch = false;
       _rating -= 0.25;
       message += ' Вы почувствовали боль и не можете продолжить матч: $_injuryName.';
     }
@@ -561,7 +564,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     if (_playerUnavailable) {
       _createMoment();
     } else {
-      _nextMomentMinute = min(88, _minute + 6 + _random.nextInt(7));
+      final isFollowUp = _phase == 'chance' || _phase == 'aerialChance';
+      _nextMomentMinute = min(88, _minute + (isFollowUp ? 1 : 6 + _random.nextInt(7)));
     }
     setState(() {});
   }
