@@ -21,7 +21,9 @@ class _AgentScreenState extends State<AgentScreen> {
   void initState() {
     super.initState();
     career = widget.career;
-    interests = TransferService.generateOffers(career);
+    interests = career.agentInterestedClubs.isNotEmpty
+        ? TransferService.generateAgentOffersFromInterest(career)
+        : TransferService.generateOffers(career);
     if (career.agentInterestedClubs.isEmpty) {
       career = career.copyWith(
         agentInterestedClubs: interests.map((offer) => offer.club.name).toList(),
