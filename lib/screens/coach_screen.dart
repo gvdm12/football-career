@@ -19,7 +19,8 @@ class CoachScreen extends StatelessWidget {
             career.coachTrust * 0.12 +
             trophies * 1.5)
         .round()
-        .clamp(1, 100);
+        .clamp(1, 100)
+        .toInt();
   }
 
   String get _coachMood {
