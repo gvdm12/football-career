@@ -2274,9 +2274,13 @@ class _SeasonScreenState extends State<SeasonScreen> {
     final previousThree = completedResults.length >= 4
         ? completedResults.sublist(completedResults.length - 4, completedResults.length - 1)
         : <Match>[];
+    final previousWasLosingStreak = previousThree.length == 3 &&
+        previousThree.every(
+          (item) => item.isPlayerLoss(updatedCareer.player.club),
+        );
     final losingStreak = lastThree.length == 3 &&
         lastThree.every((item) => item.isPlayerLoss(updatedCareer.player.club)) &&
-        !previousThree.every((item) => item.isPlayerLoss(updatedCareer.player.club));
+        !previousWasLosingStreak;
     final lastFive = completedResults.length >= 5
         ? completedResults.sublist(completedResults.length - 5)
         : <Match>[];
