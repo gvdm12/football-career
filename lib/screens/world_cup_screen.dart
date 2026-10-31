@@ -156,10 +156,17 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
         : playedPlayerMatch.playerRating >= 8.0
         ? 5
         : 0;
+    final nationalFinalBonus =
+        updatedTournament.isCompleted &&
+            updatedTournament.champion == player.nationality &&
+            earnedNationalMatches > 0
+        ? 50
+        : 0;
     final nationalCurrencyReward = earnedNationalMatches * 10 +
         earnedNationalGoals * 8 +
         earnedNationalAssists * 6 +
-        nationalPerformanceBonus;
+        nationalPerformanceBonus +
+        nationalFinalBonus;
     var updatedCareer = careerAfterMatch.copyWith(
       agentCredits: careerAfterMatch.agentCredits + nationalCurrencyReward,
       worldCup: updatedTournament,
