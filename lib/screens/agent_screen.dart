@@ -216,7 +216,7 @@ class _AgentScreenState extends State<AgentScreen> {
                   Text(
                     AppStrings.isEnglish
                         ? 'Preliminary interest based on your performances. Final offers may change during the transfer window.'
-                        : 'Предварительный интерес клубов с учётом ваших выступлений. Окончательные предложения могут измениться в трансферное окно.',
+                        : 'Предварительный интерес клубов с учётом ваших выступлений.предложения могут измениться.',
                     style: const TextStyle(
                       color: Colors.white54,
                       fontSize: 12,
@@ -286,7 +286,7 @@ class _AgentScreenState extends State<AgentScreen> {
             '€${_money(offer.salary)} / ${AppStrings.isEnglish ? 'month' : 'мес.'}',
           ),
           _line(
-            AppStrings.contractRemaining,
+            AppStrings.contractLabel,
             AppStrings.transferContractDuration(offer.contractYears),
           ),
         ],

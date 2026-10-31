@@ -152,11 +152,11 @@ class AppStrings {
   static String get estimatedOffer =>
       _en ? 'Estimated offer' : 'Предлагаемая зарплата';
   static String get agentFee => _en ? 'Agent development' : 'Развитие агента';
-  static String get gameCurrency => _en ? 'Game currency' : 'Игровая валюта';
+  static String get gameCurrency => _en ? 'Currency' : 'Монеты';
   static String get currencyEarned => _en ? 'Coins earned' : 'Получено монет';
   static String get currencyRewardsHint => _en
-      ? 'Earn coins for goals, assists, strong ratings and season trophies. Appearances alone do not count.'
-      : 'Монеты начисляются за голы, ассисты, высокие оценки и трофеи сезона. Само участие в матче не оплачивается.';
+      ? 'Earn coins for goals, assists, strong ratings and season trophies.'
+      : 'Начисляются за голы, ассисты, высокие оценки и трофеи сезона.';
   static String get agentDescription => _en
       ? 'A stronger agent can negotiate better wages and attract more clubs.'
       : 'Более опытный агент помогает договариваться о зарплате и привлекать интерес клубов.';
