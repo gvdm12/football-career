@@ -64,6 +64,17 @@ class _SeasonScreenState extends State<SeasonScreen> {
     isHome: isHome,
   );
 
+  bool _playerWonMatchWithPenalties(Match match, String team) {
+    final isHome = match.homeTeam == team;
+    final teamGoals = isHome ? match.homeGoals : match.awayGoals;
+    final opponentGoals = isHome ? match.awayGoals : match.homeGoals;
+    if (teamGoals != opponentGoals) return teamGoals > opponentGoals;
+    if (!match.hasPenalties) return false;
+    final teamPenalties = isHome ? match.homePenalties! : match.awayPenalties!;
+    final opponentPenalties = isHome ? match.awayPenalties! : match.homePenalties!;
+    return teamPenalties > opponentPenalties;
+  }
+
   bool get worldCupBlocksSeason {
     final tournament = career.worldCup;
     return tournament != null &&
@@ -1381,6 +1392,13 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     if (!mounted || updatedCareer == null) return;
 
+    if (isFinal && match.playerPlayed &&
+        _playerWonMatchWithPenalties(match, career.player.club)) {
+      updatedCareer = updatedCareer.copyWith(
+        agentCredits: updatedCareer.agentCredits + 50,
+      );
+    }
+
     var updatedTournament = updatedCareer.championsLeague ?? tournament;
 
     if (isFinal) {
@@ -1615,6 +1633,13 @@ class _SeasonScreenState extends State<SeasonScreen> {
     }
 
     if (!mounted || updatedCareer == null) return;
+
+    if (isFinal && match.playerPlayed &&
+        _playerWonMatchWithPenalties(match, career.player.club)) {
+      updatedCareer = updatedCareer.copyWith(
+        agentCredits: updatedCareer.agentCredits + 50,
+      );
+    }
 
     var updatedTournament = updatedCareer.europaLeague ?? tournament;
 
@@ -1860,6 +1885,12 @@ class _SeasonScreenState extends State<SeasonScreen> {
     }
 
     if (!mounted || updatedCareer == null) return;
+
+    if (cupMatch.round == 4 && cupWinner == playerClub && match.playerPlayed) {
+      updatedCareer = updatedCareer.copyWith(
+        agentCredits: updatedCareer.agentCredits + 50,
+      );
+    }
 
     // Используем тот же объект матча, который был передан в MatchScreen.
     final homeGoals = match.homeGoals;
