@@ -114,8 +114,7 @@ class PositionRival {
   static List<PositionRival> advanceMatch(List<PositionRival> rivals) {
     final random = Random();
     return rivals.map((rival) {
-      if (random.nextDouble() > 0.82) return rival;
-      if (random.nextDouble() >= 0.78) return rival;
+      if (random.nextDouble() > 0.25) return rival;
       final matches = rival.matches + 1;
       var goals = 0;
       var assists = 0;
