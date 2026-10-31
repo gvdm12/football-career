@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_football/models/career.dart';
+import 'package:flutter_football/models/match.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/player.dart';
 
@@ -64,6 +65,72 @@ void main() {
       expect(skills.defending, 77);
       expect(skills.pace, 78);
       expect(skills.shooting, 78);
+    });
+  });
+
+  group('Career progression systems', () {
+    final clubName = Clubs.all.first.name;
+
+    Player createTestPlayer() {
+      const skills = PlayerSkills(
+        pace: 70,
+        physical: 70,
+        passing: 70,
+        shooting: 70,
+        defending: 70,
+        dribbling: 70,
+        heading: 70,
+        vision: 70,
+      );
+      return Player(
+        name: 'Test Player',
+        nationality: 'Россия',
+        position: PlayerPosition.forward,
+        age: 22,
+        season: 1,
+        club: clubName,
+        overall: calculateOverall(
+          skills: skills,
+          position: PlayerPosition.forward,
+        ),
+        skills: skills,
+      );
+    }
+
+    test('new career creates two position rivals', () {
+      final career = Career.create(createTestPlayer());
+      expect(career.rivals.length, 2);
+    });
+
+    test('rivals, trust and agent level survive save restoration', () {
+      final career = Career.create(createTestPlayer()).copyWith(
+        coachTrust: 82,
+        agentLevel: 3,
+      );
+      final restored = Career.fromJson(career.toJson());
+
+      expect(restored.rivals.length, career.rivals.length);
+      expect(restored.coachTrust, 82);
+      expect(restored.agentLevel, 3);
+    });
+
+    test('strong performance increases coach trust', () {
+      final career = Career.create(createTestPlayer());
+      const match = Match(
+        homeTeam: 'Club',
+        awayTeam: 'Opponent',
+        homeGoals: 2,
+        awayGoals: 1,
+        playerGoals: 1,
+        playerAssists: 0,
+        yellowCards: 0,
+        redCards: 0,
+        playerRating: 8.5,
+        playerPlayed: true,
+      );
+
+      final updated = career.afterMatch(match);
+      expect(updated.coachTrust, 68);
     });
   });
 }
