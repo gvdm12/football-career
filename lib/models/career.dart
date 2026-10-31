@@ -925,6 +925,7 @@ class Career {
           break;
         case SkillName.heading:
           skills = skills.copyWith(heading: newValue);
+          break;
         case SkillName.vision:
           skills = skills.copyWith(vision: newValue);
       }
@@ -955,8 +956,9 @@ class Career {
   Player _applyAgeDecline(Player currentPlayer, int newAge, int newSeason) {
     var skills = currentPlayer.skills;
 
-    // Начиная с 16-го сезона начинается резкий спад.
-    // Все навыки теряют 4 пункта, профильный навык — ещё 1.
+    // Начиная с 16-го сезона начинается более заметный спад.
+    // Снижаются шесть основных навыков; профильные навыки позиции
+    // дополнительно теряют несколько пунктов.
 
     if (newSeason >= 16) {
       final decline = newSeason >= 18 ? 3 : 2;
@@ -972,18 +974,18 @@ class Career {
 
       switch (currentPlayer.position) {
         case PlayerPosition.forward:
-          skills = skills.copyWith(shooting: _declineSkill(skills.shooting, 1));
-          skills = skills.copyWith(shooting: _declineSkill(skills.pace, 1));
           skills = skills.copyWith(
-            shooting: _declineSkill(skills.dribbling, 2),
+            shooting: _declineSkill(skills.shooting, 1),
+            pace: _declineSkill(skills.pace, 1),
+            dribbling: _declineSkill(skills.dribbling, 2),
           );
           break;
 
         case PlayerPosition.midfielder:
-          skills = skills.copyWith(passing: _declineSkill(skills.passing, 2));
-          skills = skills.copyWith(shooting: _declineSkill(skills.pace, 2));
           skills = skills.copyWith(
-            shooting: _declineSkill(skills.dribbling, 1),
+            passing: _declineSkill(skills.passing, 2),
+            pace: _declineSkill(skills.pace, 2),
+            dribbling: _declineSkill(skills.dribbling, 1),
           );
           break;
 
@@ -1020,8 +1022,10 @@ class Career {
     if (newAge >= 34) {
       switch (currentPlayer.position) {
         case PlayerPosition.forward:
-          skills = skills.copyWith(shooting: _lowerSkill(skills.shooting));
-          skills = skills.copyWith(shooting: _lowerSkill(skills.pace));
+          skills = skills.copyWith(
+            shooting: _lowerSkill(skills.shooting),
+            pace: _lowerSkill(skills.pace),
+          );
           break;
 
         case PlayerPosition.midfielder:
