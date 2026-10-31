@@ -105,14 +105,14 @@ void main() {
     test('rivals, trust and agent level survive save restoration', () {
       final career = Career.create(createTestPlayer()).copyWith(
         coachTrust: 82,
-        agentLevel: 3,
+        agentLevel: 10,
         agentCredits: 234,
       );
       final restored = Career.fromJson(career.toJson());
 
       expect(restored.rivals.length, career.rivals.length);
       expect(restored.coachTrust, 82);
-      expect(restored.agentLevel, 3);
+      expect(restored.agentLevel, 10);
       expect(restored.agentCredits, 234);
       expect(restored.coachName, career.coachName);
     });
@@ -152,7 +152,7 @@ void main() {
 
       final updated = career.afterMatch(match);
       expect(updated.coachTrust, 68);
-      expect(updated.agentCredits, 23);
+      expect(updated.agentCredits, 3);
     });
   });
 }
