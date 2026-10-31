@@ -9,7 +9,6 @@ import 'package:flutter_football/screens/career_end_screen.dart';
 // import 'package:flutter_football/screens/development_screen.dart';
 import 'package:flutter_football/screens/home/home_screen.dart';
 import 'package:flutter_football/screens/match/match_screen.dart';
-import 'package:flutter_football/screens/news_screen.dart';
 import 'package:flutter_football/screens/season/season_screen.dart';
 import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_svg/svg.dart';
@@ -123,13 +122,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
   void initState() {
     super.initState();
     career = widget.career;
-  }
-
-  void _openNews() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => NewsScreen(career: career)),
-    );
   }
 
   // Future<void> _openDevelopment() async {
