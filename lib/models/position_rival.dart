@@ -79,7 +79,11 @@ class PositionRival {
       ),
       age: (json['age'] as num?)?.toInt() ?? 24,
       overall: (json['overall'] as num?)?.toInt() ?? 65,
-      jerseyNumber: ((json['jerseyNumber'] as num?)?.toInt() ?? 20 + (json['id'] as String? ?? '').hashCode.abs() % 70).clamp(1, 99).toInt(),
+      jerseyNumber:
+          ((json['jerseyNumber'] as num?)?.toInt() ??
+                  20 + (json['id'] as String? ?? '').hashCode.abs() % 70)
+              .clamp(1, 99)
+              .toInt(),
       matches: (json['matches'] as num?)?.toInt() ?? 0,
       goals: (json['goals'] as num?)?.toInt() ?? 0,
       assists: (json['assists'] as num?)?.toInt() ?? 0,
@@ -128,7 +132,8 @@ class PositionRival {
     return List.generate(count.clamp(1, 3).toInt(), (index) {
       final delta = random.nextInt(11) - 4;
       final overall = (player.overall + delta).clamp(55, 95).toInt();
-      final available = List<int>.generate(99, (i) => i + 1)..removeWhere(takenNumbers.contains);
+      final available = List<int>.generate(99, (i) => i + 1)
+        ..removeWhere(takenNumbers.contains);
       final number = available[random.nextInt(available.length)];
       takenNumbers.add(number);
       return PositionRival(
@@ -218,7 +223,9 @@ class PositionRival {
     }
     final targetCount = rivals.isEmpty ? 2 : rivals.length;
     final names = List<String>.from(_names[player.position]!)
-      ..removeWhere((name) => name == player.name || rivals.any((r) => r.name == name))
+      ..removeWhere(
+        (name) => name == player.name || rivals.any((r) => r.name == name),
+      )
       ..shuffle(random);
     while (remaining.length < targetCount) {
       final index = remaining.length;
@@ -227,9 +234,12 @@ class PositionRival {
         ...remaining.map((r) => r.jerseyNumber),
         ...vacatedNumbers,
       };
-      final available = List<int>.generate(99, (i) => i + 1)..removeWhere(takenNumbers.contains);
+      final available = List<int>.generate(99, (i) => i + 1)
+        ..removeWhere(takenNumbers.contains);
       if (available.isEmpty) break;
-      final name = names.isNotEmpty ? names.removeAt(0) : 'Игрок ${season}_${index + 1}';
+      final name = names.isNotEmpty
+          ? names.removeAt(0)
+          : 'Игрок ${season}_${index + 1}';
       final number = available[random.nextInt(available.length)];
       final delta = random.nextInt(11) - 4;
       remaining.add(PositionRival(
