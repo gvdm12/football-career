@@ -127,6 +127,12 @@ class AppStrings {
   static String get teamStatus => _en ? 'Team status' : 'Статус в команде';
   static String get coachTrust => _en ? 'Coach trust' : 'Доверие тренера';
   static String get positionRivals => _en ? 'POSITION COMPETITORS' : 'КОНКУРЕНТЫ ЗА ПОЗИЦИЮ';
+  static String get agent => _en ? 'PLAYER AGENT' : 'ФУТБОЛЬНЫЙ АГЕНТ';
+  static String agentLevel(int level) => _en ? 'Agent level $level' : 'Уровень агента: $level';
+  static String get upgradeAgent => _en ? 'UPGRADE AGENT' : 'УЛУЧШИТЬ АГЕНТА';
+  static String agentBonus(int percent) => _en ? '+$percent% to contract offers' : '+$percent% к зарплате в предложениях';
+  static String get agentMaxLevel => _en ? 'Maximum agent level reached' : 'Достигнут максимальный уровень агента';
+  static String get agentNotEnoughMoney => _en ? 'Not enough money for agent upgrade' : 'Недостаточно денег для улучшения агента';
   static String get rivalForm => _en ? 'Form' : 'Форма';
   static String get careerRecords => _en ? 'CAREER RECORDS' : 'РЕКОРДЫ КАРЬЕРЫ';
   static String get mostGoalsSeason => _en ? 'Most goals in a season' : 'Больше всего голов за сезон';
