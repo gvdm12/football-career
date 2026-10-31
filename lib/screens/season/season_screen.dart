@@ -49,6 +49,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
     career = widget.career;
   }
 
+  bool get _canPlayInteractiveMatch =>
+      !career.isInjured &&
+      PlayerStatusCalculator.calculate(
+            overall: career.player.overall,
+            clubName: career.player.club,
+          ) ==
+          PlayerStatus.starter;
+
   bool get worldCupBlocksSeason {
     final tournament = career.worldCup;
     return tournament != null &&
@@ -975,8 +983,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
       overall: career.player.overall,
       clubName: career.player.club,
     );
-    if (interactive &&
-        (career.isInjured || playerStatus == PlayerStatus.substitute)) {
+    if (interactive && !_canPlayInteractiveMatch) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -1217,15 +1224,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Future<void> _playChampionsLeagueMatch({required bool interactive}) async {
     if (isSaving || seasonFinishing) return;
-    if (interactive &&
-        (career.isInjured ||
-            PlayerStatusCalculator.calculate(
-                  overall: career.player.overall,
-                  clubName: career.player.club,
-                ) ==
-                PlayerStatus.substitute)) {
-      return;
-    }
+    if (interactive && !_canPlayInteractiveMatch) return;
 
     final tournament = career.championsLeague;
     final tieIndex = currentChampionsLeagueTieIndex;
@@ -1425,15 +1424,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Future<void> _playEuropaLeagueMatch({required bool interactive}) async {
     if (isSaving || seasonFinishing) return;
-    if (interactive &&
-        (career.isInjured ||
-            PlayerStatusCalculator.calculate(
-                  overall: career.player.overall,
-                  clubName: career.player.club,
-                ) ==
-                PlayerStatus.substitute)) {
-      return;
-    }
+    if (interactive && !_canPlayInteractiveMatch) return;
 
     final tournament = career.europaLeague;
     final tieIndex = currentEuropaLeagueTieIndex;
@@ -1662,15 +1653,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Future<void> _playCupMatch(CupMatch cupMatch, {required bool interactive}) async {
     if (isSaving || seasonFinishing || cupMatch.isPlayed) return;
-    if (interactive &&
-        (career.isInjured ||
-            PlayerStatusCalculator.calculate(
-                  overall: career.player.overall,
-                  clubName: career.player.club,
-                ) ==
-                PlayerStatus.substitute)) {
-      return;
-    }
+    if (interactive && !_canPlayInteractiveMatch) return;
 
     final cup = career.domesticCup;
     if (cup == null) return;
@@ -2925,12 +2908,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
   Widget _buildNextMatchCard(SeasonMatch match) {
     final playerColor = ClubColors.primary(career.player.club);
     final opponentColor = ClubColors.primary(match.opponent);
-    final interactiveAvailable = !career.isInjured &&
-        PlayerStatusCalculator.calculate(
-              overall: career.player.overall,
-              clubName: career.player.club,
-            ) !=
-            PlayerStatus.substitute;
+    final interactiveAvailable = _canPlayInteractiveMatch;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -3036,12 +3014,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     final playerColor = ClubColors.primary(playerClub);
     final opponentColor = ClubColors.primary(opponent);
-    final interactiveAvailable = !career.isInjured &&
-        PlayerStatusCalculator.calculate(
-              overall: career.player.overall,
-              clubName: career.player.club,
-            ) !=
-            PlayerStatus.substitute;
+    final interactiveAvailable = _canPlayInteractiveMatch;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -3287,12 +3260,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         ? tie.homeTeam == club
         : tie.awayTeam == club;
     final opponent = tie.homeTeam == club ? tie.awayTeam : tie.homeTeam;
-    final interactiveAvailable = !career.isInjured &&
-        PlayerStatusCalculator.calculate(
-              overall: career.player.overall,
-              clubName: career.player.club,
-            ) !=
-            PlayerStatus.substitute;
+    final interactiveAvailable = _canPlayInteractiveMatch;
 
     final matchTitle = isFinal
         ? AppStrings.finalStage
@@ -3442,12 +3410,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         ? tie.homeTeam == club
         : tie.awayTeam == club;
     final opponent = tie.homeTeam == club ? tie.awayTeam : tie.homeTeam;
-    final interactiveAvailable = !career.isInjured &&
-        PlayerStatusCalculator.calculate(
-              overall: career.player.overall,
-              clubName: career.player.club,
-            ) !=
-            PlayerStatus.substitute;
+    final interactiveAvailable = _canPlayInteractiveMatch;
 
     final matchTitle = isFinal
         ? AppStrings.finalStage
