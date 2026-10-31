@@ -764,7 +764,9 @@ class Career {
 
     return copyWith(
       player: newPlayer,
-      rivals: PositionRival.generate(player: newPlayer, season: season),
+      rivals: offer.isRenewal
+          ? rivals
+          : PositionRival.generate(player: newPlayer, season: season),
       monthlySalary: offer.salary,
       contractYears: offer.contractYears,
       coachTrust: offer.isRenewal ? coachTrust : 65,
