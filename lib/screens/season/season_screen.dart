@@ -1338,15 +1338,46 @@ class _SeasonScreenState extends State<SeasonScreen> {
       awayPenalties: awayPenalties,
     );
 
-    final updatedCareer = interactive
+    final homeTeamAggregate = !isFinal && !isFirstLeg
+        ? tie.firstLegHomeGoals! + awayGoals
+        : 0;
+    final awayTeamAggregate = !isFinal && !isFirstLeg
+        ? tie.firstLegAwayGoals! + homeGoals
+        : 0;
+    final playerAggregate = isHome ? awayTeamAggregate : homeTeamAggregate;
+    final opponentAggregate = isHome ? homeTeamAggregate : awayTeamAggregate;
+    final playerPenalties = isHome ? homePenalties : awayPenalties;
+    final opponentPenalties = isHome ? awayPenalties : homePenalties;
+    final playerEliminated = !isFinal &&
+        !isFirstLeg &&
+        (playerAggregate < opponentAggregate ||
+            (playerAggregate == opponentAggregate &&
+                playerPenalties != null &&
+                opponentPenalties != null &&
+                playerPenalties < opponentPenalties));
+    final isTournamentDecider = isFinal || playerEliminated;
+
+    var updatedCareer = interactive
         ? interactiveCareer
         : await Navigator.push<Career>(
             context,
             MaterialPageRoute(
-              builder: (_) =>
-                  MatchScreen(career: career, match: match, isCupMatch: true),
+              builder: (_) => MatchScreen(
+                career: career,
+                match: match,
+                isCupMatch: true,
+                isTournamentDecider: isTournamentDecider,
+              ),
             ),
           );
+    if (interactive && updatedCareer != null) {
+      updatedCareer = await _maybeShowPressConference(
+        updatedCareer,
+        match,
+        isTournamentDecider: isTournamentDecider,
+        includeSeasonMilestones: false,
+      );
+    }
 
     if (!mounted || updatedCareer == null) return;
 
@@ -1542,15 +1573,46 @@ class _SeasonScreenState extends State<SeasonScreen> {
       awayPenalties: awayPenalties,
     );
 
-    final updatedCareer = interactive
+    final homeTeamAggregate = !isFinal && !isFirstLeg
+        ? tie.firstLegHomeGoals! + awayGoals
+        : 0;
+    final awayTeamAggregate = !isFinal && !isFirstLeg
+        ? tie.firstLegAwayGoals! + homeGoals
+        : 0;
+    final playerAggregate = isHome ? awayTeamAggregate : homeTeamAggregate;
+    final opponentAggregate = isHome ? homeTeamAggregate : awayTeamAggregate;
+    final playerPenalties = isHome ? homePenalties : awayPenalties;
+    final opponentPenalties = isHome ? awayPenalties : homePenalties;
+    final playerEliminated = !isFinal &&
+        !isFirstLeg &&
+        (playerAggregate < opponentAggregate ||
+            (playerAggregate == opponentAggregate &&
+                playerPenalties != null &&
+                opponentPenalties != null &&
+                playerPenalties < opponentPenalties));
+    final isTournamentDecider = isFinal || playerEliminated;
+
+    var updatedCareer = interactive
         ? interactiveCareer
         : await Navigator.push<Career>(
             context,
             MaterialPageRoute(
-              builder: (_) =>
-                  MatchScreen(career: career, match: match, isCupMatch: true),
+              builder: (_) => MatchScreen(
+                career: career,
+                match: match,
+                isCupMatch: true,
+                isTournamentDecider: isTournamentDecider,
+              ),
             ),
           );
+    if (interactive && updatedCareer != null) {
+      updatedCareer = await _maybeShowPressConference(
+        updatedCareer,
+        match,
+        isTournamentDecider: isTournamentDecider,
+        includeSeasonMilestones: false,
+      );
+    }
 
     if (!mounted || updatedCareer == null) return;
 
@@ -1765,15 +1827,37 @@ class _SeasonScreenState extends State<SeasonScreen> {
       awayPenalties: awayPenalties,
     );
 
-    final updatedCareer = interactive
+    final cupWinner = match.homeGoals > match.awayGoals
+        ? match.homeTeam
+        : match.awayGoals > match.homeGoals
+        ? match.awayTeam
+        : (homePenalties ?? 0) > (awayPenalties ?? 0)
+        ? match.homeTeam
+        : match.awayTeam;
+    final isTournamentDecider =
+        cupMatch.round == 4 || cupWinner != playerClub;
+
+    var updatedCareer = interactive
         ? interactiveCareer
         : await Navigator.push<Career>(
             context,
             MaterialPageRoute(
-              builder: (_) =>
-                  MatchScreen(career: career, match: match, isCupMatch: true),
+              builder: (_) => MatchScreen(
+                career: career,
+                match: match,
+                isCupMatch: true,
+                isTournamentDecider: isTournamentDecider,
+              ),
             ),
           );
+    if (interactive && updatedCareer != null) {
+      updatedCareer = await _maybeShowPressConference(
+        updatedCareer,
+        match,
+        isTournamentDecider: isTournamentDecider,
+        includeSeasonMilestones: false,
+      );
+    }
 
     if (!mounted || updatedCareer == null) return;
 
