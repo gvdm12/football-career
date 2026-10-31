@@ -1277,6 +1277,8 @@ class Career {
       leagueTable: newLeagueTable,
       leagueMatches: newLeagueMatches,
       news: news,
+      rivals: PositionRival.nextSeason(rivals, newSeason),
+      coachTrust: coachTrust,
       monthlySalary: monthlySalary,
       isCareerFinished: false,
       domesticCup: newDomesticCup,
