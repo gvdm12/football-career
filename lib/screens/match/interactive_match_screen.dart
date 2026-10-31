@@ -79,21 +79,17 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
             playerClub: _player.club,
             playerOverall: _player.overall,
           );
-    final baseMatch = Match.generate(
-      player: _player,
-      career: widget.career,
-      opponent: widget.opponent,
-      isHome: widget.isHome,
+    final status = PlayerStatusCalculator.calculate(
+      overall: _player.overall,
+      clubName: _player.club,
     );
-    _playerPlayed = baseMatch.playerPlayed;
-    _playerOnPitch = baseMatch.playerPlayed;
+    _playerPlayed = !widget.career.isInjured &&
+        status != PlayerStatus.substitute;
+    _playerOnPitch = _playerPlayed;
+    _homeGoals = 0;
+    _awayGoals = 0;
+    _playerGoals = 0;
     _playerAssists = 0;
-    // Сохраняем командные голы обычной модели, но заменяем
-    // заранее сгенерированные голы игрока интерактивными эпизодами.
-    _homeGoals =
-        baseMatch.homeGoals - (widget.isHome ? baseMatch.playerGoals : 0);
-    _awayGoals =
-        baseMatch.awayGoals - (widget.isHome ? 0 : baseMatch.playerGoals);
     _yellowCards = 0;
     _redCards = 0;
     _rating = 6.0;
@@ -103,15 +99,13 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _finished = true;
       _event = widget.career.isInjured
           ? 'Вы пропускаете матч из-за травмы.'
-          : 'Тренер оставил вас в запасе. Матч проходит без вашего участия.';
+          : 'Тренер оставил вас в запасе. Интерактивный режим недоступен.';
       return;
     }
 
-    final status = PlayerStatusCalculator.calculate(
-      overall: _player.overall,
-      clubName: _player.club,
-    );
-    if (status == PlayerStatus.substitute) _minute = 55 + _random.nextInt(11);
+    if (status == PlayerStatus.rotation) {
+      _minute = 55 + _random.nextInt(11);
+    }
     _nextMomentMinute = _minute + 6 + _random.nextInt(7);
     _clockTimer = Timer.periodic(
       const Duration(milliseconds: 400),
@@ -216,115 +210,167 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       return;
     }
     if (_phase == 'chance') {
-      _momentTitle = 'Опасная позиция';
+      _momentTitle = 'Мяч в штрафной';
       _momentDescription =
-          'Вы получили мяч в штрафной. Защитник перекрывает удар, партнёр открывается для передачи.';
+          'Перед вами ворота, защитник сокращает дистанцию, партнёр предлагает вариант для передачи.';
       _momentReady = true;
       return;
     }
     if (_phase == 'aerialChance') {
-      _momentTitle = 'Навес в штрафную';
+      _momentTitle = 'Верховая борьба';
       _momentDescription =
-          'Мяч летит сверху в вашу зону. Можно сыграть головой или попробовать удар с лёта.';
+          'Навес летит в вашу зону в штрафной. Нужно выбрать момент для игры в воздухе.';
       _momentReady = true;
       return;
     }
-    final roll = _random.nextDouble();
+    if (_phase == 'finalThird') {
+      _momentTitle = 'Атака у штрафной';
+      _momentDescription =
+          'Команда закрепилась на половине соперника. Можно обострить передачей, сместиться или подготовить удар.';
+      _momentReady = true;
+      return;
+    }
+
     final position = _player.position;
     final setPieceRoll = _random.nextDouble();
-    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.015) {
+    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.012) {
       _phase = 'penalty';
       _momentTitle = 'ПЕНАЛЬТИ!';
       _momentDescription =
-          'Судья указал на точку. Один удар может изменить ход матча.';
-      _event = '$_minute-я минута. Ваша команда получает право на пенальти!';
+          'Судья назначил пенальти. Вы штатный исполнитель и можете пробить с точки.';
+      _event = '$_minute-я минута. Пенальти в пользу вашей команды!';
       _momentReady = true;
       return;
     }
-    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.045) {
+    if ((position == PlayerPosition.forward ||
+            position == PlayerPosition.midfielder) &&
+        setPieceRoll < 0.035) {
       _phase = 'oneOnOne';
       _momentTitle = 'Выход один на один';
       _momentDescription =
-          'Вы прорвались за линию защиты. Вратарь выходит навстречу — решите, как завершить атаку.';
-      _event = '$_minute-я минута. Опаснейший выход один на один!';
+          'Перед вами только вратарь. Можно пробить, обыграть его или отдать пас партнёру.';
+      _event = '$_minute-я минута. Выход один на один!';
       _momentReady = true;
       return;
     }
-    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.120) {
+    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.105) {
       _phase = 'corner';
-      _momentTitle = 'Угловой удар';
+      _momentTitle = 'Угловой';
       _momentDescription =
-          'Партнёры заняли позиции в штрафной. Можно подать на ближнюю/дальнюю штангу или разыграть коротко.';
-      _event = '$_minute-я минута. Ваша команда подаёт угловой!';
+          'Вы у углового флажка. Партнёры занимают позиции в штрафной.';
+      _event = '$_minute-я минута. Ваша команда подаёт угловой.';
       _momentReady = true;
       return;
     }
-    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.200) {
+    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.175) {
       _phase = 'freeKick';
-      _momentTitle = 'Штрафной удар';
+      _momentTitle = 'Штрафной';
       _momentDescription =
-          'Мяч установлен у штрафной. Выберите прямой удар или передачу партнёру.';
-      _event = '$_minute-я минута. Ваша команда заработала штрафной!';
+          'Команда заработала стандарт. Можно подать в штрафную или разыграть мяч.';
+      _event = '$_minute-я минута. Штрафной удар.';
       _momentReady = true;
       return;
     }
-    final attackChance = switch (position) {
-      PlayerPosition.forward => 0.72,
-      PlayerPosition.midfielder => 0.43,
-      PlayerPosition.defender => 0.17,
-      PlayerPosition.goalkeeper => 0.02,
-    };
-    final midfieldChance = switch (position) {
-      PlayerPosition.forward => 0.14,
-      PlayerPosition.midfielder => 0.34,
-      PlayerPosition.defender => 0.13,
-      PlayerPosition.goalkeeper => 0.08,
-    };
 
-    if (roll < attackChance) {
-      _phase = 'attack';
-      _momentTitle = 'Атака вашей команды';
-      _momentDescription = switch (_random.nextInt(5)) {
-        0 =>
-          'Вы ворвались в штрафную с фланга. Защитник пытается закрыть прострел.',
-        1 =>
-          'Вы получили мяч у штрафной. Защитник закрывает удар, партнёр открывается справа.',
-        2 =>
-          'Команда быстро вышла из обороны. Вы получили мяч перед последней линией соперника.',
-        3 =>
-          'Защитник ошибся при приёме мяча. У вас есть время принять решение.',
-        _ =>
-          'Партнёр выполнил передачу за спину защитникам. Нужно открыться под мяч.',
-      };
-      _event = '$_minute-я минута. Ваша команда переходит в атаку!';
-    } else if (roll < attackChance + midfieldChance) {
-      _phase = 'midfield';
-      _momentTitle = 'Борьба в центре поля';
-      _momentDescription = switch (_random.nextInt(5)) {
-        0 =>
-          'Соперник не успел перестроиться. Можно начать быструю контратаку.',
-        1 =>
-          'Перед вами свободная зона. Решите, ускорить атаку или придержать мяч.',
-        2 =>
-          'Партнёры открываются между линиями. Один точный пас может создать голевой момент.',
-        3 =>
-          'Соперник оставил пространство на фланге. Можно перевести туда мяч.',
-        _ => 'Команда соперника прессингует. Важно не потерять владение.',
-      };
-      _event = '$_minute-я минута. Мяч оказывается у вас в центре поля.';
-    } else if (position == PlayerPosition.goalkeeper) {
-      _phase = 'goalkeeper';
-      _momentTitle = 'Опасный удар по воротам';
-      _momentDescription =
-          'Соперник завершает атаку ударом. Нужно выбрать действие.';
-      _event = '$_minute-я минута. Соперник наносит удар!';
-    } else {
-      _phase = 'defend';
-      _momentTitle = 'Оборона';
-      _momentDescription =
-          'Соперник развивает атаку. Вы можете вступить в отбор, перехватить пас или закрыть удар.';
-      _event = '$_minute-я минута. Соперник атакует!';
+    final roll = _random.nextDouble();
+    if (position == PlayerPosition.goalkeeper) {
+      if (roll < 0.58) {
+        _phase = 'goalkeeper';
+        _momentTitle = 'Удар соперника';
+        _momentDescription =
+            'Нападающий соперника наносит удар из штрафной. Выберите способ игры на линии ворот.';
+        _event = '$_minute-я минута. Соперник завершает атаку.';
+      } else if (roll < 0.78) {
+        _phase = 'goalkeeperCross';
+        _momentTitle = 'Навес в штрафную';
+        _momentDescription =
+            'Соперник подаёт с фланга. Нужно решить, выходить ли на перехват или остаться на линии.';
+        _event = '$_minute-я минута. Опасный навес соперника.';
+      } else {
+        _phase = 'goalkeeperBuildUp';
+        _momentTitle = 'Начало атаки';
+        _momentDescription =
+            'Вы поймали мяч. Выберите, как начать атаку своей команды.';
+        _event = '$_minute-я минута. Мяч у вратаря.';
+      }
+      _momentReady = true;
+      return;
     }
+
+    switch (position) {
+      case PlayerPosition.forward:
+        if (roll < 0.42) {
+          _phase = 'box';
+          _momentTitle = 'Открывание в штрафной';
+          _momentDescription =
+              'Партнёр доставил мяч в штрафную. Защитник рядом, нужно завершить или продолжить комбинацию.';
+        } else if (roll < 0.66) {
+          _phase = 'wideAttack';
+          _momentTitle = 'Атака по флангу';
+          _momentDescription =
+              'Вы получили мяч у боковой линии вблизи штрафной. Можно обыграть защитника, прострелить или отдать назад.';
+        } else if (roll < 0.84) {
+          _phase = 'midfield';
+          _momentTitle = 'Получение между линиями';
+          _momentDescription =
+              'Вы опустились за мячом в средней трети поля. Нужно сохранить владение или ускорить атаку передачей.';
+        } else {
+          _phase = 'defend';
+          _momentTitle = 'Прессинг';
+          _momentDescription =
+              'Защитник соперника контролирует мяч при начале атаки. Вы можете перекрыть передачу или начать прессинг.';
+        }
+        break;
+      case PlayerPosition.midfielder:
+        if (roll < 0.28) {
+          _phase = 'finalThird';
+          _momentTitle = 'Продвижение к штрафной';
+          _momentDescription =
+              'Вы получили мяч перед линией обороны соперника. Есть время оценить варианты и обострить атаку.';
+        } else if (roll < 0.68) {
+          _phase = 'midfield';
+          _momentTitle = 'Борьба в центре поля';
+          _momentDescription =
+              'Вы контролируете мяч в средней трети. Партнёры открываются по флангам и между линиями.';
+        } else if (roll < 0.82) {
+          _phase = 'defend';
+          _momentTitle = 'Возврат в оборону';
+          _momentDescription =
+              'Соперник начинает атаку через центр. Можно перекрыть линию паса или вступить в отбор.';
+        } else {
+          _phase = 'wideAttack';
+          _momentTitle = 'Поддержка фланговой атаки';
+          _momentDescription =
+              'Партнёр продвинулся по флангу, а вы подключились к атаке и предлагаете вариант для передачи.';
+        }
+        break;
+      case PlayerPosition.defender:
+        if (roll < 0.55) {
+          _phase = 'defend';
+          _momentTitle = 'Оборона своей зоны';
+          _momentDescription =
+              'Соперник атакует вашу зону. Нужно выбрать позицию, момент для отбора или перехват передачи.';
+        } else if (roll < 0.76) {
+          _phase = 'buildUp';
+          _momentTitle = 'Выход из обороны';
+          _momentDescription =
+              'Вы получили мяч у своей штрафной. Важно начать атаку без риска потери.';
+        } else if (roll < 0.90) {
+          _phase = 'wideAttack';
+          _momentTitle = 'Подключение защитника';
+          _momentDescription =
+              'Вы подключились к атаке по флангу. Можно выполнить навес или сыграть с партнёром.';
+        } else {
+          _phase = 'midfield';
+          _momentTitle = 'Продвижение с мячом';
+          _momentDescription =
+              'Перед вами свободное пространство в средней трети. Можно продвинуть мяч или перевести игру.';
+        }
+        break;
+      case PlayerPosition.goalkeeper:
+        break;
+    }
+    _event = '$_minute-я минута. ${_momentTitle.toLowerCase()}.';
     _momentReady = true;
   }
 
@@ -337,84 +383,133 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     }
     if (_phase == 'oneOnOne') {
       return [
-        _actionButton('Пробить мимо вратаря', 'shoot'),
+        _actionButton('Пробить в дальний угол', 'shoot'),
         _actionButton('Обвести вратаря', 'dribble'),
-        _actionButton('Отдать пас партнёру', 'throughPass'),
+        _actionButton('Отдать пас на пустые ворота', 'throughPass'),
       ];
     }
     if (_phase == 'corner') {
       return [
         _actionButton('Навесить в штрафную', 'cross'),
-        _actionButton('Разыграть коротко', 'pass'),
+        _actionButton('Короткий розыгрыш', 'pass'),
       ];
     }
     if (_phase == 'freeKick') {
       return [
-        _actionButton('Пробить по воротам', 'shoot'),
-        _actionButton('Отдать пас партнёру', 'pass'),
+        _actionButton('Подать в штрафную', 'cross'),
+        _actionButton('Разыграть низом', 'pass'),
+        if (_player.position == PlayerPosition.forward ||
+            _player.position == PlayerPosition.midfielder)
+          _actionButton('Пробить по воротам', 'shoot'),
       ];
     }
-    if (_phase == 'attack') {
+    if (_phase == 'box' || _phase == 'chance') {
       return [
         _actionButton('Пробить по воротам', 'shoot'),
-        _actionButton('Отдать пас партнёру', 'pass'),
-        _actionButton('Обыграть соперника', 'dribble'),
-        _actionButton('Навесить в штрафную', 'cross'),
-      ];
-    }
-    if (_phase == 'chance') {
-      return [
-        _actionButton('Пробить по воротам', 'shoot'),
-        _actionButton('Убрать мяч под удар', 'dribble'),
-        _actionButton('Отдать пас партнёру', 'throughPass'),
+        _actionButton('Сыграть на партнёра', 'throughPass'),
+        _actionButton('Убрать мяч от защитника', 'dribble'),
       ];
     }
     if (_phase == 'aerialChance') {
       return [
         _actionButton('Удар головой', 'header'),
-        _actionButton('Удар с лёта', 'volley'),
+        _actionButton('Сбросить мяч партнёру', 'pass'),
+      ];
+    }
+    if (_phase == 'wideAttack') {
+      return [
+        _actionButton('Прострелить вдоль ворот', 'cross'),
+        _actionButton('Обыграть защитника', 'dribble'),
+        _actionButton('Сыграть назад', 'pass'),
+      ];
+    }
+    if (_phase == 'finalThird') {
+      return [
+        _actionButton('Отдать разрезающий пас', 'throughPass'),
+        _actionButton('Сместиться с мячом', 'dribble'),
+        _actionButton('Сыграть на фланг', 'pass'),
+        if (_player.position == PlayerPosition.midfielder ||
+            _player.position == PlayerPosition.forward)
+          _actionButton('Удар с дальней дистанции', 'longShot'),
       ];
     }
     if (_phase == 'midfield') {
+      if (_player.position == PlayerPosition.defender) {
+        return [
+          _actionButton('Короткий пас партнёру', 'pass'),
+          _actionButton('Длинная передача на фланг', 'throughPass'),
+          _actionButton('Продвинуть мяч вперёд', 'dribble'),
+          _actionButton('Сохранить владение', 'contain'),
+        ];
+      }
+      if (_player.position == PlayerPosition.forward) {
+        return [
+          _actionButton('Сыграть в стенку', 'pass'),
+          _actionButton('Открыться за спину защитникам', 'throughPass'),
+          _actionButton('Продвинуться с мячом', 'dribble'),
+          _actionButton('Прессинговать при потере', 'contain'),
+        ];
+      }
       return [
-        _actionButton('Разрезающий пас', 'throughPass'),
+        _actionButton('Отдать передачу между линиями', 'throughPass'),
+        _actionButton('Перевести мяч на фланг', 'pass'),
         _actionButton('Продвинуться с мячом', 'dribble'),
-        _actionButton('Удар издали', 'longShot'),
-        _actionButton('Сохранить владение', 'pass'),
+        _actionButton('Сохранить владение', 'contain'),
+      ];
+    }
+    if (_phase == 'buildUp') {
+      return [
+        _actionButton('Короткий пас защитнику', 'pass'),
+        _actionButton('Длинная передача вперёд', 'throughPass'),
+        _actionButton('Продвинуть мяч', 'dribble'),
       ];
     }
     if (_phase == 'goalkeeper') {
       return [
         _actionButton('Отразить удар', 'keeper'),
-        _actionButton('Перехватить навес', 'intercept'),
-        _actionButton('Начать атаку передачей', 'pass'),
+        _actionButton('Зафиксировать мяч', 'keeper'),
       ];
     }
-    switch (_player.position) {
-      case PlayerPosition.forward:
-        return [
-          _actionButton('Прессинговать соперника', 'contain'),
-          _actionButton('Попытаться отобрать мяч', 'defend'),
-        ];
-      case PlayerPosition.midfielder:
-        return [
-          _actionButton('Перехватить передачу', 'intercept'),
-          _actionButton('Пойти в отбор', 'defend'),
-          _actionButton('Сдерживать соперника', 'contain'),
-        ];
-      case PlayerPosition.defender:
-        return [
-          _actionButton('Пойти в отбор', 'defend'),
-          _actionButton('Перехватить передачу', 'intercept'),
-          _actionButton('Заблокировать удар', 'block'),
-          _actionButton('Сдерживать соперника', 'contain'),
-        ];
-      case PlayerPosition.goalkeeper:
-        return [
-          _actionButton('Отразить удар', 'keeper'),
-          _actionButton('Перехватить навес', 'intercept'),
-        ];
+    if (_phase == 'goalkeeperCross') {
+      return [
+        _actionButton('Выйти и перехватить навес', 'intercept'),
+        _actionButton('Остаться на линии', 'keeper'),
+      ];
     }
+    if (_phase == 'goalkeeperBuildUp') {
+      return [
+        _actionButton('Ввести мяч рукой защитнику', 'pass'),
+        _actionButton('Выбить мяч на фланг', 'throughPass'),
+      ];
+    }
+    if (_phase == 'defend') {
+      switch (_player.position) {
+        case PlayerPosition.forward:
+          return [
+            _actionButton('Перекрыть передачу', 'contain'),
+            _actionButton('Прессинговать защитника', 'defend'),
+          ];
+        case PlayerPosition.midfielder:
+          return [
+            _actionButton('Перекрыть линию паса', 'intercept'),
+            _actionButton('Вступить в отбор', 'defend'),
+            _actionButton('Сдерживать соперника', 'contain'),
+          ];
+        case PlayerPosition.defender:
+          return [
+            _actionButton('Выбрать позицию и сдерживать', 'contain'),
+            _actionButton('Пойти в отбор', 'defend'),
+            _actionButton('Перехватить передачу', 'intercept'),
+            _actionButton('Заблокировать удар', 'block'),
+          ];
+        case PlayerPosition.goalkeeper:
+          return [
+            _actionButton('Отразить удар', 'keeper'),
+            _actionButton('Перехватить навес', 'intercept'),
+          ];
+      }
+    }
+    return [_actionButton('Сыграть надёжно', 'pass')];
   }
 
   void _choose(String action) {
@@ -546,10 +641,14 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           _phase = 'aerialChance';
           message =
               'Навес получился точным. Мяч летит в штрафную — готовьтесь к верховой борьбе.';
+        } else if (_phase == 'midfield' || _phase == 'buildUp') {
+          _phase = action == 'throughPass' ? 'chance' : 'finalThird';
+          message = action == 'throughPass'
+              ? 'Передача разрезала линию полузащиты. Атака выходит к штрафной.'
+              : 'Команда сохранила владение и продвинулась на половину соперника.';
         } else {
           _phase = 'chance';
-          message =
-              'Точная передача! Вывели партнёра в опасную позицию, атака продолжается.';
+          message = 'Точная передача вывела партнёра на ударную позицию.';
         }
       } else {
         _phase = 'defend';
@@ -558,11 +657,14 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       }
     } else if (action == 'dribble') {
       if (success) {
-        _phase = 'chance';
+        _phase = _phase == 'midfield' || _phase == 'buildUp'
+            ? 'finalThird'
+            : 'chance';
         _rating += 0.25;
-        message =
-            'Удачная обводка! Вы прошли соперника и приблизились к воротам.';
-        if (_random.nextDouble() < 0.20) {
+        message = _phase == 'finalThird'
+            ? 'Вы прошли соперника и продвинули команду к штрафной.'
+            : 'Удачная обводка! Вы освободились от опеки вблизи ворот.';
+        if (_phase == 'chance' && _random.nextDouble() < 0.08) {
           if (widget.isHome) {
             _homeGoals++;
           } else {
@@ -648,7 +750,9 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     if (_playerUnavailable) {
       _createMoment();
     } else {
-      final isFollowUp = _phase == 'chance' || _phase == 'aerialChance';
+      final isFollowUp = _phase == 'chance' ||
+          _phase == 'aerialChance' ||
+          _phase == 'finalThird';
       _nextMomentMinute = min(
         88,
         _minute + (isFollowUp ? 1 : 6 + _random.nextInt(7)),
