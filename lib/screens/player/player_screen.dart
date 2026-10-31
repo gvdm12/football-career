@@ -32,6 +32,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
     return PlayerStatusCalculator.calculate(
       overall: player.overall,
       clubName: player.club,
+      rivals: career.rivals,
     );
   }
 
