@@ -90,8 +90,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     // заранее сгенерированные голы игрока интерактивными эпизодами.
     _homeGoals = baseMatch.homeGoals - (widget.isHome ? baseMatch.playerGoals : 0);
     _awayGoals = baseMatch.awayGoals - (widget.isHome ? 0 : baseMatch.playerGoals);
-    _yellowCards = baseMatch.yellowCards;
-    _redCards = baseMatch.redCards;
+    _yellowCards = 0;
+    _redCards = 0;
     _rating = 6.0;
 
     if (!_playerPlayed) {
