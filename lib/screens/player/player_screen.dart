@@ -1071,6 +1071,63 @@ class _PlayerScreenState extends State<PlayerScreen> {
             title: AppStrings.savings,
             value: '${_formatMoney(career.money)} €',
           ),
+          if (career.rivals.isNotEmpty) ...[
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Divider(color: Color(0xFF24552C)),
+            ),
+            Text(
+              AppStrings.positionRivals,
+              style: const TextStyle(
+                color: Color(0xFF8BE07F),
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.1,
+              ),
+            ),
+            const SizedBox(height: 6),
+            ...career.rivals.map(
+              (rival) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            rival.name,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          '${rival.overall}',
+                          style: const TextStyle(
+                            color: Color(0xFF8BE07F),
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '${AppStrings.matches}: ${rival.matches}  ·  '
+                      '${AppStrings.goalsLabel}: ${rival.goals}  ·  '
+                      '${AppStrings.assistsLabel}: ${rival.assists}  ·  '
+                      '${AppStrings.rivalForm}: ${rival.form > 0 ? '+' : ''}${rival.form}',
+                      style: const TextStyle(
+                        color: Colors.white60,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
