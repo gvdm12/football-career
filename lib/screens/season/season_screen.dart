@@ -1060,8 +1060,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
     if (!mounted || match == null) return;
 
     final playedMatch = match;
-    final updatedCareer =
+    var updatedCareer =
         classicUpdatedCareer ?? career.afterMatch(playedMatch);
+    if (interactive) {
+      updatedCareer = await _maybeShowPressConference(
+        updatedCareer,
+        playedMatch,
+      );
+    }
 
     // Проверяем, что матч соответствует клубу игрока и сопернику.
     final expectedHomeTeam = seasonMatch.isHome
@@ -2097,6 +2103,91 @@ class _SeasonScreenState extends State<SeasonScreen> {
           '${AppStrings.seasonStartedSuffix}',
         ),
       ),
+    );
+  }
+
+  Future<Career> _maybeShowPressConference(
+    Career updatedCareer,
+    Match match, {
+    bool isTournamentDecider = false,
+    bool includeSeasonMilestones = true,
+  }) async {
+    if (!match.playerPlayed) return updatedCareer;
+
+    final playedBefore = career.seasonMatches.where((item) => item.isPlayed).length;
+    final totalMatches = career.seasonMatches.length;
+    String? prompt;
+
+    if (isTournamentDecider) {
+      prompt = AppStrings.pressConferenceTournament;
+    } else if (includeSeasonMilestones && playedBefore == 0) {
+      prompt = AppStrings.pressConferenceSeasonStart;
+    } else if (includeSeasonMilestones &&
+        totalMatches > 2 &&
+        playedBefore == (totalMatches / 2).round()) {
+      prompt = AppStrings.pressConferenceSeasonMiddle;
+    } else if (includeSeasonMilestones &&
+        totalMatches > 0 &&
+        playedBefore >= totalMatches - 1) {
+      prompt = AppStrings.pressConferenceSeasonEnd;
+    } else if (match.playerRating >= 8.5 ||
+        match.playerGoals >= 2 ||
+        match.playerGoals + match.playerAssists >= 3) {
+      if (Random().nextDouble() < 0.72) {
+        prompt = AppStrings.pressConferenceGreatMatch;
+      }
+    } else if (match.playerRating <= 5.5 && Random().nextDouble() < 0.62) {
+      prompt = AppStrings.pressConferenceBadMatch;
+    }
+
+    if (prompt == null) return updatedCareer;
+
+    final response = await showDialog<int>(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFF102B17),
+        title: Text(
+          AppStrings.pressConferenceTitle,
+          style: const TextStyle(
+            color: Color(0xFF8BE07F),
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        content: Text(prompt!, style: const TextStyle(color: Colors.white70)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, 0),
+            child: Text(AppStrings.skipPressConference),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, 1),
+            child: Text(AppStrings.pressConferenceTeamFirst),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, 2),
+            child: Text(AppStrings.pressConferenceConfident),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, 3),
+            child: Text(AppStrings.pressConferenceDemand),
+          ),
+        ],
+      ),
+    );
+
+    final trustChange = switch (response) {
+      1 => 2,
+      2 => 1,
+      3 => -2,
+      _ => 0,
+    };
+    if (trustChange == 0) return updatedCareer;
+
+    return updatedCareer.copyWith(
+      coachTrust: (updatedCareer.coachTrust + trustChange)
+          .clamp(0, 100)
+          .toInt(),
     );
   }
 
