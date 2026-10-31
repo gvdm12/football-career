@@ -204,7 +204,7 @@ class TeamScreen extends StatelessWidget {
                         );
                       },
                       icon: const Icon(Icons.confirmation_number_outlined),
-                      label: const Text('ИЗМЕНИТЬ НОМЕР'),
+                      label: Text(AppStrings.isEnglish ? 'CHANGE NUMBER' : 'ИЗМЕНИТЬ НОМЕР'),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: _accent,
                         side: const BorderSide(color: _border),
