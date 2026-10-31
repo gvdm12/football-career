@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 
@@ -197,7 +198,19 @@ class PressConferenceDialog {
     return showDialog<int>(
       context: context,
       barrierDismissible: true,
-      builder: (dialogContext) => Dialog(
+      barrierColor: Colors.black.withValues(alpha: 0.28),
+      builder: (dialogContext) => Stack(
+        children: [
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+              child: Container(
+                color: Colors.black.withValues(alpha: 0.12),
+              ),
+            ),
+          ),
+          Center(
+            child: Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
         child: Container(
@@ -421,6 +434,9 @@ class PressConferenceDialog {
             ),
           ),
         ),
+      ),
+          ),
+        ],
       ),
     );
   }
