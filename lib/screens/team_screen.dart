@@ -46,7 +46,11 @@ class TeamScreen extends StatelessWidget {
         foregroundColor: Colors.white,
         title: const Text(
           'КОМАНДА',
-          style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1),
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1,
+            fontSize: 14,
+          ),
         ),
       ),
       body: Container(
@@ -61,7 +65,7 @@ class TeamScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: _panel,
                 borderRadius: BorderRadius.circular(18),
@@ -70,28 +74,31 @@ class TeamScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'ТВОЙ КЛУБ',
-                    style: TextStyle(
-                      color: _accent,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
+                  // const Text(
+                  //   'ТВОЙ КЛУБ',
+                  //   style: TextStyle(
+                  //     color: _accent,
+                  //     fontSize: 10,
+                  //     fontWeight: FontWeight.w900,
+                  //     letterSpacing: 1.2,
+                  //   ),
+                  // ),
                   const SizedBox(height: 10),
                   Row(
                     children: [
                       Container(
-                        width: 48,
-                        height: 48,
+                        width: 44,
+                        height: 44,
                         decoration: BoxDecoration(
                           color: const Color(0xFF164A24),
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(color: _border),
                         ),
-                        child: const Icon(Icons.shield_outlined,
-                            color: _accent, size: 27),
+                        child: const Icon(
+                          Icons.shield_outlined,
+                          color: _accent,
+                          size: 24,
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -102,7 +109,7 @@ class TeamScreen extends StatelessWidget {
                               player.club,
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 18,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w900,
                               ),
                             ),
@@ -111,7 +118,7 @@ class TeamScreen extends StatelessWidget {
                               'Сила клуба: ${club.strength}',
                               style: const TextStyle(
                                 color: Colors.white60,
-                                fontSize: 12,
+                                fontSize: 11,
                               ),
                             ),
                           ],
@@ -119,7 +126,7 @@ class TeamScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -130,7 +137,7 @@ class TeamScreen extends StatelessWidget {
                     child: Row(
                       children: [
                         const CircleAvatar(
-                          radius: 20,
+                          radius: 17,
                           backgroundColor: Color(0xFF205B2D),
                           child: Icon(Icons.person, color: _accent),
                         ),
@@ -144,13 +151,14 @@ class TeamScreen extends StatelessWidget {
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w800,
+                                  fontSize: 13,
                                 ),
                               ),
                               Text(
                                 '${_positionName(player.position)} · ${player.age} лет',
                                 style: const TextStyle(
                                   color: Colors.white60,
-                                  fontSize: 11,
+                                  fontSize: 10,
                                 ),
                               ),
                             ],
@@ -163,7 +171,7 @@ class TeamScreen extends StatelessWidget {
                               '${player.overall}',
                               style: const TextStyle(
                                 color: _accent,
-                                fontSize: 20,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w900,
                               ),
                             ),
@@ -171,7 +179,7 @@ class TeamScreen extends StatelessWidget {
                               status.displayName.toUpperCase(),
                               style: const TextStyle(
                                 color: Colors.white70,
-                                fontSize: 9,
+                                fontSize: 8,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
@@ -180,11 +188,11 @@ class TeamScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 1),
                 ],
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 10),
             Row(
               children: [
                 const Expanded(
@@ -192,7 +200,7 @@ class TeamScreen extends StatelessWidget {
                     'КОНКУРЕНТЫ ЗА ПОЗИЦИЮ',
                     style: TextStyle(
                       color: _accent,
-                      fontSize: 12,
+                      fontSize: 11,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1,
                     ),
@@ -266,6 +274,7 @@ class TeamScreen extends StatelessWidget {
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w800,
+                                    fontSize: 13,
                                   ),
                                 ),
                                 const SizedBox(height: 3),
@@ -273,7 +282,7 @@ class TeamScreen extends StatelessWidget {
                                   '${rival.age} лет · Форма ${rival.form > 0 ? '+' : ''}${rival.form}',
                                   style: const TextStyle(
                                     color: Colors.white54,
-                                    fontSize: 11,
+                                    fontSize: 10,
                                   ),
                                 ),
                               ],
@@ -282,8 +291,10 @@ class TeamScreen extends StatelessWidget {
                           Text(
                             '${rival.overall}',
                             style: TextStyle(
-                              color: isStronger ? const Color(0xFFFFD27A) : _accent,
-                              fontSize: 19,
+                              color: isStronger
+                                  ? const Color(0xFFFFD27A)
+                                  : _accent,
+                              fontSize: 16,
                               fontWeight: FontWeight.w900,
                             ),
                           ),
@@ -296,14 +307,17 @@ class TeamScreen extends StatelessWidget {
                           _stat('Матчи', '${rival.matches}'),
                           _stat('Голы', '${rival.goals}'),
                           _stat('Ассисты', '${rival.assists}'),
-                          _stat('Оценка', rival.averageRating.toStringAsFixed(1)),
+                          _stat(
+                            'Оценка',
+                            rival.averageRating.toStringAsFixed(1),
+                          ),
                         ],
                       ),
                     ],
                   ),
                 );
               }),
-            const SizedBox(height: 8),
+            const SizedBox(height: 1),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -315,7 +329,7 @@ class TeamScreen extends StatelessWidget {
                 'Игровое время зависит от рейтинга и репутации игрока, формы конкурентов и доверия тренера. Статус в команде может меняться по ходу сезона.',
                 style: TextStyle(
                   color: Colors.white60,
-                  fontSize: 11,
+                  fontSize: 9,
                   height: 1.4,
                 ),
               ),
