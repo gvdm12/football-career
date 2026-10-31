@@ -1215,7 +1215,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
     );
   }
 
-  Future<void> _playChampionsLeagueMatch() async {
+  Future<void> _playChampionsLeagueMatch({required bool interactive}) async {
     if (isSaving || seasonFinishing) return;
 
     final tournament = career.championsLeague;
@@ -1414,7 +1414,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
     });
   }
 
-  Future<void> _playEuropaLeagueMatch() async {
+  Future<void> _playEuropaLeagueMatch({required bool interactive}) async {
     if (isSaving || seasonFinishing) return;
 
     final tournament = career.europaLeague;
@@ -1490,13 +1490,15 @@ class _SeasonScreenState extends State<SeasonScreen> {
       awayPenalties: awayPenalties,
     );
 
-    final updatedCareer = await Navigator.push<Career>(
-      context,
-      MaterialPageRoute(
-        builder: (_) =>
-            MatchScreen(career: career, match: match, isCupMatch: true),
-      ),
-    );
+    final updatedCareer = interactive
+        ? interactiveCareer
+        : await Navigator.push<Career>(
+            context,
+            MaterialPageRoute(
+              builder: (_) =>
+                  MatchScreen(career: career, match: match, isCupMatch: true),
+            ),
+          );
 
     if (!mounted || updatedCareer == null) return;
 
@@ -1685,13 +1687,15 @@ class _SeasonScreenState extends State<SeasonScreen> {
       awayPenalties: awayPenalties,
     );
 
-    final updatedCareer = await Navigator.push<Career>(
-      context,
-      MaterialPageRoute(
-        builder: (_) =>
-            MatchScreen(career: career, match: match, isCupMatch: true),
-      ),
-    );
+    final updatedCareer = interactive
+        ? interactiveCareer
+        : await Navigator.push<Career>(
+            context,
+            MaterialPageRoute(
+              builder: (_) =>
+                  MatchScreen(career: career, match: match, isCupMatch: true),
+            ),
+          );
 
     if (!mounted || updatedCareer == null) return;
 
