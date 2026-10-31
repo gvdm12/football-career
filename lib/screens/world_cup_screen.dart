@@ -137,7 +137,25 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
             playerParticipated: playerCanPlay,
           )
         : career;
+    final earnedNationalMatches =
+        (updatedTournament.playerMatches - tournament.playerMatches).clamp(0, 99);
+    final earnedNationalGoals =
+        (updatedTournament.playerGoals - tournament.playerGoals).clamp(0, 99);
+    final earnedNationalAssists =
+        (updatedTournament.playerAssists - tournament.playerAssists).clamp(0, 99);
+    final nationalPerformanceBonus = playedPlayerMatch == null
+        ? 0
+        : playedPlayerMatch.playerRating >= 9.0
+        ? 10
+        : playedPlayerMatch.playerRating >= 8.0
+        ? 5
+        : 0;
+    final nationalCurrencyReward = earnedNationalMatches * 10 +
+        earnedNationalGoals * 8 +
+        earnedNationalAssists * 6 +
+        nationalPerformanceBonus;
     var updatedCareer = careerAfterMatch.copyWith(
+      agentCredits: careerAfterMatch.agentCredits + nationalCurrencyReward,
       worldCup: updatedTournament,
     );
 
