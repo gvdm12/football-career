@@ -36,6 +36,7 @@ class Career {
 
   final int money;
   final int agentCredits;
+  final List<String> agentInterestedClubs;
   final int monthlySalary; // Зарплата в месяц, евро
   final int contractYears;
   final int developmentPoints;
@@ -78,6 +79,7 @@ class Career {
     this.coachTrust = 65,
     this.agentLevel = 1,
     this.agentCredits = 0,
+    this.agentInterestedClubs = const [],
     this.coachName = 'Главный тренер',
     required this.monthlySalary,
     required this.isCareerFinished,
@@ -297,6 +299,7 @@ class Career {
       'leagueTable': leagueTable.map((item) => item.toJson()).toList(),
       'money': money,
       'agentCredits': agentCredits,
+      'agentInterestedClubs': agentInterestedClubs,
       'contractYears': contractYears,
       'developmentPoints': developmentPoints,
       'seasonMatches': seasonMatches.map((item) => item.toJson()).toList(),
@@ -445,6 +448,7 @@ class Career {
       leagueTable: leagueTable,
       money: (json['money'] as num?)?.toInt() ?? 0,
       agentCredits: (json['agentCredits'] as num?)?.toInt() ?? 0,
+      agentInterestedClubs: (json['agentInterestedClubs'] as List?)?.whereType<String>().toList() ?? const [],
       contractYears: (json['contractYears'] as num?)?.toInt() ?? 0,
       developmentPoints: (json['developmentPoints'] as num?)?.toInt() ?? 0,
       seasonMatches: seasonMatches,
@@ -488,6 +492,7 @@ class Career {
     double? averageRating,
     int? money,
     int? agentCredits,
+    List<String>? agentInterestedClubs,
     int? contractYears,
     int? developmentPoints,
     List<SeasonMatch>? seasonMatches,
@@ -521,6 +526,7 @@ class Career {
       averageRating: averageRating ?? this.averageRating,
       money: money ?? this.money,
       agentCredits: agentCredits ?? this.agentCredits,
+      agentInterestedClubs: agentInterestedClubs ?? this.agentInterestedClubs,
       contractYears: contractYears ?? this.contractYears,
       developmentPoints: developmentPoints ?? this.developmentPoints,
       seasonMatches: seasonMatches ?? this.seasonMatches,
