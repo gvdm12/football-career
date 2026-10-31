@@ -22,6 +22,7 @@ class Career {
   final List<CareerNews> news;
   final List<PositionRival> rivals;
   final int coachTrust;
+  final int agentLevel;
 
   final int matches;
   final int goals;
@@ -73,6 +74,7 @@ class Career {
     this.news = const [],
     this.rivals = const [],
     this.coachTrust = 65,
+    this.agentLevel = 1,
     required this.monthlySalary,
     required this.isCareerFinished,
     this.domesticCup,
@@ -280,6 +282,7 @@ class Career {
       'news': news.map((item) => item.toJson()).toList(),
       'rivals': rivals.map((item) => item.toJson()).toList(),
       'coachTrust': coachTrust,
+      'agentLevel': agentLevel,
       'monthlySalary': monthlySalary,
       'isCareerFinished': isCareerFinished,
       'domesticCup': domesticCup?.toJson(),
@@ -427,6 +430,7 @@ class Career {
           ? readList('rivals', PositionRival.fromJson)
           : PositionRival.generate(player: loadedPlayer, season: currentSeason),
       coachTrust: ((json['coachTrust'] as num?)?.toInt() ?? 65).clamp(0, 100).toInt(),
+      agentLevel: ((json['agentLevel'] as num?)?.toInt() ?? 1).clamp(1, 3).toInt(),
       monthlySalary: (json['monthlySalary'] as num?)?.toInt() ?? 0,
       isCareerFinished: json['isCareerFinished'] as bool? ?? false,
       domesticCup: restoredCup,
@@ -467,6 +471,7 @@ class Career {
     List<CareerNews>? news,
     List<PositionRival>? rivals,
     int? coachTrust,
+    int? agentLevel,
     int? monthlySalary,
     bool? isCareerFinished,
     DomesticCup? domesticCup,
@@ -497,6 +502,7 @@ class Career {
       news: news ?? this.news,
       rivals: rivals ?? this.rivals,
       coachTrust: coachTrust ?? this.coachTrust,
+      agentLevel: agentLevel ?? this.agentLevel,
       monthlySalary: monthlySalary ?? this.monthlySalary,
       isCareerFinished: isCareerFinished ?? this.isCareerFinished,
       domesticCup: domesticCup ?? this.domesticCup,
@@ -699,6 +705,7 @@ class Career {
       monthlySalary: offer.salary,
       contractYears: offer.contractYears,
       coachTrust: offer.isRenewal ? coachTrust : 65,
+      agentLevel: agentLevel,
     );
   }
 
@@ -1303,6 +1310,7 @@ class Career {
       news: news,
       rivals: PositionRival.nextSeason(rivals, newSeason),
       coachTrust: coachTrust,
+      agentLevel: agentLevel,
       monthlySalary: monthlySalary,
       isCareerFinished: false,
       domesticCup: newDomesticCup,
