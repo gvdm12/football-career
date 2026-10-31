@@ -2264,10 +2264,49 @@ class _SeasonScreenState extends State<SeasonScreen> {
         match.playerGoals >= 2 ||
         match.playerGoals + match.playerAssists >= 3;
     final poor = match.playerRating <= 5.5;
+    final completedResults = updatedCareer.seasonMatches
+        .where((item) => item.isPlayed && item.result != null)
+        .map((item) => item.result!)
+        .toList();
+    final lastThree = completedResults.length >= 3
+        ? completedResults.sublist(completedResults.length - 3)
+        : <Match>[];
+    final previousThree = completedResults.length >= 4
+        ? completedResults.sublist(completedResults.length - 4, completedResults.length - 1)
+        : <Match>[];
+    final losingStreak = lastThree.length == 3 &&
+        lastThree.every((item) => item.isPlayerLoss(updatedCareer.player.club)) &&
+        !previousThree.every((item) => item.isPlayerLoss(updatedCareer.player.club));
+    final lastFive = completedResults.length >= 5
+        ? completedResults.sublist(completedResults.length - 5)
+        : <Match>[];
+    final previousFive = completedResults.length >= 6
+        ? completedResults.sublist(completedResults.length - 6, completedResults.length - 1)
+        : <Match>[];
+    final lossesInLastFive = lastFive
+        .where((item) => item.isPlayerLoss(updatedCareer.player.club))
+        .length;
+    final lossesInPreviousFive = previousFive
+        .where((item) => item.isPlayerLoss(updatedCareer.player.club))
+        .length;
+    final badRun = lastFive.length == 5 &&
+        lossesInLastFive >= 4 &&
+        (previousFive.length < 5 || lossesInPreviousFive < 4);
+    final poorSeasonCheckpoint = max(6, (totalMatches * 0.65).round());
+    final poorSeason = playedBefore + 1 == poorSeasonCheckpoint &&
+        ((updatedCareer.averageRating ?? 6.5) < 6.2 ||
+            completedResults.where((item) => item.isPlayerLoss(updatedCareer.player.club)).length >=
+                (completedResults.length * 0.55).ceil());
 
     String? category;
     if (isTournamentDecider) {
       category = 'tournament';
+    } else if (losingStreak) {
+      category = 'losingStreak';
+    } else if (badRun) {
+      category = 'badRun';
+    } else if (poorSeason) {
+      category = 'poorSeason';
     } else if (includeSeasonMilestones && playedBefore == 0) {
       category = 'seasonStart';
     } else if (includeSeasonMilestones &&
