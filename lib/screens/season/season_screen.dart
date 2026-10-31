@@ -1062,13 +1062,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
     final playedMatch = match;
     var updatedCareer =
         classicUpdatedCareer ?? career.afterMatch(playedMatch);
-    if (interactive) {
-      updatedCareer = await _maybeShowPressConference(
-        updatedCareer,
-        playedMatch,
-      );
-    }
-
     // Проверяем, что матч соответствует клубу игрока и сопернику.
     final expectedHomeTeam = seasonMatch.isHome
         ? career.player.club
@@ -1083,6 +1076,13 @@ class _SeasonScreenState extends State<SeasonScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text(AppStrings.matchCalendarError)));
       return;
+    }
+
+    if (interactive) {
+      updatedCareer = await _maybeShowPressConference(
+        updatedCareer,
+        playedMatch,
+      );
     }
 
     // Сохраняем результат матча в календаре игрока.
