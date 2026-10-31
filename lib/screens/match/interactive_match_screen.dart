@@ -44,7 +44,6 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   bool _momentReady = false;
   bool _playerUnavailable = false;
   bool _playerOnPitch = true;
-  bool _playerOnPitch = true;
   String? _injuryName;
   int _injuryMatchesRemaining = 0;
   String _event = 'Матч начинается! Ваша команда разыгрывает мяч.';
@@ -57,8 +56,6 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   late final String _awayTeam;
 
   Player get _player => widget.career.player;
-  int get _playerTeamStrength => widget.isHome ? _homeStrength : _awayStrength;
-  int get _opponentTeamStrength => widget.isHome ? _awayStrength : _homeStrength;
 
   @override
   void initState() {
