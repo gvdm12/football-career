@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_football/models/career.dart';
@@ -10,12 +12,14 @@ class MatchScreen extends StatelessWidget {
   final Match match;
 
   final bool isCupMatch;
+  final bool isTournamentDecider;
 
   const MatchScreen({
     super.key,
     required this.career,
     required this.match,
     required this.isCupMatch,
+    this.isTournamentDecider = false,
   });
 
   bool get isPlayerWin => match.isPlayerWin(career.player.club);
@@ -36,14 +40,52 @@ class MatchScreen extends StatelessWidget {
     return const Color(0xFFFF7777);
   }
 
+  String? _pressConferencePrompt() {
+    if (!match.playerPlayed) return null;
+
+    final playedBefore = career.seasonMatches.where((item) => item.isPlayed).length;
+    final totalMatches = career.seasonMatches.length;
+
+    if (isTournamentDecider) return AppStrings.pressConferenceTournament;
+    if (playedBefore == 0) return AppStrings.pressConferenceSeasonStart;
+    if (totalMatches > 2 && playedBefore == (totalMatches / 2).round()) {
+      return AppStrings.pressConferenceSeasonMiddle;
+    }
+    if (totalMatches > 0 && playedBefore >= totalMatches - 1) {
+      return AppStrings.pressConferenceSeasonEnd;
+    }
+
+    final outstanding = match.playerRating >= 8.5 ||
+        match.playerGoals >= 2 ||
+        match.playerGoals + match.playerAssists >= 3;
+    final poor = match.playerRating <= 5.5;
+
+    if (outstanding && Random().nextDouble() < 0.72) {
+      return AppStrings.pressConferenceGreatMatch;
+    }
+    if (poor && Random().nextDouble() < 0.62) {
+      return AppStrings.pressConferenceBadMatch;
+    }
+
+    // В кубковых матчах беседа появляется не автоматически, а только
+    // после заметного результата или болезненного вылета.
+    if (isCupMatch &&
+        (match.isPlayerLoss(career.player.club) || outstanding) &&
+        Random().nextDouble() < 0.35) {
+      return AppStrings.pressConferenceTournament;
+    }
+
+    return null;
+  }
+
   Future<void> _finishMatch(BuildContext context) async {
     var updatedCareer = career.afterMatch(match);
+    final prompt = _pressConferencePrompt();
 
-    // Пресс-конференция появляется только если игрок участвовал в матче.
-    if (match.playerPlayed) {
+    if (prompt != null) {
       final response = await showDialog<int>(
         context: context,
-        barrierDismissible: false,
+        barrierDismissible: true,
         builder: (dialogContext) => AlertDialog(
           backgroundColor: const Color(0xFF102B17),
           title: Text(
@@ -54,10 +96,14 @@ class MatchScreen extends StatelessWidget {
             ),
           ),
           content: Text(
-            AppStrings.pressConferenceQuestion,
+            prompt,
             style: const TextStyle(color: Colors.white70),
           ),
           actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, 0),
+              child: Text(AppStrings.skipPressConference),
+            ),
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, 1),
               child: Text(AppStrings.pressConferenceTeamFirst),
@@ -80,11 +126,13 @@ class MatchScreen extends StatelessWidget {
         3 => -2,
         _ => 0,
       };
-      updatedCareer = updatedCareer.copyWith(
-        coachTrust: (updatedCareer.coachTrust + trustChange)
-            .clamp(0, 100)
-            .toInt(),
-      );
+      if (trustChange != 0) {
+        updatedCareer = updatedCareer.copyWith(
+          coachTrust: (updatedCareer.coachTrust + trustChange)
+              .clamp(0, 100)
+              .toInt(),
+        );
+      }
     }
 
     if (!context.mounted) return;
