@@ -1371,7 +1371,7 @@ class Career {
       leagueTable: newLeagueTable,
       leagueMatches: newLeagueMatches,
       news: news,
-      rivals: PositionRival.nextSeason(rivals, newSeason),
+      rivals: PositionRival.nextSeason(rivals, newSeason, player: newPlayer),
       coachTrust: coachTrust,
       agentLevel: agentLevel,
       agentInterestedClubs: const [],
