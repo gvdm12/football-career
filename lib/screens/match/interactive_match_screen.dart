@@ -187,6 +187,16 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       expectedGoalsRemaining: _awayXgRemaining,
       minutesRemaining: minutesRemaining,
     );
+    // Распределяем оставшийся xG по оставшимся минутам,
+    // чтобы интенсивность не росла искусственно к финальному свистку.
+    _homeXgRemaining = (_homeXgRemaining -
+            _homeXgRemaining / minutesRemaining)
+        .clamp(0.0, 2.8)
+        .toDouble();
+    _awayXgRemaining = (_awayXgRemaining -
+            _awayXgRemaining / minutesRemaining)
+        .clamp(0.0, 2.8)
+        .toDouble();
     final homeScored = _random.nextDouble() < homeChance;
     final awayScored = _random.nextDouble() < awayChance;
     if (homeScored) {
