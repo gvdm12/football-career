@@ -33,10 +33,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   int _playerAssists = 0;
   int _yellowCards = 0;
   int _redCards = 0;
-  int _actions = 0;
   int _shots = 0;
   int _successfulActions = 0;
-  int _maxActions = 9;
   int _nextMomentMinute = 8;
   Timer? _clockTimer;
   String _momentTitle = '';
@@ -112,11 +110,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       clubName: _player.club,
     );
     if (status == PlayerStatus.substitute) _minute = 55 + _random.nextInt(11);
-    _maxActions = status == PlayerStatus.substitute
-        ? 5 + _random.nextInt(2)
-        : 7 + _random.nextInt(3);
-    _createMoment();
-    _nextMomentMinute = 7 + _random.nextInt(6);
+    _nextMomentMinute = _minute + 6 + _random.nextInt(7);
     _clockTimer = Timer.periodic(const Duration(milliseconds: 400), _tickMatchClock);
   }
 
@@ -558,7 +552,6 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   }
 
   void _advanceClock(String message) {
-    _actions++;
     _event = message;
     _momentReady = false;
     if (_playerUnavailable) {
