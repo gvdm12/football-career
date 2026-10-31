@@ -248,6 +248,15 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
         tournament = updatedTournament;
         busy = false;
       });
+      if (nationalCurrencyReward > 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '${AppStrings.currencyEarned}: +🪙 $nationalCurrencyReward',
+            ),
+          ),
+        );
+      }
     } catch (_) {
       if (!mounted) return;
       setState(() => busy = false);
