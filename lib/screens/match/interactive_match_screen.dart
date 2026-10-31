@@ -273,6 +273,60 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     }
 
     final roll = _random.nextDouble();
+
+    // Дополнительные тактические эпизоды до обычного позиционного сценария.
+    if ((position == PlayerPosition.forward ||
+            position == PlayerPosition.midfielder) &&
+        roll < 0.10) {
+      _phase = 'twoOnOne';
+      _momentTitle = 'Выход 2 в 1';
+      _momentDescription =
+          'Вы и партнёр выходите на двух защитников. Можно отдать пас на свободного игрока или взять завершение на себя.';
+      _event = '$_minute-я минута. Быстрая атака 2 в 1!';
+      _momentReady = true;
+      return;
+    }
+    if (position == PlayerPosition.forward && roll >= 0.10 && roll < 0.20) {
+      _phase = 'isolatedPress';
+      _momentTitle = 'Выше всех линии атаки';
+      _momentDescription =
+          'Команда потеряла мяч, а вы остались впереди. Можно начать давление на защитника или вернуться и помочь команде сохранить компактность.';
+      _event = '$_minute-я минута. Команда перестраивается после потери.';
+      _momentReady = true;
+      return;
+    }
+    if ((position == PlayerPosition.midfielder ||
+            position == PlayerPosition.defender) &&
+        roll >= 0.10 && roll < 0.19) {
+      _phase = 'secondBall';
+      _momentTitle = 'Подбор мяча';
+      _momentDescription =
+          'После верховой борьбы мяч отскочил в свободную зону. Нужно первым добраться до него и решить, как продолжить атаку.';
+      _event = '$_minute-я минута. Борьба за подбор.';
+      _momentReady = true;
+      return;
+    }
+    if (position == PlayerPosition.midfielder &&
+        roll >= 0.19 && roll < 0.29) {
+      _phase = 'counterAttack';
+      _momentTitle = 'Контратака';
+      _momentDescription =
+          'Вы перехватили мяч, соперник не успел вернуться. Можно ускорить атаку передачей вперёд или продвинуть мяч самостоятельно.';
+      _event = '$_minute-я минута. Ваша команда убегает в контратаку.';
+      _momentReady = true;
+      return;
+    }
+    if (position == PlayerPosition.defender &&
+        roll >= 0.19 && roll < 0.29) {
+      _phase = 'defensiveLine';
+      _momentTitle = 'Линия обороны';
+      _momentDescription =
+          'Нападающий соперника пытается открыться за спину. Нужно выбрать: держать линию, отступить или сыграть на перехват.';
+      _event = '$_minute-я минута. Опасное движение за спину.';
+      _momentReady = true;
+      return;
+    }
+
     if (position == PlayerPosition.goalkeeper) {
       if (roll < 0.58) {
         _phase = 'goalkeeper';
@@ -380,6 +434,39 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     }
     if (_phase == 'penalty') {
       return [_actionButton('Пробить пенальти', 'penaltyShoot')];
+    }
+    if (_phase == 'twoOnOne') {
+      return [
+        _actionButton('Отдать пас свободному партнёру', 'twoOnOnePass'),
+        _actionButton('Продолжить самому и пробить', 'twoOnOneShoot'),
+      ];
+    }
+    if (_phase == 'isolatedPress') {
+      return [
+        _actionButton('Начать прессинг защитника', 'press'),
+        _actionButton('Вернуться на свою позицию', 'recover'),
+      ];
+    }
+    if (_phase == 'secondBall') {
+      return [
+        _actionButton('Выиграть подбор и сыграть в пас', 'pass'),
+        _actionButton('Продвинуть мяч вперёд', 'dribble'),
+        _actionButton('Сбросить партнёру рядом', 'contain'),
+      ];
+    }
+    if (_phase == 'counterAttack') {
+      return [
+        _actionButton('Отдать передачу на ход', 'throughPass'),
+        _actionButton('Пройти свободную зону с мячом', 'dribble'),
+        _actionButton('Притормозить и сохранить владение', 'contain'),
+      ];
+    }
+    if (_phase == 'defensiveLine') {
+      return [
+        _actionButton('Сохранить линию и держать позицию', 'contain'),
+        _actionButton('Отступить за нападающим', 'recover'),
+        _actionButton('Рискнуть и сыграть на перехват', 'intercept'),
+      ];
     }
     if (_phase == 'oneOnOne') {
       return [
@@ -521,6 +608,53 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           ? 'Вы удалены. Команда продолжает матч в меньшинстве.'
           : 'Вы покинули поле из-за травмы. Матч продолжается.';
       setState(() {});
+      return;
+    }
+    if (action == 'twoOnOnePass') {
+      final passChance = (0.66 + (_player.skills.passing - 60) * 0.004)
+          .clamp(0.35, 0.90);
+      if (_random.nextDouble() < passChance) {
+        _phase = 'chance';
+        _rating += 0.32;
+        _playerAssists++;
+        _advanceClock(
+          'Вы вовремя отдали пас партнёру — он выходит на ударную позицию!',
+        );
+      } else {
+        _phase = 'defend';
+        _rating -= 0.18;
+        _advanceClock('Защитник прочитал передачу и перехватил мяч.');
+      }
+      return;
+    }
+    if (action == 'twoOnOneShoot') {
+      _phase = 'oneOnOne';
+      action = 'shoot';
+    }
+    if (action == 'press' || action == 'recover') {
+      final pressChance = (0.48 +
+              (_player.skills.pace - 60) * 0.004 +
+              (_player.skills.defending - 60) * 0.003)
+          .clamp(0.20, 0.82);
+      if (action == 'press' && _random.nextDouble() < pressChance) {
+        _phase = 'midfield';
+        _rating += 0.20;
+        _advanceClock(
+          'Прессинг сработал! Соперник ошибся под давлением, ваша команда вернула мяч.',
+        );
+      } else if (action == 'recover') {
+        _phase = 'midfield';
+        _rating += 0.12;
+        _advanceClock(
+          'Вы вернулись на позицию и помогли команде восстановить компактность.',
+        );
+      } else {
+        _phase = 'defend';
+        _rating -= 0.12;
+        _advanceClock(
+          'Соперник вышел из-под давления и продвинул мяч вперёд.',
+        );
+      }
       return;
     }
     if (action == 'penaltyShoot') {
