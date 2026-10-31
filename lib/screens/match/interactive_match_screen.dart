@@ -89,23 +89,6 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     _awayTeam = widget.isHome ? widget.opponent : playerTeamName;
     _homeStrength = widget.isHome ? playerStrength : opponentStrength;
     _awayStrength = widget.isHome ? opponentStrength : playerStrength;
-    final expectedGoals = Match.calculateExpectedGoals(
-      player: _player,
-      opponent: widget.opponent,
-      isHome: widget.isHome,
-      playerPlayed: true,
-      playerTeamStrength: playerStrength,
-      opponentStrength: opponentStrength,
-    );
-    final elapsedMinutes = 90 - (_minute);
-    _homeGoals = _samplePoisson(
-      expectedGoals.home * elapsedMinutes / 90,
-    );
-    _awayGoals = _samplePoisson(
-      expectedGoals.away * elapsedMinutes / 90,
-    );
-    _homeXgRemaining = expectedGoals.home * _minute / 90;
-    _awayXgRemaining = expectedGoals.away * _minute / 90;
     final status = PlayerStatusCalculator.calculate(
       overall: _player.overall,
       clubName: _player.club,
@@ -120,8 +103,6 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                 isHome: widget.isHome,
               ));
     _playerOnPitch = _playerPlayed;
-    _homeGoals = 0;
-    _awayGoals = 0;
     _playerGoals = 0;
     _playerAssists = 0;
     _yellowCards = 0;
@@ -140,6 +121,25 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     if (status == PlayerStatus.rotation) {
       _minute = 55 + _random.nextInt(11);
     }
+
+    final expectedGoals = Match.calculateExpectedGoals(
+      player: _player,
+      opponent: widget.opponent,
+      isHome: widget.isHome,
+      playerPlayed: true,
+      playerTeamStrength: playerStrength,
+      opponentStrength: opponentStrength,
+    );
+    final elapsedMinutes = _minute - 1;
+    final remainingMinutes = 90 - elapsedMinutes;
+    _homeGoals = _samplePoisson(
+      expectedGoals.home * elapsedMinutes / 90,
+    );
+    _awayGoals = _samplePoisson(
+      expectedGoals.away * elapsedMinutes / 90,
+    );
+    _homeXgRemaining = expectedGoals.home * remainingMinutes / 90;
+    _awayXgRemaining = expectedGoals.away * remainingMinutes / 90;
     _nextMomentMinute = _minute + 6 + _random.nextInt(7);
     _clockTimer = Timer.periodic(
       const Duration(milliseconds: 400),
