@@ -121,7 +121,9 @@ class PositionRival {
     int count = 2,
   }) {
     final random = Random(('${player.name}|${player.club}|$season').hashCode);
-    final names = List<String>.from(_names[player.position]!)..shuffle(random);
+    final names = List<String>.from(_names[player.position]!)
+      ..removeWhere((name) => name == player.name)
+      ..shuffle(random);
     final takenNumbers = <int>{player.jerseyNumber};
     return List.generate(count.clamp(1, 3).toInt(), (index) {
       final delta = random.nextInt(11) - 4;
