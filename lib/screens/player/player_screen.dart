@@ -1025,6 +1025,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
             title: AppStrings.savings,
             value: '${_formatMoney(career.money)} €',
           ),
+          _InfoRow(
+            title: AppStrings.gameCurrency,
+            value: '🪙 ${_formatMoney(career.agentCredits)}',
+          ),
           if (career.rivals.isNotEmpty) ...[
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 8),
