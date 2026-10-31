@@ -133,6 +133,19 @@ class AppStrings {
   static String agentBonus(int percent) => _en ? '+$percent% to contract offers' : '+$percent% к зарплате в предложениях';
   static String get agentMaxLevel => _en ? 'Maximum agent level reached' : 'Достигнут максимальный уровень агента';
   static String get agentNotEnoughMoney => _en ? 'Not enough money for agent upgrade' : 'Недостаточно денег для улучшения агента';
+  static String get pressConferenceTitle => _en ? 'PRESS CONFERENCE' : 'ПРЕСС-КОНФЕРЕНЦИЯ';
+  static String get pressConferenceQuestion => _en
+      ? 'Journalists ask how you assess the match and your role in the team.'
+      : 'Журналисты спрашивают, как вы оцениваете матч и свою роль в команде.';
+  static String get pressConferenceTeamFirst => _en
+      ? 'The team result comes first'
+      : 'Главное — результат команды';
+  static String get pressConferenceConfident => _en
+      ? 'I am ready to fight for my place'
+      : 'Я готов бороться за своё место';
+  static String get pressConferenceDemand => _en
+      ? 'I deserve more playing time'
+      : 'Я заслуживаю больше игрового времени';
   static String get rivalForm => _en ? 'Form' : 'Форма';
   static String get careerRecords => _en ? 'CAREER RECORDS' : 'РЕКОРДЫ КАРЬЕРЫ';
   static String get mostGoalsSeason => _en ? 'Most goals in a season' : 'Больше всего голов за сезон';
