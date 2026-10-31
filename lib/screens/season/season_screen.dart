@@ -3258,6 +3258,12 @@ class _SeasonScreenState extends State<SeasonScreen> {
         ? tie.homeTeam == club
         : tie.awayTeam == club;
     final opponent = tie.homeTeam == club ? tie.awayTeam : tie.homeTeam;
+    final interactiveAvailable = !career.isInjured &&
+        PlayerStatusCalculator.calculate(
+              overall: career.player.overall,
+              clubName: career.player.club,
+            ) !=
+            PlayerStatus.substitute;
 
     final matchTitle = isFinal
         ? AppStrings.finalStage
@@ -3349,23 +3355,39 @@ class _SeasonScreenState extends State<SeasonScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: isSaving || seasonFinishing
-                          ? null
-                          : _playChampionsLeagueMatch,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8DB8FF),
-                        foregroundColor: const Color(0xFF071526),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: isSaving || seasonFinishing
+                              ? null
+                              : () => _playChampionsLeagueMatch(interactive: false),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF8DB8FF),
+                            foregroundColor: const Color(0xFF071526),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          child: const Text('Симуляция'),
+                        ),
                       ),
-                      child: Text(
-                        AppStrings.playMatchUpper,
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
+                      if (interactiveAvailable) ...[
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: isSaving || seasonFinishing
+                                ? null
+                                : () => _playChampionsLeagueMatch(interactive: true),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF22C55E),
+                              foregroundColor: const Color(0xFF06210D),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                            child: const Text('Играть'),
+                          ),
+                        ),
+                      ],
+                    ],
+                  )
                 ],
               ),
             ),
@@ -3391,6 +3413,12 @@ class _SeasonScreenState extends State<SeasonScreen> {
         ? tie.homeTeam == club
         : tie.awayTeam == club;
     final opponent = tie.homeTeam == club ? tie.awayTeam : tie.homeTeam;
+    final interactiveAvailable = !career.isInjured &&
+        PlayerStatusCalculator.calculate(
+              overall: career.player.overall,
+              clubName: career.player.club,
+            ) !=
+            PlayerStatus.substitute;
 
     final matchTitle = isFinal
         ? AppStrings.finalStage
@@ -3482,23 +3510,39 @@ class _SeasonScreenState extends State<SeasonScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: isSaving || seasonFinishing
-                          ? null
-                          : _playEuropaLeagueMatch,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFFC857),
-                        foregroundColor: const Color(0xFF1A1204),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: isSaving || seasonFinishing
+                              ? null
+                              : () => _playEuropaLeagueMatch(interactive: false),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFFC857),
+                            foregroundColor: const Color(0xFF1A1204),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          child: const Text('Симуляция'),
+                        ),
                       ),
-                      child: Text(
-                        AppStrings.playMatchUpper,
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
+                      if (interactiveAvailable) ...[
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: isSaving || seasonFinishing
+                                ? null
+                                : () => _playEuropaLeagueMatch(interactive: true),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF22C55E),
+                              foregroundColor: const Color(0xFF06210D),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                            child: const Text('Играть'),
+                          ),
+                        ),
+                      ],
+                    ],
+                  )
                 ],
               ),
             ),
