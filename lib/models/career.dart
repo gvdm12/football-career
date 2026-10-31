@@ -1374,6 +1374,7 @@ class Career {
       rivals: PositionRival.nextSeason(rivals, newSeason),
       coachTrust: coachTrust,
       agentLevel: agentLevel,
+      agentInterestedClubs: const [],
       coachName: coachName,
       monthlySalary: monthlySalary,
       isCareerFinished: false,
