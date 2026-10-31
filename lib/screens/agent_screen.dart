@@ -26,9 +26,9 @@ class _AgentScreenState extends State<AgentScreen> {
 
   void _upgradeAgent() {
     if (career.agentLevel >= 3) return;
-    final cost = career.agentLevel == 1 ? 15000 : 35000;
+    final cost = career.agentLevel == 1 ? 150 : 350;
 
-    if (career.money < cost) {
+    if (career.agentCredits < cost) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppStrings.agentNotEnoughMoney)),
       );
@@ -37,7 +37,7 @@ class _AgentScreenState extends State<AgentScreen> {
 
     setState(() {
       career = career.copyWith(
-        money: career.money - cost,
+        agentCredits: career.agentCredits - cost,
         agentLevel: career.agentLevel + 1,
       );
       interests = TransferService.generateOffers(career);
@@ -58,7 +58,7 @@ class _AgentScreenState extends State<AgentScreen> {
   Widget build(BuildContext context) {
     final level = career.agentLevel;
     final isMax = level >= 3;
-    final upgradeCost = level == 1 ? 15000 : 35000;
+    final upgradeCost = level == 1 ? 150 : 350;
 
     return PopScope<Career>(
       canPop: false,
@@ -107,13 +107,18 @@ class _AgentScreenState extends State<AgentScreen> {
                       child: Text(
                         isMax
                             ? AppStrings.agentMaxLevel
-                            : '${AppStrings.upgradeAgent} · €${_money(upgradeCost)}',
+                            : '${AppStrings.upgradeAgent} · 🪙 ${_money(upgradeCost)}',
                       ),
                     ),
                   ),
                   Text(
-                    '${AppStrings.savings}: €${_money(career.money)}',
+                    '${AppStrings.gameCurrency}: 🪙 ${_money(career.agentCredits)}',
                     style: const TextStyle(color: Colors.white54, fontSize: 12),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    AppStrings.currencyRewardsHint,
+                    style: const TextStyle(color: Colors.white54, fontSize: 11, height: 1.35),
                   ),
                 ],
               ),
