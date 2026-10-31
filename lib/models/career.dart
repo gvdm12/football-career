@@ -35,6 +35,7 @@ class Career {
   final List<LeagueTableEntry> leagueTable;
 
   final int money;
+  final int agentCredits;
   final int monthlySalary; // Зарплата в месяц, евро
   final int contractYears;
   final int developmentPoints;
@@ -76,6 +77,7 @@ class Career {
     this.rivals = const [],
     this.coachTrust = 65,
     this.agentLevel = 1,
+    this.agentCredits = 0,
     this.coachName = 'Главный тренер',
     required this.monthlySalary,
     required this.isCareerFinished,
@@ -294,6 +296,7 @@ class Career {
       'averageRating': averageRating,
       'leagueTable': leagueTable.map((item) => item.toJson()).toList(),
       'money': money,
+      'agentCredits': agentCredits,
       'contractYears': contractYears,
       'developmentPoints': developmentPoints,
       'seasonMatches': seasonMatches.map((item) => item.toJson()).toList(),
@@ -441,6 +444,7 @@ class Career {
       averageRating: (json['averageRating'] as num?)?.toDouble(),
       leagueTable: leagueTable,
       money: (json['money'] as num?)?.toInt() ?? 0,
+      agentCredits: (json['agentCredits'] as num?)?.toInt() ?? 0,
       contractYears: (json['contractYears'] as num?)?.toInt() ?? 0,
       developmentPoints: (json['developmentPoints'] as num?)?.toInt() ?? 0,
       seasonMatches: seasonMatches,
@@ -483,6 +487,7 @@ class Career {
     int? redCards,
     double? averageRating,
     int? money,
+    int? agentCredits,
     int? contractYears,
     int? developmentPoints,
     List<SeasonMatch>? seasonMatches,
@@ -515,6 +520,7 @@ class Career {
       redCards: redCards ?? this.redCards,
       averageRating: averageRating ?? this.averageRating,
       money: money ?? this.money,
+      agentCredits: agentCredits ?? this.agentCredits,
       contractYears: contractYears ?? this.contractYears,
       developmentPoints: developmentPoints ?? this.developmentPoints,
       seasonMatches: seasonMatches ?? this.seasonMatches,
@@ -650,6 +656,21 @@ class Career {
     );
   }
 
+  static int currencyRewardForMatch(Match match) {
+    if (!match.playerPlayed) return 0;
+
+    final performanceBonus = match.playerRating >= 9.0
+        ? 10
+        : match.playerRating >= 8.0
+        ? 5
+        : 0;
+
+    return 10 +
+        match.playerGoals * 8 +
+        match.playerAssists * 6 +
+        performanceBonus;
+  }
+
   Career afterMatch(Match match) {
     // Конкуренты получают игровую практику даже тогда, когда игрок пропустил матч.
     final matchCareer = copyWith(rivals: PositionRival.advanceMatch(rivals));
@@ -697,6 +718,7 @@ class Career {
     }
 
     final updatedCareer = trustedCareer.copyWith(
+      agentCredits: trustedCareer.agentCredits + currencyRewardForMatch(match),
       matches: newMatches,
       goals: newGoals,
       assists: newAssists,
@@ -907,7 +929,19 @@ class Career {
             ))
         .toList();
 
+    const teamTrophies = {
+      'Чемпион страны',
+      'Обладатель кубка страны',
+      'Победитель Лиги чемпионов',
+      'Победитель Лиги Европы',
+      'Чемпион мира',
+    };
+    final trophyReward =
+        achievements.where(teamTrophies.contains).length * 75 +
+        (achievements.contains('Золотая бутса') ? 40 : 0);
+
     var updatedCareer = copyWith(
+      agentCredits: agentCredits + trophyReward,
       history: [...history, seasonStats],
       news: [...news, ...awardNews],
       developmentPoints: pointsToAdd,
