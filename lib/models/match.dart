@@ -53,6 +53,121 @@ class Match {
     return Random(seed).nextDouble() < playChance;
   }
 
+  /// Единая модель ожидаемых голов для обычной и интерактивной симуляции.
+  /// Возвращает xG хозяев и гостей с учётом силы команд и влияния игрока.
+  static ({double home, double away}) calculateExpectedGoals({
+    required Player player,
+    required String opponent,
+    required bool isHome,
+    required bool playerPlayed,
+    int? playerTeamStrength,
+    int? opponentStrength,
+  }) {
+    final effectivePlayerStrength = playerTeamStrength ??
+        Clubs.effectiveStrength(
+          clubName: player.club,
+          playerClub: player.club,
+          playerOverall: player.overall,
+        );
+    final effectiveOpponentStrength =
+        opponentStrength ?? Clubs.getByName(opponent).strength;
+
+    final homeStrength =
+        isHome ? effectivePlayerStrength : effectiveOpponentStrength;
+    final awayStrength =
+        isHome ? effectiveOpponentStrength : effectivePlayerStrength;
+    final strengthDifference = homeStrength - awayStrength;
+
+    double homeExpectedGoals =
+        1.35 + strengthDifference * 0.035 + 0.15;
+    double awayExpectedGoals = 1.35 - strengthDifference * 0.035;
+
+    if (playerPlayed) {
+      final skills = player.skills;
+      switch (player.position) {
+        case PlayerPosition.forward:
+          final attackPower =
+              skills.shooting * 0.45 +
+              skills.dribbling * 0.25 +
+              skills.pace * 0.20 +
+              skills.heading * 0.15;
+          final attackBonus =
+              ((attackPower - 60) * 0.004 +
+                      (player.overall - 60) * 0.003)
+                  .clamp(-0.08, 0.18)
+                  .toDouble() +
+              (skills.vision - 60) * 0.001;
+          if (isHome) {
+            homeExpectedGoals += attackBonus;
+          } else {
+            awayExpectedGoals += attackBonus;
+          }
+          break;
+        case PlayerPosition.midfielder:
+          final midfieldPower =
+              skills.passing * 0.30 +
+              skills.vision * 0.25 +
+              skills.dribbling * 0.25 +
+              skills.shooting * 0.12 +
+              skills.pace * 0.08;
+          final attackBonus =
+              ((midfieldPower - 60) * 0.003 +
+                      (player.overall - 60) * 0.002)
+                  .clamp(-0.06, 0.13)
+                  .toDouble() +
+              (skills.vision - 60) * 0.0015;
+          if (isHome) {
+            homeExpectedGoals += attackBonus;
+          } else {
+            awayExpectedGoals += attackBonus;
+          }
+          break;
+        case PlayerPosition.defender:
+          final defenseBonus =
+              ((skills.defending - 60) * 0.003 +
+                      (skills.physical - 60) * 0.0015 +
+                      (skills.heading - 60) * 0.0015 +
+                      (skills.vision - 60) * 0.0008)
+                  .clamp(-0.06, 0.15)
+                  .toDouble();
+          if (isHome) {
+            awayExpectedGoals -= defenseBonus;
+          } else {
+            homeExpectedGoals -= defenseBonus;
+          }
+          break;
+        case PlayerPosition.goalkeeper:
+          final defenseBonus =
+              ((skills.defending - 60) * 0.004 +
+                      (skills.physical - 60) * 0.001 +
+                      (skills.vision - 60) * 0.0008)
+                  .clamp(-0.06, 0.16)
+                  .toDouble();
+          if (isHome) {
+            awayExpectedGoals -= defenseBonus;
+          } else {
+            homeExpectedGoals -= defenseBonus;
+          }
+          break;
+      }
+    }
+
+    return (
+      home: homeExpectedGoals.clamp(0.35, 2.8).toDouble(),
+      away: awayExpectedGoals.clamp(0.35, 2.8).toDouble(),
+    );
+  }
+
+  /// Вероятность гола за одну минуту при оставшемся xG.
+  static double goalChancePerMinute({
+    required double expectedGoalsRemaining,
+    required int minutesRemaining,
+  }) {
+    if (expectedGoalsRemaining <= 0 || minutesRemaining <= 0) return 0;
+    return (1 - exp(-expectedGoalsRemaining / minutesRemaining))
+        .clamp(0.0, 1.0);
+  }
+
   final String homeTeam;
   final String awayTeam;
   final int homeGoals;
@@ -122,22 +237,6 @@ class Match {
 
     final opponentClub = Clubs.getByName(opponent);
 
-    // Сила клуба игрока с учётом бонуса за общий рейтинг.
-    final playerClubStrength = Clubs.effectiveStrength(
-      clubName: player.club,
-      playerClub: player.club,
-      playerOverall: player.overall,
-    );
-
-    // Сила соперника остаётся базовой.
-    final opponentStrength = opponentClub.strength;
-
-    final homeStrength = isHome ? playerClubStrength : opponentStrength;
-
-    final awayStrength = isHome ? opponentStrength : playerClubStrength;
-
-    final strengthDifference = homeStrength - awayStrength;
-
     final playerPlayed = willPlayerPlay(
       player: player,
       career: career,
@@ -145,106 +244,14 @@ class Match {
       isHome: isHome,
     );
 
-    // ------------------------------------------------------------
-    // 2. БАЗОВАЯ СИЛА АТАКИ
-    // ------------------------------------------------------------
-
-    // Обе команды используют одинаковую базовую формулу.
-    // Преимущество хозяев учитывается отдельно.
-    double homeExpectedGoals = 1.35 + strengthDifference * 0.035 + 0.15;
-
-    double awayExpectedGoals = 1.35 - strengthDifference * 0.035;
-
-    // ------------------------------------------------------------
-    // 3. ВЛИЯНИЕ ИГРОКА НА РЕЗУЛЬТАТ
-    // ------------------------------------------------------------
-
-    if (playerPlayed) {
-      final skills = player.skills;
-
-      switch (player.position) {
-        case PlayerPosition.forward:
-          // Нападающий влияет прежде всего на создание и реализацию моментов.
-          final attackPower =
-              skills.shooting * 0.45 +
-              skills.dribbling * 0.25 +
-              skills.pace * 0.20 +
-              skills.heading * 0.15;
-
-          final attackBonus =
-              ((attackPower - 60) * 0.004 + (player.overall - 60) * 0.003)
-                  .clamp(-0.08, 0.18)
-                  .toDouble() +
-              (skills.vision - 60) * 0.001;
-
-          if (isHome) {
-            homeExpectedGoals += attackBonus;
-          } else {
-            awayExpectedGoals += attackBonus;
-          }
-          break;
-
-        case PlayerPosition.midfielder:
-          // Полузащитник помогает продвижению мяча и атаке.
-          final midfieldPower =
-              skills.passing * 0.30 +
-              skills.vision * 0.25 +
-              skills.dribbling * 0.25 +
-              skills.shooting * 0.12 +
-              skills.pace * 0.08;
-
-          final attackBonus =
-              ((midfieldPower - 60) * 0.003 + (player.overall - 60) * 0.002)
-                  .clamp(-0.06, 0.13)
-                  .toDouble() +
-              (skills.vision - 60) * 0.0015;
-
-          if (isHome) {
-            homeExpectedGoals += attackBonus;
-          } else {
-            awayExpectedGoals += attackBonus;
-          }
-          break;
-
-        case PlayerPosition.defender:
-          // Хороший защитник немного уменьшает ожидаемые голы соперника.
-          final defenseBonus =
-              ((skills.defending - 60) * 0.003 +
-                      (skills.physical - 60) * 0.0015 +
-                      (skills.heading - 60) * 0.0015 +
-                      (skills.vision - 60) * 0.0008)
-                  .clamp(-0.06, 0.15)
-                  .toDouble();
-
-          if (isHome) {
-            awayExpectedGoals -= defenseBonus;
-          } else {
-            homeExpectedGoals -= defenseBonus;
-          }
-          break;
-
-        case PlayerPosition.goalkeeper:
-          // Вратарь влияет на защиту, если эта позиция используется.
-          final defenseBonus =
-              ((skills.defending - 60) * 0.004 +
-                      (skills.physical - 60) * 0.001 +
-                      (skills.vision - 60) * 0.0008)
-                  .clamp(-0.06, 0.16)
-                  .toDouble();
-
-          if (isHome) {
-            awayExpectedGoals -= defenseBonus;
-          } else {
-            homeExpectedGoals -= defenseBonus;
-          }
-          break;
-      }
-    }
-
-    // Не допускаем отрицательных или чрезмерных ожиданий голов.
-    homeExpectedGoals = homeExpectedGoals.clamp(0.35, 2.8).toDouble();
-
-    awayExpectedGoals = awayExpectedGoals.clamp(0.35, 2.8).toDouble();
+    final expectedGoals = calculateExpectedGoals(
+      player: player,
+      opponent: opponent,
+      isHome: isHome,
+      playerPlayed: playerPlayed,
+    );
+    final homeExpectedGoals = expectedGoals.home;
+    final awayExpectedGoals = expectedGoals.away;
 
     // Генерируем окончательный счёт.
     final homeGoals = _generateGoals(random, homeExpectedGoals);
