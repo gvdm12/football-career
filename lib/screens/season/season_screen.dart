@@ -10,6 +10,7 @@ import 'package:flutter_football/models/cup_match.dart';
 import 'package:flutter_football/models/league_match.dart';
 import 'package:flutter_football/models/league_table.dart';
 import 'package:flutter_football/models/match.dart';
+import 'package:flutter_football/models/player_status.dart';
 import 'package:flutter_football/models/season_match.dart';
 import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/screens/development_screen.dart';
@@ -970,6 +971,23 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Future<void> _playMatch(SeasonMatch seasonMatch, {required bool interactive}) async {
     if (isSaving || seasonFinishing || seasonMatch.isPlayed) return;
+    final playerStatus = PlayerStatusCalculator.calculate(
+      overall: career.player.overall,
+      clubName: career.player.club,
+    );
+    if (interactive &&
+        (career.isInjured || playerStatus == PlayerStatus.substitute)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            career.isInjured
+                ? 'Из-за травмы интерактивный матч недоступен.'
+                : 'Интерактивный матч доступен только игрокам основного состава и ротации.',
+          ),
+        ),
+      );
+      return;
+    }
 
     final worldCup = career.worldCup;
     if (worldCup != null && !worldCup.isCompleted) {
@@ -2820,6 +2838,12 @@ class _SeasonScreenState extends State<SeasonScreen> {
   Widget _buildNextMatchCard(SeasonMatch match) {
     final playerColor = ClubColors.primary(career.player.club);
     final opponentColor = ClubColors.primary(match.opponent);
+    final interactiveAvailable = !career.isInjured &&
+        PlayerStatusCalculator.calculate(
+              overall: career.player.overall,
+              clubName: career.player.club,
+            ) !=
+            PlayerStatus.substitute;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -2886,11 +2910,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: isSaving || seasonFinishing
+                  onPressed: isSaving || seasonFinishing || !interactiveAvailable
                       ? null
                       : () => _playMatch(match, interactive: true),
                   icon: const Icon(Icons.sports_soccer_rounded, size: 18),
-                  label: const Text('Играть'),
+                  label: Text(interactiveAvailable ? 'Играть' : 'Недоступно'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF22C55E),
                     foregroundColor: const Color(0xFF06210D),
