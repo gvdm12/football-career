@@ -247,6 +247,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
       context: context,
       takenNumbers: previewRivals.map((rival) => rival.jerseyNumber).toSet(),
       preferredNumber: player.jerseyNumber,
+      playerOverall: player.overall,
       english: AppStrings.isEnglish,
     );
 
