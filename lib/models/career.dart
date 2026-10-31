@@ -11,6 +11,7 @@ import 'player.dart';
 import 'match.dart';
 import 'season_match.dart';
 import 'season_stats.dart';
+import 'position_rival.dart';
 import 'transfer_offer.dart';
 import 'league_table.dart';
 
@@ -19,6 +20,7 @@ class Career {
   final int season;
   final List<SeasonStats> history;
   final List<CareerNews> news;
+  final List<PositionRival> rivals;
 
   final int matches;
   final int goals;
@@ -68,6 +70,7 @@ class Career {
     required this.leagueTable,
     required this.leagueMatches,
     this.news = const [],
+    this.rivals = const [],
     required this.monthlySalary,
     required this.isCareerFinished,
     this.domesticCup,
@@ -228,6 +231,7 @@ class Career {
     return Career(
       player: player,
       season: 1,
+      rivals: PositionRival.generate(player: player, season: 1),
       matches: 0,
       goals: 0,
       assists: 0,
@@ -272,6 +276,7 @@ class Career {
       'seasonMatches': seasonMatches.map((item) => item.toJson()).toList(),
       'leagueMatches': leagueMatches.map((item) => item.toJson()).toList(),
       'news': news.map((item) => item.toJson()).toList(),
+      'rivals': rivals.map((item) => item.toJson()).toList(),
       'monthlySalary': monthlySalary,
       'isCareerFinished': isCareerFinished,
       'domesticCup': domesticCup?.toJson(),
@@ -415,6 +420,9 @@ class Career {
       seasonMatches: seasonMatches,
       leagueMatches: leagueMatches,
       news: readList('news', CareerNews.fromJson),
+      rivals: readList('rivals', PositionRival.fromJson).isNotEmpty
+          ? readList('rivals', PositionRival.fromJson)
+          : PositionRival.generate(player: loadedPlayer, season: currentSeason),
       monthlySalary: (json['monthlySalary'] as num?)?.toInt() ?? 0,
       isCareerFinished: json['isCareerFinished'] as bool? ?? false,
       domesticCup: restoredCup,
@@ -453,6 +461,7 @@ class Career {
     List<LeagueTableEntry>? leagueTable,
     List<LeagueMatch>? leagueMatches,
     List<CareerNews>? news,
+    List<PositionRival>? rivals,
     int? monthlySalary,
     bool? isCareerFinished,
     DomesticCup? domesticCup,
@@ -481,6 +490,7 @@ class Career {
       leagueTable: leagueTable ?? this.leagueTable,
       leagueMatches: leagueMatches ?? this.leagueMatches,
       news: news ?? this.news,
+      rivals: rivals ?? this.rivals,
       monthlySalary: monthlySalary ?? this.monthlySalary,
       isCareerFinished: isCareerFinished ?? this.isCareerFinished,
       domesticCup: domesticCup ?? this.domesticCup,
@@ -582,13 +592,16 @@ class Career {
   }
 
   Career afterMatch(Match match) {
+    // Конкуренты получают игровую практику даже тогда, когда игрок пропустил матч.
+    final matchCareer = copyWith(rivals: PositionRival.advanceMatch(rivals));
+
     // Травмированный игрок пропускает матч, но срок восстановления уменьшается.
     if (isInjured) {
-      return advanceAfterCompetitionMatch(playerParticipated: false);
+      return matchCareer.advanceAfterCompetitionMatch(playerParticipated: false);
     }
 
     // Команда сыграла, но игрок не участвовал.
-    if (!match.playerPlayed) return this;
+    if (!match.playerPlayed) return matchCareer;
 
     final newMatches = matches + 1;
 
@@ -611,14 +624,14 @@ class Career {
           ((averageRating! * matches) + match.playerRating) / newMatches;
     }
 
-    final updatedCareer = copyWith(
+    final updatedCareer = matchCareer.copyWith(
       matches: newMatches,
       goals: newGoals,
       assists: newAssists,
       yellowCards: newYellowCards,
       redCards: newRedCards,
       averageRating: double.parse(newAverageRating.toStringAsFixed(2)),
-      news: [...news, ...matchNews],
+      news: [...matchCareer.news, ...matchNews],
     ).advanceAfterCompetitionMatch(playerParticipated: true);
 
     if (match.injuryName != null && match.injuryMatchesRemaining > 0) {
@@ -639,6 +652,7 @@ class Career {
 
     return copyWith(
       player: newPlayer,
+      rivals: PositionRival.generate(player: newPlayer, season: season),
       monthlySalary: offer.salary,
       contractYears: offer.contractYears,
     );
@@ -1197,6 +1211,7 @@ class Career {
     return Career(
       player: newPlayer,
       season: newSeason,
+      rivals: PositionRival.nextSeason(rivals, newSeason),
       matches: 0,
       goals: 0,
       assists: 0,
