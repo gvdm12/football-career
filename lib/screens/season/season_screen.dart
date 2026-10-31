@@ -25,6 +25,7 @@ import 'package:flutter_football/screens/match/interactive_match_screen.dart';
 import 'package:flutter_football/screens/transfers/transfer_screen.dart';
 import 'package:flutter_football/screens/world_cup_screen.dart';
 import 'package:flutter_football/services/app_strings.dart';
+import 'package:flutter_football/screens/press_conference_dialog.dart';
 import 'package:flutter_football/services/career_storage.dart';
 import 'package:flutter_football/screens/career_end_screen.dart';
 import 'package:flutter_svg/svg.dart';
@@ -2237,73 +2238,46 @@ class _SeasonScreenState extends State<SeasonScreen> {
         .where((item) => item.isPlayed)
         .length;
     final totalMatches = career.seasonMatches.length;
-    String? prompt;
+    final outstanding = match.playerRating >= 8.5 ||
+        match.playerGoals >= 2 ||
+        match.playerGoals + match.playerAssists >= 3;
+    final poor = match.playerRating <= 5.5;
 
+    String? category;
     if (isTournamentDecider) {
-      prompt = AppStrings.pressConferenceTournament;
+      category = 'tournament';
     } else if (includeSeasonMilestones && playedBefore == 0) {
-      prompt = AppStrings.pressConferenceSeasonStart;
+      category = 'seasonStart';
     } else if (includeSeasonMilestones &&
         totalMatches > 2 &&
         playedBefore == (totalMatches / 2).round()) {
-      prompt = AppStrings.pressConferenceSeasonMiddle;
+      category = 'seasonMiddle';
     } else if (includeSeasonMilestones &&
         totalMatches > 0 &&
         playedBefore >= totalMatches - 1) {
-      prompt = AppStrings.pressConferenceSeasonEnd;
-    } else if (match.playerRating >= 8.5 ||
-        match.playerGoals >= 2 ||
-        match.playerGoals + match.playerAssists >= 3) {
-      if (Random().nextDouble() < 0.72) {
-        prompt = AppStrings.pressConferenceGreatMatch;
-      }
-    } else if (match.playerRating <= 5.5 && Random().nextDouble() < 0.62) {
-      prompt = AppStrings.pressConferenceBadMatch;
+      category = 'seasonEnd';
+    } else if (outstanding && Random().nextDouble() < 0.82) {
+      category = 'great';
+    } else if (poor && Random().nextDouble() < 0.72) {
+      category = 'poor';
+    } else if (Random().nextDouble() < 0.18) {
+      category = 'normal';
     }
 
-    if (prompt == null) return updatedCareer;
+    if (category == null) return updatedCareer;
 
-    final response = await showDialog<int>(
+    final content = PressConferenceContentFactory.create(
+      category: category,
+      english: AppStrings.isEnglish,
+    );
+    final trustChange = await PressConferenceDialog.show(
       context: context,
-      barrierDismissible: true,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: const Color(0xFF102B17),
-        title: Text(
-          AppStrings.pressConferenceTitle,
-          style: const TextStyle(
-            color: Color(0xFF8BE07F),
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-        content: Text(prompt!, style: const TextStyle(color: Colors.white70)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, 0),
-            child: Text(AppStrings.skipPressConference),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, 1),
-            child: Text(AppStrings.pressConferenceTeamFirst),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, 2),
-            child: Text(AppStrings.pressConferenceConfident),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, 3),
-            child: Text(AppStrings.pressConferenceDemand),
-          ),
-        ],
-      ),
+      content: content,
+      title: AppStrings.pressConferenceTitle,
+      skipLabel: AppStrings.skipPressConference,
     );
 
-    final trustChange = switch (response) {
-      1 => 2,
-      2 => 1,
-      3 => -2,
-      _ => 0,
-    };
-    if (trustChange == 0) return updatedCareer;
+    if (trustChange == null || trustChange == 0) return updatedCareer;
 
     return updatedCareer.copyWith(
       coachTrust: (updatedCareer.coachTrust + trustChange)
