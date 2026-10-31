@@ -6,6 +6,70 @@ import 'player.dart';
 import 'career.dart';
 
 class Match {
+  /// Стабильное решение о выходе игрока именно в этот матч.
+  /// Используется и карточкой матча, и самой симуляцией, чтобы кнопка
+  /// не обещала интерактивную игру, если игрок останется вне состава.
+  static bool willPlayerPlay({
+    required Player player,
+    Career? career,
+    required String opponent,
+    required bool isHome,
+  }) {
+    if (career?.isInjured == true) return false;
+
+    final clubStrength = Clubs.effectiveStrength(
+      clubName: player.club,
+      playerClub: player.club,
+      playerOverall: player.overall,
+    );
+    final status = PlayerStatusCalculator.calculate(
+      overall: player.overall,
+      clubName: player.club,
+    );
+    final ratingDifference = player.overall - clubStrength;
+
+    double playChance;
+    if (ratingDifference >= 10) {
+      playChance = 0.98;
+    } else if (ratingDifference >= 5) {
+      playChance = 0.94;
+    } else if (ratingDifference >= 0) {
+      playChance = 0.88;
+    } else if (ratingDifference >= -5) {
+      playChance = 0.72;
+    } else if (ratingDifference >= -10) {
+      playChance = 0.60;
+    } else {
+      playChance = 0.35;
+    }
+
+    switch (status) {
+      case PlayerStatus.starter:
+        playChance = max(playChance, 0.90);
+        break;
+      case PlayerStatus.rotation:
+        playChance = max(playChance, 0.70);
+        break;
+      case PlayerStatus.substitute:
+        playChance = max(playChance, 0.50);
+        break;
+    }
+
+    final seedText = [
+      player.club,
+      player.name,
+      player.overall.toString(),
+      opponent,
+      isHome ? 'home' : 'away',
+      (career?.season ?? 1).toString(),
+    ].join('|');
+    var seed = 17;
+    for (final unit in seedText.codeUnits) {
+      seed = (seed * 31 + unit) & 0x7fffffff;
+    }
+    return Random(seed).nextDouble() < playChance;
+  }
+
   final String homeTeam;
   final String awayTeam;
   final int homeGoals;
@@ -91,44 +155,12 @@ class Match {
 
     final strengthDifference = homeStrength - awayStrength;
 
-    final status = PlayerStatusCalculator.calculate(
-      overall: player.overall,
-      clubName: player.club,
+    final playerPlayed = willPlayerPlay(
+      player: player,
+      career: career,
+      opponent: opponent,
+      isHome: isHome,
     );
-
-    // Вероятность выхода на поле.
-    final ratingDifference = player.overall - playerClubStrength;
-    double playChance;
-
-    if (ratingDifference >= 10) {
-      playChance = 0.98;
-    } else if (ratingDifference >= 5) {
-      playChance = 0.94;
-    } else if (ratingDifference >= 0) {
-      playChance = 0.88;
-    } else if (ratingDifference >= -5) {
-      playChance = 0.72;
-    } else if (ratingDifference >= -10) {
-      playChance = 0.60;
-    } else {
-      playChance = 0.35;
-    }
-
-    switch (status) {
-      case PlayerStatus.starter:
-        playChance = max(playChance, 0.90);
-        break;
-      case PlayerStatus.rotation:
-        playChance = max(playChance, 0.70);
-        break;
-      case PlayerStatus.substitute:
-        playChance = max(playChance, 0.50);
-        break;
-    }
-
-    final playerPlayed = career?.isInjured == true
-        ? false
-        : random.nextDouble() < playChance;
 
     // ------------------------------------------------------------
     // 2. БАЗОВАЯ СИЛА АТАКИ
