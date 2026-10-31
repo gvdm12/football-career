@@ -23,6 +23,7 @@ class Career {
   final List<PositionRival> rivals;
   final int coachTrust;
   final int agentLevel;
+  final String coachName;
 
   final int matches;
   final int goals;
@@ -75,6 +76,7 @@ class Career {
     this.rivals = const [],
     this.coachTrust = 65,
     this.agentLevel = 1,
+    this.coachName = 'Главный тренер',
     required this.monthlySalary,
     required this.isCareerFinished,
     this.domesticCup,
@@ -193,6 +195,22 @@ class Career {
     return 1500;
   }
 
+  static String _generateCoachName() {
+    const names = [
+      'Александр Волков',
+      'Марк Петерсен',
+      'Даниэль Морено',
+      'Роберто Силва',
+      'Томас Шнайдер',
+      'Лукас Мартинес',
+      'Антонио Росси',
+      'Джеймс Уокер',
+      'Михаил Орлов',
+      'Карим Бенали',
+    ];
+    return names[Random().nextInt(names.length)];
+  }
+
   factory Career.create(Player player) {
     final leagueMatches = _createLeagueMatches(player.club);
 
@@ -236,6 +254,7 @@ class Career {
       player: player,
       season: 1,
       rivals: PositionRival.generate(player: player, season: 1),
+      coachName: _generateCoachName(),
       matches: 0,
       goals: 0,
       assists: 0,
@@ -283,6 +302,7 @@ class Career {
       'rivals': rivals.map((item) => item.toJson()).toList(),
       'coachTrust': coachTrust,
       'agentLevel': agentLevel,
+      'coachName': coachName,
       'monthlySalary': monthlySalary,
       'isCareerFinished': isCareerFinished,
       'domesticCup': domesticCup?.toJson(),
@@ -431,6 +451,7 @@ class Career {
           : PositionRival.generate(player: loadedPlayer, season: currentSeason),
       coachTrust: ((json['coachTrust'] as num?)?.toInt() ?? 65).clamp(0, 100).toInt(),
       agentLevel: ((json['agentLevel'] as num?)?.toInt() ?? 1).clamp(1, 3).toInt(),
+      coachName: json['coachName'] as String? ?? 'Главный тренер',
       monthlySalary: (json['monthlySalary'] as num?)?.toInt() ?? 0,
       isCareerFinished: json['isCareerFinished'] as bool? ?? false,
       domesticCup: restoredCup,
@@ -472,6 +493,7 @@ class Career {
     List<PositionRival>? rivals,
     int? coachTrust,
     int? agentLevel,
+    String? coachName,
     int? monthlySalary,
     bool? isCareerFinished,
     DomesticCup? domesticCup,
@@ -503,6 +525,7 @@ class Career {
       rivals: rivals ?? this.rivals,
       coachTrust: coachTrust ?? this.coachTrust,
       agentLevel: agentLevel ?? this.agentLevel,
+      coachName: coachName ?? this.coachName,
       monthlySalary: monthlySalary ?? this.monthlySalary,
       isCareerFinished: isCareerFinished ?? this.isCareerFinished,
       domesticCup: domesticCup ?? this.domesticCup,
@@ -706,6 +729,7 @@ class Career {
       contractYears: offer.contractYears,
       coachTrust: offer.isRenewal ? coachTrust : 65,
       agentLevel: agentLevel,
+      coachName: offer.isRenewal ? coachName : _generateCoachName(),
     );
   }
 
@@ -1311,6 +1335,7 @@ class Career {
       rivals: PositionRival.nextSeason(rivals, newSeason),
       coachTrust: coachTrust,
       agentLevel: agentLevel,
+      coachName: coachName,
       monthlySalary: monthlySalary,
       isCareerFinished: false,
       domesticCup: newDomesticCup,
