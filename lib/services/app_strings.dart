@@ -132,6 +132,7 @@ class AppStrings {
   static String get coachProfileTitle => _en ? 'COACH & REPUTATION' : 'ТРЕНЕР И РЕПУТАЦИЯ';
   static String get headCoach => _en ? 'Head coach' : 'Главный тренер';
   static String get playerReputation => _en ? 'Player reputation' : 'Репутация игрока';
+  static String get careerAwards => _en ? 'Career awards' : 'Награды за карьеру';
   static String get squadRole => _en ? 'Squad role' : 'Роль в команде';
   static String get currentForm => _en ? 'Current form' : 'Текущая форма';
   static String get coachRelationship => _en ? 'Relationship with coach' : 'Отношения с тренером';
