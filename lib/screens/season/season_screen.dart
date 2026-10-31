@@ -989,6 +989,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
     final playerStatus = PlayerStatusCalculator.calculate(
       overall: career.player.overall,
       clubName: career.player.club,
+      rivals: career.rivals,
     );
     if (interactive &&
         !_canPlayInteractiveMatch(
