@@ -165,7 +165,8 @@ class Match {
   }) {
     if (expectedGoalsRemaining <= 0 || minutesRemaining <= 0) return 0;
     return (1 - exp(-expectedGoalsRemaining / minutesRemaining))
-        .clamp(0.0, 1.0);
+        .clamp(0.0, 1.0)
+        .toDouble();
   }
 
   final String homeTeam;
@@ -234,8 +235,6 @@ class Match {
     // ------------------------------------------------------------
     // 1. СИЛА КОМАНД И УЧАСТИЕ ИГРОКА
     // ------------------------------------------------------------
-
-    final opponentClub = Clubs.getByName(opponent);
 
     final playerPlayed = willPlayerPlay(
       player: player,
