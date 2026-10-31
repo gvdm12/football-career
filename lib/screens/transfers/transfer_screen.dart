@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/transfer_offer.dart';
+import 'package:flutter_football/widgets/jersey_number_picker.dart';
 import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/services/transfer_service.dart';
 
@@ -32,9 +33,23 @@ class _TransferScreenState extends State<TransferScreen> {
     renewalOffer = TransferService.generateRenewalOffer(career);
   }
 
-  void _acceptTransfer(TransferOffer offer) {
+  Future<void> _acceptTransfer(TransferOffer offer) async {
     final newCareer = career.acceptTransfer(offer);
-    Navigator.pop(context, newCareer);
+    final jerseyNumber = await JerseyNumberPicker.show(
+      context: context,
+      takenNumbers: newCareer.rivals.map((rival) => rival.jerseyNumber).toSet(),
+      preferredNumber: newCareer.player.jerseyNumber,
+      english: AppStrings.isEnglish,
+    );
+
+    if (!mounted || jerseyNumber == null) return;
+
+    Navigator.pop(
+      context,
+      newCareer.copyWith(
+        player: newCareer.player.copyWith(jerseyNumber: jerseyNumber),
+      ),
+    );
   }
 
   void _rejectAll() {
