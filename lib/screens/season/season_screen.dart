@@ -1475,7 +1475,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
         opponent: opponent,
         isHome: isHome,
       );
-    }    final homeGoals = generatedMatch.homeGoals;
+    }
+
+    final homeGoals = generatedMatch.homeGoals;
     final awayGoals = generatedMatch.awayGoals;
 
     int? homePenalties;
