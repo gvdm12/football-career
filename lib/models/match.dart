@@ -50,6 +50,14 @@ class Match {
     for (final unit in seedText.codeUnits) {
       seed = (seed * 31 + unit) & 0x7fffffff;
     }
+    final strongerRivals = career?.rivals
+            .where((rival) => rival.overall + rival.form > player.overall)
+            .length ??
+        0;
+    playChance = (playChance - strongerRivals * 0.14)
+        .clamp(0.12, 0.98)
+        .toDouble();
+
     return Random(seed).nextDouble() < playChance;
   }
 
