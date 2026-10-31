@@ -2336,8 +2336,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
               ],
             ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: ListView(
+            padding: EdgeInsets.zero,
             children: [
               Container(
                 padding: const EdgeInsets.fromLTRB(20, 26, 20, 22),
