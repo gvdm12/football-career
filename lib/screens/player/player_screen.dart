@@ -1031,6 +1031,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
             value: playerStatus.displayName,
           ),
           _InfoRow(
+            title: AppStrings.coachTrust,
+            value: '${career.coachTrust}/100',
+          ),
+          _InfoRow(
             title: AppStrings.clubStrength,
             value: () {
               final baseStrength = Clubs.getByName(player.club).strength;
