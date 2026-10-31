@@ -654,9 +654,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           .clamp(0.35, 0.90);
       if (_random.nextDouble() < passChance) {
         _rating += 0.32;
-        _playerAssists++;
         final partnerScores = _random.nextDouble() < 0.48;
+        _phase = 'buildUp';
         if (partnerScores) {
+          _playerAssists++;
           if (widget.isHome) {
             _homeGoals++;
           } else {
