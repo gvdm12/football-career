@@ -19,10 +19,12 @@ class PressConferenceOption {
 class PressConferenceContent {
   final String question;
   final List<PressConferenceOption> options;
+  final bool english;
 
   const PressConferenceContent({
     required this.question,
     required this.options,
+    required this.english,
   });
 }
 
@@ -141,6 +143,7 @@ class PressConferenceContentFactory {
     return PressConferenceContent(
       question: questions[random.nextInt(questions.length)],
       options: options,
+      english: english,
     );
   }
 }
@@ -216,7 +219,9 @@ class PressConferenceDialog {
                             ),
                             const SizedBox(height: 3),
                             Text(
-                              'MEDIA ROOM  ·  POST-MATCH',
+                              content.english
+                                ? 'MEDIA ROOM  ·  POST-MATCH'
+                                : 'ПРЕСС-ЦЕНТР  ·  ПОСЛЕ МАТЧА',
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.58),
                                 fontSize: 9,
@@ -237,11 +242,11 @@ class PressConferenceDialog {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        children: const [
-                          Icon(Icons.format_quote_rounded, color: _accent, size: 18),
-                          SizedBox(width: 6),
+                        children: [
+                          const Icon(Icons.format_quote_rounded, color: _accent, size: 18),
+                          const SizedBox(width: 6),
                           Text(
-                            'ВОПРОС ЖУРНАЛИСТА',
+                            content.english ? 'JOURNALIST QUESTION' : 'ВОПРОС ЖУРНАЛИСТА',
                             style: TextStyle(
                               color: _accent,
                               fontSize: 10,
@@ -272,11 +277,11 @@ class PressConferenceDialog {
                       ),
                       const SizedBox(height: 14),
                       Row(
-                        children: const [
-                          Icon(Icons.reply_rounded, color: Color(0xFF9DB7A1), size: 17),
-                          SizedBox(width: 6),
+                        children: [
+                          const Icon(Icons.reply_rounded, color: Color(0xFF9DB7A1), size: 17),
+                          const SizedBox(width: 6),
                           Text(
-                            'ВАШ ОТВЕТ',
+                            content.english ? 'YOUR RESPONSE' : 'ВАШ ОТВЕТ',
                             style: TextStyle(
                               color: Color(0xFFB9CDBD),
                               fontSize: 10,
