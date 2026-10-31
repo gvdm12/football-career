@@ -11,7 +11,7 @@ class JerseyNumberPicker {
       ..removeWhere(takenNumbers.contains);
 
     if (availableNumbers.isEmpty) {
-      return Future.value(null);
+      return Future<int?>.value(null);
     }
 
     final initialNumber = availableNumbers.contains(preferredNumber)
