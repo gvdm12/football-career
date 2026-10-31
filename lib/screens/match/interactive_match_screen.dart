@@ -924,7 +924,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     } else {
       final isFollowUp = _phase == 'chance' ||
           _phase == 'aerialChance' ||
-          _phase == 'finalThird';
+          _phase == 'finalThird' ||
+          _phase == 'cutback';
       _nextMomentMinute = min(
         88,
         _minute + (isFollowUp ? 1 : 6 + _random.nextInt(7)),
