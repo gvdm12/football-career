@@ -129,49 +129,81 @@ class AppStrings {
   static String get coachMenu => _en ? 'Coach' : 'Тренер';
   static String get agentMenu => _en ? 'Agent' : 'Агент';
   static String get newsMenu => _en ? 'News' : 'Новости';
-  static String get coachProfileTitle => _en ? 'COACH & REPUTATION' : 'ТРЕНЕР И РЕПУТАЦИЯ';
+  static String get coachProfileTitle =>
+      _en ? 'COACH & REPUTATION' : 'ТРЕНЕР И РЕПУТАЦИЯ';
   static String get headCoach => _en ? 'Head coach' : 'Главный тренер';
-  static String get playerReputation => _en ? 'Player reputation' : 'Репутация игрока';
-  static String get careerAwards => _en ? 'Career awards' : 'Награды за карьеру';
+  static String get playerReputation =>
+      _en ? 'Player reputation' : 'Репутация игрока';
+  static String get careerAwards =>
+      _en ? 'Career awards' : 'Награды за карьеру';
   static String get squadRole => _en ? 'Squad role' : 'Роль в команде';
   static String get currentForm => _en ? 'Current form' : 'Текущая форма';
-  static String get coachRelationship => _en ? 'Relationship with coach' : 'Отношения с тренером';
+  static String get coachRelationship =>
+      _en ? 'Relationship with coach' : 'Отношения с тренером';
   static String get agentProfileTitle => _en ? 'YOUR AGENT' : 'ВАШ АГЕНТ';
-  static String get currentContract => _en ? 'Current contract' : 'Текущий контракт';
+  static String get currentContract =>
+      _en ? 'Current contract' : 'Текущий контракт';
   static String get monthlyWage => _en ? 'Monthly salary' : 'Зарплата в месяц';
-  static String get interestedClubs => _en ? 'Interested clubs' : 'Заинтересованные клубы';
-  static String get noInterestedClubs => _en ? 'No clubs are interested right now' : 'Сейчас нет заинтересованных клубов';
-  static String get estimatedOffer => _en ? 'Estimated offer' : 'Предлагаемая зарплата';
+  static String get interestedClubs =>
+      _en ? 'Interested clubs' : 'Заинтересованные клубы';
+  static String get noInterestedClubs => _en
+      ? 'No clubs are interested right now'
+      : 'Сейчас нет заинтересованных клубов';
+  static String get estimatedOffer =>
+      _en ? 'Estimated offer' : 'Предлагаемая зарплата';
   static String get agentFee => _en ? 'Agent development' : 'Развитие агента';
   static String get gameCurrency => _en ? 'Game currency' : 'Игровая валюта';
   static String get currencyEarned => _en ? 'Coins earned' : 'Получено монет';
   static String get currencyRewardsHint => _en
       ? 'Earn coins for goals, assists, strong ratings and season trophies. Appearances alone do not count.'
       : 'Монеты начисляются за голы, ассисты, высокие оценки и трофеи сезона. Само участие в матче не оплачивается.';
-  static String get agentDescription => _en ? 'A stronger agent can negotiate better wages and attract more clubs.' : 'Более опытный агент помогает договариваться о зарплате и привлекать интерес клубов.';
+  static String get agentDescription => _en
+      ? 'A stronger agent can negotiate better wages and attract more clubs.'
+      : 'Более опытный агент помогает договариваться о зарплате и привлекать интерес клубов.';
   static String get skipPressConference => _en ? 'Skip' : 'Пропустить';
-  static String get pressConferenceSeasonStart => _en ? 'The season has started. What are your goals?' : 'Сезон начался. Какие у вас цели?';
-  static String get pressConferenceSeasonMiddle => _en ? 'The season is reaching its midpoint. How do you assess your progress?' : 'Сезон достиг середины. Как оцените свои результаты?';
-  static String get pressConferenceSeasonEnd => _en ? 'The season is ending. What would you like to say?' : 'Сезон подходит к концу. Что скажете болельщикам?';
-  static String get pressConferenceGreatMatch => _en ? 'You had an outstanding match. How do you feel?' : 'Вы провели выдающийся матч. Какие ощущения?';
-  static String get pressConferenceBadMatch => _en ? 'After a difficult match, how will you respond?' : 'После неудачного матча как собираетесь ответить?';
-  static String get pressConferenceTournament => _en ? 'The tournament has reached an important moment. What is your reaction?' : 'Турнир подошёл к важному моменту. Как прокомментируете?';
-  static String get pressConferenceSkipMessage => _en ? 'No comment' : 'Без комментариев';
+  static String get pressConferenceSeasonStart => _en
+      ? 'The season has started. What are your goals?'
+      : 'Сезон начался. Какие у вас цели?';
+  static String get pressConferenceSeasonMiddle => _en
+      ? 'The season is reaching its midpoint. How do you assess your progress?'
+      : 'Сезон достиг середины. Как оцените свои результаты?';
+  static String get pressConferenceSeasonEnd => _en
+      ? 'The season is ending. What would you like to say?'
+      : 'Сезон подходит к концу. Что скажете болельщикам?';
+  static String get pressConferenceGreatMatch => _en
+      ? 'You had an outstanding match. How do you feel?'
+      : 'Вы провели выдающийся матч. Какие ощущения?';
+  static String get pressConferenceBadMatch => _en
+      ? 'After a difficult match, how will you respond?'
+      : 'После неудачного матча как собираетесь ответить?';
+  static String get pressConferenceTournament => _en
+      ? 'The tournament has reached an important moment. What is your reaction?'
+      : 'Турнир подошёл к важному моменту. Как прокомментируете?';
+  static String get pressConferenceSkipMessage =>
+      _en ? 'No comment' : 'Без комментариев';
 
-  static String get positionRivals => _en ? 'POSITION COMPETITORS' : 'КОНКУРЕНТЫ ЗА ПОЗИЦИЮ';
+  static String get positionRivals =>
+      _en ? 'POSITION COMPETITORS' : 'КОНКУРЕНТЫ ЗА ПОЗИЦИЮ';
   static String get agent => _en ? 'PLAYER AGENT' : 'ФУТБОЛЬНЫЙ АГЕНТ';
-  static String agentLevel(int level) => _en ? 'Agent level $level' : 'Уровень агента: $level';
+  static String agentLevel(int level) =>
+      _en ? 'Agent level $level' : 'Уровень агента: $level';
   static String get upgradeAgent => _en ? 'UPGRADE AGENT' : 'УЛУЧШИТЬ АГЕНТА';
-  static String agentBonus(int percent) => _en ? '+$percent% to contract offers' : '+$percent% к зарплате в предложениях';
-  static String get agentMaxLevel => _en ? 'Maximum agent level reached' : 'Достигнут максимальный уровень агента';
-  static String get agentNotEnoughMoney => _en ? 'Not enough game currency for agent upgrade' : 'Недостаточно игровой валюты для улучшения агента';
-  static String get pressConferenceTitle => _en ? 'PRESS CONFERENCE' : 'ПРЕСС-КОНФЕРЕНЦИЯ';
+  static String agentBonus(int percent) => _en
+      ? '+$percent% to contract offers'
+      : '+$percent% к зарплате в предложениях';
+  static String get agentMaxLevel => _en
+      ? 'Maximum agent level reached'
+      : 'Достигнут максимальный уровень агента';
+  static String get agentNotEnoughMoney => _en
+      ? 'Not enough game currency for agent upgrade'
+      : 'Недостаточно игровой валюты для улучшения агента';
+  static String get pressConferenceTitle =>
+      _en ? 'PRESS CONFERENCE' : 'ПРЕСС-КОНФЕРЕНЦИЯ';
   static String get pressConferenceQuestion => _en
       ? 'Journalists ask how you assess the match and your role in the team.'
       : 'Журналисты спрашивают, как вы оцениваете матч и свою роль в команде.';
-  static String get pressConferenceTeamFirst => _en
-      ? 'The team result comes first'
-      : 'Главное — результат команды';
+  static String get pressConferenceTeamFirst =>
+      _en ? 'The team result comes first' : 'Главное — результат команды';
   static String get pressConferenceConfident => _en
       ? 'I am ready to fight for my place'
       : 'Я готов бороться за своё место';
@@ -180,10 +212,14 @@ class AppStrings {
       : 'Я заслуживаю больше игрового времени';
   static String get rivalForm => _en ? 'Form' : 'Форма';
   static String get careerRecords => _en ? 'CAREER RECORDS' : 'РЕКОРДЫ КАРЬЕРЫ';
-  static String get mostGoalsSeason => _en ? 'Most goals in a season' : 'Больше всего голов за сезон';
-  static String get mostAssistsSeason => _en ? 'Most assists in a season' : 'Больше всего ассистов за сезон';
-  static String get bestSeasonRating => _en ? 'Best season rating' : 'Лучшая оценка за сезон';
-  static String get bestContributionSeason => _en ? 'Most goal contributions' : 'Больше всего гол+пас за сезон';
+  static String get mostGoalsSeason =>
+      _en ? 'Most goals in a season' : 'Больше всего голов за сезон';
+  static String get mostAssistsSeason =>
+      _en ? 'Most assists in a season' : 'Больше всего ассистов за сезон';
+  static String get bestSeasonRating =>
+      _en ? 'Best season rating' : 'Лучшая оценка за сезон';
+  static String get bestContributionSeason =>
+      _en ? 'Most goal contributions' : 'Больше всего гол+пас за сезон';
   static String get clubStrength => _en ? 'Club strength' : 'Сила клуба';
   static String get age => _en ? 'Age' : 'Возраст';
   static String get yearsOld => _en ? 'years old' : 'лет';
@@ -547,8 +583,7 @@ class AppStrings {
   static String get nationalCupTrophy => _en ? 'National cup' : 'Кубок страны';
   static String get championsLeagueTrophy =>
       _en ? 'Champions League' : 'Лига чемпионов';
-  static String get europaLeagueTrophy =>
-      _en ? 'Europa League' : 'Лига Европы';
+  static String get europaLeagueTrophy => _en ? 'Europa League' : 'Лига Европы';
   static String get goldenBootTrophy => _en ? 'Golden Boot' : 'Золотая бутса';
   static String get seasonTrophies => _en ? 'SEASON TROPHIES' : 'ТРОФЕИ СЕЗОНА';
   static String get noSeasonTrophies =>
@@ -613,7 +648,6 @@ class AppStrings {
       'Лучший игрок сезона': 'Player of the Season',
       'Лучший молодой игрок сезона': 'Best Young Player',
       'В сборной сезона': 'Team of the Season',
-      'Лучший ассистент': 'Top Assister',
     };
     return names[value] ?? value;
   }

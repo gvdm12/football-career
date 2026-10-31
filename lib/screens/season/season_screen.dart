@@ -10,7 +10,6 @@ import 'package:flutter_football/models/cup_match.dart';
 import 'package:flutter_football/models/league_match.dart';
 import 'package:flutter_football/models/league_table.dart';
 import 'package:flutter_football/models/match.dart';
-import 'package:flutter_football/models/player_status.dart';
 import 'package:flutter_football/models/season_match.dart';
 import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/screens/development_screen.dart';
@@ -71,7 +70,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
     if (teamGoals != opponentGoals) return teamGoals > opponentGoals;
     if (!match.hasPenalties) return false;
     final teamPenalties = isHome ? match.homePenalties! : match.awayPenalties!;
-    final opponentPenalties = isHome ? match.awayPenalties! : match.homePenalties!;
+    final opponentPenalties = isHome
+        ? match.awayPenalties!
+        : match.homePenalties!;
     return teamPenalties > opponentPenalties;
   }
 
@@ -1071,8 +1072,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
     if (!mounted || match == null) return;
 
     final playedMatch = match;
-    var updatedCareer =
-        classicUpdatedCareer ?? career.afterMatch(playedMatch);
+    var updatedCareer = classicUpdatedCareer ?? career.afterMatch(playedMatch);
     // Проверяем, что матч соответствует клубу игрока и сопернику.
     final expectedHomeTeam = seasonMatch.isHome
         ? career.player.club
@@ -1359,7 +1359,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
     final opponentAggregate = isHome ? homeTeamAggregate : awayTeamAggregate;
     final playerPenalties = isHome ? homePenalties : awayPenalties;
     final opponentPenalties = isHome ? awayPenalties : homePenalties;
-    final playerEliminated = !isFinal &&
+    final playerEliminated =
+        !isFinal &&
         !isFirstLeg &&
         (playerAggregate < opponentAggregate ||
             (playerAggregate == opponentAggregate &&
@@ -1392,7 +1393,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     if (!mounted || updatedCareer == null) return;
 
-    if (isFinal && match.playerPlayed &&
+    if (isFinal &&
+        match.playerPlayed &&
         _playerWonMatchWithPenalties(match, career.player.club)) {
       updatedCareer = updatedCareer.copyWith(
         agentCredits: updatedCareer.agentCredits + 8,
@@ -1601,7 +1603,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
     final opponentAggregate = isHome ? homeTeamAggregate : awayTeamAggregate;
     final playerPenalties = isHome ? homePenalties : awayPenalties;
     final opponentPenalties = isHome ? awayPenalties : homePenalties;
-    final playerEliminated = !isFinal &&
+    final playerEliminated =
+        !isFinal &&
         !isFirstLeg &&
         (playerAggregate < opponentAggregate ||
             (playerAggregate == opponentAggregate &&
@@ -1634,7 +1637,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     if (!mounted || updatedCareer == null) return;
 
-    if (isFinal && match.playerPlayed &&
+    if (isFinal &&
+        match.playerPlayed &&
         _playerWonMatchWithPenalties(match, career.player.club)) {
       updatedCareer = updatedCareer.copyWith(
         agentCredits: updatedCareer.agentCredits + 8,
@@ -1859,8 +1863,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         : (homePenalties ?? 0) > (awayPenalties ?? 0)
         ? match.homeTeam
         : match.awayTeam;
-    final isTournamentDecider =
-        cupMatch.round == 4 || cupWinner != playerClub;
+    final isTournamentDecider = cupMatch.round == 4 || cupWinner != playerClub;
 
     var updatedCareer = interactive
         ? interactiveCareer
@@ -2229,7 +2232,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
   }) async {
     if (!match.playerPlayed) return updatedCareer;
 
-    final playedBefore = career.seasonMatches.where((item) => item.isPlayed).length;
+    final playedBefore = career.seasonMatches
+        .where((item) => item.isPlayed)
+        .length;
     final totalMatches = career.seasonMatches.length;
     String? prompt;
 

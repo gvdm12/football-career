@@ -83,9 +83,17 @@ class PositionRival {
   }
 
   static const Map<PlayerPosition, List<String>> _names = {
-    PlayerPosition.goalkeeper: ['Алексей Волков', 'Даниэль Коста', 'Марк Фишер'],
+    PlayerPosition.goalkeeper: [
+      'Алексей Волков',
+      'Даниэль Коста',
+      'Марк Фишер',
+    ],
     PlayerPosition.defender: ['Илья Морозов', 'Лукас Мартин', 'Эрик Браун'],
-    PlayerPosition.midfielder: ['Артём Соколов', 'Матео Ромеро', 'Оливер Кларк'],
+    PlayerPosition.midfielder: [
+      'Артём Соколов',
+      'Матео Ромеро',
+      'Оливер Кларк',
+    ],
     PlayerPosition.forward: ['Даниэль Силва', 'Максим Орлов', 'Лео Мартинес'],
   };
 
@@ -94,13 +102,13 @@ class PositionRival {
     required int season,
     int count = 2,
   }) {
-    final random = Random((player.name + '|' + player.club + '|' + season.toString()).hashCode);
+    final random = Random(('${player.name}|${player.club}|$season').hashCode);
     final names = List<String>.from(_names[player.position]!)..shuffle(random);
     return List.generate(count.clamp(1, 3).toInt(), (index) {
       final delta = random.nextInt(11) - 4;
       final overall = (player.overall + delta).clamp(55, 95).toInt();
       return PositionRival(
-        id: 's' + season.toString() + '_' + player.position.name + '_' + (index + 1).toString(),
+        id: 's${season}_${player.position.name}_${index + 1}',
         name: names[index],
         position: player.position,
         age: 19 + random.nextInt(12),
@@ -134,9 +142,20 @@ class PositionRival {
         case PlayerPosition.goalkeeper:
           break;
       }
-      final rating = (6.0 + random.nextDouble() * 2.0).clamp(5.0, 9.0).toDouble();
-      final average = ((rival.averageRating * rival.matches) + rating) / matches;
-      final form = (rival.form + (rating >= 7.2 ? 1 : rating < 6.0 ? -1 : 0)).clamp(-5, 5).toInt();
+      final rating = (6.0 + random.nextDouble() * 2.0)
+          .clamp(5.0, 9.0)
+          .toDouble();
+      final average =
+          ((rival.averageRating * rival.matches) + rating) / matches;
+      final form =
+          (rival.form +
+                  (rating >= 7.2
+                      ? 1
+                      : rating < 6.0
+                      ? -1
+                      : 0))
+              .clamp(-5, 5)
+              .toInt();
       return rival.copyWith(
         matches: matches,
         goals: rival.goals + goals,
@@ -147,12 +166,19 @@ class PositionRival {
     }).toList();
   }
 
-  static List<PositionRival> nextSeason(List<PositionRival> rivals, int season) {
+  static List<PositionRival> nextSeason(
+    List<PositionRival> rivals,
+    int season,
+  ) {
     return rivals.map((rival) {
       final age = rival.age + 1;
-      final ageChange = age >= 33 ? -2 : age <= 23 ? 1 : 0;
+      final ageChange = age >= 33
+          ? -2
+          : age <= 23
+          ? 1
+          : 0;
       return PositionRival(
-        id: 's' + season.toString() + '_' + rival.position.name + '_' + rival.id.hashCode.abs().toString(),
+        id: 's${season}_${rival.position.name}_${rival.id.hashCode.abs()}',
         name: rival.name,
         position: rival.position,
         age: age,
