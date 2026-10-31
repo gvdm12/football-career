@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/club.dart';
+import 'package:flutter_football/models/position_rival.dart';
+import 'package:flutter_football/widgets/jersey_number_picker.dart';
 import 'package:flutter_football/screens/player/player_screen.dart';
 import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/services/career_storage.dart';
@@ -237,7 +239,26 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
       club: selectedClub!,
     );
 
-    final career = Career.create(player);
+    final previewRivals = PositionRival.generate(
+      player: player,
+      season: 1,
+    );
+    final jerseyNumber = await JerseyNumberPicker.show(
+      context: context,
+      takenNumbers: previewRivals.map((rival) => rival.jerseyNumber).toSet(),
+      preferredNumber: player.jerseyNumber,
+      english: AppStrings.isEnglish,
+    );
+
+    if (!mounted) return;
+    if (jerseyNumber == null) {
+      setState(() => _isCreating = false);
+      return;
+    }
+
+    final career = Career.create(
+      player.copyWith(jerseyNumber: jerseyNumber),
+    );
 
     try {
       await CareerStorage.save(career);
