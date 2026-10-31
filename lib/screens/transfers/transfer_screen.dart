@@ -44,6 +44,7 @@ class _TransferScreenState extends State<TransferScreen> {
       context: context,
       takenNumbers: newCareer.rivals.map((rival) => rival.jerseyNumber).toSet(),
       preferredNumber: newCareer.player.jerseyNumber,
+      playerOverall: newCareer.player.overall,
       english: AppStrings.isEnglish,
     );
 
