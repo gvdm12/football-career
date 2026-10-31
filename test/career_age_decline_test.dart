@@ -106,13 +106,14 @@ void main() {
       final career = Career.create(createTestPlayer()).copyWith(
         coachTrust: 82,
         agentLevel: 3,
+        agentCredits: 234,
       );
       final restored = Career.fromJson(career.toJson());
 
       expect(restored.rivals.length, career.rivals.length);
       expect(restored.coachTrust, 82);
       expect(restored.agentLevel, 3);
-      expect(restored.agentCredits, career.agentCredits);
+      expect(restored.agentCredits, 234);
       expect(restored.coachName, career.coachName);
     });
 
