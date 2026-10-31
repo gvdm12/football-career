@@ -28,7 +28,7 @@ class _TransferScreenState extends State<TransferScreen> {
   }
 
   void _generateTransferOffers() {
-    offers = TransferService.generateOffers(career);
+    offers = TransferService.generateCombinedOffers(career);
     renewalOffer = TransferService.generateRenewalOffer(career);
   }
 
@@ -336,6 +336,18 @@ class _TransferScreenState extends State<TransferScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(
+                  offer.isAgentOffer
+                      ? (AppStrings.isEnglish ? 'AGENT OFFER' : 'ПРЕДЛОЖЕНИЕ АГЕНТА')
+                      : (AppStrings.isEnglish ? 'STANDARD OFFER' : 'ОБЫЧНОЕ ПРЕДЛОЖЕНИЕ'),
+                  style: const TextStyle(
+                    color: Color(0xFF8BE07F),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                const SizedBox(height: 5),
                 Text(
                   offer.club.name,
                   style: const TextStyle(
