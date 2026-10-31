@@ -187,6 +187,7 @@ class Player {
   final int age;
   final int season;
   final String club;
+  final int jerseyNumber;
 
   final int overall;
   final PlayerSkills skills;
@@ -198,6 +199,7 @@ class Player {
     required this.age,
     required this.season,
     required this.club,
+    this.jerseyNumber = 10,
     required this.overall,
     required this.skills,
   });
@@ -217,6 +219,7 @@ class Player {
       age: 17,
       season: 1,
       club: club,
+      jerseyNumber: 10,
       overall: calculateOverall(skills: skills, position: position),
       skills: skills,
     );
@@ -229,6 +232,7 @@ class Player {
     int? age,
     int? season,
     String? club,
+    int? jerseyNumber,
     int? overall,
     PlayerSkills? skills,
   }) {
@@ -239,6 +243,7 @@ class Player {
       age: age ?? this.age,
       season: season ?? this.season,
       club: club ?? this.club,
+      jerseyNumber: jerseyNumber ?? this.jerseyNumber,
       overall: overall ?? this.overall,
       skills: skills ?? this.skills,
     );
@@ -252,6 +257,7 @@ class Player {
       'age': age,
       'season': season,
       'club': club,
+      'jerseyNumber': jerseyNumber,
       'overall': overall,
       'skills': skills.toJson(),
     };
@@ -278,6 +284,7 @@ class Player {
       age: (json['age'] as num?)?.toInt() ?? 17,
       season: (json['season'] as num?)?.toInt() ?? 1,
       club: json['club'] as String? ?? 'Без клуба',
+      jerseyNumber: ((json['jerseyNumber'] as num?)?.toInt() ?? 10).clamp(1, 99).toInt(),
       overall:
           (json['overall'] as num?)?.toInt() ??
           calculateOverall(skills: skills, position: position),
