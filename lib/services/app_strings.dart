@@ -144,6 +144,7 @@ class AppStrings {
   static String get estimatedOffer => _en ? 'Estimated offer' : 'Предлагаемая зарплата';
   static String get agentFee => _en ? 'Agent development' : 'Развитие агента';
   static String get gameCurrency => _en ? 'Game currency' : 'Игровая валюта';
+  static String get currencyEarned => _en ? 'Coins earned' : 'Получено монет';
   static String get currencyRewardsHint => _en
       ? 'Earn coins for appearances, goals, assists, strong ratings and season trophies.'
       : 'Монеты начисляются за участие в матчах, голы, ассисты, высокие оценки и трофеи сезона.';
