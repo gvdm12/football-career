@@ -14,6 +14,8 @@ import 'package:flutter_football/models/player_status.dart';
 import 'package:flutter_football/models/season_match.dart';
 import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/screens/development_screen.dart';
+import 'package:flutter_football/screens/home/home_screen.dart';
+import 'package:flutter_football/screens/player/player_screen.dart';
 import 'package:flutter_football/screens/league_table/league_table_screen.dart';
 import 'package:flutter_football/screens/match/match_screen.dart';
 import 'package:flutter_football/screens/match/interactive_match_screen.dart';
@@ -2099,6 +2101,144 @@ class _SeasonScreenState extends State<SeasonScreen> {
     );
   }
 
+  Future<void> _openPlayerProfile() async {
+    final updatedCareer = await Navigator.push<Career>(
+      context,
+      MaterialPageRoute(builder: (_) => PlayerScreen(career: career)),
+    );
+
+    if (!mounted || updatedCareer == null) return;
+    setState(() => career = updatedCareer);
+    await _saveCareer(updatedCareer);
+  }
+
+  Future<void> _returnToHome() async {
+    await _saveCareer(career);
+    if (!mounted) return;
+
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+      (route) => false,
+    );
+  }
+
+  Widget _buildNavigationDrawer() {
+    return Drawer(
+      backgroundColor: const Color(0xFF071D0D),
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 26, 20, 22),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF145326), Color(0xFF082A12)],
+                ),
+                border: Border(
+                  bottom: BorderSide(color: Color(0xFF24552C)),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(
+                    Icons.sports_soccer_rounded,
+                    color: Color(0xFF8BE07F),
+                    size: 34,
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    career.player.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 19,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${career.player.club}  ·  OVR ${career.player.overall}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Color(0xFF8BE07F),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            _drawerItem(
+              icon: Icons.person_outline_rounded,
+              title: 'Игрок',
+              onTap: () {
+                Navigator.pop(context);
+                _openPlayerProfile();
+              },
+            ),
+            _drawerItem(
+              icon: Icons.table_chart_rounded,
+              title: 'Таблица',
+              onTap: () {
+                Navigator.pop(context);
+                _openLeagueTable();
+              },
+            ),
+            _drawerItem(
+              icon: Icons.calendar_month_rounded,
+              title: 'Календарь',
+              onTap: () {
+                Navigator.pop(context);
+                _openCalendar();
+              },
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: Divider(color: Color(0xFF24552C), height: 1),
+            ),
+            _drawerItem(
+              icon: Icons.home_outlined,
+              title: 'Главный экран',
+              onTap: () {
+                Navigator.pop(context);
+                _returnToHome();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _drawerItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 22),
+      leading: Icon(icon, color: const Color(0xFF8BE07F), size: 23),
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      onTap: onTap,
+      dense: true,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    );
+  }
+
   Future<void> _openLeagueTable() async {
     await Navigator.push(
       context,
@@ -2177,6 +2317,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
       },
       child: Scaffold(
         backgroundColor: const Color(0xFF061B0C),
+        drawer: widget.calendarOnly ? null : _buildNavigationDrawer(),
         appBar: AppBar(
           backgroundColor: const Color.fromARGB(82, 81, 84, 82),
           foregroundColor: Colors.white,
