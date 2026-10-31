@@ -968,54 +968,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
     }
   }
 
-  Widget _matchModeTile({
-    required BuildContext context,
-    required IconData icon,
-    required String title,
-    required String description,
-    required String value,
-  }) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(14),
-      onTap: () => Navigator.pop(context, value),
-      child: Ink(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: const Color(0xFF123A1D),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFF24552C)),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: const Color(0xFF8BE07F), size: 28),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    description,
-                    style: const TextStyle(color: Colors.white70, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(Icons.chevron_right, color: Colors.white54),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _playMatch(SeasonMatch seasonMatch) async {
+  Future<void> _playMatch(SeasonMatch seasonMatch, {required bool interactive}) async {
     if (isSaving || seasonFinishing || seasonMatch.isPlayed) return;
 
     final worldCup = career.worldCup;
@@ -1036,56 +989,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
       return;
     }
 
-    final matchMode = await showModalBottomSheet<String>(
-      context: context,
-      backgroundColor: const Color(0xFF0B2111),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (sheetContext) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(18, 18, 18, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Text(
-                'Выберите режим матча',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 19,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              _matchModeTile(
-                context: sheetContext,
-                icon: Icons.fast_forward_rounded,
-                title: 'Обычная симуляция',
-                description: 'Матч рассчитывается автоматически, как раньше',
-                value: 'classic',
-              ),
-              const SizedBox(height: 10),
-              _matchModeTile(
-                context: sheetContext,
-                icon: Icons.sports_soccer_rounded,
-                title: 'Интерактивная симуляция',
-                description:
-                    'Ход матча прерывается ключевыми игровыми моментами',
-                value: 'interactive',
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-
-    if (!mounted || matchMode == null) return;
+    if (!mounted) return;
 
     Match? match;
     Career? classicUpdatedCareer;
-    if (matchMode == 'interactive') {
+    if (interactive) {
       match = await Navigator.push<Match>(
         context,
         MaterialPageRoute(
@@ -2955,26 +2863,45 @@ class _SeasonScreenState extends State<SeasonScreen> {
             '${match.isHome ? AppStrings.home : AppStrings.away}',
             style: const TextStyle(color: Colors.white, fontSize: 12),
           ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: isSaving || seasonFinishing
-                  ? null
-                  : () => _playMatch(match),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 249, 249, 249),
-                foregroundColor: const Color.fromARGB(255, 0, 0, 0),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadiusGeometry.circular(10),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: isSaving || seasonFinishing
+                      ? null
+                      : () => _playMatch(match, interactive: false),
+                  icon: const Icon(Icons.fast_forward_rounded, size: 18),
+                  label: const Text('Симуляция'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFE8EDE8),
+                    foregroundColor: const Color(0xFF102B17),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
                 ),
               ),
-              child: Text(
-                AppStrings.playMatch,
-                style: TextStyle(fontWeight: FontWeight.bold),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: isSaving || seasonFinishing
+                      ? null
+                      : () => _playMatch(match, interactive: true),
+                  icon: const Icon(Icons.sports_soccer_rounded, size: 18),
+                  label: const Text('Играть'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF22C55E),
+                    foregroundColor: const Color(0xFF06210D),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ],
       ),
