@@ -2298,10 +2298,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
   }
 
   Future<void> _openTeam() async {
-    await Navigator.push(
+    final updatedCareer = await Navigator.push<Career>(
       context,
       MaterialPageRoute(builder: (_) => TeamScreen(career: career)),
     );
+
+    if (!mounted || updatedCareer == null) return;
+    setState(() => career = updatedCareer);
+    await _saveCareer(updatedCareer);
   }
 
   Future<void> _openCoach() async {
