@@ -454,7 +454,7 @@ class Career {
           ? readList('rivals', PositionRival.fromJson)
           : PositionRival.generate(player: loadedPlayer, season: currentSeason),
       coachTrust: ((json['coachTrust'] as num?)?.toInt() ?? 65).clamp(0, 100).toInt(),
-      agentLevel: ((json['agentLevel'] as num?)?.toInt() ?? 1).clamp(1, 3).toInt(),
+      agentLevel: ((json['agentLevel'] as num?)?.toInt() ?? 1).clamp(1, 10).toInt(),
       coachName: json['coachName'] as String? ?? 'Главный тренер',
       monthlySalary: (json['monthlySalary'] as num?)?.toInt() ?? 0,
       isCareerFinished: json['isCareerFinished'] as bool? ?? false,
@@ -660,14 +660,13 @@ class Career {
     if (!match.playerPlayed) return 0;
 
     final performanceBonus = match.playerRating >= 9.0
-        ? 10
+        ? 2
         : match.playerRating >= 8.0
-        ? 5
+        ? 1
         : 0;
 
-    return 10 +
-        match.playerGoals * 8 +
-        match.playerAssists * 6 +
+    return match.playerGoals * 2 +
+        match.playerAssists +
         performanceBonus;
   }
 
@@ -937,8 +936,8 @@ class Career {
       'Чемпион мира',
     };
     final trophyReward =
-        achievements.where(teamTrophies.contains).length * 75 +
-        (achievements.contains('Золотая бутса') ? 40 : 0);
+        achievements.where(teamTrophies.contains).length * 15 +
+        (achievements.contains('Золотая бутса') ? 8 : 0);
 
     var updatedCareer = copyWith(
       agentCredits: agentCredits + trophyReward,
