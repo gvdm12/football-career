@@ -1217,6 +1217,15 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Future<void> _playChampionsLeagueMatch({required bool interactive}) async {
     if (isSaving || seasonFinishing) return;
+    if (interactive &&
+        (career.isInjured ||
+            PlayerStatusCalculator.calculate(
+                  overall: career.player.overall,
+                  clubName: career.player.club,
+                ) ==
+                PlayerStatus.substitute)) {
+      return;
+    }
 
     final tournament = career.championsLeague;
     final tieIndex = currentChampionsLeagueTieIndex;
@@ -1416,6 +1425,15 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Future<void> _playEuropaLeagueMatch({required bool interactive}) async {
     if (isSaving || seasonFinishing) return;
+    if (interactive &&
+        (career.isInjured ||
+            PlayerStatusCalculator.calculate(
+                  overall: career.player.overall,
+                  clubName: career.player.club,
+                ) ==
+                PlayerStatus.substitute)) {
+      return;
+    }
 
     final tournament = career.europaLeague;
     final tieIndex = currentEuropaLeagueTieIndex;
@@ -1642,6 +1660,15 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Future<void> _playCupMatch(CupMatch cupMatch, {required bool interactive}) async {
     if (isSaving || seasonFinishing || cupMatch.isPlayed) return;
+    if (interactive &&
+        (career.isInjured ||
+            PlayerStatusCalculator.calculate(
+                  overall: career.player.overall,
+                  clubName: career.player.club,
+                ) ==
+                PlayerStatus.substitute)) {
+      return;
+    }
 
     final cup = career.domesticCup;
     if (cup == null) return;
