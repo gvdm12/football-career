@@ -47,11 +47,11 @@ class MatchScreen extends StatelessWidget {
     final totalMatches = career.seasonMatches.length;
 
     if (isTournamentDecider) return AppStrings.pressConferenceTournament;
-    if (playedBefore == 0) return AppStrings.pressConferenceSeasonStart;
-    if (totalMatches > 2 && playedBefore == (totalMatches / 2).round()) {
+    if (!isCupMatch && playedBefore == 0) return AppStrings.pressConferenceSeasonStart;
+    if (!isCupMatch && totalMatches > 2 && playedBefore == (totalMatches / 2).round()) {
       return AppStrings.pressConferenceSeasonMiddle;
     }
-    if (totalMatches > 0 && playedBefore >= totalMatches - 1) {
+    if (!isCupMatch && totalMatches > 0 && playedBefore >= totalMatches - 1) {
       return AppStrings.pressConferenceSeasonEnd;
     }
 
