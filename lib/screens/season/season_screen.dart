@@ -1232,11 +1232,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Future<void> _playChampionsLeagueMatch({required bool interactive}) async {
     if (isSaving || seasonFinishing) return;
-    if (interactive &&
-        !_canPlayInteractiveMatch(opponent: opponent, isHome: isHome)) {
-      return;
-    }
-
     final tournament = career.championsLeague;
     final tieIndex = currentChampionsLeagueTieIndex;
 
@@ -1436,11 +1431,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Future<void> _playEuropaLeagueMatch({required bool interactive}) async {
     if (isSaving || seasonFinishing) return;
-    if (interactive &&
-        !_canPlayInteractiveMatch(opponent: opponent, isHome: isHome)) {
-      return;
-    }
-
     final tournament = career.europaLeague;
     final tieIndex = currentEuropaLeagueTieIndex;
 
@@ -1455,6 +1445,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
     final isHome = isFinal || isFirstLeg
         ? tie.homeTeam == club
         : tie.awayTeam == club;
+
+    if (interactive &&
+        !_canPlayInteractiveMatch(opponent: opponent, isHome: isHome)) {
+      return;
+    }
 
     final opponent = tie.homeTeam == club ? tie.awayTeam : tie.homeTeam;
 
@@ -1669,11 +1664,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Future<void> _playCupMatch(CupMatch cupMatch, {required bool interactive}) async {
     if (isSaving || seasonFinishing || cupMatch.isPlayed) return;
-    if (interactive &&
-        !_canPlayInteractiveMatch(opponent: opponent, isHome: isHome)) {
-      return;
-    }
-
     final cup = career.domesticCup;
     if (cup == null) return;
 
@@ -1697,6 +1687,16 @@ class _SeasonScreenState extends State<SeasonScreen> {
         : cupMatch.homeTeam;
 
     final isHome = cupMatch.homeTeam == playerClub;
+
+    if (interactive &&
+        !_canPlayInteractiveMatch(opponent: opponent, isHome: isHome)) {
+      return;
+    }
+
+    if (interactive &&
+        !_canPlayInteractiveMatch(opponent: opponent, isHome: isHome)) {
+      return;
+    }
 
     Match generatedMatch;
     Career? interactiveCareer;
