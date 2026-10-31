@@ -247,16 +247,17 @@ class WorldCupMatch {
     }
 
     if (playerGoalsOverride != null) {
-      scoredByPlayer = playerGoalsOverride.clamp(
-        0,
-        playerTeam == homeTeam ? home : away,
-      );
+      scoredByPlayer = playerGoalsOverride
+          .clamp(0, playerTeam == homeTeam ? home : away)
+          .toInt();
     }
     if (playerAssistsOverride != null) {
-      assistedByPlayer = playerAssistsOverride.clamp(
-        0,
-        max(0, (playerTeam == homeTeam ? home : away) - scoredByPlayer),
-      );
+      assistedByPlayer = playerAssistsOverride
+          .clamp(
+            0,
+            max(0, (playerTeam == homeTeam ? home : away) - scoredByPlayer),
+          )
+          .toInt();
     }
     if (playerRatingOverride != null) {
       rating = playerRatingOverride;
