@@ -22,6 +22,11 @@ class _AgentScreenState extends State<AgentScreen> {
     super.initState();
     career = widget.career;
     interests = TransferService.generateOffers(career);
+    if (career.agentInterestedClubs.isEmpty) {
+      career = career.copyWith(
+        agentInterestedClubs: interests.map((offer) => offer.club.name).toList(),
+      );
+    }
   }
 
   static const List<int> _upgradeCosts = [
@@ -45,6 +50,9 @@ class _AgentScreenState extends State<AgentScreen> {
         agentLevel: career.agentLevel + 1,
       );
       interests = TransferService.generateOffers(career);
+      career = career.copyWith(
+        agentInterestedClubs: interests.map((offer) => offer.club.name).toList(),
+      );
     });
   }
 
