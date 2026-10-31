@@ -89,6 +89,7 @@ class TransferService {
     required double rating,
     required int contributions,
     required int previousSalary,
+    required int agentLevel,
   }) {
     final clubSalary = 2000 * pow(1.14, max(0, club.strength - 60));
 
@@ -135,7 +136,8 @@ class TransferService {
         ? 1.5
         : 1.4;
 
-    return max(1000, (salary * leagueMultiplier).round());
+    final agentMultiplier = 1.0 + (agentLevel.clamp(1, 3) - 1) * 0.04;
+    return max(1000, (salary * leagueMultiplier * agentMultiplier).round());
   }
 
   /// Вес клуба при выборе предложений после 15-го сезона.
@@ -367,6 +369,7 @@ class TransferService {
         rating: rating,
         contributions: contributions,
         previousSalary: career.monthlySalary,
+        agentLevel: career.agentLevel,
       );
 
       return TransferOffer(
@@ -443,6 +446,7 @@ class TransferService {
       rating: rating,
       contributions: contributions,
       previousSalary: career.monthlySalary,
+      agentLevel: career.agentLevel,
     );
 
     return TransferOffer(
