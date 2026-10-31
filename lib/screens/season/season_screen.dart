@@ -2260,7 +2260,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
         .where((item) => item.isPlayed)
         .length;
     final totalMatches = career.seasonMatches.length;
-    final outstanding = match.playerRating >= 8.5 ||
+    final outstanding =
+        match.playerRating >= 8.5 ||
         match.playerGoals >= 2 ||
         match.playerGoals + match.playerAssists >= 3;
     final poor = match.playerRating <= 5.5;
@@ -2272,20 +2273,30 @@ class _SeasonScreenState extends State<SeasonScreen> {
         ? completedResults.sublist(completedResults.length - 3)
         : <Match>[];
     final previousThree = completedResults.length >= 4
-        ? completedResults.sublist(completedResults.length - 4, completedResults.length - 1)
+        ? completedResults.sublist(
+            completedResults.length - 4,
+            completedResults.length - 1,
+          )
         : <Match>[];
-    final previousWasLosingStreak = previousThree.length == 3 &&
+    final previousWasLosingStreak =
+        previousThree.length == 3 &&
         previousThree.every(
           (item) => item.isPlayerLoss(updatedCareer.player.club),
         );
-    final losingStreak = lastThree.length == 3 &&
-        lastThree.every((item) => item.isPlayerLoss(updatedCareer.player.club)) &&
+    final losingStreak =
+        lastThree.length == 3 &&
+        lastThree.every(
+          (item) => item.isPlayerLoss(updatedCareer.player.club),
+        ) &&
         !previousWasLosingStreak;
     final lastFive = completedResults.length >= 5
         ? completedResults.sublist(completedResults.length - 5)
         : <Match>[];
     final previousFive = completedResults.length >= 6
-        ? completedResults.sublist(completedResults.length - 6, completedResults.length - 1)
+        ? completedResults.sublist(
+            completedResults.length - 6,
+            completedResults.length - 1,
+          )
         : <Match>[];
     final lossesInLastFive = lastFive
         .where((item) => item.isPlayerLoss(updatedCareer.player.club))
@@ -2293,13 +2304,19 @@ class _SeasonScreenState extends State<SeasonScreen> {
     final lossesInPreviousFive = previousFive
         .where((item) => item.isPlayerLoss(updatedCareer.player.club))
         .length;
-    final badRun = lastFive.length == 5 &&
+    final badRun =
+        lastFive.length == 5 &&
         lossesInLastFive >= 4 &&
         (previousFive.length < 5 || lossesInPreviousFive < 4);
     final poorSeasonCheckpoint = max(6, (totalMatches * 0.65).round());
-    final poorSeason = playedBefore + 1 == poorSeasonCheckpoint &&
+    final poorSeason =
+        playedBefore + 1 == poorSeasonCheckpoint &&
         ((updatedCareer.averageRating ?? 6.5) < 6.2 ||
-            completedResults.where((item) => item.isPlayerLoss(updatedCareer.player.club)).length >=
+            completedResults
+                    .where(
+                      (item) => item.isPlayerLoss(updatedCareer.player.club),
+                    )
+                    .length >=
                 (completedResults.length * 0.55).ceil());
 
     String? category;
@@ -2418,8 +2435,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
               end: Alignment.bottomRight,
               colors: [
                 Color.fromARGB(255, 248, 248, 249),
-                Color.fromARGB(255, 209, 210, 213),
-                Color.fromARGB(255, 85, 84, 84),
+                Color.fromARGB(255, 226, 222, 222),
+                Color.fromARGB(255, 171, 170, 170),
               ],
             ),
           ),

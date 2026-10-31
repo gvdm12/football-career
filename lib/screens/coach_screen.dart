@@ -25,15 +25,23 @@ class CoachScreen extends StatelessWidget {
 
   String get _coachMood {
     if (career.coachTrust >= 85) {
-      return AppStrings.isEnglish ? 'Excellent relationship' : 'Отличные отношения';
+      return AppStrings.isEnglish
+          ? 'Excellent relationship'
+          : 'Отличные отношения';
     }
     if (career.coachTrust >= 65) {
-      return AppStrings.isEnglish ? 'Positive relationship' : 'Хорошие отношения';
+      return AppStrings.isEnglish
+          ? 'Positive relationship'
+          : 'Хорошие отношения';
     }
     if (career.coachTrust >= 40) {
-      return AppStrings.isEnglish ? 'Uncertain relationship' : 'Неоднозначные отношения';
+      return AppStrings.isEnglish
+          ? 'Uncertain relationship'
+          : 'Неоднозначные отношения';
     }
-    return AppStrings.isEnglish ? 'Tense relationship' : 'Напряжённые отношения';
+    return AppStrings.isEnglish
+        ? 'Tense relationship'
+        : 'Напряжённые отношения';
   }
 
   @override
@@ -49,7 +57,10 @@ class CoachScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFF0B3A1A),
         foregroundColor: Colors.white,
-        title: Text(AppStrings.coachProfileTitle),
+        title: Text(
+          AppStrings.coachProfileTitle,
+          style: TextStyle(fontSize: 16),
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -62,7 +73,7 @@ class CoachScreen extends StatelessWidget {
                   AppStrings.headCoach.toUpperCase(),
                   style: const TextStyle(
                     color: Color(0xFF8BE07F),
-                    fontSize: 11,
+                    fontSize: 10,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 1.2,
                   ),
@@ -71,9 +82,13 @@ class CoachScreen extends StatelessWidget {
                 Row(
                   children: [
                     const CircleAvatar(
-                      radius: 27,
+                      radius: 20,
                       backgroundColor: Color(0xFF24552C),
-                      child: Icon(Icons.sports, color: Color(0xFF8BE07F), size: 30),
+                      child: Icon(
+                        Icons.sports,
+                        color: Color(0xFF8BE07F),
+                        size: 24,
+                      ),
                     ),
                     const SizedBox(width: 14),
                     Expanded(
@@ -84,31 +99,37 @@ class CoachScreen extends StatelessWidget {
                             career.coachName,
                             style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 18,
+                              fontSize: 14,
                               fontWeight: FontWeight.w900,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             career.player.club,
-                            style: const TextStyle(color: Colors.white60),
+                            style: const TextStyle(
+                              color: Colors.white60,
+                              fontSize: 12,
+                            ),
                           ),
                         ],
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
                 _meter(AppStrings.coachTrust, career.coachTrust),
                 const SizedBox(height: 8),
                 Text(
                   _coachMood,
-                  style: const TextStyle(color: Color(0xFF8BE07F), fontSize: 12),
+                  style: const TextStyle(
+                    color: Color(0xFF8BE07F),
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           _panel(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,12 +138,12 @@ class CoachScreen extends StatelessWidget {
                   AppStrings.playerReputation.toUpperCase(),
                   style: const TextStyle(
                     color: Color(0xFF8BE07F),
-                    fontSize: 11,
+                    fontSize: 10,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 1.2,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 3),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -130,36 +151,43 @@ class CoachScreen extends StatelessWidget {
                       '$_reputation',
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 42,
+                        fontSize: 24,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
                     const Padding(
                       padding: EdgeInsets.only(bottom: 8, left: 5),
-                      child: Text('/100', style: TextStyle(color: Colors.white54)),
+                      child: Text(
+                        '/100',
+                        style: TextStyle(color: Colors.white54),
+                      ),
                     ),
                   ],
                 ),
                 _meter(AppStrings.playerReputation, _reputation),
-                const SizedBox(height: 18),
+                const SizedBox(height: 8),
                 _line(AppStrings.squadRole, status.displayName),
                 _line(AppStrings.ratingLabel, career.player.overall.toString()),
-                _line(AppStrings.currentForm,
-                    career.averageRating?.toStringAsFixed(2) ?? '—'),
+                _line(
+                  AppStrings.currentForm,
+                  career.averageRating?.toStringAsFixed(2) ?? '—',
+                ),
                 _line(AppStrings.matches, career.matches.toString()),
                 _line(AppStrings.goalsLabel, career.goals.toString()),
                 _line(AppStrings.assistsLabel, career.assists.toString()),
                 _line(
                   AppStrings.careerAwards,
-                  career.history.fold<int>(
-                    0,
-                    (sum, season) => sum + season.achievements.length,
-                  ).toString(),
+                  career.history
+                      .fold<int>(
+                        0,
+                        (sum, season) => sum + season.achievements.length,
+                      )
+                      .toString(),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           _panel(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,18 +198,21 @@ class CoachScreen extends StatelessWidget {
                     color: Color(0xFF8BE07F),
                     fontWeight: FontWeight.w900,
                     letterSpacing: 1,
+                    fontSize: 10,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 5),
                 if (career.rivals.isEmpty)
                   Text(
-                    AppStrings.isEnglish ? 'No direct competitors' : 'Прямых конкурентов пока нет',
+                    AppStrings.isEnglish
+                        ? 'No direct competitors'
+                        : 'Прямых конкурентов пока нет',
                     style: const TextStyle(color: Colors.white60),
                   )
                 else
                   ...career.rivals.map(
                     (rival) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 7),
+                      padding: const EdgeInsets.symmetric(vertical: 4),
                       child: Row(
                         children: [
                           Expanded(
@@ -190,6 +221,7 @@ class CoachScreen extends StatelessWidget {
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w700,
+                                fontSize: 12,
                               ),
                             ),
                           ),
@@ -198,6 +230,7 @@ class CoachScreen extends StatelessWidget {
                             style: const TextStyle(
                               color: Color(0xFF8BE07F),
                               fontWeight: FontWeight.w800,
+                              fontSize: 12,
                             ),
                           ),
                         ],
@@ -218,8 +251,17 @@ class CoachScreen extends StatelessWidget {
       children: [
         Row(
           children: [
-            Expanded(child: Text(title, style: const TextStyle(color: Colors.white70))),
-            Text('$value/100', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+            Expanded(
+              child: Text(title, style: const TextStyle(color: Colors.white70)),
+            ),
+            Text(
+              '$value/100',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+                fontSize: 13,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 7),
@@ -238,11 +280,23 @@ class CoachScreen extends StatelessWidget {
 
   Widget _line(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
         children: [
-          Expanded(child: Text(label, style: const TextStyle(color: Colors.white60))),
-          Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(color: Colors.white60, fontSize: 12),
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+              fontSize: 12,
+            ),
+          ),
         ],
       ),
     );

@@ -736,7 +736,7 @@ class PressConferenceDialog {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 9),
+                            const SizedBox(height: 4),
                             Container(
                               width: double.infinity,
                               padding: const EdgeInsets.all(14),
@@ -751,20 +751,20 @@ class PressConferenceDialog {
                                 content.question,
                                 style: const TextStyle(
                                   color: Color(0xFFF0F5F0),
-                                  fontSize: 14,
-                                  height: 1.4,
+                                  fontSize: 12,
+                                  height: 1.2,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 14),
+                            const SizedBox(height: 8),
                             Row(
                               children: [
-                                const Icon(
-                                  Icons.reply_rounded,
-                                  color: Color(0xFF9DB7A1),
-                                  size: 17,
-                                ),
+                                // const Icon(
+                                //   Icons.reply_rounded,
+                                //   color: Color(0xFF9DB7A1),
+                                //   size: 17,
+                                // ),
                                 const SizedBox(width: 6),
                                 Text(
                                   content.english
@@ -862,7 +862,7 @@ class PressConferenceDialog {
                                                 : '${option.trustChange}',
                                             style: TextStyle(
                                               color: accent,
-                                              fontSize: 11,
+                                              fontSize: 10,
                                               fontWeight: FontWeight.w900,
                                             ),
                                           ),
@@ -884,7 +884,7 @@ class PressConferenceDialog {
                                 // ),
                                 label: Text(skipLabel),
                                 style: TextButton.styleFrom(
-                                  foregroundColor: Colors.white54,
+                                  foregroundColor: Colors.white70,
                                 ),
                               ),
                             ),
