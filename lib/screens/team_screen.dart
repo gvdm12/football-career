@@ -3,8 +3,6 @@ import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/player_status.dart';
-import 'package:flutter_football/services/app_strings.dart';
-import 'package:flutter_football/widgets/jersey_number_picker.dart';
 
 class TeamScreen extends StatelessWidget {
   final Career career;
@@ -183,35 +181,6 @@ class TeamScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: () async {
-                        final number = await JerseyNumberPicker.show(
-                          context: context,
-                          takenNumbers: career.rivals
-                              .map((rival) => rival.jerseyNumber)
-                              .toSet(),
-                          preferredNumber: player.jerseyNumber,
-                          english: AppStrings.isEnglish,
-                        );
-                        if (!context.mounted || number == null) return;
-                        Navigator.pop(
-                          context,
-                          career.copyWith(
-                            player: player.copyWith(jerseyNumber: number),
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.confirmation_number_outlined),
-                      label: Text(AppStrings.isEnglish ? 'CHANGE NUMBER' : 'ИЗМЕНИТЬ НОМЕР'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: _accent,
-                        side: const BorderSide(color: _border),
-                        padding: const EdgeInsets.symmetric(vertical: 11),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
