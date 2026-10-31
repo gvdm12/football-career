@@ -93,14 +93,26 @@ class PositionRival {
       'Алексей Волков',
       'Даниэль Коста',
       'Марк Фишер',
+      'Иван Петров',
+      'Никита Смирнов',
+      'Томас Берг',
     ],
-    PlayerPosition.defender: ['Илья Морозов', 'Лукас Мартин', 'Эрик Браун'],
+    PlayerPosition.defender: [
+      'Илья Морозов', 'Лукас Мартин', 'Эрик Браун',
+      'Давид Гарсия', 'Маттиас Кляйн', 'Адам Новак',
+    ],
     PlayerPosition.midfielder: [
       'Артём Соколов',
       'Матео Ромеро',
       'Оливер Кларк',
+      'Алекс Мюллер',
+      'Федерико Росси',
+      'Самир Хаддад',
     ],
-    PlayerPosition.forward: ['Даниэль Силва', 'Максим Орлов', 'Лео Мартинес'],
+    PlayerPosition.forward: [
+      'Даниэль Силва', 'Максим Орлов', 'Лео Мартинес',
+      'Рафаэль Коста', 'Тьяго Алвес', 'Юсуф Диалло',
+    ],
   };
 
   static List<PositionRival> generate({
@@ -200,7 +212,7 @@ class PositionRival {
     }
     final targetCount = rivals.isEmpty ? 2 : rivals.length;
     final names = List<String>.from(_names[player.position]!)
-      ..removeWhere((name) => name == player.name || remaining.any((r) => r.name == name))
+      ..removeWhere((name) => name == player.name || rivals.any((r) => r.name == name))
       ..shuffle(random);
     while (remaining.length < targetCount) {
       final index = remaining.length;
