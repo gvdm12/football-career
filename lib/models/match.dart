@@ -18,6 +18,8 @@ class Match {
   final int redCards;
   final double playerRating;
   final bool playerPlayed;
+  final String? injuryName;
+  final int injuryMatchesRemaining;
 
   const Match({
     required this.homeTeam,
@@ -30,6 +32,8 @@ class Match {
     required this.redCards,
     required this.playerRating,
     this.playerPlayed = true,
+    this.injuryName,
+    this.injuryMatchesRemaining = 0,
     this.homePenalties,
     this.awayPenalties,
   });
