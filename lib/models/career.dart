@@ -631,7 +631,7 @@ class Career {
     // Конкуренты получают игровую практику даже тогда, когда игрок пропустил матч.
     final matchCareer = copyWith(rivals: PositionRival.advanceMatch(rivals));
     final trustChange = !match.playerPlayed
-        ? -1
+        ? 0
         : match.playerRating >= 8.0
         ? 3
         : match.playerRating >= 7.0
