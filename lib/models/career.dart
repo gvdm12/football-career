@@ -435,6 +435,21 @@ class Career {
             ),
           );
 
+    final savedRivals = readList('rivals', PositionRival.fromJson);
+    final rivalsToRestore = savedRivals.isNotEmpty
+        ? savedRivals
+        : PositionRival.generate(player: loadedPlayer, season: currentSeason);
+    final usedJerseyNumbers = <int>{loadedPlayer.jerseyNumber};
+    final restoredRivals = rivalsToRestore.map((rival) {
+      if (usedJerseyNumbers.add(rival.jerseyNumber)) return rival;
+      final available = List<int>.generate(99, (index) => index + 1)
+        ..removeWhere(usedJerseyNumbers.contains);
+      if (available.isEmpty) return rival;
+      final number = available.first;
+      usedJerseyNumbers.add(number);
+      return rival.copyWith(jerseyNumber: number);
+    }).toList();
+
     return Career(
       player: loadedPlayer,
       season: (json['season'] as num?)?.toInt() ?? 1,
@@ -454,9 +469,7 @@ class Career {
       seasonMatches: seasonMatches,
       leagueMatches: leagueMatches,
       news: readList('news', CareerNews.fromJson),
-      rivals: readList('rivals', PositionRival.fromJson).isNotEmpty
-          ? readList('rivals', PositionRival.fromJson)
-          : PositionRival.generate(player: loadedPlayer, season: currentSeason),
+      rivals: restoredRivals,
       coachTrust: ((json['coachTrust'] as num?)?.toInt() ?? 65).clamp(0, 100).toInt(),
       agentLevel: ((json['agentLevel'] as num?)?.toInt() ?? 1).clamp(1, 10).toInt(),
       coachName: json['coachName'] as String? ?? 'Главный тренер',
