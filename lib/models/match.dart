@@ -54,9 +54,12 @@ class Match {
             .where((rival) => rival.overall + rival.form > player.overall)
             .length ??
         0;
-    final trustBonus = ((career?.coachTrust ?? 65) - 65) * 0.002;
-    playChance = (playChance - strongerRivals * 0.14 + trustBonus)
-        .clamp(0.12, 0.98)
+    // Конкуренты влияют на игровое время, но не должны почти
+    // полностью лишать игрока шанса выйти на поле в каждом матче.
+    final rivalPenalty = strongerRivals * 0.07;
+    final trustBonus = ((career?.coachTrust ?? 65) - 65) * 0.003;
+    playChance = (playChance - rivalPenalty + trustBonus)
+        .clamp(0.20, 0.98)
         .toDouble();
 
     return Random(seed).nextDouble() < playChance;
