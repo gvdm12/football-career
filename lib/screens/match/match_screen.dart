@@ -439,6 +439,11 @@ class MatchScreen extends StatelessWidget {
             title: AppStrings.totalAssists,
             value: '${career.assists + match.playerAssists}',
           ),
+          if (match.playerPlayed)
+            _StatRow(
+              title: AppStrings.currencyEarned,
+              value: '+🪙 ${Career.currencyRewardForMatch(match)}',
+            ),
         ],
       ),
     );
