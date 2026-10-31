@@ -110,26 +110,30 @@ class _AgentScreenState extends State<AgentScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
-                    Icons.handshake_rounded,
-                    color: Color(0xFF8BE07F),
-                    size: 38,
-                  ),
-                  const SizedBox(height: 10),
+                  // const Icon(
+                  //   Icons.handshake_rounded,
+                  //   color: Color(0xFF8BE07F),
+                  //   size: 30,
+                  // ),
+                  // const SizedBox(height: 10),
                   Text(
                     AppStrings.agentLevel(level),
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 20,
+                      fontSize: 16,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
                   const SizedBox(height: 5),
                   Text(
                     AppStrings.agentDescription,
-                    style: const TextStyle(color: Colors.white70, height: 1.4),
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      height: 1.2,
+                      fontSize: 12,
+                    ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Text(
                     AppStrings.agentBonus((level - 1) * 2),
                     style: const TextStyle(
@@ -137,7 +141,7 @@ class _AgentScreenState extends State<AgentScreen> {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 6),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -167,7 +171,7 @@ class _AgentScreenState extends State<AgentScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 7),
             _panel(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,7 +185,7 @@ class _AgentScreenState extends State<AgentScreen> {
                       letterSpacing: 1,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 7),
                   _line(AppStrings.team, career.player.club),
                   _line(
                     AppStrings.monthlyWage,
@@ -198,7 +202,7 @@ class _AgentScreenState extends State<AgentScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 7),
             _panel(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -215,15 +219,15 @@ class _AgentScreenState extends State<AgentScreen> {
                   const SizedBox(height: 6),
                   Text(
                     AppStrings.isEnglish
-                        ? 'Preliminary interest based on your performances. Final offers may change during the transfer window.'
-                        : 'Предварительный интерес клубов с учётом ваших выступлений.предложения могут измениться.',
+                        ? 'Preliminary interest based on your performances.'
+                        : 'Предварительный интерес клубов с учётом ваших выступлений.',
                     style: const TextStyle(
                       color: Colors.white54,
                       fontSize: 12,
-                      height: 1.35,
+                      height: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 7),
                   if (interests.isEmpty)
                     Text(
                       AppStrings.noInterestedClubs,
@@ -260,7 +264,7 @@ class _AgentScreenState extends State<AgentScreen> {
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w900,
-                    fontSize: 15,
+                    fontSize: 14,
                   ),
                 ),
               ),
@@ -269,6 +273,7 @@ class _AgentScreenState extends State<AgentScreen> {
                 style: const TextStyle(
                   color: Color(0xFF8BE07F),
                   fontWeight: FontWeight.w800,
+                  fontSize: 12,
                 ),
               ),
             ],
@@ -280,7 +285,7 @@ class _AgentScreenState extends State<AgentScreen> {
                 : offer.club.league.countryName,
             style: const TextStyle(color: Colors.white60, fontSize: 12),
           ),
-          const SizedBox(height: 9),
+          const SizedBox(height: 5),
           _line(
             AppStrings.estimatedOffer,
             '€${_money(offer.salary)} / ${AppStrings.isEnglish ? 'month' : 'мес.'}',
@@ -296,7 +301,7 @@ class _AgentScreenState extends State<AgentScreen> {
 
   Widget _line(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
         children: [
           Expanded(
