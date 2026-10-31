@@ -311,7 +311,7 @@ class TeamScreen extends StatelessWidget {
                 border: Border.all(color: const Color(0xFF234B2D)),
               ),
               child: const Text(
-                'Игровое время зависит от силы игрока, формы конкурентов и доверия тренера. Статус в команде может меняться по ходу сезона.',
+                'Игровое время зависит от рейтинга и репутации игрока, формы конкурентов и доверия тренера. Статус в команде может меняться по ходу сезона.',
                 style: TextStyle(
                   color: Colors.white60,
                   fontSize: 11,
