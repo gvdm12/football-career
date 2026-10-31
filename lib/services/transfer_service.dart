@@ -212,12 +212,16 @@ class TransferService {
 
     final currentStrength = currentClub?.strength ?? 60;
 
-    final maxStrength = _getMaxStrength(
+    final maxStrength = (_getMaxStrength(
       overall: overall,
       age: age,
       rating: rating,
       contributions: contributions,
-    );
+    ) +
+        career.agentLevel -
+        1)
+        .clamp(60, 97)
+        .toInt();
 
     final minStrength = max(60, currentStrength - 8);
 
@@ -339,6 +343,9 @@ class TransferService {
       if (overall < 80) {
         topClubChance *= 0.4;
       }
+      topClubChance = (topClubChance + (career.agentLevel - 1) * 0.04)
+          .clamp(0.0, 0.75)
+          .toDouble();
 
       final topClubs = candidates.where((club) => club.strength >= 88).toList();
 
