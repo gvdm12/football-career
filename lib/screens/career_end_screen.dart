@@ -92,6 +92,26 @@ class CareerEndScreen extends StatelessWidget {
       }
     }
 
+    final bestGoals = career.history.isEmpty
+        ? null
+        : career.history.reduce((a, b) => a.goals >= b.goals ? a : b);
+    final bestAssists = career.history.isEmpty
+        ? null
+        : career.history.reduce((a, b) => a.assists >= b.assists ? a : b);
+    final bestRating = career.history
+        .where((item) => item.averageRating != null && item.matches > 0)
+        .fold<SeasonStats?>(null, (best, item) {
+          if (best == null || item.averageRating! > best.averageRating!) {
+            return item;
+          }
+          return best;
+        });
+    final bestContributions = career.history.isEmpty
+        ? null
+        : career.history.reduce(
+            (a, b) => a.goals + a.assists >= b.goals + b.assists ? a : b,
+          );
+
     return Scaffold(
       backgroundColor: const Color(0xFF061B0C),
       appBar: AppBar(
@@ -175,6 +195,33 @@ class CareerEndScreen extends StatelessWidget {
                   ),
                   const Divider(color: Color(0xFF24552C)),
                   _stat(AppStrings.goldenBootTrophy, goldenBoots.toString()),
+                ]),
+                const SizedBox(height: 10),
+                _section(AppStrings.careerRecords, [
+                  _stat(
+                    AppStrings.mostGoalsSeason,
+                    bestGoals == null
+                        ? '—'
+                        : '${bestGoals.goals} · ${AppStrings.seasonNumber(bestGoals.season)}',
+                  ),
+                  _stat(
+                    AppStrings.mostAssistsSeason,
+                    bestAssists == null
+                        ? '—'
+                        : '${bestAssists.assists} · ${AppStrings.seasonNumber(bestAssists.season)}',
+                  ),
+                  _stat(
+                    AppStrings.bestSeasonRating,
+                    bestRating == null
+                        ? '—'
+                        : '${bestRating.averageRating!.toStringAsFixed(2)} · ${AppStrings.seasonNumber(bestRating.season)}',
+                  ),
+                  _stat(
+                    AppStrings.bestContributionSeason,
+                    bestContributions == null
+                        ? '—'
+                        : '${bestContributions.goals + bestContributions.assists} · ${AppStrings.seasonNumber(bestContributions.season)}',
+                  ),
                 ]),
                 const SizedBox(height: 10),
                 _section(
