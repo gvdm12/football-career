@@ -1262,7 +1262,6 @@ class Career {
     return Career(
       player: newPlayer,
       season: newSeason,
-      rivals: PositionRival.nextSeason(rivals, newSeason),
       matches: 0,
       goals: 0,
       assists: 0,
