@@ -8,6 +8,7 @@ class PositionRival {
   final PlayerPosition position;
   final int age;
   final int overall;
+  final int jerseyNumber;
   final int matches;
   final int goals;
   final int assists;
@@ -20,6 +21,7 @@ class PositionRival {
     required this.position,
     required this.age,
     required this.overall,
+    this.jerseyNumber = 11,
     this.matches = 0,
     this.goals = 0,
     this.assists = 0,
@@ -30,6 +32,7 @@ class PositionRival {
   PositionRival copyWith({
     int? age,
     int? overall,
+    int? jerseyNumber,
     int? matches,
     int? goals,
     int? assists,
@@ -42,6 +45,7 @@ class PositionRival {
       position: position,
       age: age ?? this.age,
       overall: overall ?? this.overall,
+      jerseyNumber: jerseyNumber ?? this.jerseyNumber,
       matches: matches ?? this.matches,
       goals: goals ?? this.goals,
       assists: assists ?? this.assists,
@@ -56,6 +60,7 @@ class PositionRival {
     'position': position.name,
     'age': age,
     'overall': overall,
+    'jerseyNumber': jerseyNumber,
     'matches': matches,
     'goals': goals,
     'assists': assists,
@@ -74,6 +79,7 @@ class PositionRival {
       ),
       age: (json['age'] as num?)?.toInt() ?? 24,
       overall: (json['overall'] as num?)?.toInt() ?? 65,
+      jerseyNumber: ((json['jerseyNumber'] as num?)?.toInt() ?? 20 + (json['id'] as String? ?? '').hashCode.abs() % 70).clamp(1, 99).toInt(),
       matches: (json['matches'] as num?)?.toInt() ?? 0,
       goals: (json['goals'] as num?)?.toInt() ?? 0,
       assists: (json['assists'] as num?)?.toInt() ?? 0,
@@ -104,21 +110,25 @@ class PositionRival {
   }) {
     final random = Random(('${player.name}|${player.club}|$season').hashCode);
     final names = List<String>.from(_names[player.position]!)..shuffle(random);
+    final takenNumbers = <int>{player.jerseyNumber};
     return List.generate(count.clamp(1, 3).toInt(), (index) {
       final delta = random.nextInt(11) - 4;
       final overall = (player.overall + delta).clamp(55, 95).toInt();
+      final available = List<int>.generate(99, (i) => i + 1)..removeWhere(takenNumbers.contains);
+      final number = available[random.nextInt(available.length)];
+      takenNumbers.add(number);
       return PositionRival(
         id: 's${season}_${player.position.name}_${index + 1}',
         name: names[index],
         position: player.position,
         age: 19 + random.nextInt(12),
         overall: overall,
+        jerseyNumber: number,
         averageRating: 6.2 + random.nextDouble() * 0.9,
         form: random.nextInt(7) - 3,
       );
     });
   }
-
   static List<PositionRival> advanceMatch(List<PositionRival> rivals) {
     final random = Random();
     return rivals.map((rival) {
@@ -168,23 +178,49 @@ class PositionRival {
 
   static List<PositionRival> nextSeason(
     List<PositionRival> rivals,
-    int season,
-  ) {
-    return rivals.map((rival) {
+    int season, {
+    required Player player,
+  }) {
+    final random = Random();
+    final remaining = <PositionRival>[];
+    for (final rival in rivals) {
+      final leavesClub = rivals.length > 1 && random.nextDouble() < 0.18;
+      if (leavesClub) continue;
       final age = rival.age + 1;
-      final ageChange = age >= 33
-          ? -2
-          : age <= 23
-          ? 1
-          : 0;
-      return PositionRival(
-        id: 's${season}_${rival.position.name}_${rival.id.hashCode.abs()}',
+      final ageChange = age >= 33 ? -2 : age <= 23 ? 1 : 0;
+      remaining.add(PositionRival(
+        id: 's${season}_${rival.id}',
         name: rival.name,
         position: rival.position,
         age: age,
         overall: (rival.overall + ageChange).clamp(50, 95).toInt(),
+        jerseyNumber: rival.jerseyNumber,
         averageRating: 6.5,
-      );
-    }).toList();
+      ));
+    }
+    final targetCount = rivals.isEmpty ? 2 : rivals.length;
+    final names = List<String>.from(_names[player.position]!)
+      ..removeWhere((name) => name == player.name || remaining.any((r) => r.name == name))
+      ..shuffle(random);
+    while (remaining.length < targetCount) {
+      final index = remaining.length;
+      final takenNumbers = <int>{player.jerseyNumber, ...remaining.map((r) => r.jerseyNumber)};
+      final available = List<int>.generate(99, (i) => i + 1)..removeWhere(takenNumbers.contains);
+      if (available.isEmpty) break;
+      final name = names.isNotEmpty ? names.removeAt(0) : 'Игрок ${season}_${index + 1}';
+      final number = available[random.nextInt(available.length)];
+      final delta = random.nextInt(11) - 4;
+      remaining.add(PositionRival(
+        id: 's${season}_new_${index + 1}_${random.nextInt(100000)}',
+        name: name,
+        position: player.position,
+        age: 18 + random.nextInt(13),
+        overall: (player.overall + delta).clamp(55, 95).toInt(),
+        jerseyNumber: number,
+        averageRating: 6.2 + random.nextDouble() * 0.9,
+        form: random.nextInt(7) - 3,
+      ));
+    }
+    return remaining;
   }
 }
