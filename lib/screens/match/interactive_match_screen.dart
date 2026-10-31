@@ -56,9 +56,9 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   late final String _awayTeam;
 
   Player get _player => widget.career.player;
-  int get _playerTeamStrength => widget.isHome ? _homeStrength : _awayStrength;
-  int get _opponentTeamStrength =>
-      widget.isHome ? _awayStrength : _homeStrength;
+  // int get _playerTeamStrength => widget.isHome ? _homeStrength : _awayStrength;
+  // int get _opponentTeamStrength =>
+  //     widget.isHome ? _awayStrength : _homeStrength;
 
   @override
   void initState() {
