@@ -986,11 +986,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
     required bool interactive,
   }) async {
     if (isSaving || seasonFinishing || seasonMatch.isPlayed) return;
-    final playerStatus = PlayerStatusCalculator.calculate(
-      overall: career.player.overall,
-      clubName: career.player.club,
-      rivals: career.rivals,
-    );
     if (interactive &&
         !_canPlayInteractiveMatch(
           opponent: seasonMatch.opponent,
@@ -1001,7 +996,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
           content: Text(
             career.isInjured
                 ? 'Из-за травмы интерактивный матч недоступен.'
-                : 'Интерактивный матч доступен только игрокам основного состава и ротации.',
+                : 'Тренер не планирует выпускать вас на поле в этом матче.',
           ),
         ),
       );
