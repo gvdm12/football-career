@@ -112,6 +112,7 @@ void main() {
       expect(restored.rivals.length, career.rivals.length);
       expect(restored.coachTrust, 82);
       expect(restored.agentLevel, 3);
+      expect(restored.coachName, career.coachName);
     });
 
     test('strong performance increases coach trust', () {
