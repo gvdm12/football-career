@@ -80,7 +80,7 @@ class CoachScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            AppStrings.isEnglish ? 'Club head coach' : 'Главный тренер клуба',
+                            career.coachName,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 18,
