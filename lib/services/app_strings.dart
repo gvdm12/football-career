@@ -126,6 +126,13 @@ class AppStrings {
   static String get club => _en ? 'Club' : 'Клуб';
   static String get teamStatus => _en ? 'Team status' : 'Статус в команде';
   static String get coachTrust => _en ? 'Coach trust' : 'Доверие тренера';
+  static String get positionRivals => _en ? 'POSITION COMPETITORS' : 'КОНКУРЕНТЫ ЗА ПОЗИЦИЮ';
+  static String get rivalForm => _en ? 'Form' : 'Форма';
+  static String get careerRecords => _en ? 'CAREER RECORDS' : 'РЕКОРДЫ КАРЬЕРЫ';
+  static String get mostGoalsSeason => _en ? 'Most goals in a season' : 'Больше всего голов за сезон';
+  static String get mostAssistsSeason => _en ? 'Most assists in a season' : 'Больше всего ассистов за сезон';
+  static String get bestSeasonRating => _en ? 'Best season rating' : 'Лучшая оценка за сезон';
+  static String get bestContributionSeason => _en ? 'Most goal contributions' : 'Больше всего гол+пас за сезон';
   static String get clubStrength => _en ? 'Club strength' : 'Сила клуба';
   static String get age => _en ? 'Age' : 'Возраст';
   static String get yearsOld => _en ? 'years old' : 'лет';
