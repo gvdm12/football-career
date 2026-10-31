@@ -150,7 +150,7 @@ class CoachScreen extends StatelessWidget {
                 _line(AppStrings.goalsLabel, career.goals.toString()),
                 _line(AppStrings.assistsLabel, career.assists.toString()),
                 _line(
-                  AppStrings.seasonAchievements,
+                  AppStrings.careerAwards,
                   career.history.fold<int>(
                     0,
                     (sum, season) => sum + season.achievements.length,
