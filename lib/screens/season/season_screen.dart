@@ -3286,7 +3286,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
         ? tie.homeTeam == club
         : tie.awayTeam == club;
     final opponent = tie.homeTeam == club ? tie.awayTeam : tie.homeTeam;
-    final interactiveAvailable = _canPlayInteractiveMatch;
+    final interactiveAvailable = _canPlayInteractiveMatch(
+      opponent: opponent,
+      isHome: isHome,
+    );
 
     final matchTitle = isFinal
         ? AppStrings.finalStage
@@ -3436,7 +3439,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
         ? tie.homeTeam == club
         : tie.awayTeam == club;
     final opponent = tie.homeTeam == club ? tie.awayTeam : tie.homeTeam;
-    final interactiveAvailable = _canPlayInteractiveMatch;
+    final interactiveAvailable = _canPlayInteractiveMatch(
+      opponent: opponent,
+      isHome: isHome,
+    );
 
     final matchTitle = isFinal
         ? AppStrings.finalStage
