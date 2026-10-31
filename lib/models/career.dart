@@ -537,6 +537,30 @@ class Career {
           '${rating.toStringAsFixed(1)}. '
           'Игроку предстоит реабилитироваться в следующих матчах.';
     }
+    // Тренерская оценка зависит от выступлений и накопленного доверия.
+    else if (rating >= 7.8 && coachTrust >= 75) {
+      title = 'Тренер доволен вашей формой';
+      description =
+          'После очередного сильного выступления тренер высоко оценил '
+          'вашу игру. Доверие тренерского штаба растёт.';
+    }
+    else if (rating <= 6.0 && coachTrust <= 45) {
+      title = 'Тренер ждёт реакции';
+      description =
+          'После неудачного матча тренерский штаб ожидает от вас '
+          'более уверенной игры в следующих турах.';
+    }
+    // Борьба за место в составе.
+    else if (matchNumber % 3 == 0 &&
+        rivals.any((rival) => rival.overall + rival.form > player.overall)) {
+      final rival = rivals.firstWhere(
+        (item) => item.overall + item.form > player.overall,
+      );
+      title = 'Конкурент давит';
+      description =
+          '${rival.name} набирает форму и претендует на игровое время. '
+          'Чтобы сохранить место, важно продолжать показывать результат.';
+    }
     // Краткая сводка после каждых пяти матчей.
     else if (matchNumber % 5 == 0) {
       title = 'Промежуточные итоги';
@@ -674,6 +698,7 @@ class Career {
       rivals: PositionRival.generate(player: newPlayer, season: season),
       monthlySalary: offer.salary,
       contractYears: offer.contractYears,
+      coachTrust: offer.isRenewal ? coachTrust : 65,
     );
   }
 
