@@ -42,6 +42,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   bool _finished = false;
   bool _momentReady = false;
   bool _playerUnavailable = false;
+  bool _playerOnPitch = true;
   String? _injuryName;
   int _injuryMatchesRemaining = 0;
   String _event = 'Матч начинается! Ваша команда разыгрывает мяч.';
@@ -83,6 +84,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       isHome: widget.isHome,
     );
     _playerPlayed = baseMatch.playerPlayed;
+    _playerOnPitch = baseMatch.playerPlayed;
     _playerAssists = baseMatch.playerAssists;
     // Сохраняем командные голы обычной модели, но заменяем
     // заранее сгенерированные голы игрока интерактивными эпизодами.
@@ -142,12 +144,12 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   }
 
   void _createMoment() {
-    if (_playerUnavailable) {
+    if (!_playerOnPitch) {
       _phase = 'unavailable';
-      _momentTitle = _injuryName == null ? 'Вы удалены' : 'Травма';
+      _momentTitle = _injuryName == null ? 'Вы удалены' : 'Замена из-за травмы';
       _momentDescription = _injuryName == null
-          ? 'Вы покинули поле после красной карточки. Команда продолжает матч в меньшинстве.'
-          : 'Вы получили травму ($_injuryName). Медицинский штаб просит вас покинуть поле.';
+          ? 'Вы удалены. Команда доигрывает матч в меньшинстве.'
+          : 'Вы покинули поле из-за травмы ($_injuryName). Команда продолжает матч.';
       _momentReady = true;
       return;
     }
@@ -160,7 +162,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     final roll = _random.nextDouble();
     final position = _player.position;
     final setPieceRoll = _random.nextDouble();
-    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.035) {
+    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.004) {
       _phase = 'penalty';
       _momentTitle = 'ПЕНАЛЬТИ!';
       _momentDescription = 'Судья указал на точку. Один удар может изменить ход матча.';
@@ -168,7 +170,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _momentReady = true;
       return;
     }
-    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.085) {
+    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.020) {
       _phase = 'oneOnOne';
       _momentTitle = 'Выход один на один';
       _momentDescription = 'Вы прорвались за линию защиты. Вратарь выходит навстречу — решите, как завершить атаку.';
@@ -176,7 +178,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _momentReady = true;
       return;
     }
-    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.145) {
+    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.055) {
       _phase = 'corner';
       _momentTitle = 'Угловой удар';
       _momentDescription = 'Партнёры заняли позиции в штрафной. Можно подать на ближнюю/дальнюю штангу или разыграть коротко.';
@@ -184,7 +186,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _momentReady = true;
       return;
     }
-    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.195) {
+    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.095) {
       _phase = 'freeKick';
       _momentTitle = 'Штрафной удар';
       _momentDescription = 'Мяч установлен у штрафной. Выберите прямой удар или передачу партнёру.';
@@ -208,20 +210,24 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     if (roll < attackChance) {
       _phase = 'attack';
       _momentTitle = 'Атака вашей команды';
-      _momentDescription = _random.nextInt(3) == 0
-          ? 'Вы ворвались в штрафную с фланга. Защитник пытается закрыть прострел.'
-          : _random.nextBool()
-              ? 'Вы получили мяч у штрафной. Защитник закрывает удар, партнёр открывается справа.'
-              : 'Команда быстро вышла из обороны. Вы получили мяч перед последней линией соперника.';
+      _momentDescription = switch (_random.nextInt(5)) {
+        0 => 'Вы ворвались в штрафную с фланга. Защитник пытается закрыть прострел.',
+        1 => 'Вы получили мяч у штрафной. Защитник закрывает удар, партнёр открывается справа.',
+        2 => 'Команда быстро вышла из обороны. Вы получили мяч перед последней линией соперника.',
+        3 => 'Защитник ошибся при приёме мяча. У вас есть время принять решение.',
+        _ => 'Партнёр выполнил передачу за спину защитникам. Нужно открыться под мяч.',
+      };
       _event = '$_minute-я минута. Ваша команда переходит в атаку!';
     } else if (roll < attackChance + midfieldChance) {
       _phase = 'midfield';
       _momentTitle = 'Борьба в центре поля';
-      _momentDescription = _random.nextInt(3) == 0
-          ? 'Соперник не успел перестроиться. Можно начать быструю контратаку.'
-          : _random.nextBool()
-              ? 'Перед вами свободная зона. Решите, ускорить атаку или придержать мяч.'
-              : 'Партнёры открываются между линиями. Один точный пас может создать голевой момент.';
+      _momentDescription = switch (_random.nextInt(5)) {
+        0 => 'Соперник не успел перестроиться. Можно начать быструю контратаку.',
+        1 => 'Перед вами свободная зона. Решите, ускорить атаку или придержать мяч.',
+        2 => 'Партнёры открываются между линиями. Один точный пас может создать голевой момент.',
+        3 => 'Соперник оставил пространство на фланге. Можно перевести туда мяч.',
+        _ => 'Команда соперника прессингует. Важно не потерять владение.',
+      };
       _event = '$_minute-я минута. Мяч оказывается у вас в центре поля.';
     } else if (position == PlayerPosition.goalkeeper) {
       _phase = 'goalkeeper';
@@ -327,9 +333,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   void _choose(String action) {
     if (_finished || !_momentReady) return;
     if (action == 'continue') {
-      _advanceClock(_injuryName == null
-          ? 'Вы удалены. Команда продолжает матч в меньшинстве.'
-          : 'Вы покинули поле из-за травмы. Команда продолжает матч.');
+      _playerOnPitch = false;
+      _finishRemainingMatch();
       return;
     }
     if (action == 'penaltyShoot') {
@@ -364,15 +369,19 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     final advantage = widget.isHome
         ? (_homeStrength - _awayStrength) * 0.003
         : (_awayStrength - _homeStrength) * 0.003;
-    final chance = (0.52 + (skill - 60) * 0.007 + advantage - difficulty)
-        .clamp(0.12, 0.91);
+    final chance = (0.49 + (skill - 60) * 0.0055 + advantage - difficulty)
+        .clamp(0.16, 0.84);
     final success = _random.nextDouble() < chance;
     if (success) _successfulActions++;
     String message;
 
     if (action == 'shoot' || action == 'longShot' || action == 'header') {
       _shots++;
-      if (success && _random.nextDouble() < (action == 'header' ? 0.36 : 0.43)) {
+      final isOneOnOne = _phase == 'oneOnOne';
+      final finishingChance = isOneOnOne
+          ? (action == 'header' ? 0.38 : 0.56)
+          : action == 'header' ? 0.27 : action == 'longShot' ? 0.19 : 0.31;
+      if (success && _random.nextDouble() < finishingChance) {
         if (widget.isHome) { _homeGoals++; } else { _awayGoals++; }
         _playerGoals++;
         _rating += 1.1;
@@ -457,9 +466,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     }
 
     final committedFoul = ['defend', 'tackle', 'contain'].contains(action) &&
-        _random.nextDouble() < 0.16;
+        _random.nextDouble() < 0.075;
     if (committedFoul) {
-      if (_yellowCards >= 1 || _random.nextDouble() < 0.025) {
+      if (_yellowCards >= 1 || _random.nextDouble() < 0.004) {
+        _yellowCards = 2;
         _redCards = 1;
         _playerUnavailable = true;
         _injuryName = null;
@@ -470,11 +480,11 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         message += ' Судья показывает жёлтую карточку за фол.';
         _rating -= 0.12;
       }
-    } else if (!isAttackingAction && _random.nextDouble() < 0.035) {
+    } else if (!isAttackingAction && _random.nextDouble() < 0.018) {
       _yellowCards = min(2, _yellowCards + 1);
       message += ' Судья показывает жёлтую карточку.';
     }
-    if (!_playerUnavailable && _random.nextDouble() < 0.025) {
+    if (!_playerUnavailable && _random.nextDouble() < 0.007) {
       const injuries = ['Растяжение мышц', 'Ушиб', 'Повреждение голеностопа', 'Мышечная травма'];
       _injuryName = injuries[_random.nextInt(injuries.length)];
       _injuryMatchesRemaining = 1 + _random.nextInt(4);
@@ -483,6 +493,41 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       message += ' Вы почувствовали боль и не можете продолжить матч: $_injuryName.';
     }
     _advanceClock(message);
+  }
+
+  void _finishRemainingMatch() {
+    final remainingActions = max(1, ((_maxActions - _actions) * 0.65).round());
+    for (var i = 0; i < remainingActions; i++) {
+      final teamAttackChance = (0.16 +
+              (_playerTeamStrength - _opponentTeamStrength) * 0.003)
+          .clamp(0.08, 0.28);
+      if (_random.nextDouble() < teamAttackChance) {
+        if (widget.isHome) {
+          _homeGoals++;
+        } else {
+          _awayGoals++;
+        }
+      }
+      final opponentAttackChance = (0.17 +
+              (_opponentTeamStrength - _playerTeamStrength) * 0.003)
+          .clamp(0.08, 0.28);
+      if (_random.nextDouble() < opponentAttackChance) {
+        if (widget.isHome) {
+          _awayGoals++;
+        } else {
+          _homeGoals++;
+        }
+      }
+    }
+    _minute = 90;
+    _finished = true;
+    _rating = _rating.clamp(4.0, 10.0).toDouble();
+    setState(() {
+      _event = _injuryName == null
+          ? 'Матч завершён. Вы удалены, команда доиграла встречу в меньшинстве. Финальный свисток!'
+          : 'Матч завершён. Вы покинули поле из-за травмы. Финальный свисток!';
+      _momentReady = false;
+    });
   }
 
   void _advanceClock(String message) {
