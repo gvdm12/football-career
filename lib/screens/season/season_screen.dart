@@ -2124,111 +2124,136 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Widget _buildNavigationDrawer() {
     return Drawer(
-      backgroundColor: const Color(0xFF071D0D),
+      backgroundColor: const Color(0xFFE7EAF0),
       child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              padding: const EdgeInsets.fromLTRB(20, 26, 20, 22),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFF145326), Color(0xFF082A12)],
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFFF8FAFC),
+                Color(0xFFE2E6ED),
+                Color(0xFFCBD2DC),
+              ],
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                padding: const EdgeInsets.fromLTRB(20, 26, 20, 22),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFFFFFFFF), Color(0xFFDDE2E9)],
+                  ),
+                  border: Border(
+                    bottom: BorderSide(color: Color(0xFFB8C0CC)),
+                  ),
                 ),
-                border: Border(
-                  bottom: BorderSide(color: Color(0xFF24552C)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/player.svg',
+                      width: 36,
+                      height: 36,
+                      fit: BoxFit.contain,
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      career.player.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFF202833),
+                        fontSize: 19,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${career.player.club}  ·  OVR ${career.player.overall}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFF657080),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(
-                    Icons.sports_soccer_rounded,
-                    color: Color(0xFF8BE07F),
-                    size: 34,
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    career.player.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 19,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${career.player.club}  ·  OVR ${career.player.overall}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Color(0xFF8BE07F),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+              const SizedBox(height: 12),
+              _drawerItem(
+                icon: Icons.person_outline_rounded,
+                title: 'Игрок',
+                onTap: () {
+                  Navigator.pop(context);
+                  _openPlayerProfile();
+                },
               ),
-            ),
-            const SizedBox(height: 12),
-            _drawerItem(
-              icon: Icons.person_outline_rounded,
-              title: 'Игрок',
-              onTap: () {
-                Navigator.pop(context);
-                _openPlayerProfile();
-              },
-            ),
-            _drawerItem(
-              icon: Icons.table_chart_rounded,
-              title: 'Таблица',
-              onTap: () {
-                Navigator.pop(context);
-                _openLeagueTable();
-              },
-            ),
-            _drawerItem(
-              icon: Icons.calendar_month_rounded,
-              title: 'Календарь',
-              onTap: () {
-                Navigator.pop(context);
-                _openCalendar();
-              },
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: Divider(color: Color(0xFF24552C), height: 1),
-            ),
-            _drawerItem(
-              icon: Icons.home_outlined,
-              title: 'Главный экран',
-              onTap: () {
-                Navigator.pop(context);
-                _returnToHome();
-              },
-            ),
-          ],
+              _drawerItem(
+                assetPath: 'assets/icons/table.svg',
+                title: 'Таблица',
+                onTap: () {
+                  Navigator.pop(context);
+                  _openLeagueTable();
+                },
+              ),
+              _drawerItem(
+                icon: Icons.calendar_month_rounded,
+                title: 'Календарь',
+                onTap: () {
+                  Navigator.pop(context);
+                  _openCalendar();
+                },
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Divider(color: Color(0xFFB8C0CC), height: 1),
+              ),
+              _drawerItem(
+                icon: Icons.home_outlined,
+                title: 'Главный экран',
+                onTap: () {
+                  Navigator.pop(context);
+                  _returnToHome();
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _drawerItem({
-    required IconData icon,
+    IconData? icon,
+    String? assetPath,
     required String title,
     required VoidCallback onTap,
   }) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 22),
-      leading: Icon(icon, color: const Color(0xFF8BE07F), size: 23),
+      leading: assetPath != null
+          ? SvgPicture.asset(
+              assetPath,
+              width: 23,
+              height: 23,
+              colorFilter: const ColorFilter.mode(
+                Color(0xFF596575),
+                BlendMode.srcIn,
+              ),
+            )
+          : Icon(icon, color: const Color(0xFF596575), size: 23),
       title: Text(
         title,
         style: const TextStyle(
-          color: Colors.white,
+          color: Color(0xFF28313D),
           fontSize: 15,
           fontWeight: FontWeight.w600,
         ),
