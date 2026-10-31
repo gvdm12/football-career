@@ -125,6 +125,7 @@ class AppStrings {
       _en ? 'CAREER & FINANCES' : 'КАРЬЕРА И ФИНАНСЫ';
   static String get club => _en ? 'Club' : 'Клуб';
   static String get teamStatus => _en ? 'Team status' : 'Статус в команде';
+  static String get coachTrust => _en ? 'Coach trust' : 'Доверие тренера';
   static String get clubStrength => _en ? 'Club strength' : 'Сила клуба';
   static String get age => _en ? 'Age' : 'Возраст';
   static String get yearsOld => _en ? 'years old' : 'лет';
@@ -552,6 +553,9 @@ class AppStrings {
       'Лучший бомбардир': 'Top Scorer',
       'Лучший ассистент': 'Top Assister',
       'Лучший игрок сезона': 'Player of the Season',
+      'Лучший молодой игрок сезона': 'Best Young Player',
+      'В сборной сезона': 'Team of the Season',
+      'Лучший ассистент': 'Top Assister',
     };
     return names[value] ?? value;
   }
