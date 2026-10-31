@@ -36,11 +36,58 @@ class MatchScreen extends StatelessWidget {
     return const Color(0xFFFF7777);
   }
 
-  void _finishMatch(BuildContext context) {
-    final updatedCareer = career.afterMatch(match);
+  Future<void> _finishMatch(BuildContext context) async {
+    var updatedCareer = career.afterMatch(match);
+
+    // Пресс-конференция появляется только если игрок участвовал в матче.
+    if (match.playerPlayed) {
+      final response = await showDialog<int>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) => AlertDialog(
+          backgroundColor: const Color(0xFF102B17),
+          title: Text(
+            AppStrings.pressConferenceTitle,
+            style: const TextStyle(
+              color: Color(0xFF8BE07F),
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          content: Text(
+            AppStrings.pressConferenceQuestion,
+            style: const TextStyle(color: Colors.white70),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, 1),
+              child: Text(AppStrings.pressConferenceTeamFirst),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, 2),
+              child: Text(AppStrings.pressConferenceConfident),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, 3),
+              child: Text(AppStrings.pressConferenceDemand),
+            ),
+          ],
+        ),
+      );
+
+      final trustChange = switch (response) {
+        1 => 2,
+        2 => 1,
+        3 => -2,
+        _ => 0,
+      };
+      updatedCareer = updatedCareer.copyWith(
+        coachTrust: (updatedCareer.coachTrust + trustChange)
+            .clamp(0, 100)
+            .toInt(),
+      );
+    }
 
     if (!context.mounted) return;
-
     Navigator.pop(context, updatedCareer);
   }
 
