@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_football/models/career.dart';
+import 'package:flutter_football/models/match.dart';
+import 'package:flutter_football/screens/match/interactive_match_screen.dart';
 import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/services/career_storage.dart';
 
@@ -26,7 +28,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
     tournament = career.worldCup!;
   }
 
-  Future<void> _continueTournament() async {
+  Future<void> _continueTournament({bool interactive = false}) async {
     if (busy || tournament.isCompleted) return;
     setState(() => busy = true);
     final playerHasMatch = tournament.matches.any(
@@ -44,17 +46,75 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
               (match.homeTeam == player.nationality ||
                   match.awayTeam == player.nationality),
         );
+
+    var updatedTournament = tournament;
+    if (interactive && playerCanPlay) {
+      final playerMatchIndex = tournament.matches.indexWhere(
+        (match) =>
+            !match.isPlayed &&
+            (match.homeTeam == player.nationality ||
+                match.awayTeam == player.nationality),
+      );
+      if (playerMatchIndex < 0) {
+        if (mounted) setState(() => busy = false);
+        return;
+      }
+      final playerMatch = tournament.matches[playerMatchIndex];
+      final isHome = playerMatch.homeTeam == player.nationality;
+      final opponent = isHome ? playerMatch.awayTeam : playerMatch.homeTeam;
+      final playedMatch = await Navigator.push<Match>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => InteractiveMatchScreen(
+            career: career,
+            opponent: opponent,
+            isHome: isHome,
+            playerTeamName: player.nationality,
+            playerTeamStrength: worldCupStrengthOf(player.nationality) +
+                ((player.overall - 70) * 0.12).clamp(0, 3).toInt(),
+            opponentStrength: worldCupStrengthOf(opponent),
+            forcePlayerParticipation: true,
+          ),
+        ),
+      );
+      if (!mounted) return;
+      if (playedMatch == null) {
+        setState(() => busy = false);
+        return;
+      }
+      updatedTournament = tournament.playMatch(
+        playerMatchIndex,
+        homeGoals: playedMatch.homeGoals,
+        awayGoals: playedMatch.awayGoals,
+        playerTeam: player.nationality,
+        playerOverall: player.overall,
+        playerPosition: player.position.name,
+        playerShooting: player.skills.shooting,
+        playerPassing: player.skills.passing,
+        playerDribbling: player.skills.dribbling,
+        playerGoalsOverride: playedMatch.playerGoals,
+        playerAssistsOverride: playedMatch.playerAssists,
+        playerRatingOverride: playedMatch.playerRating,
+      );
+      // Остальные матчи этого раунда проходят автоматически.
+      if (!updatedTournament.isCompleted &&
+          updatedTournament.stage == tournament.stage) {
+        updatedTournament = updatedTournament.playCurrentRound();
+      }
+    }
     // Продвигаем только один раунд за нажатие, даже если сборная
     // игрока уже вылетела или игрок не был вызван. Так результаты
     // каждого этапа остаются на экране и доступны в календаре.
-    var updatedTournament = tournament.playCurrentRound(
-      playerTeam: playerCanPlay ? player.nationality : null,
-      playerOverall: player.overall,
-      playerPosition: player.position.name,
-      playerShooting: player.skills.shooting,
-      playerPassing: player.skills.passing,
-      playerDribbling: player.skills.dribbling,
-    );
+    if (!interactive) {
+      updatedTournament = tournament.playCurrentRound(
+        playerTeam: playerCanPlay ? player.nationality : null,
+        playerOverall: player.overall,
+        playerPosition: player.position.name,
+        playerShooting: player.skills.shooting,
+        playerPassing: player.skills.passing,
+        playerDribbling: player.skills.dribbling,
+      );
+    }
 
     // Если сборная игрока вылетела, автоматически доигрываем турнир до финала.
     final playerTeamStillInTournament = updatedTournament.matches.any(
@@ -419,22 +479,43 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                   );
                 }),
               const SizedBox(height: 12),
-              if (!tournament.isCompleted)
-                FilledButton(
-                  onPressed: busy ? null : _continueTournament,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: green,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  child: Text(
-                    busy
-                        ? 'Симуляция...'
-                        : playerCanPlay
-                        ? 'Сыграть матч сборной'
-                        : 'Продолжить чемпионат мира',
-                  ),
-                )
+              if (!tournament.isCompleted) ...[
+                Row(
+                  children: [
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: busy
+                            ? null
+                            : () => _continueTournament(interactive: false),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color(0xFFE8EDE8),
+                          foregroundColor: const Color(0xFF102B17),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        child: Text(
+                          playerCanPlay ? 'Симуляция' : 'Продолжить',
+                        ),
+                      ),
+                    ),
+                    if (playerCanPlay) ...[
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: busy
+                              ? null
+                              : () => _continueTournament(interactive: true),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: green,
+                            foregroundColor: Colors.black,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          child: const Text('Играть'),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ]
               else ...[
                 const SizedBox(height: 4),
                 SizedBox(
