@@ -112,7 +112,26 @@ void main() {
       expect(restored.rivals.length, career.rivals.length);
       expect(restored.coachTrust, 82);
       expect(restored.agentLevel, 3);
+      expect(restored.agentCredits, career.agentCredits);
       expect(restored.coachName, career.coachName);
+    });
+
+    test('a player who did not play earns no match currency', () {
+      final career = Career.create(createTestPlayer());
+      const match = Match(
+        homeTeam: 'Club',
+        awayTeam: 'Opponent',
+        homeGoals: 1,
+        awayGoals: 0,
+        playerGoals: 0,
+        playerAssists: 0,
+        yellowCards: 0,
+        redCards: 0,
+        playerRating: 0,
+        playerPlayed: false,
+      );
+
+      expect(career.afterMatch(match).agentCredits, 0);
     });
 
     test('strong performance increases coach trust', () {
@@ -132,6 +151,7 @@ void main() {
 
       final updated = career.afterMatch(match);
       expect(updated.coachTrust, 68);
+      expect(updated.agentCredits, 23);
     });
   });
 }
