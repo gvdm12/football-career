@@ -103,7 +103,7 @@ class _AgentScreenState extends State<AgentScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: isMax || career.money < upgradeCost ? null : _upgradeAgent,
+                      onPressed: isMax || career.agentCredits < upgradeCost ? null : _upgradeAgent,
                       child: Text(
                         isMax
                             ? AppStrings.agentMaxLevel
