@@ -2415,7 +2415,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
               ),
               _drawerItem(
                 icon: Icons.groups_2_outlined,
-                title: 'Команда',
+                title: AppStrings.isEnglish ? 'Team' : 'Команда',
                 onTap: () {
                   Navigator.pop(context);
                   _openTeam();
