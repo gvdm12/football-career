@@ -24,9 +24,13 @@ class _AgentScreenState extends State<AgentScreen> {
     interests = TransferService.generateOffers(career);
   }
 
+  static const List<int> _upgradeCosts = [
+    50, 100, 175, 275, 400, 550, 725, 925, 1150,
+  ];
+
   void _upgradeAgent() {
-    if (career.agentLevel >= 3) return;
-    final cost = career.agentLevel == 1 ? 150 : 350;
+    if (career.agentLevel >= 10) return;
+    final cost = _upgradeCosts[career.agentLevel - 1];
 
     if (career.agentCredits < cost) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -57,8 +61,8 @@ class _AgentScreenState extends State<AgentScreen> {
   @override
   Widget build(BuildContext context) {
     final level = career.agentLevel;
-    final isMax = level >= 3;
-    final upgradeCost = level == 1 ? 150 : 350;
+    final isMax = level >= 10;
+    final upgradeCost = isMax ? 0 : _upgradeCosts[level - 1];
 
     return PopScope<Career>(
       canPop: false,
@@ -96,7 +100,7 @@ class _AgentScreenState extends State<AgentScreen> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    AppStrings.agentBonus((level - 1) * 4),
+                    AppStrings.agentBonus((level - 1) * 2),
                     style: const TextStyle(color: Color(0xFF8BE07F), fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(height: 14),
@@ -136,7 +140,7 @@ class _AgentScreenState extends State<AgentScreen> {
                   _line(AppStrings.team, career.player.club),
                   _line(AppStrings.monthlyWage, '€${_money(career.monthlySalary)}'),
                   _line(AppStrings.contractRemaining, AppStrings.transferContractDuration(career.contractYears)),
-                  _line(AppStrings.agentLevel(level), AppStrings.agentBonus((level - 1) * 4)),
+                  _line(AppStrings.agentLevel(level), AppStrings.agentBonus((level - 1) * 2)),
                 ],
               ),
             ),
