@@ -184,7 +184,7 @@ class PositionRival {
     final random = Random();
     final remaining = <PositionRival>[];
     for (final rival in rivals) {
-      final leavesClub = rivals.length > 1 && random.nextDouble() < 0.18;
+      final leavesClub = random.nextDouble() < 0.18;
       if (leavesClub) continue;
       final age = rival.age + 1;
       final ageChange = age >= 33 ? -2 : age <= 23 ? 1 : 0;
