@@ -161,7 +161,7 @@ class _SuperLeagueScreenState extends State<SuperLeagueScreen> {
                         'Выбери клуб в одном из двух дивизионов: 20 команд в первом и '
                         '22 во втором. Создай футболиста с рейтингом 75, '
                         'борись за чемпионство, повышение в классе или спасение '
-                        'от вылета. Каждый сезон состав дивизионов может меняться.',
+                        'от вылета.',
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.78),
                           height: 1.5,

@@ -1003,10 +1003,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                   const SizedBox(height: 3),
                   Text(
                     description,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                    ),
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                 ],
               ),
@@ -1074,7 +1071,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 context: sheetContext,
                 icon: Icons.sports_soccer_rounded,
                 title: 'Интерактивная симуляция',
-                description: 'Ход матча прерывается ключевыми игровыми моментами',
+                description:
+                    'Ход матча прерывается ключевыми игровыми моментами',
                 value: 'interactive',
               ),
             ],
@@ -1109,11 +1107,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
       classicUpdatedCareer = await Navigator.push<Career>(
         context,
         MaterialPageRoute(
-          builder: (_) => MatchScreen(
-            career: career,
-            match: match!,
-            isCupMatch: false,
-          ),
+          builder: (_) =>
+              MatchScreen(career: career, match: match!, isCupMatch: false),
         ),
       );
     }
@@ -1121,7 +1116,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
     if (!mounted || match == null) return;
 
     final playedMatch = match;
-    final updatedCareer = classicUpdatedCareer ?? career.afterMatch(playedMatch);
+    final updatedCareer =
+        classicUpdatedCareer ?? career.afterMatch(playedMatch);
 
     // Проверяем, что матч соответствует клубу игрока и сопернику.
     final expectedHomeTeam = seasonMatch.isHome
@@ -2181,7 +2177,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
                   'assets/icons/table.svg',
                   width: 34,
                   height: 34,
-                  colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
           ],
@@ -2544,7 +2543,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
             AppStrings.seasonStats,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 17,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -2715,7 +2714,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
             value,
             style: const TextStyle(
               color: Color.fromARGB(255, 255, 255, 255),
-              fontSize: 20,
+              fontSize: 15,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -2724,7 +2723,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
             label,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 12,
+              fontSize: 11,
               fontWeight: FontWeight.w700,
             ),
           ),

@@ -147,6 +147,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
             style: const TextStyle(
               fontWeight: FontWeight.w900,
               letterSpacing: 1,
+              fontSize: 14,
             ),
           ),
           actions: [
@@ -166,9 +167,12 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                   children: [
                     SvgPicture.asset(
                       'assets/icons/table.svg',
-                      width: 32,
-                      height: 32,
-                      colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                      width: 30,
+                      height: 30,
+                      colorFilter: const ColorFilter.mode(
+                        Colors.white,
+                        BlendMode.srcIn,
+                      ),
                     ),
                     SizedBox(height: 2),
                     Text(
@@ -200,7 +204,7 @@ class _SuperLeagueSeasonScreenState extends State<SuperLeagueSeasonScreen> {
                     Icon(
                       Icons.calendar_month_rounded,
                       color: Color.fromARGB(255, 255, 255, 255),
-                      size: 32,
+                      size: 30,
                     ),
                     SizedBox(height: 2),
                     Text(
