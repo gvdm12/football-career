@@ -23,6 +23,7 @@ import 'package:flutter_football/screens/league_table/league_table_screen.dart';
 import 'package:flutter_football/screens/match/match_screen.dart';
 import 'package:flutter_football/screens/match/interactive_match_screen.dart';
 import 'package:flutter_football/screens/transfers/transfer_screen.dart';
+import 'package:flutter_football/widgets/jersey_number_picker.dart';
 import 'package:flutter_football/screens/world_cup_screen.dart';
 import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/screens/press_conference_dialog.dart';
@@ -2180,6 +2181,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
   }
 
   Future<void> _openTransferWindowAndStartSeason() async {
+    final previousClub = career.player.club;
     final transferResult = await Navigator.push<Career>(
       context,
       MaterialPageRoute(builder: (_) => TransferScreen(career: career)),
@@ -2194,7 +2196,27 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     // После трансферов сразу начинаем следующий сезон.
     // История текущего сезона уже сохранена до смены клуба.
-    final nextCareer = career.startNextSeason();
+    var nextCareer = career.startNextSeason();
+
+    // Если игрок остался в клубе, он может выбрать новый номер
+    // в начале сезона. После трансфера номер уже выбран в окне переходов.
+    if (nextCareer.player.club == previousClub) {
+      final jerseyNumber = await JerseyNumberPicker.show(
+        context: context,
+        takenNumbers: nextCareer.rivals
+            .map((rival) => rival.jerseyNumber)
+            .toSet(),
+        preferredNumber: nextCareer.player.jerseyNumber,
+        playerOverall: nextCareer.player.overall,
+        english: AppStrings.isEnglish,
+      );
+      if (!mounted) return;
+      if (jerseyNumber != null) {
+        nextCareer = nextCareer.copyWith(
+          player: nextCareer.player.copyWith(jerseyNumber: jerseyNumber),
+        );
+      }
+    }
 
     setState(() {
       career = nextCareer;
