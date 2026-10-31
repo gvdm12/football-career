@@ -16,6 +16,9 @@ import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/screens/development_screen.dart';
 import 'package:flutter_football/screens/home/home_screen.dart';
 import 'package:flutter_football/screens/player/player_screen.dart';
+import 'package:flutter_football/screens/coach_screen.dart';
+import 'package:flutter_football/screens/agent_screen.dart';
+import 'package:flutter_football/screens/news_screen.dart';
 import 'package:flutter_football/screens/league_table/league_table_screen.dart';
 import 'package:flutter_football/screens/match/match_screen.dart';
 import 'package:flutter_football/screens/match/interactive_match_screen.dart';
@@ -2108,6 +2111,30 @@ class _SeasonScreenState extends State<SeasonScreen> {
     await _saveCareer(updatedCareer);
   }
 
+  Future<void> _openCoach() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => CoachScreen(career: career)),
+    );
+  }
+
+  Future<void> _openAgent() async {
+    final updatedCareer = await Navigator.push<Career>(
+      context,
+      MaterialPageRoute(builder: (_) => AgentScreen(career: career)),
+    );
+    if (!mounted || updatedCareer == null) return;
+    setState(() => career = updatedCareer);
+    await _saveCareer(updatedCareer);
+  }
+
+  Future<void> _openNews() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => NewsScreen(career: career)),
+    );
+  }
+
   Future<void> _returnToHome() async {
     await _saveCareer(career);
     if (!mounted) return;
@@ -2191,6 +2218,30 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 onTap: () {
                   Navigator.pop(context);
                   _openPlayerProfile();
+                },
+              ),
+              _drawerItem(
+                icon: Icons.sports,
+                title: AppStrings.coachMenu,
+                onTap: () {
+                  Navigator.pop(context);
+                  _openCoach();
+                },
+              ),
+              _drawerItem(
+                icon: Icons.handshake_outlined,
+                title: AppStrings.agentMenu,
+                onTap: () {
+                  Navigator.pop(context);
+                  _openAgent();
+                },
+              ),
+              _drawerItem(
+                icon: Icons.newspaper_outlined,
+                title: AppStrings.newsMenu,
+                onTap: () {
+                  Navigator.pop(context);
+                  _openNews();
                 },
               ),
               _drawerItem(
