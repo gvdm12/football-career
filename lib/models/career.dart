@@ -611,7 +611,7 @@ class Career {
           ((averageRating! * matches) + match.playerRating) / newMatches;
     }
 
-    return copyWith(
+    final updatedCareer = copyWith(
       matches: newMatches,
       goals: newGoals,
       assists: newAssists,
@@ -620,6 +620,14 @@ class Career {
       averageRating: double.parse(newAverageRating.toStringAsFixed(2)),
       news: [...news, ...matchNews],
     ).advanceAfterCompetitionMatch(playerParticipated: true);
+
+    if (match.injuryName != null && match.injuryMatchesRemaining > 0) {
+      return updatedCareer.copyWith(
+        injuryName: match.injuryName,
+        injuryMatchesRemaining: match.injuryMatchesRemaining,
+      );
+    }
+    return updatedCareer;
   }
 
   // ============================================================
