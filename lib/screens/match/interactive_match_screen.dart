@@ -327,6 +327,18 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       return;
     }
 
+    if ((position == PlayerPosition.forward ||
+            position == PlayerPosition.midfielder) &&
+        roll >= 0.29 && roll < 0.37) {
+      _phase = 'pressingTrap';
+      _momentTitle = 'Командный прессинг';
+      _momentDescription =
+          'Соперник получил мяч у боковой линии. Вы можете закрыть ближайшую передачу или совместно с партнёром начать давление.';
+      _event = '$_minute-я минута. Команда включает прессинг.';
+      _momentReady = true;
+      return;
+    }
+
     if (position == PlayerPosition.goalkeeper) {
       if (roll < 0.58) {
         _phase = 'goalkeeper';
@@ -410,10 +422,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           _momentDescription =
               'Вы получили мяч у своей штрафной. Важно начать атаку без риска потери.';
         } else if (roll < 0.90) {
-          _phase = 'wideAttack';
-          _momentTitle = 'Подключение защитника';
+          _phase = 'overlapRun';
+          _momentTitle = 'Подключение по внешнему флангу';
           _momentDescription =
-              'Вы подключились к атаке по флангу. Можно выполнить навес или сыграть с партнёром.';
+              'Партнёр сместился с мячом в центр, а вы свободны на фланге. Можно сделать рывок, получить передачу и прострелить.';
         } else {
           _phase = 'midfield';
           _momentTitle = 'Продвижение с мячом';
@@ -501,6 +513,27 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       return [
         _actionButton('Удар головой', 'header'),
         _actionButton('Сбросить мяч партнёру', 'pass'),
+      ];
+    }
+    if (_phase == 'overlapRun') {
+      return [
+        _actionButton('Рвануть по флангу и прострелить', 'cross'),
+        _actionButton('Сыграть в короткую стенку', 'pass'),
+        _actionButton('Продвинуть мяч самостоятельно', 'dribble'),
+      ];
+    }
+    if (_phase == 'cutback') {
+      return [
+        _actionButton('Пробить с линии вратарской', 'shoot'),
+        _actionButton('Отдать пас под удар партнёру', 'throughPass'),
+        _actionButton('Пропустить мяч партнёру', 'contain'),
+      ];
+    }
+    if (_phase == 'pressingTrap') {
+      return [
+        _actionButton('Вместе с партнёром закрыть пас', 'intercept'),
+        _actionButton('Атаковать игрока с мячом', 'press'),
+        _actionButton('Сдержать соперника и закрыть центр', 'contain'),
       ];
     }
     if (_phase == 'wideAttack') {
@@ -616,7 +649,6 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       if (_random.nextDouble() < passChance) {
         _phase = 'chance';
         _rating += 0.32;
-        _playerAssists++;
         _advanceClock(
           'Вы вовремя отдали пас партнёру — он выходит на ударную позицию!',
         );
@@ -772,9 +804,15 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       if (success) {
         _rating += 0.25;
         if (action == 'cross') {
-          _phase = 'aerialChance';
-          message =
-              'Навес получился точным. Мяч летит в штрафную — готовьтесь к верховой борьбе.';
+          if (_phase == 'wideAttack' && _random.nextDouble() < 0.38) {
+            _phase = 'cutback';
+            message =
+                'Вы прострелили назад под удар. Партнёр встречает мяч у линии вратарской!';
+          } else {
+            _phase = 'aerialChance';
+            message =
+                'Навес получился точным. Мяч летит в штрафную — готовьтесь к верховой борьбе.';
+          }
         } else if (_phase == 'midfield' || _phase == 'buildUp') {
           _phase = action == 'throughPass' ? 'chance' : 'finalThird';
           message = action == 'throughPass'
