@@ -166,6 +166,9 @@ class WorldCupMatch {
     int playerShooting = 60,
     int playerPassing = 60,
     int playerDribbling = 60,
+    int? playerGoalsOverride,
+    int? playerAssistsOverride,
+    double? playerRatingOverride,
   }) {
     final random = Random();
     var homeStrength = worldCupStrengthOf(homeTeam).toDouble();
@@ -241,6 +244,22 @@ class WorldCupMatch {
               .clamp(4.5, 10.0)
               .toDouble();
       rating = double.parse(rating.toStringAsFixed(1));
+    }
+
+    if (playerGoalsOverride != null) {
+      scoredByPlayer = playerGoalsOverride.clamp(
+        0,
+        playerTeam == homeTeam ? home : away,
+      );
+    }
+    if (playerAssistsOverride != null) {
+      assistedByPlayer = playerAssistsOverride.clamp(
+        0,
+        max(0, (playerTeam == homeTeam ? home : away) - scoredByPlayer),
+      );
+    }
+    if (playerRatingOverride != null) {
+      rating = playerRatingOverride;
     }
 
     return WorldCupMatch(
@@ -380,13 +399,55 @@ class WorldCup {
     );
   }
 
-  WorldCup playMatch(int index, {int? homeGoals, int? awayGoals}) {
+  WorldCup playMatch(
+    int index, {
+    int? homeGoals,
+    int? awayGoals,
+    String? playerTeam,
+    int playerOverall = 70,
+    String playerPosition = 'forward',
+    int playerShooting = 60,
+    int playerPassing = 60,
+    int playerDribbling = 60,
+    int? playerGoalsOverride,
+    int? playerAssistsOverride,
+    double? playerRatingOverride,
+  }) {
     if (isCompleted || index < 0 || index >= matches.length) return this;
     final updated = [...matches];
     final match = updated[index];
     if (match.isPlayed) return this;
-    updated[index] = match.play(homeScore: homeGoals, awayScore: awayGoals);
-    final updatedCup = copyWith(matches: updated);
+    final played = match.play(
+      homeScore: homeGoals,
+      awayScore: awayGoals,
+      playerTeam: playerTeam,
+      playerOverall: playerOverall,
+      playerPosition: playerPosition,
+      playerShooting: playerShooting,
+      playerPassing: playerPassing,
+      playerDribbling: playerDribbling,
+      playerGoalsOverride: playerGoalsOverride,
+      playerAssistsOverride: playerAssistsOverride,
+      playerRatingOverride: playerRatingOverride,
+    );
+    updated[index] = played;
+
+    final hasPlayer = playerTeam == match.homeTeam ||
+        playerTeam == match.awayTeam;
+    var updatedCup = copyWith(matches: updated);
+    if (hasPlayer && played.playerRating != null) {
+      final nextMatches = playerMatches + 1;
+      final nextRatingTotal =
+          (playerAverageRating ?? 0) * playerMatches + played.playerRating!;
+      updatedCup = updatedCup.copyWith(
+        playerMatches: nextMatches,
+        playerGoals: playerGoals + played.playerGoals,
+        playerAssists: playerAssists + played.playerAssists,
+        playerAverageRating: double.parse(
+          (nextRatingTotal / nextMatches).toStringAsFixed(2),
+        ),
+      );
+    }
     return updatedCup.matches.every((item) => item.isPlayed)
         ? updatedCup._advanceRound()
         : updatedCup;
