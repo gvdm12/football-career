@@ -44,6 +44,80 @@ class _TransferScreenState extends State<TransferScreen> {
     Navigator.pop(context, career);
   }
 
+  void _upgradeAgent() {
+    if (career.agentLevel >= 3) return;
+    final cost = career.agentLevel == 1 ? 15000 : 35000;
+    if (career.money < cost) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.agentNotEnoughMoney)),
+      );
+      return;
+    }
+
+    setState(() {
+      career = career.copyWith(
+        money: career.money - cost,
+        agentLevel: career.agentLevel + 1,
+      );
+      _generateTransferOffers();
+    });
+  }
+
+  Widget _buildAgentCard() {
+    final level = career.agentLevel;
+    final cost = level == 1 ? 15000 : 35000;
+    final isMax = level >= 3;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF102B17),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF397B43)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppStrings.agent,
+            style: const TextStyle(
+              color: Color(0xFF8BE07F),
+              fontSize: 11,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            AppStrings.agentLevel(level),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            AppStrings.agentBonus((level - 1) * 4),
+            style: const TextStyle(color: Colors.white70, fontSize: 12),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: isMax || career.money < cost ? null : _upgradeAgent,
+              child: Text(
+                isMax
+                    ? AppStrings.agentMaxLevel
+                    : '${AppStrings.upgradeAgent} · €${_formatMoney(cost)}',
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   String _contractDuration(int years) {
     return AppStrings.transferContractDuration(years);
   }
@@ -94,6 +168,10 @@ class _TransferScreenState extends State<TransferScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 _buildHeader(),
+
+                const SizedBox(height: 10),
+
+                _buildAgentCard(),
 
                 const SizedBox(height: 10),
 
