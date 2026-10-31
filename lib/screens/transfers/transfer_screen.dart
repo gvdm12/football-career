@@ -35,6 +35,11 @@ class _TransferScreenState extends State<TransferScreen> {
 
   Future<void> _acceptTransfer(TransferOffer offer) async {
     final newCareer = career.acceptTransfer(offer);
+    if (offer.isRenewal) {
+      Navigator.pop(context, newCareer);
+      return;
+    }
+
     final jerseyNumber = await JerseyNumberPicker.show(
       context: context,
       takenNumbers: newCareer.rivals.map((rival) => rival.jerseyNumber).toSet(),
