@@ -1,4 +1,5 @@
 import 'club.dart';
+import 'position_rival.dart';
 
 enum PlayerStatus { starter, rotation, substitute }
 
@@ -19,38 +20,38 @@ class PlayerStatusCalculator {
   static PlayerStatus calculate({
     required int overall,
     required String clubName,
+    List<PositionRival> rivals = const [],
   }) {
     final club = Clubs.getByName(clubName);
     final difference = club.strength - overall;
 
-    // Сильный игрок должен быть основным даже
-    // в клубе, который немного превосходит его.
+    PlayerStatus status;
+
+    // Сначала оцениваем уровень игрока относительно силы клуба.
     if (overall >= 80 && difference <= 10) {
-      return PlayerStatus.starter;
+      status = PlayerStatus.starter;
+    } else if (overall >= 76 && difference <= 4) {
+      status = PlayerStatus.starter;
+    } else if (overall >= 70 && difference <= 10) {
+      status = PlayerStatus.rotation;
+    } else if (overall >= 60 && difference >= 5 && difference <= 9) {
+      status = PlayerStatus.rotation;
+    } else if (difference <= 4) {
+      status = PlayerStatus.starter;
+    } else {
+      status = PlayerStatus.substitute;
     }
 
-    // Игроки с рейтингом 76–79 могут быть основными,
-    // если клуб не превосходит их больше чем на 4 пункта.
-    if (overall >= 76 && difference <= 4) {
-      return PlayerStatus.starter;
-    }
+    // Два более сильных конкурента отодвигают игрока в запас.
+    // Форма влияет на борьбу, но не заменяет общий рейтинг.
+    final strongerRivals = rivals.where(
+      (rival) => rival.overall + rival.form > overall,
+    ).length;
 
-    // Игроки с рейтингом 70–79 при заметно более
-    // сильном клубе обычно относятся к ротации.
-    if (overall >= 70 && difference <= 10) {
+    if (strongerRivals >= 2) return PlayerStatus.substitute;
+    if (strongerRivals == 1 && status == PlayerStatus.starter) {
       return PlayerStatus.rotation;
     }
-
-    // Для игроков с рейтингом 60–69 разница в 5–9
-    // пунктов означает ротацию, а 10 и более — запас.
-    if (overall >= 60 && difference >= 5 && difference <= 9) {
-      return PlayerStatus.rotation;
-    }
-
-    if (difference <= 4) {
-      return PlayerStatus.starter;
-    }
-
-    return PlayerStatus.substitute;
+    return status;
   }
 }
