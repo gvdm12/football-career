@@ -74,7 +74,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   void initState() {
     super.initState();
     final playerTeamName = widget.playerTeamName ?? _player.club;
-    final playerStrength = widget.playerTeamStrength ??
+    final playerStrength =
+        widget.playerTeamStrength ??
         Clubs.effectiveStrength(
           clubName: _player.club,
           playerClub: _player.club,
@@ -311,7 +312,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     }
     if ((position == PlayerPosition.midfielder ||
             position == PlayerPosition.defender) &&
-        roll >= 0.10 && roll < 0.19) {
+        roll >= 0.10 &&
+        roll < 0.19) {
       _phase = 'secondBall';
       _momentTitle = 'Подбор мяча';
       _momentDescription =
@@ -320,8 +322,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _momentReady = true;
       return;
     }
-    if (position == PlayerPosition.midfielder &&
-        roll >= 0.19 && roll < 0.29) {
+    if (position == PlayerPosition.midfielder && roll >= 0.19 && roll < 0.29) {
       _phase = 'counterAttack';
       _momentTitle = 'Контратака';
       _momentDescription =
@@ -330,8 +331,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _momentReady = true;
       return;
     }
-    if (position == PlayerPosition.defender &&
-        roll >= 0.19 && roll < 0.29) {
+    if (position == PlayerPosition.defender && roll >= 0.19 && roll < 0.29) {
       _phase = 'defensiveLine';
       _momentTitle = 'Линия обороны';
       _momentDescription =
@@ -343,7 +343,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
 
     if ((position == PlayerPosition.forward ||
             position == PlayerPosition.midfielder) &&
-        roll >= 0.29 && roll < 0.37) {
+        roll >= 0.29 &&
+        roll < 0.37) {
       _phase = 'pressingTrap';
       _momentTitle = 'Командный прессинг';
       _momentDescription =
@@ -658,8 +659,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       return;
     }
     if (action == 'twoOnOnePass') {
-      final passChance = (0.66 + (_player.skills.passing - 60) * 0.004)
-          .clamp(0.35, 0.90);
+      final passChance = (0.66 + (_player.skills.passing - 60) * 0.004).clamp(
+        0.35,
+        0.90,
+      );
       if (_random.nextDouble() < passChance) {
         _rating += 0.32;
         final partnerScores = _random.nextDouble() < 0.48;
@@ -691,10 +694,11 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       action = 'shoot';
     }
     if (action == 'press' || action == 'recover') {
-      final pressChance = (0.48 +
-              (_player.skills.pace - 60) * 0.004 +
-              (_player.skills.defending - 60) * 0.003)
-          .clamp(0.20, 0.82);
+      final pressChance =
+          (0.48 +
+                  (_player.skills.pace - 60) * 0.004 +
+                  (_player.skills.defending - 60) * 0.003)
+              .clamp(0.20, 0.82);
       if (action == 'press' && _random.nextDouble() < pressChance) {
         _phase = 'midfield';
         _rating += 0.20;
@@ -710,9 +714,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       } else {
         _phase = 'defend';
         _rating -= 0.12;
-        _advanceClock(
-          'Соперник вышел из-под давления и продвинул мяч вперёд.',
-        );
+        _advanceClock('Соперник вышел из-под давления и продвинул мяч вперёд.');
       }
       return;
     }
@@ -949,7 +951,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     if (_playerUnavailable) {
       _createMoment();
     } else {
-      final isFollowUp = _phase == 'chance' ||
+      final isFollowUp =
+          _phase == 'chance' ||
           _phase == 'aerialChance' ||
           _phase == 'finalThird' ||
           _phase == 'cutback';
@@ -1089,12 +1092,17 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                 if (_finished || !_playerPlayed)
                   SizedBox(
                     width: double.infinity,
+                    height: 44,
                     child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                      ),
                       onPressed: _finish,
                       child: const Text('Завершить матч'),
                     ),
                   ),
-                if (!_playerPlayed && !_finished) const SizedBox(height: 4),
+                if (!_playerPlayed && !_finished) const SizedBox(height: 6),
                 if (_playerPlayed)
                   Text(
                     'Ваш рейтинг: ${_rating.clamp(4.0, 10.0).toStringAsFixed(1)}',

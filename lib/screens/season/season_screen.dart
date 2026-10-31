@@ -52,13 +52,12 @@ class _SeasonScreenState extends State<SeasonScreen> {
   bool _canPlayInteractiveMatch({
     required String opponent,
     required bool isHome,
-  }) =>
-      Match.willPlayerPlay(
-        player: career.player,
-        career: career,
-        opponent: opponent,
-        isHome: isHome,
-      );
+  }) => Match.willPlayerPlay(
+    player: career.player,
+    career: career,
+    opponent: opponent,
+    isHome: isHome,
+  );
 
   bool get worldCupBlocksSeason {
     final tournament = career.worldCup;
@@ -980,7 +979,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
     }
   }
 
-  Future<void> _playMatch(SeasonMatch seasonMatch, {required bool interactive}) async {
+  Future<void> _playMatch(
+    SeasonMatch seasonMatch, {
+    required bool interactive,
+  }) async {
     if (isSaving || seasonFinishing || seasonMatch.isPlayed) return;
     final playerStatus = PlayerStatusCalculator.calculate(
       overall: career.player.overall,
@@ -1667,7 +1669,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
   //   });
   // }
 
-  Future<void> _playCupMatch(CupMatch cupMatch, {required bool interactive}) async {
+  Future<void> _playCupMatch(
+    CupMatch cupMatch, {
+    required bool interactive,
+  }) async {
     if (isSaving || seasonFinishing || cupMatch.isPlayed) return;
     final cup = career.domesticCup;
     if (cup == null) return;
@@ -2983,7 +2988,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
                   onPressed: isSaving || seasonFinishing
                       ? null
                       : () => _playMatch(match, interactive: false),
-                  icon: const Icon(Icons.fast_forward_rounded, size: 18),
                   label: const Text('Симуляция'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFE8EDE8),
@@ -3002,7 +3006,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                     onPressed: isSaving || seasonFinishing
                         ? null
                         : () => _playMatch(match, interactive: true),
-                    icon: const Icon(Icons.sports_soccer_rounded, size: 18),
+                    icon: const Icon(Icons.sports_soccer, size: 18),
                     label: const Text('Играть'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF22C55E),
@@ -3016,7 +3020,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 ),
               ],
             ],
-          )
+          ),
         ],
       ),
     );
@@ -3132,7 +3136,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 ),
               ],
             ],
-          )
+          ),
         ],
       ),
     );
@@ -3387,7 +3391,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
                         child: ElevatedButton(
                           onPressed: isSaving || seasonFinishing
                               ? null
-                              : () => _playChampionsLeagueMatch(interactive: false),
+                              : () => _playChampionsLeagueMatch(
+                                  interactive: false,
+                                ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF8DB8FF),
                             foregroundColor: const Color(0xFF071526),
@@ -3402,7 +3408,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
                           child: ElevatedButton(
                             onPressed: isSaving || seasonFinishing
                                 ? null
-                                : () => _playChampionsLeagueMatch(interactive: true),
+                                : () => _playChampionsLeagueMatch(
+                                    interactive: true,
+                                  ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF22C55E),
                               foregroundColor: const Color(0xFF06210D),
@@ -3413,7 +3421,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                         ),
                       ],
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
@@ -3540,7 +3548,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
                         child: ElevatedButton(
                           onPressed: isSaving || seasonFinishing
                               ? null
-                              : () => _playEuropaLeagueMatch(interactive: false),
+                              : () =>
+                                    _playEuropaLeagueMatch(interactive: false),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFFFFC857),
                             foregroundColor: const Color(0xFF1A1204),
@@ -3555,7 +3564,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
                           child: ElevatedButton(
                             onPressed: isSaving || seasonFinishing
                                 ? null
-                                : () => _playEuropaLeagueMatch(interactive: true),
+                                : () =>
+                                      _playEuropaLeagueMatch(interactive: true),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF22C55E),
                               foregroundColor: const Color(0xFF06210D),
@@ -3566,7 +3576,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                         ),
                       ],
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
