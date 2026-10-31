@@ -16,6 +16,7 @@ class InteractiveMatchScreen extends StatefulWidget {
   final int? playerTeamStrength;
   final int? opponentStrength;
   final bool forcePlayerParticipation;
+  final bool? playerWillPlay;
 
   const InteractiveMatchScreen({
     super.key,
@@ -26,6 +27,7 @@ class InteractiveMatchScreen extends StatefulWidget {
     this.playerTeamStrength,
     this.opponentStrength,
     this.forcePlayerParticipation = false,
+    this.playerWillPlay,
   });
 
   @override
@@ -88,9 +90,15 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       overall: _player.overall,
       clubName: _player.club,
     );
-    _playerPlayed = !widget.career.isInjured &&
-        (widget.forcePlayerParticipation ||
-            status != PlayerStatus.substitute);
+    _playerPlayed = widget.forcePlayerParticipation
+        ? !widget.career.isInjured
+        : (widget.playerWillPlay ??
+              Match.willPlayerPlay(
+                player: _player,
+                career: widget.career,
+                opponent: widget.opponent,
+                isHome: widget.isHome,
+              ));
     _playerOnPitch = _playerPlayed;
     _homeGoals = 0;
     _awayGoals = 0;
