@@ -6,6 +6,7 @@ import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/match.dart';
 import 'package:flutter_football/services/app_strings.dart';
+import 'package:flutter_football/screens/press_conference_dialog.dart';
 
 class MatchScreen extends StatelessWidget {
   final Career career;
@@ -40,19 +41,21 @@ class MatchScreen extends StatelessWidget {
     return const Color(0xFFFF7777);
   }
 
-  String? _pressConferencePrompt() {
+  String? _pressConferenceCategory() {
     if (!match.playerPlayed) return null;
 
     final playedBefore = career.seasonMatches.where((item) => item.isPlayed).length;
     final totalMatches = career.seasonMatches.length;
 
-    if (isTournamentDecider) return AppStrings.pressConferenceTournament;
-    if (!isCupMatch && playedBefore == 0) return AppStrings.pressConferenceSeasonStart;
-    if (!isCupMatch && totalMatches > 2 && playedBefore == (totalMatches / 2).round()) {
-      return AppStrings.pressConferenceSeasonMiddle;
+    if (isTournamentDecider) return 'tournament';
+    if (!isCupMatch && playedBefore == 0) return 'seasonStart';
+    if (!isCupMatch &&
+        totalMatches > 2 &&
+        playedBefore == (totalMatches / 2).round()) {
+      return 'seasonMiddle';
     }
     if (!isCupMatch && totalMatches > 0 && playedBefore >= totalMatches - 1) {
-      return AppStrings.pressConferenceSeasonEnd;
+      return 'seasonEnd';
     }
 
     final outstanding = match.playerRating >= 8.5 ||
@@ -60,73 +63,37 @@ class MatchScreen extends StatelessWidget {
         match.playerGoals + match.playerAssists >= 3;
     final poor = match.playerRating <= 5.5;
 
-    if (outstanding && Random().nextDouble() < 0.72) {
-      return AppStrings.pressConferenceGreatMatch;
-    }
-    if (poor && Random().nextDouble() < 0.62) {
-      return AppStrings.pressConferenceBadMatch;
-    }
+    if (outstanding && Random().nextDouble() < 0.82) return 'great';
+    if (poor && Random().nextDouble() < 0.72) return 'poor';
 
-    // В кубковых матчах беседа появляется не автоматически, а только
-    // после заметного результата или болезненного вылета.
     if (isCupMatch &&
         (match.isPlayerLoss(career.player.club) || outstanding) &&
-        Random().nextDouble() < 0.35) {
-      return AppStrings.pressConferenceTournament;
+        Random().nextDouble() < 0.55) {
+      return 'tournament';
     }
 
+    // Иногда журналисты задают обычные вопросы даже после рядового матча.
+    if (Random().nextDouble() < 0.18) return 'normal';
     return null;
   }
 
   Future<void> _finishMatch(BuildContext context) async {
     var updatedCareer = career.afterMatch(match);
-    final prompt = _pressConferencePrompt();
+    final category = _pressConferenceCategory();
 
-    if (prompt != null) {
-      final response = await showDialog<int>(
+    if (category != null) {
+      final content = PressConferenceContentFactory.create(
+        category: category,
+        english: AppStrings.isEnglish,
+      );
+      final trustChange = await PressConferenceDialog.show(
         context: context,
-        barrierDismissible: true,
-        builder: (dialogContext) => AlertDialog(
-          backgroundColor: const Color(0xFF102B17),
-          title: Text(
-            AppStrings.pressConferenceTitle,
-            style: const TextStyle(
-              color: Color(0xFF8BE07F),
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          content: Text(
-            prompt,
-            style: const TextStyle(color: Colors.white70),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext, 0),
-              child: Text(AppStrings.skipPressConference),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext, 1),
-              child: Text(AppStrings.pressConferenceTeamFirst),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext, 2),
-              child: Text(AppStrings.pressConferenceConfident),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext, 3),
-              child: Text(AppStrings.pressConferenceDemand),
-            ),
-          ],
-        ),
+        content: content,
+        title: AppStrings.pressConferenceTitle,
+        skipLabel: AppStrings.skipPressConference,
       );
 
-      final trustChange = switch (response) {
-        1 => 2,
-        2 => 1,
-        3 => -2,
-        _ => 0,
-      };
-      if (trustChange != 0) {
+      if (trustChange != null && trustChange != 0) {
         updatedCareer = updatedCareer.copyWith(
           coachTrust: (updatedCareer.coachTrust + trustChange)
               .clamp(0, 100)
