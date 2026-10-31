@@ -33,7 +33,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
       overall: player.overall,
       clubName: player.club,
       rivals: career.rivals,
-      rivals: career.rivals,
     );
   }
 
