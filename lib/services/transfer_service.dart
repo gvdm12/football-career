@@ -387,6 +387,41 @@ class TransferService {
     }).toList();
   }
 
+  /// Объединяет прежнюю систему трансферов и предложения через агента.
+  /// Обычные предложения не получают бонусов уровня агента.
+  static List<TransferOffer> generateCombinedOffers(Career career) {
+    final ordinary = generateOffers(career.copyWith(agentLevel: 1));
+    final ordinaryCount = ordinary.isEmpty ? 0 : 1 + _random.nextInt(2);
+    final selected = <TransferOffer>[];
+
+    for (final offer in ordinary.take(ordinaryCount)) {
+      selected.add(TransferOffer(
+        club: offer.club,
+        salary: offer.salary,
+        contractYears: offer.contractYears,
+      ));
+    }
+
+    // Агент открывает дополнительные варианты. Повторно тот же клуб
+    // в списке предложений не появляется.
+    final agentOffers = generateOffers(career)
+        .where((offer) => !selected.any((item) => item.club.name == offer.club.name))
+        .toList()
+      ..shuffle(_random);
+
+    final agentCount = agentOffers.isEmpty ? 0 : 1 + _random.nextInt(2);
+    for (final offer in agentOffers.take(agentCount)) {
+      selected.add(TransferOffer(
+        club: offer.club,
+        salary: offer.salary,
+        contractYears: offer.contractYears,
+        isAgentOffer: true,
+      ));
+    }
+
+    return selected;
+  }
+
   /// Предложение о продлении контракта с текущим клубом.
   static TransferOffer? generateRenewalOffer(Career career) {
     if (career.player.club == 'Без клуба') return null;
