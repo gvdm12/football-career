@@ -404,9 +404,12 @@ class TransferService {
 
     // Агент открывает дополнительные варианты. Повторно тот же клуб
     // в списке предложений не появляется.
-    final agentOffers = career.agentInterestedClubs.isNotEmpty
+    final agentOffers = (career.agentInterestedClubs.isNotEmpty
         ? generateAgentOffersFromInterest(career)
-        : generateOffers(career).where((offer) => !selected.any((item) => item.club.name == offer.club.name)).toList();
+        : generateOffers(career))
+        .where((offer) => !selected.any((item) => item.club.name == offer.club.name))
+        .toList()
+      ..shuffle(_random);
 
     final agentCount = agentOffers.isEmpty ? 0 : 1 + _random.nextInt(2);
     for (final offer in agentOffers.take(agentCount)) {
