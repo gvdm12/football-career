@@ -21,6 +21,7 @@ class Career {
   final List<SeasonStats> history;
   final List<CareerNews> news;
   final List<PositionRival> rivals;
+  final int coachTrust;
 
   final int matches;
   final int goals;
@@ -71,6 +72,7 @@ class Career {
     required this.leagueMatches,
     this.news = const [],
     this.rivals = const [],
+    this.coachTrust = 65,
     required this.monthlySalary,
     required this.isCareerFinished,
     this.domesticCup,
@@ -277,6 +279,7 @@ class Career {
       'leagueMatches': leagueMatches.map((item) => item.toJson()).toList(),
       'news': news.map((item) => item.toJson()).toList(),
       'rivals': rivals.map((item) => item.toJson()).toList(),
+      'coachTrust': coachTrust,
       'monthlySalary': monthlySalary,
       'isCareerFinished': isCareerFinished,
       'domesticCup': domesticCup?.toJson(),
@@ -423,6 +426,7 @@ class Career {
       rivals: readList('rivals', PositionRival.fromJson).isNotEmpty
           ? readList('rivals', PositionRival.fromJson)
           : PositionRival.generate(player: loadedPlayer, season: currentSeason),
+      coachTrust: ((json['coachTrust'] as num?)?.toInt() ?? 65).clamp(0, 100).toInt(),
       monthlySalary: (json['monthlySalary'] as num?)?.toInt() ?? 0,
       isCareerFinished: json['isCareerFinished'] as bool? ?? false,
       domesticCup: restoredCup,
@@ -462,6 +466,7 @@ class Career {
     List<LeagueMatch>? leagueMatches,
     List<CareerNews>? news,
     List<PositionRival>? rivals,
+    int? coachTrust,
     int? monthlySalary,
     bool? isCareerFinished,
     DomesticCup? domesticCup,
@@ -491,6 +496,7 @@ class Career {
       leagueMatches: leagueMatches ?? this.leagueMatches,
       news: news ?? this.news,
       rivals: rivals ?? this.rivals,
+      coachTrust: coachTrust ?? this.coachTrust,
       monthlySalary: monthlySalary ?? this.monthlySalary,
       isCareerFinished: isCareerFinished ?? this.isCareerFinished,
       domesticCup: domesticCup ?? this.domesticCup,
@@ -594,14 +600,27 @@ class Career {
   Career afterMatch(Match match) {
     // Конкуренты получают игровую практику даже тогда, когда игрок пропустил матч.
     final matchCareer = copyWith(rivals: PositionRival.advanceMatch(rivals));
+    final trustChange = !match.playerPlayed
+        ? -1
+        : match.playerRating >= 8.0
+        ? 3
+        : match.playerRating >= 7.0
+        ? 1
+        : match.playerRating < 6.0
+        ? -3
+        : match.playerRating < 6.5
+        ? -1
+        : 0;
+    final updatedTrust = (coachTrust + trustChange).clamp(0, 100).toInt();
+    final trustedCareer = matchCareer.copyWith(coachTrust: updatedTrust);
 
     // Травмированный игрок пропускает матч, но срок восстановления уменьшается.
     if (isInjured) {
-      return matchCareer.advanceAfterCompetitionMatch(playerParticipated: false);
+      return trustedCareer.advanceAfterCompetitionMatch(playerParticipated: false);
     }
 
     // Команда сыграла, но игрок не участвовал.
-    if (!match.playerPlayed) return matchCareer;
+    if (!match.playerPlayed) return trustedCareer;
 
     final newMatches = matches + 1;
 
@@ -624,14 +643,14 @@ class Career {
           ((averageRating! * matches) + match.playerRating) / newMatches;
     }
 
-    final updatedCareer = matchCareer.copyWith(
+    final updatedCareer = trustedCareer.copyWith(
       matches: newMatches,
       goals: newGoals,
       assists: newAssists,
       yellowCards: newYellowCards,
       redCards: newRedCards,
       averageRating: double.parse(newAverageRating.toStringAsFixed(2)),
-      news: [...matchCareer.news, ...matchNews],
+      news: [...trustedCareer.news, ...matchNews],
     ).advanceAfterCompetitionMatch(playerParticipated: true);
 
     if (match.injuryName != null && match.injuryMatchesRemaining > 0) {
