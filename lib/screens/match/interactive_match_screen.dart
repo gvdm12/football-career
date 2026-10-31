@@ -12,12 +12,20 @@ class InteractiveMatchScreen extends StatefulWidget {
   final Career career;
   final String opponent;
   final bool isHome;
+  final String? playerTeamName;
+  final int? playerTeamStrength;
+  final int? opponentStrength;
+  final bool forcePlayerParticipation;
 
   const InteractiveMatchScreen({
     super.key,
     required this.career,
     required this.opponent,
     required this.isHome,
+    this.playerTeamName,
+    this.playerTeamStrength,
+    this.opponentStrength,
+    this.forcePlayerParticipation = false,
   });
 
   @override
@@ -63,28 +71,26 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   @override
   void initState() {
     super.initState();
-    _homeTeam = widget.isHome ? _player.club : widget.opponent;
-    _awayTeam = widget.isHome ? widget.opponent : _player.club;
-    _homeStrength = widget.isHome
-        ? Clubs.effectiveStrength(
-            clubName: _player.club,
-            playerClub: _player.club,
-            playerOverall: _player.overall,
-          )
-        : Clubs.getByName(widget.opponent).strength;
-    _awayStrength = widget.isHome
-        ? Clubs.getByName(widget.opponent).strength
-        : Clubs.effectiveStrength(
-            clubName: _player.club,
-            playerClub: _player.club,
-            playerOverall: _player.overall,
-          );
+    final playerTeamName = widget.playerTeamName ?? _player.club;
+    final playerStrength = widget.playerTeamStrength ??
+        Clubs.effectiveStrength(
+          clubName: _player.club,
+          playerClub: _player.club,
+          playerOverall: _player.overall,
+        );
+    final opponentStrength =
+        widget.opponentStrength ?? Clubs.getByName(widget.opponent).strength;
+    _homeTeam = widget.isHome ? playerTeamName : widget.opponent;
+    _awayTeam = widget.isHome ? widget.opponent : playerTeamName;
+    _homeStrength = widget.isHome ? playerStrength : opponentStrength;
+    _awayStrength = widget.isHome ? opponentStrength : playerStrength;
     final status = PlayerStatusCalculator.calculate(
       overall: _player.overall,
       clubName: _player.club,
     );
     _playerPlayed = !widget.career.isInjured &&
-        status != PlayerStatus.substitute;
+        (widget.forcePlayerParticipation ||
+            status != PlayerStatus.substitute);
     _playerOnPitch = _playerPlayed;
     _homeGoals = 0;
     _awayGoals = 0;
