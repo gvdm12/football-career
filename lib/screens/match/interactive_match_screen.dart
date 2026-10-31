@@ -62,6 +62,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   late final bool _playerPlayed;
   late final int _homeStrength;
   late final int _awayStrength;
+  late double _homeXgRemaining;
+  late double _awayXgRemaining;
   late final String _homeTeam;
   late final String _awayTeam;
 
@@ -87,6 +89,23 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     _awayTeam = widget.isHome ? widget.opponent : playerTeamName;
     _homeStrength = widget.isHome ? playerStrength : opponentStrength;
     _awayStrength = widget.isHome ? opponentStrength : playerStrength;
+    final expectedGoals = Match.calculateExpectedGoals(
+      player: _player,
+      opponent: widget.opponent,
+      isHome: widget.isHome,
+      playerPlayed: true,
+      playerTeamStrength: playerStrength,
+      opponentStrength: opponentStrength,
+    );
+    final elapsedMinutes = 90 - (_minute);
+    _homeGoals = _samplePoisson(
+      expectedGoals.home * elapsedMinutes / 90,
+    );
+    _awayGoals = _samplePoisson(
+      expectedGoals.away * elapsedMinutes / 90,
+    );
+    _homeXgRemaining = expectedGoals.home * _minute / 90;
+    _awayXgRemaining = expectedGoals.away * _minute / 90;
     final status = PlayerStatusCalculator.calculate(
       overall: _player.overall,
       clubName: _player.club,
@@ -134,21 +153,52 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     super.dispose();
   }
 
+  int _samplePoisson(double lambda) {
+    final limit = exp(-lambda);
+    var product = 1.0;
+    var count = 0;
+    do {
+      count++;
+      product *= _random.nextDouble();
+    } while (product > limit);
+    return count - 1;
+  }
+
+  void _addGoal({required bool home}) {
+    if (home) {
+      _homeGoals++;
+      _homeXgRemaining = (_homeXgRemaining - 1).clamp(0.0, 2.8);
+    } else {
+      _awayGoals++;
+      _awayXgRemaining = (_awayXgRemaining - 1).clamp(0.0, 2.8);
+    }
+  }
+
   void _tickMatchClock(Timer timer) {
     if (!mounted || _finished || _momentReady) return;
     if (_minute < 90) _minute++;
 
-    final homeChance = (0.010 + (_homeStrength - _awayStrength) * 0.00012)
-        .clamp(0.004, 0.018);
-    final awayChance = (0.010 + (_awayStrength - _homeStrength) * 0.00012)
-        .clamp(0.004, 0.018);
-    if (_random.nextDouble() < homeChance) {
-      _homeGoals++;
+    final minutesRemaining = 91 - _minute;
+    final homeChance = Match.goalChancePerMinute(
+      expectedGoalsRemaining: _homeXgRemaining,
+      minutesRemaining: minutesRemaining,
+    );
+    final awayChance = Match.goalChancePerMinute(
+      expectedGoalsRemaining: _awayXgRemaining,
+      minutesRemaining: minutesRemaining,
+    );
+    final homeScored = _random.nextDouble() < homeChance;
+    final awayScored = _random.nextDouble() < awayChance;
+    if (homeScored) {
+      _addGoal(home: true);
       _event = 'ГОЛ! $_homeTeam забивает после атаки.';
-    } else if (_random.nextDouble() < awayChance) {
-      _awayGoals++;
+    }
+    if (awayScored) {
+      _addGoal(home: false);
       _event = 'ГОЛ! $_awayTeam забивает после быстрой атаки.';
-    } else if (_random.nextDouble() < 0.025) {
+    }
+    if (!homeScored && !awayScored && _random.nextDouble() < 0.025) {
+
       _event = _random.nextBool()
           ? 'Соперник проводит атаку, но защита успевает вернуться.'
           : 'Ваша команда контролирует мяч и ищет свободные зоны.';
@@ -670,9 +720,9 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         if (partnerScores) {
           _playerAssists++;
           if (widget.isHome) {
-            _homeGoals++;
+            _addGoal(home: true);
           } else {
-            _awayGoals++;
+            _addGoal(home: false);
           }
           _advanceClock(
             'Вы вывели партнёра на пустые ворота — ГОЛ! Отличная командная атака.',
@@ -728,9 +778,9 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       String penaltyMessage;
       if (scored) {
         if (widget.isHome) {
-          _homeGoals++;
+          _addGoal(home: true);
         } else {
-          _awayGoals++;
+          _addGoal(home: false);
         }
         _playerGoals++;
         _rating += 1.0;
@@ -793,9 +843,9 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           : 0.27;
       if (success && _random.nextDouble() < finishingChance) {
         if (widget.isHome) {
-          _homeGoals++;
+          _addGoal(home: true);
         } else {
-          _awayGoals++;
+          _addGoal(home: false);
         }
         _playerGoals++;
         _rating += 1.1;
@@ -819,9 +869,9 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
             : 'Отличная реакция! Вы поймали мяч и быстро начали атаку.';
       } else {
         if (widget.isHome) {
-          _awayGoals++;
+          _addGoal(home: false);
         } else {
-          _homeGoals++;
+          _addGoal(home: true);
         }
         _rating -= 0.35;
         _phase = 'buildUp';
@@ -867,9 +917,9 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
             : 'Удачная обводка! Вы освободились от опеки вблизи ворот.';
         if (_phase == 'chance' && _random.nextDouble() < 0.08) {
           if (widget.isHome) {
-            _homeGoals++;
+            _addGoal(home: true);
           } else {
-            _awayGoals++;
+            _addGoal(home: false);
           }
           _playerGoals++;
           message += ' Вы завершили проход голом!';
@@ -897,9 +947,9 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         message = 'Не удалось остановить атаку соперника.';
         if (_random.nextDouble() < 0.20) {
           if (widget.isHome) {
-            _awayGoals++;
+            _addGoal(home: false);
           } else {
-            _homeGoals++;
+            _addGoal(home: true);
           }
           message += ' Соперник забивает!';
         }
