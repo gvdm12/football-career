@@ -532,7 +532,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       return [
         _actionButton('Пробить с линии вратарской', 'shoot'),
         _actionButton('Отдать пас под удар партнёру', 'throughPass'),
-        _actionButton('Пропустить мяч партнёру', 'contain'),
+        _actionButton('Скинуть мяч партнёру под удар', 'throughPass'),
       ];
     }
     if (_phase == 'pressingTrap') {
@@ -653,11 +653,23 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       final passChance = (0.66 + (_player.skills.passing - 60) * 0.004)
           .clamp(0.35, 0.90);
       if (_random.nextDouble() < passChance) {
-        _phase = 'chance';
         _rating += 0.32;
-        _advanceClock(
-          'Вы вовремя отдали пас партнёру — он выходит на ударную позицию!',
-        );
+        _playerAssists++;
+        final partnerScores = _random.nextDouble() < 0.48;
+        if (partnerScores) {
+          if (widget.isHome) {
+            _homeGoals++;
+          } else {
+            _awayGoals++;
+          }
+          _advanceClock(
+            'Вы вывели партнёра на пустые ворота — ГОЛ! Отличная командная атака.',
+          );
+        } else {
+          _advanceClock(
+            'Пас прошёл! Партнёр пробил, но вратарь спас соперников.',
+          );
+        }
       } else {
         _phase = 'defend';
         _rating -= 0.18;
