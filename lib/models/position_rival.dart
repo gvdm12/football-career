@@ -114,18 +114,18 @@ class PositionRival {
   static List<PositionRival> advanceMatch(List<PositionRival> rivals) {
     final random = Random();
     return rivals.map((rival) {
-      if (random.nextDouble() > 0.25) return rival;
+      if (random.nextDouble() > 0.78) return rival;
       final matches = rival.matches + 1;
       var goals = 0;
       var assists = 0;
       switch (rival.position) {
         case PlayerPosition.forward:
-          if (random.nextDouble() < rival.overall / 145) goals = 1;
-          if (random.nextDouble() < 0.16) assists = 1;
+          if (random.nextDouble() < rival.overall / 260) goals = 1;
+          if (random.nextDouble() < 0.12) assists = 1;
           break;
         case PlayerPosition.midfielder:
-          if (random.nextDouble() < rival.overall / 280) goals = 1;
-          if (random.nextDouble() < 0.30) assists = 1;
+          if (random.nextDouble() < rival.overall / 500) goals = 1;
+          if (random.nextDouble() < 0.22) assists = 1;
           break;
         case PlayerPosition.defender:
           if (random.nextDouble() < 0.055) goals = 1;
