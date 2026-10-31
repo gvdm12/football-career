@@ -143,6 +143,10 @@ class AppStrings {
   static String get noInterestedClubs => _en ? 'No clubs are interested right now' : 'Сейчас нет заинтересованных клубов';
   static String get estimatedOffer => _en ? 'Estimated offer' : 'Предлагаемая зарплата';
   static String get agentFee => _en ? 'Agent development' : 'Развитие агента';
+  static String get gameCurrency => _en ? 'Game currency' : 'Игровая валюта';
+  static String get currencyRewardsHint => _en
+      ? 'Earn coins for appearances, goals, assists, strong ratings and season trophies.'
+      : 'Монеты начисляются за участие в матчах, голы, ассисты, высокие оценки и трофеи сезона.';
   static String get agentDescription => _en ? 'A stronger agent can negotiate better wages and attract more clubs.' : 'Более опытный агент помогает договариваться о зарплате и привлекать интерес клубов.';
   static String get skipPressConference => _en ? 'Skip' : 'Пропустить';
   static String get pressConferenceSeasonStart => _en ? 'The season has started. What are your goals?' : 'Сезон начался. Какие у вас цели?';
@@ -159,7 +163,7 @@ class AppStrings {
   static String get upgradeAgent => _en ? 'UPGRADE AGENT' : 'УЛУЧШИТЬ АГЕНТА';
   static String agentBonus(int percent) => _en ? '+$percent% to contract offers' : '+$percent% к зарплате в предложениях';
   static String get agentMaxLevel => _en ? 'Maximum agent level reached' : 'Достигнут максимальный уровень агента';
-  static String get agentNotEnoughMoney => _en ? 'Not enough money for agent upgrade' : 'Недостаточно денег для улучшения агента';
+  static String get agentNotEnoughMoney => _en ? 'Not enough game currency for agent upgrade' : 'Недостаточно игровой валюты для улучшения агента';
   static String get pressConferenceTitle => _en ? 'PRESS CONFERENCE' : 'ПРЕСС-КОНФЕРЕНЦИЯ';
   static String get pressConferenceQuestion => _en
       ? 'Journalists ask how you assess the match and your role in the team.'
