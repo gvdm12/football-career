@@ -92,6 +92,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     final status = PlayerStatusCalculator.calculate(
       overall: _player.overall,
       clubName: _player.club,
+      rivals: widget.career.rivals,
     );
     _playerPlayed = widget.forcePlayerParticipation
         ? !widget.career.isInjured
