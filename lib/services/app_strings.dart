@@ -138,7 +138,6 @@ class AppStrings {
   static String get agentProfileTitle => _en ? 'YOUR AGENT' : 'ВАШ АГЕНТ';
   static String get currentContract => _en ? 'Current contract' : 'Текущий контракт';
   static String get monthlyWage => _en ? 'Monthly salary' : 'Зарплата в месяц';
-  static String get contractRemaining => _en ? 'Contract remaining' : 'Осталось по контракту';
   static String get interestedClubs => _en ? 'Interested clubs' : 'Заинтересованные клубы';
   static String get noInterestedClubs => _en ? 'No clubs are interested right now' : 'Сейчас нет заинтересованных клубов';
   static String get estimatedOffer => _en ? 'Estimated offer' : 'Предлагаемая зарплата';
