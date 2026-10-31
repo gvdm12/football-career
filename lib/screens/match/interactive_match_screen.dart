@@ -85,7 +85,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     );
     _playerPlayed = baseMatch.playerPlayed;
     _playerOnPitch = baseMatch.playerPlayed;
-    _playerAssists = baseMatch.playerAssists;
+    _playerAssists = 0;
     // Сохраняем командные голы обычной модели, но заменяем
     // заранее сгенерированные голы игрока интерактивными эпизодами.
     _homeGoals = baseMatch.homeGoals - (widget.isHome ? baseMatch.playerGoals : 0);
