@@ -800,6 +800,21 @@ class Career {
                   (worldCupStats?.playerAverageRating ?? 0) * nationalMatches) /
               totalSeasonMatches;
 
+    final seasonRating = totalSeasonRating ?? 0;
+    if (totalSeasonMatches >= 15 && seasonRating >= 7.5 &&
+        totalSeasonGoals + totalSeasonAssists >= 15) {
+      achievements.add('Лучший игрок сезона');
+    }
+    if (player.age <= 21 && totalSeasonMatches >= 15 && seasonRating >= 7.0) {
+      achievements.add('Лучший молодой игрок сезона');
+    }
+    if (totalSeasonMatches >= 20 && seasonRating >= 7.2) {
+      achievements.add('В сборной сезона');
+    }
+    if (totalSeasonMatches >= 10 && totalSeasonAssists >= 15) {
+      achievements.add('Лучший ассистент');
+    }
+
     final seasonStats = SeasonStats(
       season: season,
       club: player.club,
@@ -820,8 +835,25 @@ class Career {
         ? 6
         : 3;
 
+    final awardNews = achievements
+        .where((item) => item == 'Лучший игрок сезона' ||
+            item == 'Лучший молодой игрок сезона' ||
+            item == 'В сборной сезона' ||
+            item == 'Лучший ассистент' ||
+            item == 'Золотая бутса')
+        .map((award) => CareerNews(
+              id: 's${season}_award_${award.hashCode}',
+              season: season,
+              matchNumber: seasonMatches.length + 1,
+              title: award,
+              description: '${player.name} получил награду «$award» по итогам сезона.',
+              type: CareerNewsType.achievement,
+            ))
+        .toList();
+
     var updatedCareer = copyWith(
       history: [...history, seasonStats],
+      news: [...news, ...awardNews],
       developmentPoints: pointsToAdd,
     );
     // Развитие навыков только со 2-го по 13-й сезон
