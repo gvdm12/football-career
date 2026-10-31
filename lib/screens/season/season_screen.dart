@@ -16,6 +16,7 @@ import 'package:flutter_football/screens/development_screen.dart';
 import 'package:flutter_football/screens/home/home_screen.dart';
 import 'package:flutter_football/screens/player/player_screen.dart';
 import 'package:flutter_football/screens/coach_screen.dart';
+import 'package:flutter_football/screens/team_screen.dart';
 import 'package:flutter_football/screens/agent_screen.dart';
 import 'package:flutter_football/screens/news_screen.dart';
 import 'package:flutter_football/screens/league_table/league_table_screen.dart';
@@ -2322,6 +2323,13 @@ class _SeasonScreenState extends State<SeasonScreen> {
     await _saveCareer(updatedCareer);
   }
 
+  Future<void> _openTeam() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => TeamScreen(career: career)),
+    );
+  }
+
   Future<void> _openCoach() async {
     await Navigator.push(
       context,
@@ -2429,6 +2437,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 onTap: () {
                   Navigator.pop(context);
                   _openPlayerProfile();
+                },
+              ),
+              _drawerItem(
+                icon: Icons.groups_2_outlined,
+                title: 'Команда',
+                onTap: () {
+                  Navigator.pop(context);
+                  _openTeam();
                 },
               ),
               _drawerItem(
