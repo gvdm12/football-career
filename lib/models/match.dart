@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter_football/models/club.dart';
-import 'package:flutter_football/models/player_status.dart';
 import 'player.dart';
 import 'career.dart';
 
