@@ -49,13 +49,16 @@ class _SeasonScreenState extends State<SeasonScreen> {
     career = widget.career;
   }
 
-  bool get _canPlayInteractiveMatch =>
-      !career.isInjured &&
-      PlayerStatusCalculator.calculate(
-            overall: career.player.overall,
-            clubName: career.player.club,
-          ) ==
-          PlayerStatus.starter;
+  bool _canPlayInteractiveMatch({
+    required String opponent,
+    required bool isHome,
+  }) =>
+      Match.willPlayerPlay(
+        player: career.player,
+        career: career,
+        opponent: opponent,
+        isHome: isHome,
+      );
 
   bool get worldCupBlocksSeason {
     final tournament = career.worldCup;
@@ -983,7 +986,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
       overall: career.player.overall,
       clubName: career.player.club,
     );
-    if (interactive && !_canPlayInteractiveMatch) {
+    if (interactive &&
+        !_canPlayInteractiveMatch(
+          opponent: seasonMatch.opponent,
+          isHome: seasonMatch.isHome,
+        )) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -1026,6 +1033,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
             career: career,
             opponent: seasonMatch.opponent,
             isHome: seasonMatch.isHome,
+            playerWillPlay: true,
           ),
         ),
       );
@@ -1224,7 +1232,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Future<void> _playChampionsLeagueMatch({required bool interactive}) async {
     if (isSaving || seasonFinishing) return;
-    if (interactive && !_canPlayInteractiveMatch) return;
+    if (interactive &&
+        !_canPlayInteractiveMatch(opponent: opponent, isHome: isHome)) {
+      return;
+    }
 
     final tournament = career.championsLeague;
     final tieIndex = currentChampionsLeagueTieIndex;
@@ -1253,6 +1264,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
             career: career,
             opponent: opponent,
             isHome: isHome,
+            playerWillPlay: true,
           ),
         ),
       );
@@ -1424,7 +1436,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Future<void> _playEuropaLeagueMatch({required bool interactive}) async {
     if (isSaving || seasonFinishing) return;
-    if (interactive && !_canPlayInteractiveMatch) return;
+    if (interactive &&
+        !_canPlayInteractiveMatch(opponent: opponent, isHome: isHome)) {
+      return;
+    }
 
     final tournament = career.europaLeague;
     final tieIndex = currentEuropaLeagueTieIndex;
@@ -1453,6 +1468,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
             career: career,
             opponent: opponent,
             isHome: isHome,
+            playerWillPlay: true,
           ),
         ),
       );
@@ -1653,7 +1669,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Future<void> _playCupMatch(CupMatch cupMatch, {required bool interactive}) async {
     if (isSaving || seasonFinishing || cupMatch.isPlayed) return;
-    if (interactive && !_canPlayInteractiveMatch) return;
+    if (interactive &&
+        !_canPlayInteractiveMatch(opponent: opponent, isHome: isHome)) {
+      return;
+    }
 
     final cup = career.domesticCup;
     if (cup == null) return;
@@ -1689,6 +1708,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
             career: career,
             opponent: opponent,
             isHome: isHome,
+            playerWillPlay: true,
           ),
         ),
       );
@@ -2908,7 +2928,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
   Widget _buildNextMatchCard(SeasonMatch match) {
     final playerColor = ClubColors.primary(career.player.club);
     final opponentColor = ClubColors.primary(match.opponent);
-    final interactiveAvailable = _canPlayInteractiveMatch;
+    final interactiveAvailable = _canPlayInteractiveMatch(
+      opponent: match.opponent,
+      isHome: match.isHome,
+    );
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -3014,7 +3037,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     final playerColor = ClubColors.primary(playerClub);
     final opponentColor = ClubColors.primary(opponent);
-    final interactiveAvailable = _canPlayInteractiveMatch;
+    final interactiveAvailable = _canPlayInteractiveMatch(
+      opponent: opponent,
+      isHome: isHome,
+    );
 
     return Container(
       padding: const EdgeInsets.all(16),
