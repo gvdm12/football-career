@@ -96,9 +96,9 @@ class PositionRival {
   }) {
     final random = Random((player.name + '|' + player.club + '|' + season.toString()).hashCode);
     final names = List<String>.from(_names[player.position]!)..shuffle(random);
-    return List.generate(count.clamp(1, 3), (index) {
+    return List.generate(count.clamp(1, 3).toInt(), (index) {
       final delta = random.nextInt(11) - 4;
-      final overall = (player.overall + delta).clamp(55, 95);
+      final overall = (player.overall + delta).clamp(55, 95).toInt();
       return PositionRival(
         id: 's' + season.toString() + '_' + player.position.name + '_' + (index + 1).toString(),
         name: names[index],
@@ -135,9 +135,9 @@ class PositionRival {
         case PlayerPosition.goalkeeper:
           break;
       }
-      final rating = (6.0 + random.nextDouble() * 2.0).clamp(5.0, 9.0);
+      final rating = (6.0 + random.nextDouble() * 2.0).clamp(5.0, 9.0).toDouble();
       final average = ((rival.averageRating * rival.matches) + rating) / matches;
-      final form = (rival.form + (rating >= 7.2 ? 1 : rating < 6.0 ? -1 : 0)).clamp(-5, 5);
+      final form = (rival.form + (rating >= 7.2 ? 1 : rating < 6.0 ? -1 : 0)).clamp(-5, 5).toInt();
       return rival.copyWith(
         matches: matches,
         goals: rival.goals + goals,
@@ -157,7 +157,7 @@ class PositionRival {
         name: rival.name,
         position: rival.position,
         age: age,
-        overall: (rival.overall + ageChange).clamp(50, 95),
+        overall: (rival.overall + ageChange).clamp(50, 95).toInt(),
         averageRating: 6.5,
       );
     }).toList();
