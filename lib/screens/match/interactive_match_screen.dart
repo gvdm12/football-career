@@ -167,10 +167,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   void _addGoal({required bool home}) {
     if (home) {
       _homeGoals++;
-      _homeXgRemaining = (_homeXgRemaining - 1).clamp(0.0, 2.8);
+      _homeXgRemaining = (_homeXgRemaining - 1).clamp(0.0, 2.8).toDouble();
     } else {
       _awayGoals++;
-      _awayXgRemaining = (_awayXgRemaining - 1).clamp(0.0, 2.8);
+      _awayXgRemaining = (_awayXgRemaining - 1).clamp(0.0, 2.8).toDouble();
     }
   }
 
