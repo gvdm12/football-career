@@ -8,6 +8,7 @@ import 'package:flutter_football/screens/match/interactive_match_screen.dart';
 import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/services/career_storage.dart';
 import 'package:flutter_football/services/app_strings.dart';
+import 'package:flutter_football/screens/press_conference_dialog.dart';
 
 class WorldCupScreen extends StatefulWidget {
   final Career career;
@@ -190,53 +191,22 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
           (poor && Random().nextDouble() < 0.62);
 
       if (shouldAsk) {
-        final response = await showDialog<int>(
-          context: context,
-          barrierDismissible: true,
-          builder: (dialogContext) => AlertDialog(
-            backgroundColor: const Color(0xFF102B17),
-            title: Text(
-              AppStrings.pressConferenceTitle,
-              style: const TextStyle(
-                color: Color(0xFF8BE07F),
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            content: Text(
-              isTournamentDecider
-                  ? AppStrings.pressConferenceTournament
-                  : outstanding
-                  ? AppStrings.pressConferenceGreatMatch
-                  : AppStrings.pressConferenceBadMatch,
-              style: const TextStyle(color: Colors.white70),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext, 0),
-                child: Text(AppStrings.skipPressConference),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext, 1),
-                child: Text(AppStrings.pressConferenceTeamFirst),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext, 2),
-                child: Text(AppStrings.pressConferenceConfident),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext, 3),
-                child: Text(AppStrings.pressConferenceDemand),
-              ),
-            ],
-          ),
+        final category = isTournamentDecider
+            ? 'tournament'
+            : outstanding
+            ? 'great'
+            : 'poor';
+        final content = PressConferenceContentFactory.create(
+          category: category,
+          english: AppStrings.isEnglish,
         );
+        final trustChange = await PressConferenceDialog.show(
+          context: context,
+          content: content,
+          title: AppStrings.pressConferenceTitle,
+          skipLabel: AppStrings.skipPressConference,
+        ) ?? 0;
 
-        final trustChange = switch (response) {
-          1 => 2,
-          2 => 1,
-          3 => -2,
-          _ => 0,
-        };
         if (trustChange != 0) {
           updatedCareer = updatedCareer.copyWith(
             coachTrust: (updatedCareer.coachTrust + trustChange)
