@@ -197,9 +197,13 @@ class PositionRival {
   }) {
     final random = Random();
     final remaining = <PositionRival>[];
+    final vacatedNumbers = <int>{};
     for (final rival in rivals) {
       final leavesClub = random.nextDouble() < 0.18;
-      if (leavesClub) continue;
+      if (leavesClub) {
+        vacatedNumbers.add(rival.jerseyNumber);
+        continue;
+      }
       final age = rival.age + 1;
       final ageChange = age >= 33 ? -2 : age <= 23 ? 1 : 0;
       remaining.add(PositionRival(
@@ -218,7 +222,11 @@ class PositionRival {
       ..shuffle(random);
     while (remaining.length < targetCount) {
       final index = remaining.length;
-      final takenNumbers = <int>{player.jerseyNumber, ...remaining.map((r) => r.jerseyNumber)};
+      final takenNumbers = <int>{
+        player.jerseyNumber,
+        ...remaining.map((r) => r.jerseyNumber),
+        ...vacatedNumbers,
+      };
       final available = List<int>.generate(99, (i) => i + 1)..removeWhere(takenNumbers.contains);
       if (available.isEmpty) break;
       final name = names.isNotEmpty ? names.removeAt(0) : 'Игрок ${season}_${index + 1}';
