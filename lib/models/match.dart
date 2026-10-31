@@ -22,10 +22,6 @@ class Match {
       playerClub: player.club,
       playerOverall: player.overall,
     );
-    final status = PlayerStatusCalculator.calculate(
-      overall: player.overall,
-      clubName: player.club,
-    );
     final ratingDifference = player.overall - clubStrength;
 
     double playChance;
@@ -41,18 +37,6 @@ class Match {
       playChance = 0.60;
     } else {
       playChance = 0.35;
-    }
-
-    switch (status) {
-      case PlayerStatus.starter:
-        playChance = max(playChance, 0.90);
-        break;
-      case PlayerStatus.rotation:
-        playChance = max(playChance, 0.70);
-        break;
-      case PlayerStatus.substitute:
-        playChance = max(playChance, 0.50);
-        break;
     }
 
     final seedText = [
