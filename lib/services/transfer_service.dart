@@ -136,7 +136,7 @@ class TransferService {
         ? 1.5
         : 1.4;
 
-    final agentMultiplier = 1.0 + (agentLevel.clamp(1, 3) - 1) * 0.04;
+    final agentMultiplier = 1.0 + (agentLevel.clamp(1, 10) - 1) * 0.02;
     return max(1000, (salary * leagueMultiplier * agentMultiplier).round());
   }
 
@@ -343,7 +343,7 @@ class TransferService {
       if (overall < 80) {
         topClubChance *= 0.4;
       }
-      topClubChance = (topClubChance + (career.agentLevel - 1) * 0.04)
+      topClubChance = (topClubChance + (career.agentLevel - 1) * 0.015)
           .clamp(0.0, 0.75)
           .toDouble();
 
