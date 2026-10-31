@@ -1379,6 +1379,8 @@ class Career {
       redCards: 0,
       averageRating: null,
       money: money,
+      // Игровая валюта агента должна сохраняться между сезонами.
+      agentCredits: agentCredits,
       contractYears: contractYears,
       developmentPoints: newDevelopmentPoints,
       seasonMatches: newSeasonMatches,
