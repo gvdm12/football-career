@@ -77,6 +77,24 @@ class PressConferenceContentFactory {
           choose('Что нужно изменить перед следующей игрой?',
               'What needs to change before the next match?'),
         ],
+      'losingStreak' => [
+          choose('Три поражения подряд. Кто должен взять ответственность за результаты?',
+              'Three defeats in a row. Who must take responsibility for the results?'),
+          choose('Команда переживает тяжёлую серию. В чём главная проблема?',
+              'The team is going through a difficult run. What is the main problem?'),
+        ],
+      'badRun' => [
+          choose('В последних матчах команда регулярно теряет очки. Что происходит?',
+              'The team has been dropping points recently. What is happening?'),
+          choose('Кажется, команда потеряла уверенность. Как это исправить?',
+              'The team seems to have lost confidence. How can it be fixed?'),
+        ],
+      'poorSeason' => [
+          choose('Сезон складывается провально. Можно ли винить тренерский штаб?',
+              'The season has been disappointing. Is the coaching staff to blame?'),
+          choose('Болельщики ждут объяснений. Почему команда выступает так слабо?',
+              'The fans want answers. Why is the team performing so poorly?'),
+        ],
       'tournament' => [
           choose('Впереди решающий этап турнира. Насколько верите в команду?',
               'A decisive stage of the tournament is ahead. How much do you believe in the team?'),
@@ -125,6 +143,24 @@ class PressConferenceContentFactory {
           PressConferenceOption(text: choose('Разберём ошибки и станем сильнее', 'We will review our mistakes and get stronger'), detail: choose('Конструктивный настрой', 'Constructive attitude'), trustChange: 2, icon: Icons.build_outlined),
           PressConferenceOption(text: choose('Нам просто не повезло', 'We were simply unlucky'), detail: choose('Перекладывание причин', 'Deflecting responsibility'), trustChange: -1, icon: Icons.cloud_outlined),
           PressConferenceOption(text: choose('Хочу как можно скорее исправить ситуацию', 'I want to put things right as soon as possible'), detail: choose('Настрой на реакцию', 'Determined response'), trustChange: 1, icon: Icons.refresh),
+        ],
+      'losingStreak' => [
+          PressConferenceOption(text: choose('Тренер должен пересмотреть тактику', 'The coach must rethink the tactics'), detail: choose('Критика тренера: пресса может поддержать, но доверие тренера снизится', 'Criticising the coach may appeal to the media but hurts the relationship'), trustChange: -4, icon: Icons.warning_amber_rounded),
+          PressConferenceOption(text: choose('Каждый игрок должен отвечать за свою игру', 'Every player must take responsibility'), detail: choose('Требовательный, но командный ответ', 'Demanding but team-minded'), trustChange: 2, icon: Icons.groups_outlined),
+          PressConferenceOption(text: choose('Нам не хватает характера в решающие моменты', 'We lack character in decisive moments'), detail: choose('Критика команды', 'Criticism of the team'), trustChange: -2, icon: Icons.bolt),
+          PressConferenceOption(text: choose('Я тоже должен играть лучше и вести команду за собой', 'I must also play better and lead by example'), detail: choose('Личная ответственность', 'Personal responsibility'), trustChange: 3, icon: Icons.shield_outlined),
+        ],
+      'badRun' => [
+          PressConferenceOption(text: choose('Тренерская схема не работает, нужны изменения', 'The coach’s system is not working; changes are needed'), detail: choose('Резкая критика штаба', 'Strong criticism of the staff'), trustChange: -5, icon: Icons.warning_amber_rounded),
+          PressConferenceOption(text: choose('Команда должна прибавить, начиная с меня', 'The team must improve, starting with me'), detail: choose('Берёте ответственность на себя', 'You take responsibility'), trustChange: 3, icon: Icons.shield_outlined),
+          PressConferenceOption(text: choose('Нам не хватает сыгранности', 'We lack chemistry as a team'), detail: choose('Умеренная критика команды', 'Measured criticism of the team'), trustChange: -1, icon: Icons.groups_outlined),
+          PressConferenceOption(text: choose('Нужно спокойно разобрать ошибки и работать', 'We need to review our mistakes and keep working'), detail: choose('Конструктивный ответ', 'Constructive response'), trustChange: 2, icon: Icons.build_outlined),
+        ],
+      'poorSeason' => [
+          PressConferenceOption(text: choose('Ответственность лежит на тренере и его решениях', 'The coach and his decisions are responsible'), detail: choose('Открытый конфликт с тренером', 'Open conflict with the coach'), trustChange: -7, icon: Icons.warning_amber_rounded),
+          PressConferenceOption(text: choose('Состав должен играть лучше, оправданий нет', 'The squad must perform better; there are no excuses'), detail: choose('Жёсткая критика команды', 'Harsh criticism of the team'), trustChange: -3, icon: Icons.groups_outlined),
+          PressConferenceOption(text: choose('Виноваты все, и я в том числе', 'Everyone is responsible, including me'), detail: choose('Честное признание общей ответственности', 'Honest acceptance of shared responsibility'), trustChange: 3, icon: Icons.handshake_outlined),
+          PressConferenceOption(text: choose('Нужно менять подход и исправлять ситуацию вместе', 'We must change our approach and fix this together'), detail: choose('Конструктивная позиция', 'Constructive approach'), trustChange: 2, icon: Icons.build_outlined),
         ],
       'tournament' => [
           PressConferenceOption(text: choose('Мы верим в себя и идём за победой', 'We believe in ourselves and are going for the win'), detail: choose('Уверенность в команде', 'Belief in the team'), trustChange: 2, icon: Icons.emoji_events_outlined),
