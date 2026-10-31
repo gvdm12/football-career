@@ -5,6 +5,7 @@ import 'package:flutter_football/models/match.dart';
 import 'package:flutter_football/screens/match/interactive_match_screen.dart';
 import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/services/career_storage.dart';
+import 'package:flutter_football/services/app_strings.dart';
 
 class WorldCupScreen extends StatefulWidget {
   final Career career;
@@ -48,6 +49,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
         );
 
     var updatedTournament = tournament;
+    Match? playedPlayerMatch;
     if (interactive && playerCanPlay) {
       final playerMatchIndex = tournament.matches.indexWhere(
         (match) =>
@@ -82,6 +84,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
         setState(() => busy = false);
         return;
       }
+      playedPlayerMatch = playedMatch;
       updatedTournament = tournament.playMatch(
         playerMatchIndex,
         homeGoals: playedMatch.homeGoals,
@@ -132,9 +135,85 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
             playerParticipated: playerCanPlay,
           )
         : career;
-    final updatedCareer = careerAfterMatch.copyWith(
+    var updatedCareer = careerAfterMatch.copyWith(
       worldCup: updatedTournament,
     );
+
+    final playerStillInTournament = updatedTournament.matches.any(
+      (match) =>
+          match.homeTeam == player.nationality ||
+          match.awayTeam == player.nationality,
+    );
+    final isTournamentDecider =
+        updatedTournament.isCompleted || !playerStillInTournament;
+    final playerMatch = playedPlayerMatch;
+    if (playerMatch != null && playerMatch.playerPlayed) {
+      final outstanding = playerMatch.playerRating >= 8.5 ||
+          playerMatch.playerGoals >= 2 ||
+          playerMatch.playerGoals + playerMatch.playerAssists >= 3;
+      final poor = playerMatch.playerRating <= 5.5;
+      final shouldAsk = isTournamentDecider ||
+          (outstanding && Random().nextDouble() < 0.72) ||
+          (poor && Random().nextDouble() < 0.62);
+
+      if (shouldAsk) {
+        final response = await showDialog<int>(
+          context: context,
+          barrierDismissible: true,
+          builder: (dialogContext) => AlertDialog(
+            backgroundColor: const Color(0xFF102B17),
+            title: Text(
+              AppStrings.pressConferenceTitle,
+              style: const TextStyle(
+                color: Color(0xFF8BE07F),
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            content: Text(
+              isTournamentDecider
+                  ? AppStrings.pressConferenceTournament
+                  : outstanding
+                  ? AppStrings.pressConferenceGreatMatch
+                  : AppStrings.pressConferenceBadMatch,
+              style: const TextStyle(color: Colors.white70),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, 0),
+                child: Text(AppStrings.skipPressConference),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, 1),
+                child: Text(AppStrings.pressConferenceTeamFirst),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, 2),
+                child: Text(AppStrings.pressConferenceConfident),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, 3),
+                child: Text(AppStrings.pressConferenceDemand),
+              ),
+            ],
+          ),
+        );
+
+        final trustChange = switch (response) {
+          1 => 2,
+          2 => 1,
+          3 => -2,
+          _ => 0,
+        };
+        if (trustChange != 0) {
+          updatedCareer = updatedCareer.copyWith(
+            coachTrust: (updatedCareer.coachTrust + trustChange)
+                .clamp(0, 100)
+                .toInt(),
+          );
+        }
+      }
+    }
+
     try {
       await CareerStorage.save(updatedCareer);
       if (!mounted) return;
