@@ -58,7 +58,25 @@ class Match {
     // полностью лишать игрока шанса выйти на поле в каждом матче.
     final rivalPenalty = strongerRivals * 0.07;
     final trustBonus = ((career?.coachTrust ?? 65) - 65) * 0.003;
-    playChance = (playChance - rivalPenalty + trustBonus)
+    final averageRating = career?.averageRating ?? 6.0;
+    final trophyCount = career?.history.fold<int>(
+          0,
+          (sum, season) => sum + season.achievements.length,
+        ) ??
+        0;
+    final reputation = (player.overall * 0.55 +
+            averageRating * 4 +
+            (career?.coachTrust ?? 65) * 0.12 +
+            trophyCount * 1.5)
+        .round()
+        .clamp(1, 100)
+        .toInt();
+    final reputationBonus = (reputation - 60) * 0.004;
+
+    playChance = (playChance -
+            rivalPenalty +
+            trustBonus +
+            reputationBonus)
         .clamp(0.20, 0.98)
         .toDouble();
 
