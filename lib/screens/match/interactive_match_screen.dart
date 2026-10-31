@@ -56,6 +56,9 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   late final String _awayTeam;
 
   Player get _player => widget.career.player;
+  int get _playerTeamStrength => widget.isHome ? _homeStrength : _awayStrength;
+  int get _opponentTeamStrength =>
+      widget.isHome ? _awayStrength : _homeStrength;
 
   @override
   void initState() {
@@ -87,8 +90,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     _playerAssists = 0;
     // Сохраняем командные голы обычной модели, но заменяем
     // заранее сгенерированные голы игрока интерактивными эпизодами.
-    _homeGoals = baseMatch.homeGoals - (widget.isHome ? baseMatch.playerGoals : 0);
-    _awayGoals = baseMatch.awayGoals - (widget.isHome ? 0 : baseMatch.playerGoals);
+    _homeGoals =
+        baseMatch.homeGoals - (widget.isHome ? baseMatch.playerGoals : 0);
+    _awayGoals =
+        baseMatch.awayGoals - (widget.isHome ? 0 : baseMatch.playerGoals);
     _yellowCards = 0;
     _redCards = 0;
     _rating = 6.0;
@@ -108,7 +113,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     );
     if (status == PlayerStatus.substitute) _minute = 55 + _random.nextInt(11);
     _nextMomentMinute = _minute + 6 + _random.nextInt(7);
-    _clockTimer = Timer.periodic(const Duration(milliseconds: 400), _tickMatchClock);
+    _clockTimer = Timer.periodic(
+      const Duration(milliseconds: 400),
+      _tickMatchClock,
+    );
   }
 
   @override
@@ -154,24 +162,40 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     final s = _player.skills;
     switch (action) {
       case 'dribble':
-        return s.dribbling * 0.48 + s.pace * 0.30 + s.physical * 0.12 + s.vision * 0.10;
+        return s.dribbling * 0.48 +
+            s.pace * 0.30 +
+            s.physical * 0.12 +
+            s.vision * 0.10;
       case 'pass':
       case 'throughPass':
       case 'cross':
         return s.passing * 0.55 + s.vision * 0.30 + s.dribbling * 0.15;
       case 'shoot':
       case 'longShot':
-        return s.shooting * 0.58 + s.dribbling * 0.12 + s.vision * 0.12 + s.physical * 0.10 + s.heading * 0.08;
+        return s.shooting * 0.58 +
+            s.dribbling * 0.12 +
+            s.vision * 0.12 +
+            s.physical * 0.10 +
+            s.heading * 0.08;
       case 'header':
         return s.heading * 0.58 + s.physical * 0.18 + s.shooting * 0.24;
       case 'volley':
-        return s.shooting * 0.55 + s.heading * 0.20 + s.dribbling * 0.15 + s.physical * 0.10;
+        return s.shooting * 0.55 +
+            s.heading * 0.20 +
+            s.dribbling * 0.15 +
+            s.physical * 0.10;
       case 'intercept':
-        return s.vision * 0.35 + s.defending * 0.40 + s.pace * 0.15 + s.passing * 0.10;
+        return s.vision * 0.35 +
+            s.defending * 0.40 +
+            s.pace * 0.15 +
+            s.passing * 0.10;
       case 'block':
         return s.physical * 0.35 + s.defending * 0.45 + s.heading * 0.20;
       case 'keeper':
-        return s.defending * 0.42 + s.physical * 0.24 + s.vision * 0.22 + s.pace * 0.12;
+        return s.defending * 0.42 +
+            s.physical * 0.24 +
+            s.vision * 0.22 +
+            s.pace * 0.12;
       case 'defend':
       case 'tackle':
       case 'contain':
@@ -193,13 +217,15 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     }
     if (_phase == 'chance') {
       _momentTitle = 'Опасная позиция';
-      _momentDescription = 'Вы получили мяч в штрафной. Защитник перекрывает удар, партнёр открывается для передачи.';
+      _momentDescription =
+          'Вы получили мяч в штрафной. Защитник перекрывает удар, партнёр открывается для передачи.';
       _momentReady = true;
       return;
     }
     if (_phase == 'aerialChance') {
       _momentTitle = 'Навес в штрафную';
-      _momentDescription = 'Мяч летит сверху в вашу зону. Можно сыграть головой или попробовать удар с лёта.';
+      _momentDescription =
+          'Мяч летит сверху в вашу зону. Можно сыграть головой или попробовать удар с лёта.';
       _momentReady = true;
       return;
     }
@@ -209,7 +235,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.015) {
       _phase = 'penalty';
       _momentTitle = 'ПЕНАЛЬТИ!';
-      _momentDescription = 'Судья указал на точку. Один удар может изменить ход матча.';
+      _momentDescription =
+          'Судья указал на точку. Один удар может изменить ход матча.';
       _event = '$_minute-я минута. Ваша команда получает право на пенальти!';
       _momentReady = true;
       return;
@@ -217,7 +244,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.045) {
       _phase = 'oneOnOne';
       _momentTitle = 'Выход один на один';
-      _momentDescription = 'Вы прорвались за линию защиты. Вратарь выходит навстречу — решите, как завершить атаку.';
+      _momentDescription =
+          'Вы прорвались за линию защиты. Вратарь выходит навстречу — решите, как завершить атаку.';
       _event = '$_minute-я минута. Опаснейший выход один на один!';
       _momentReady = true;
       return;
@@ -225,7 +253,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.120) {
       _phase = 'corner';
       _momentTitle = 'Угловой удар';
-      _momentDescription = 'Партнёры заняли позиции в штрафной. Можно подать на ближнюю/дальнюю штангу или разыграть коротко.';
+      _momentDescription =
+          'Партнёры заняли позиции в штрафной. Можно подать на ближнюю/дальнюю штангу или разыграть коротко.';
       _event = '$_minute-я минута. Ваша команда подаёт угловой!';
       _momentReady = true;
       return;
@@ -233,7 +262,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.200) {
       _phase = 'freeKick';
       _momentTitle = 'Штрафной удар';
-      _momentDescription = 'Мяч установлен у штрафной. Выберите прямой удар или передачу партнёру.';
+      _momentDescription =
+          'Мяч установлен у штрафной. Выберите прямой удар или передачу партнёру.';
       _event = '$_minute-я минута. Ваша команда заработала штрафной!';
       _momentReady = true;
       return;
@@ -255,33 +285,44 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _phase = 'attack';
       _momentTitle = 'Атака вашей команды';
       _momentDescription = switch (_random.nextInt(5)) {
-        0 => 'Вы ворвались в штрафную с фланга. Защитник пытается закрыть прострел.',
-        1 => 'Вы получили мяч у штрафной. Защитник закрывает удар, партнёр открывается справа.',
-        2 => 'Команда быстро вышла из обороны. Вы получили мяч перед последней линией соперника.',
-        3 => 'Защитник ошибся при приёме мяча. У вас есть время принять решение.',
-        _ => 'Партнёр выполнил передачу за спину защитникам. Нужно открыться под мяч.',
+        0 =>
+          'Вы ворвались в штрафную с фланга. Защитник пытается закрыть прострел.',
+        1 =>
+          'Вы получили мяч у штрафной. Защитник закрывает удар, партнёр открывается справа.',
+        2 =>
+          'Команда быстро вышла из обороны. Вы получили мяч перед последней линией соперника.',
+        3 =>
+          'Защитник ошибся при приёме мяча. У вас есть время принять решение.',
+        _ =>
+          'Партнёр выполнил передачу за спину защитникам. Нужно открыться под мяч.',
       };
       _event = '$_minute-я минута. Ваша команда переходит в атаку!';
     } else if (roll < attackChance + midfieldChance) {
       _phase = 'midfield';
       _momentTitle = 'Борьба в центре поля';
       _momentDescription = switch (_random.nextInt(5)) {
-        0 => 'Соперник не успел перестроиться. Можно начать быструю контратаку.',
-        1 => 'Перед вами свободная зона. Решите, ускорить атаку или придержать мяч.',
-        2 => 'Партнёры открываются между линиями. Один точный пас может создать голевой момент.',
-        3 => 'Соперник оставил пространство на фланге. Можно перевести туда мяч.',
+        0 =>
+          'Соперник не успел перестроиться. Можно начать быструю контратаку.',
+        1 =>
+          'Перед вами свободная зона. Решите, ускорить атаку или придержать мяч.',
+        2 =>
+          'Партнёры открываются между линиями. Один точный пас может создать голевой момент.',
+        3 =>
+          'Соперник оставил пространство на фланге. Можно перевести туда мяч.',
         _ => 'Команда соперника прессингует. Важно не потерять владение.',
       };
       _event = '$_minute-я минута. Мяч оказывается у вас в центре поля.';
     } else if (position == PlayerPosition.goalkeeper) {
       _phase = 'goalkeeper';
       _momentTitle = 'Опасный удар по воротам';
-      _momentDescription = 'Соперник завершает атаку ударом. Нужно выбрать действие.';
+      _momentDescription =
+          'Соперник завершает атаку ударом. Нужно выбрать действие.';
       _event = '$_minute-я минута. Соперник наносит удар!';
     } else {
       _phase = 'defend';
       _momentTitle = 'Оборона';
-      _momentDescription = 'Соперник развивает атаку. Вы можете вступить в отбор, перехватить пас или закрыть удар.';
+      _momentDescription =
+          'Соперник развивает атаку. Вы можете вступить в отбор, перехватить пас или закрыть удар.';
       _event = '$_minute-я минута. Соперник атакует!';
     }
     _momentReady = true;
@@ -388,16 +429,23 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       return;
     }
     if (action == 'penaltyShoot') {
-      final penaltyChance = (0.68 + (_player.skills.shooting - 60) * 0.006 +
-              (_player.skills.vision - 60) * 0.001)
-          .clamp(0.42, 0.91);
+      final penaltyChance =
+          (0.68 +
+                  (_player.skills.shooting - 60) * 0.006 +
+                  (_player.skills.vision - 60) * 0.001)
+              .clamp(0.42, 0.91);
       final scored = _random.nextDouble() < penaltyChance;
       String penaltyMessage;
       if (scored) {
-        if (widget.isHome) { _homeGoals++; } else { _awayGoals++; }
+        if (widget.isHome) {
+          _homeGoals++;
+        } else {
+          _awayGoals++;
+        }
         _playerGoals++;
         _rating += 1.0;
-        penaltyMessage = 'ГОЛ С ПЕНАЛЬТИ! Вы уверенно реализовали одиннадцатиметровый.';
+        penaltyMessage =
+            'ГОЛ С ПЕНАЛЬТИ! Вы уверенно реализовали одиннадцатиметровый.';
       } else {
         _rating -= 0.18;
         penaltyMessage = _random.nextBool()
@@ -410,12 +458,23 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     }
     final skill = _skill(action);
     final isAttackingAction = [
-      'shoot', 'longShot', 'header', 'volley', 'pass', 'throughPass', 'cross', 'dribble'
+      'shoot',
+      'longShot',
+      'header',
+      'volley',
+      'pass',
+      'throughPass',
+      'cross',
+      'dribble',
     ].contains(action);
-    final difficulty = action == 'longShot' ? 0.27
-        : action == 'throughPass' ? 0.16
-        : action == 'header' || action == 'volley' ? 0.12
-        : action == 'shoot' ? 0.10
+    final difficulty = action == 'longShot'
+        ? 0.27
+        : action == 'throughPass'
+        ? 0.16
+        : action == 'header' || action == 'volley'
+        ? 0.12
+        : action == 'shoot'
+        ? 0.10
         : 0.04;
     final advantage = widget.isHome
         ? (_homeStrength - _awayStrength) * 0.003
@@ -426,17 +485,28 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     if (success) _successfulActions++;
     String message;
 
-    if (action == 'shoot' || action == 'longShot' || action == 'header' || action == 'volley') {
+    if (action == 'shoot' ||
+        action == 'longShot' ||
+        action == 'header' ||
+        action == 'volley') {
       _shots++;
       final isOneOnOne = _phase == 'oneOnOne';
       final isAerial = _phase == 'aerialChance';
       final finishingChance = isAerial
-          ? action == 'header' ? 0.30 : 0.22
+          ? action == 'header'
+                ? 0.30
+                : 0.22
           : isOneOnOne
-              ? 0.48
-              : action == 'longShot' ? 0.16 : 0.27;
+          ? 0.48
+          : action == 'longShot'
+          ? 0.16
+          : 0.27;
       if (success && _random.nextDouble() < finishingChance) {
-        if (widget.isHome) { _homeGoals++; } else { _awayGoals++; }
+        if (widget.isHome) {
+          _homeGoals++;
+        } else {
+          _awayGoals++;
+        }
         _playerGoals++;
         _rating += 1.1;
         message = 'ГОЛ! Отличное завершение атаки!';
@@ -458,20 +528,28 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
             ? 'СЕЙВ! Вы отбили сложный удар и спасли команду.'
             : 'Отличная реакция! Вы поймали мяч и быстро начали атаку.';
       } else {
-        if (widget.isHome) { _awayGoals++; } else { _homeGoals++; }
+        if (widget.isHome) {
+          _awayGoals++;
+        } else {
+          _homeGoals++;
+        }
         _rating -= 0.35;
         _phase = 'buildUp';
         message = 'Гол соперника. На этот раз удар оказался слишком точным.';
       }
-    } else if (action == 'pass' || action == 'throughPass' || action == 'cross') {
+    } else if (action == 'pass' ||
+        action == 'throughPass' ||
+        action == 'cross') {
       if (success) {
         _rating += 0.25;
         if (action == 'cross') {
           _phase = 'aerialChance';
-          message = 'Навес получился точным. Мяч летит в штрафную — готовьтесь к верховой борьбе.';
+          message =
+              'Навес получился точным. Мяч летит в штрафную — готовьтесь к верховой борьбе.';
         } else {
           _phase = 'chance';
-          message = 'Точная передача! Вывели партнёра в опасную позицию, атака продолжается.';
+          message =
+              'Точная передача! Вывели партнёра в опасную позицию, атака продолжается.';
         }
       } else {
         _phase = 'defend';
@@ -482,9 +560,14 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       if (success) {
         _phase = 'chance';
         _rating += 0.25;
-        message = 'Удачная обводка! Вы прошли соперника и приблизились к воротам.';
+        message =
+            'Удачная обводка! Вы прошли соперника и приблизились к воротам.';
         if (_random.nextDouble() < 0.20) {
-          if (widget.isHome) { _homeGoals++; } else { _awayGoals++; }
+          if (widget.isHome) {
+            _homeGoals++;
+          } else {
+            _awayGoals++;
+          }
           _playerGoals++;
           message += ' Вы завершили проход голом!';
           _rating += 0.8;
@@ -501,22 +584,27 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         message = action == 'intercept'
             ? 'Перехват! Вы прочитали передачу и остановили атаку.'
             : action == 'block'
-                ? 'Отличная блокировка! Вы закрыли направление удара.'
-                : action == 'contain'
-                    ? 'Вы сдержали соперника и заставили его отдать мяч назад.'
-                    : 'Отличный отбор! Вы остановили опасную атаку.';
+            ? 'Отличная блокировка! Вы закрыли направление удара.'
+            : action == 'contain'
+            ? 'Вы сдержали соперника и заставили его отдать мяч назад.'
+            : 'Отличный отбор! Вы остановили опасную атаку.';
       } else {
         _phase = 'defend';
         _rating -= 0.18;
         message = 'Не удалось остановить атаку соперника.';
         if (_random.nextDouble() < 0.20) {
-          if (widget.isHome) { _awayGoals++; } else { _homeGoals++; }
+          if (widget.isHome) {
+            _awayGoals++;
+          } else {
+            _homeGoals++;
+          }
           message += ' Соперник забивает!';
         }
       }
     }
 
-    final committedFoul = ['defend', 'tackle', 'contain'].contains(action) &&
+    final committedFoul =
+        ['defend', 'tackle', 'contain'].contains(action) &&
         _random.nextDouble() < 0.075;
     if (committedFoul) {
       if (_yellowCards >= 1 || _random.nextDouble() < 0.004) {
@@ -537,13 +625,19 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       message += ' Судья показывает жёлтую карточку.';
     }
     if (!_playerUnavailable && _random.nextDouble() < 0.007) {
-      const injuries = ['Растяжение мышц', 'Ушиб', 'Повреждение голеностопа', 'Мышечная травма'];
+      const injuries = [
+        'Растяжение мышц',
+        'Ушиб',
+        'Повреждение голеностопа',
+        'Мышечная травма',
+      ];
       _injuryName = injuries[_random.nextInt(injuries.length)];
       _injuryMatchesRemaining = 1 + _random.nextInt(4);
       _playerUnavailable = true;
       _playerOnPitch = false;
       _rating -= 0.25;
-      message += ' Вы почувствовали боль и не можете продолжить матч: $_injuryName.';
+      message +=
+          ' Вы почувствовали боль и не можете продолжить матч: $_injuryName.';
     }
     _advanceClock(message);
   }
@@ -555,7 +649,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _createMoment();
     } else {
       final isFollowUp = _phase == 'chance' || _phase == 'aerialChance';
-      _nextMomentMinute = min(88, _minute + (isFollowUp ? 1 : 6 + _random.nextInt(7)));
+      _nextMomentMinute = min(
+        88,
+        _minute + (isFollowUp ? 1 : 6 + _random.nextInt(7)),
+      );
     }
     setState(() {});
   }
@@ -566,11 +663,20 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       awayTeam: _awayTeam,
       homeGoals: _homeGoals,
       awayGoals: _awayGoals,
-      playerGoals: _playerPlayed ? min(_playerGoals, widget.isHome ? _homeGoals : _awayGoals) : 0,
-      playerAssists: _playerPlayed ? min(_playerAssists, max(0, (widget.isHome ? _homeGoals : _awayGoals) - _playerGoals)) : 0,
+      playerGoals: _playerPlayed
+          ? min(_playerGoals, widget.isHome ? _homeGoals : _awayGoals)
+          : 0,
+      playerAssists: _playerPlayed
+          ? min(
+              _playerAssists,
+              max(0, (widget.isHome ? _homeGoals : _awayGoals) - _playerGoals),
+            )
+          : 0,
       yellowCards: _playerPlayed ? _yellowCards : 0,
       redCards: _playerPlayed ? _redCards : 0,
-      playerRating: _playerPlayed ? double.parse(_rating.toStringAsFixed(1)) : 0,
+      playerRating: _playerPlayed
+          ? double.parse(_rating.toStringAsFixed(1))
+          : 0,
       playerPlayed: _playerPlayed,
       injuryName: _injuryName,
       injuryMatchesRemaining: _injuryMatchesRemaining,
@@ -589,13 +695,34 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                const Text('МАТЧ', style: TextStyle(color: Color(0xFF8BE07F), fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 2)),
+                const Text(
+                  'МАТЧ',
+                  style: TextStyle(
+                    color: Color(0xFF8BE07F),
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                  ),
+                ),
                 const SizedBox(height: 8),
-                Text('$_minute’', style: const TextStyle(color: Color(0xFF8BE07F), fontSize: 24, fontWeight: FontWeight.bold)),
+                Text(
+                  '$_minute’',
+                  style: const TextStyle(
+                    color: Color(0xFF8BE07F),
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 8),
-                Text('$_homeTeam  $_homeGoals : $_awayGoals  $_awayTeam',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.bold)),
+                Text(
+                  '$_homeTeam  $_homeGoals : $_awayGoals  $_awayTeam',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 19,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 24),
                 Container(
                   width: double.infinity,
@@ -626,7 +753,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                         Text(
                           _event,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.white, fontSize: 16),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
                         ),
                     ],
                   ),
@@ -643,7 +773,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                 ] else if (_momentReady) ...[
                   const Text(
                     'Выберите действие',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   ..._positionActions(),
@@ -657,11 +790,12 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                       child: const Text('Завершить матч'),
                     ),
                   ),
-                if (!_playerPlayed && !_finished)
-                  const SizedBox(height: 4),
+                if (!_playerPlayed && !_finished) const SizedBox(height: 4),
                 if (_playerPlayed)
-                  Text('Ваш рейтинг: ${_rating.clamp(4.0, 10.0).toStringAsFixed(1)}',
-                      style: const TextStyle(color: Colors.white60)),
+                  Text(
+                    'Ваш рейтинг: ${_rating.clamp(4.0, 10.0).toStringAsFixed(1)}',
+                    style: const TextStyle(color: Colors.white60),
+                  ),
               ],
             ),
           ),
@@ -724,18 +858,18 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   }
 
   Widget _actionButton(String label, String action) => Padding(
-        padding: const EdgeInsets.only(bottom: 8),
-        child: SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: () => _choose(action),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF14532D),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 13),
-            ),
-            child: Text(label),
-          ),
+    padding: const EdgeInsets.only(bottom: 8),
+    child: SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () => _choose(action),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF14532D),
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 13),
         ),
-      );
+        child: Text(label),
+      ),
+    ),
+  );
 }
