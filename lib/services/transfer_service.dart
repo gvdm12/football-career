@@ -404,10 +404,9 @@ class TransferService {
 
     // Агент открывает дополнительные варианты. Повторно тот же клуб
     // в списке предложений не появляется.
-    final agentOffers = generateOffers(career)
-        .where((offer) => !selected.any((item) => item.club.name == offer.club.name))
-        .toList()
-      ..shuffle(_random);
+    final agentOffers = career.agentInterestedClubs.isNotEmpty
+        ? generateAgentOffersFromInterest(career)
+        : generateOffers(career).where((offer) => !selected.any((item) => item.club.name == offer.club.name)).toList();
 
     final agentCount = agentOffers.isEmpty ? 0 : 1 + _random.nextInt(2);
     for (final offer in agentOffers.take(agentCount)) {
@@ -420,6 +419,40 @@ class TransferService {
     }
 
     return selected;
+  }
+
+  /// Создаёт реальные предложения от клубов, сохранённых на экране агента.
+  static List<TransferOffer> generateAgentOffersFromInterest(Career career) {
+    final rating = career.averageRating ?? 0;
+    final contributions = career.goals + career.assists;
+    final offers = <TransferOffer>[];
+
+    for (final clubName in career.agentInterestedClubs) {
+      final club = Clubs.getByName(clubName);
+      if (club.name == career.player.club) continue;
+
+      final salary = _generateSalary(
+        club: club,
+        overall: career.player.overall,
+        age: career.player.age,
+        rating: rating,
+        contributions: contributions,
+        previousSalary: career.monthlySalary,
+        agentLevel: career.agentLevel,
+      );
+
+      offers.add(TransferOffer(
+        club: club,
+        salary: salary,
+        contractYears: _generateContractYears(
+          rating: rating,
+          contributions: contributions,
+        ),
+        isAgentOffer: true,
+      ));
+    }
+
+    return offers;
   }
 
   /// Предложение о продлении контракта с текущим клубом.
