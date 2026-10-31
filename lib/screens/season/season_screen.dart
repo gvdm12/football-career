@@ -2132,9 +2132,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color(0xFFF8FAFC),
-                Color(0xFFE2E6ED),
-                Color(0xFFCBD2DC),
+                Color.fromARGB(255, 248, 248, 249),
+                Color.fromARGB(255, 209, 210, 213),
+                Color.fromARGB(255, 85, 84, 84),
               ],
             ),
           ),
@@ -2147,11 +2147,12 @@ class _SeasonScreenState extends State<SeasonScreen> {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [Color(0xFFFFFFFF), Color(0xFFDDE2E9)],
+                    colors: [
+                      Color.fromARGB(255, 188, 177, 177),
+                      Color(0xFFFFFFFF),
+                    ],
                   ),
-                  border: Border(
-                    bottom: BorderSide(color: Color(0xFFB8C0CC)),
-                  ),
+                  border: Border(bottom: BorderSide(color: Color(0xFFB8C0CC))),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -2283,25 +2284,25 @@ class _SeasonScreenState extends State<SeasonScreen> {
     await _saveCareer(result);
   }
 
-  Widget _buildCalendarButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: () => _openCalendar(),
-        icon: const Icon(Icons.calendar_month_rounded),
-        label: const Text('КАЛЕНДАРЬ СЕЗОНА'),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: const Color.fromARGB(255, 3, 3, 3),
-          backgroundColor: const Color.fromARGB(255, 189, 177, 177),
-          side: const BorderSide(color: Color(0xFF24552C)),
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget _buildCalendarButton() {
+  //   return SizedBox(
+  //     width: double.infinity,
+  //     child: OutlinedButton.icon(
+  //       onPressed: () => _openCalendar(),
+  //       icon: const Icon(Icons.calendar_month_rounded),
+  //       label: const Text('КАЛЕНДАРЬ СЕЗОНА'),
+  //       style: OutlinedButton.styleFrom(
+  //         foregroundColor: const Color.fromARGB(255, 3, 3, 3),
+  //         backgroundColor: const Color.fromARGB(255, 189, 177, 177),
+  //         side: const BorderSide(color: Color(0xFF24552C)),
+  //         padding: const EdgeInsets.symmetric(vertical: 14),
+  //         shape: RoundedRectangleBorder(
+  //           borderRadius: BorderRadius.circular(12),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -2355,22 +2356,22 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 : '${AppStrings.seasonTitle} ${career.season}',
             style: const TextStyle(fontWeight: FontWeight.w700),
           ),
-          actions: [
-            if (!widget.calendarOnly)
-              IconButton(
-                tooltip: AppStrings.leagueTableTooltip,
-                onPressed: _openLeagueTable,
-                icon: SvgPicture.asset(
-                  'assets/icons/table.svg',
-                  width: 34,
-                  height: 34,
-                  colorFilter: const ColorFilter.mode(
-                    Colors.white,
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ),
-          ],
+          // actions: [
+          //   if (!widget.calendarOnly)
+          //     IconButton(
+          //       tooltip: AppStrings.leagueTableTooltip,
+          //       onPressed: _openLeagueTable,
+          //       icon: SvgPicture.asset(
+          //         'assets/icons/table.svg',
+          //         width: 34,
+          //         height: 34,
+          //         colorFilter: const ColorFilter.mode(
+          //           Colors.white,
+          //           BlendMode.srcIn,
+          //         ),
+          //       ),
+          //     ),
+          // ],
         ),
         body: Stack(
           children: [
@@ -2445,8 +2446,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
                                 _buildNextCupMatchCard(nextCupMatch)
                               else if (!seasonFinished && nextMatch != null)
                                 _buildNextMatchCard(nextMatch),
-                              const SizedBox(height: 12),
-                              _buildCalendarButton(),
                               const SizedBox(height: 10),
                               if (!worldCupBlocksSeason) _buildSeasonButton(),
                             ],
