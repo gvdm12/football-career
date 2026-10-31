@@ -54,7 +54,8 @@ class Match {
             .where((rival) => rival.overall + rival.form > player.overall)
             .length ??
         0;
-    playChance = (playChance - strongerRivals * 0.14)
+    final trustBonus = ((career?.coachTrust ?? 65) - 65) * 0.002;
+    playChance = (playChance - strongerRivals * 0.14 + trustBonus)
         .clamp(0.12, 0.98)
         .toDouble();
 
