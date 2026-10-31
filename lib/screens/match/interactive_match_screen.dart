@@ -41,6 +41,9 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   double _rating = 6.0;
   bool _finished = false;
   bool _momentReady = false;
+  bool _playerUnavailable = false;
+  String? _injuryName;
+  int _injuryMatchesRemaining = 0;
   String _event = 'Матч начинается! Ваша команда разыгрывает мяч.';
   String _phase = 'buildUp';
 
@@ -139,6 +142,15 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   }
 
   void _createMoment() {
+    if (_playerUnavailable) {
+      _phase = 'unavailable';
+      _momentTitle = _injuryName == null ? 'Вы удалены' : 'Травма';
+      _momentDescription = _injuryName == null
+          ? 'Вы покинули поле после красной карточки. Команда продолжает матч в меньшинстве.'
+          : 'Вы получили травму ($_injuryName). Медицинский штаб просит вас покинуть поле.';
+      _momentReady = true;
+      return;
+    }
     if (_phase == 'chance') {
       _momentTitle = 'Шанс забить!';
       _momentDescription = 'Вы прошли первую линию обороны. Можно пробить, обыграть вратаря или вывести партнёра на удар.';
@@ -147,6 +159,39 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     }
     final roll = _random.nextDouble();
     final position = _player.position;
+    final setPieceRoll = _random.nextDouble();
+    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.035) {
+      _phase = 'penalty';
+      _momentTitle = 'ПЕНАЛЬТИ!';
+      _momentDescription = 'Судья указал на точку. Один удар может изменить ход матча.';
+      _event = '$_minute-я минута. Ваша команда получает право на пенальти!';
+      _momentReady = true;
+      return;
+    }
+    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.085) {
+      _phase = 'oneOnOne';
+      _momentTitle = 'Выход один на один';
+      _momentDescription = 'Вы прорвались за линию защиты. Вратарь выходит навстречу — решите, как завершить атаку.';
+      _event = '$_minute-я минута. Опаснейший выход один на один!';
+      _momentReady = true;
+      return;
+    }
+    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.145) {
+      _phase = 'corner';
+      _momentTitle = 'Угловой удар';
+      _momentDescription = 'Партнёры заняли позиции в штрафной. Можно подать на ближнюю/дальнюю штангу или разыграть коротко.';
+      _event = '$_minute-я минута. Ваша команда подаёт угловой!';
+      _momentReady = true;
+      return;
+    }
+    if (position != PlayerPosition.goalkeeper && setPieceRoll < 0.195) {
+      _phase = 'freeKick';
+      _momentTitle = 'Штрафной удар';
+      _momentDescription = 'Мяч установлен у штрафной. Выберите прямой удар или передачу партнёру.';
+      _event = '$_minute-я минута. Ваша команда заработала штрафной!';
+      _momentReady = true;
+      return;
+    }
     final attackChance = switch (position) {
       PlayerPosition.forward => 0.72,
       PlayerPosition.midfielder => 0.43,
@@ -193,6 +238,32 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   }
 
   List<Widget> _positionActions() {
+    if (_phase == 'unavailable') {
+      return [_actionButton('Продолжить матч', 'continue')];
+    }
+    if (_phase == 'penalty') {
+      return [_actionButton('Пробить пенальти', 'penaltyShoot')];
+    }
+    if (_phase == 'oneOnOne') {
+      return [
+        _actionButton('Пробить мимо вратаря', 'shoot'),
+        _actionButton('Обвести вратаря', 'dribble'),
+        _actionButton('Отдать пас партнёру', 'throughPass'),
+      ];
+    }
+    if (_phase == 'corner') {
+      return [
+        _actionButton('Навесить на ближнюю штангу', 'cross'),
+        _actionButton('Навесить на дальнюю штангу', 'header'),
+        _actionButton('Разыграть коротко', 'pass'),
+      ];
+    }
+    if (_phase == 'freeKick') {
+      return [
+        _actionButton('Пробить по воротам', 'shoot'),
+        _actionButton('Отдать пас партнёру', 'pass'),
+      ];
+    }
     if (_phase == 'attack') {
       return [
         _actionButton('Пробить по воротам', 'shoot'),
@@ -255,6 +326,33 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
 
   void _choose(String action) {
     if (_finished || !_momentReady) return;
+    if (action == 'continue') {
+      _advanceClock(_injuryName == null
+          ? 'Вы удалены. Команда продолжает матч в меньшинстве.'
+          : 'Вы покинули поле из-за травмы. Команда продолжает матч.');
+      return;
+    }
+    if (action == 'penaltyShoot') {
+      final penaltyChance = (0.68 + (_player.skills.shooting - 60) * 0.006 +
+              (_player.skills.vision - 60) * 0.001)
+          .clamp(0.42, 0.91);
+      final scored = _random.nextDouble() < penaltyChance;
+      String penaltyMessage;
+      if (scored) {
+        if (widget.isHome) { _homeGoals++; } else { _awayGoals++; }
+        _playerGoals++;
+        _rating += 1.0;
+        penaltyMessage = 'ГОЛ С ПЕНАЛЬТИ! Вы уверенно реализовали одиннадцатиметровый.';
+      } else {
+        _rating -= 0.18;
+        penaltyMessage = _random.nextBool()
+            ? 'Вратарь угадал направление и отразил пенальти!'
+            : 'Промах с точки! Мяч прошёл мимо ворот.';
+      }
+      _phase = 'buildUp';
+      _advanceClock(penaltyMessage);
+      return;
+    }
     final skill = _skill(action);
     final isAttackingAction = [
       'shoot', 'longShot', 'header', 'pass', 'throughPass', 'cross', 'dribble'
@@ -358,9 +456,31 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       }
     }
 
-    if (!isAttackingAction && _random.nextDouble() < 0.08) {
+    final committedFoul = ['defend', 'tackle', 'contain'].contains(action) &&
+        _random.nextDouble() < 0.16;
+    if (committedFoul) {
+      if (_yellowCards >= 1 || _random.nextDouble() < 0.025) {
+        _redCards = 1;
+        _playerUnavailable = true;
+        _injuryName = null;
+        message += ' Вторая жёлтая / прямая красная! Судья удаляет вас с поля.';
+        _rating -= 0.65;
+      } else {
+        _yellowCards = min(2, _yellowCards + 1);
+        message += ' Судья показывает жёлтую карточку за фол.';
+        _rating -= 0.12;
+      }
+    } else if (!isAttackingAction && _random.nextDouble() < 0.035) {
       _yellowCards = min(2, _yellowCards + 1);
       message += ' Судья показывает жёлтую карточку.';
+    }
+    if (!_playerUnavailable && _random.nextDouble() < 0.025) {
+      const injuries = ['Растяжение мышц', 'Ушиб', 'Повреждение голеностопа', 'Мышечная травма'];
+      _injuryName = injuries[_random.nextInt(injuries.length)];
+      _injuryMatchesRemaining = 1 + _random.nextInt(4);
+      _playerUnavailable = true;
+      _rating -= 0.25;
+      message += ' Вы почувствовали боль и не можете продолжить матч: $_injuryName.';
     }
     _advanceClock(message);
   }
@@ -414,6 +534,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       redCards: _playerPlayed ? _redCards : 0,
       playerRating: _playerPlayed ? double.parse(_rating.toStringAsFixed(1)) : 0,
       playerPlayed: _playerPlayed,
+      injuryName: _injuryName,
+      injuryMatchesRemaining: _injuryMatchesRemaining,
     );
     Navigator.pop(context, match);
   }
