@@ -1434,14 +1434,30 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     final opponent = tie.homeTeam == club ? tie.awayTeam : tie.homeTeam;
 
-    final generatedMatch = Match.generate(
-      player: career.player,
-      career: career,
-      opponent: opponent,
-      isHome: isHome,
-    );
-
-    final homeGoals = generatedMatch.homeGoals;
+    Match generatedMatch;
+    Career? interactiveCareer;
+    if (interactive) {
+      final played = await Navigator.push<Match>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => InteractiveMatchScreen(
+            career: career,
+            opponent: opponent,
+            isHome: isHome,
+          ),
+        ),
+      );
+      if (!mounted || played == null) return;
+      generatedMatch = played;
+      interactiveCareer = career.afterMatch(played);
+    } else {
+      generatedMatch = Match.generate(
+        player: career.player,
+        career: career,
+        opponent: opponent,
+        isHome: isHome,
+      );
+    }    final homeGoals = generatedMatch.homeGoals;
     final awayGoals = generatedMatch.awayGoals;
 
     int? homePenalties;
@@ -1651,12 +1667,30 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     final isHome = cupMatch.homeTeam == playerClub;
 
-    final generatedMatch = Match.generate(
-      player: career.player,
-      career: career,
-      opponent: opponent,
-      isHome: isHome,
-    );
+    Match generatedMatch;
+    Career? interactiveCareer;
+    if (interactive) {
+      final played = await Navigator.push<Match>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => InteractiveMatchScreen(
+            career: career,
+            opponent: opponent,
+            isHome: isHome,
+          ),
+        ),
+      );
+      if (!mounted || played == null) return;
+      generatedMatch = played;
+      interactiveCareer = career.afterMatch(played);
+    } else {
+      generatedMatch = Match.generate(
+        player: career.player,
+        career: career,
+        opponent: opponent,
+        isHome: isHome,
+      );
+    }
 
     int? homePenalties;
     int? awayPenalties;
