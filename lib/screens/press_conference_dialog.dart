@@ -769,7 +769,12 @@ class PressConferenceContentFactory {
         selectedQuestion.contains('personally satisfied');
     final isTeamImprovementQuestion =
         selectedQuestion.contains('важнее всего улучшить вашей команде') ||
-        selectedQuestion.contains('most important thing for your team to improve');
+        selectedQuestion.contains('most important thing for your team to improve') ||
+        selectedQuestion.contains('команда должна улучшить в ближайших матчах') ||
+        selectedQuestion.contains('team improve in the coming matches');
+    final isFootballStyleQuestion =
+        selectedQuestion.contains('какой футбол вы хотели бы видеть') ||
+        selectedQuestion.contains('what kind of football would you like');
     final isFanExpectationsQuestion =
         selectedQuestion.contains('болельщикам ждать от вас') ||
         selectedQuestion.contains('what should the fans expect from you') ||
@@ -944,6 +949,45 @@ class PressConferenceContentFactory {
           detail: choose('Комплексный подход', 'A complete approach'),
           trustChange: 2,
           icon: Icons.build_outlined,
+        ),
+      ];
+    } else if (isFootballStyleQuestion) {
+      options = [
+        PressConferenceOption(
+          text: choose(
+            'Хочу видеть быстрый атакующий футбол с постоянным движением',
+            'I want us to play fast attacking football with constant movement',
+          ),
+          detail: choose('Атакующий стиль', 'Attacking style'),
+          trustChange: 2,
+          icon: Icons.bolt,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Важно контролировать мяч и диктовать темп игры',
+            'We should control possession and dictate the tempo',
+          ),
+          detail: choose('Контроль мяча', 'Possession-based football'),
+          trustChange: 2,
+          icon: Icons.track_changes,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Нужно активно прессинговать и быстро возвращать владение',
+            'We should press actively and win the ball back quickly',
+          ),
+          detail: choose('Высокий прессинг', 'High pressing'),
+          trustChange: 1,
+          icon: Icons.flash_on,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Главное — уметь подстраиваться под соперника',
+            'The most important thing is adapting to the opponent',
+          ),
+          detail: choose('Гибкий подход', 'Flexible approach'),
+          trustChange: 2,
+          icon: Icons.tune,
         ),
       ];
     } else if (isFanExpectationsQuestion || isPoorSeasonFansQuestion) {
