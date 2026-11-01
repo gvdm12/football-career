@@ -577,7 +577,10 @@ class PressConferenceContentFactory {
             'Тренер должен объяснить выбранную тактику',
             'The coach must explain the chosen tactics',
           ),
-          detail: choose('Публичная критика тренера', 'Public criticism of the coach'),
+          detail: choose(
+            'Публичная критика тренера',
+            'Public criticism of the coach',
+          ),
           trustChange: -5,
           icon: Icons.warning_amber_rounded,
         ),
@@ -586,7 +589,10 @@ class PressConferenceContentFactory {
             'Нам не хватило качества в решающие моменты',
             'We lacked quality in decisive moments',
           ),
-          detail: choose('Критика командной игры', 'Criticism of team performance'),
+          detail: choose(
+            'Критика командной игры',
+            'Criticism of team performance',
+          ),
           trustChange: -2,
           icon: Icons.groups_outlined,
         ),
@@ -595,7 +601,10 @@ class PressConferenceContentFactory {
             'Не ищу оправданий — мы должны были пройти дальше',
             'I will not make excuses — we should have gone through',
           ),
-          detail: choose('Честная и требовательная позиция', 'Honest and demanding response'),
+          detail: choose(
+            'Честная и требовательная позиция',
+            'Honest and demanding response',
+          ),
           trustChange: 2,
           icon: Icons.shield_outlined,
         ),
@@ -604,7 +613,10 @@ class PressConferenceContentFactory {
             'Я сделал всё, что мог, но команда подвела',
             'I did all I could, but the team let me down',
           ),
-          detail: choose('Перекладывание ответственности на партнёров', 'Blaming teammates'),
+          detail: choose(
+            'Перекладывание ответственности на партнёров',
+            'Blaming teammates',
+          ),
           trustChange: -3,
           icon: Icons.person_outline,
         ),
@@ -706,7 +718,10 @@ class PressConferenceContentFactory {
             'Поддержка болельщиков даёт мне дополнительную мотивацию',
             'The fans’ support gives me extra motivation',
           ),
-          detail: choose('Благодарность и связь с фанатами', 'Grateful and connected to the fans'),
+          detail: choose(
+            'Благодарность и связь с фанатами',
+            'Grateful and connected to the fans',
+          ),
           trustChange: 3,
           icon: Icons.favorite_outline,
         ),
@@ -715,7 +730,10 @@ class PressConferenceContentFactory {
             'Я всегда чувствую ответственность перед нашими болельщиками',
             'I always feel responsible to our supporters',
           ),
-          detail: choose('Уважение к болельщикам', 'Respect for the supporters'),
+          detail: choose(
+            'Уважение к болельщикам',
+            'Respect for the supporters',
+          ),
           trustChange: 2,
           icon: Icons.groups_outlined,
         ),
@@ -724,7 +742,10 @@ class PressConferenceContentFactory {
             'Их поддержка важна, но на поле нужно сосредоточиться на игре',
             'Their support matters, but on the pitch I must focus on the game',
           ),
-          detail: choose('Профессиональный и сдержанный ответ', 'Professional and measured response'),
+          detail: choose(
+            'Профессиональный и сдержанный ответ',
+            'Professional and measured response',
+          ),
           trustChange: 1,
           icon: Icons.sports_soccer,
         ),
@@ -733,7 +754,10 @@ class PressConferenceContentFactory {
             'Я стараюсь не обращать внимания на трибуны',
             'I try not to pay attention to the stands',
           ),
-          detail: choose('Независимость от внешнего давления', 'Unaffected by outside pressure'),
+          detail: choose(
+            'Независимость от внешнего давления',
+            'Unaffected by outside pressure',
+          ),
           trustChange: 0,
           icon: Icons.hearing_disabled_outlined,
         ),
@@ -873,183 +897,191 @@ class PressConferenceDialog {
                         child: SingleChildScrollView(
                           child: Padding(
                             padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(
-                                  Icons.format_quote_rounded,
-                                  color: _accent,
-                                  size: 18,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  content.english
-                                      ? 'JOURNALIST QUESTION'
-                                      : 'ВОПРОС ЖУРНАЛИСТА',
-                                  style: TextStyle(
-                                    color: _accent,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(14),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF0A2110),
-                                borderRadius: BorderRadius.circular(14),
-                                border: Border.all(
-                                  color: const Color(0xFF315E39),
-                                ),
-                              ),
-                              child: Text(
-                                content.question,
-                                style: const TextStyle(
-                                  color: Color(0xFFF0F5F0),
-                                  fontSize: 12,
-                                  height: 1.2,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                // const Icon(
-                                //   Icons.reply_rounded,
-                                //   color: Color(0xFF9DB7A1),
-                                //   size: 17,
-                                // ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  content.english
-                                      ? 'YOUR RESPONSE'
-                                      : 'ВАШ ОТВЕТ',
-                                  style: TextStyle(
-                                    color: Color(0xFFB9CDBD),
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            ...content.options.asMap().entries.map((entry) {
-                              final index = entry.key;
-                              final option = entry.value;
-                              final accent = switch (index) {
-                                0 => const Color(0xFF70B77B),
-                                1 => const Color(0xFF76AFA4),
-                                2 => const Color(0xFFC3A66B),
-                                _ => const Color(0xFF8EAA91),
-                              };
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 7),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    borderRadius: BorderRadius.circular(13),
-                                    onTap: () => Navigator.pop(
-                                      dialogContext,
-                                      option.trustChange,
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.format_quote_rounded,
+                                      color: _accent,
+                                      size: 18,
                                     ),
-                                    child: Ink(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 11,
-                                        vertical: 10,
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      content.english
+                                          ? 'JOURNALIST QUESTION'
+                                          : 'ВОПРОС ЖУРНАЛИСТА',
+                                      style: TextStyle(
+                                        color: _accent,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1,
                                       ),
-                                      decoration: BoxDecoration(
-                                        color: accent.withValues(alpha: 0.075),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(14),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF0A2110),
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: const Color(0xFF315E39),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    content.question,
+                                    style: const TextStyle(
+                                      color: Color(0xFFF0F5F0),
+                                      fontSize: 12,
+                                      height: 1.2,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    // const Icon(
+                                    //   Icons.reply_rounded,
+                                    //   color: Color(0xFF9DB7A1),
+                                    //   size: 17,
+                                    // ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      content.english
+                                          ? 'YOUR RESPONSE'
+                                          : 'ВАШ ОТВЕТ',
+                                      style: TextStyle(
+                                        color: Color(0xFFB9CDBD),
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                ...content.options.asMap().entries.map((entry) {
+                                  final index = entry.key;
+                                  final option = entry.value;
+                                  final accent = switch (index) {
+                                    0 => const Color(0xFF70B77B),
+                                    1 => const Color(0xFF76AFA4),
+                                    2 => const Color(0xFFC3A66B),
+                                    _ => const Color(0xFF8EAA91),
+                                  };
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 7),
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
                                         borderRadius: BorderRadius.circular(13),
-                                        border: Border.all(
-                                          color: accent.withValues(alpha: 0.48),
+                                        onTap: () => Navigator.pop(
+                                          dialogContext,
+                                          option.trustChange,
+                                        ),
+                                        child: Ink(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 11,
+                                            vertical: 10,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: accent.withValues(
+                                              alpha: 0.075,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              13,
+                                            ),
+                                            border: Border.all(
+                                              color: accent.withValues(
+                                                alpha: 0.48,
+                                              ),
+                                            ),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                width: 31,
+                                                height: 31,
+                                                decoration: BoxDecoration(
+                                                  color: accent.withValues(
+                                                    alpha: 0.16,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(9),
+                                                ),
+                                                child: Icon(
+                                                  option.icon,
+                                                  color: accent,
+                                                  size: 17,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      option.text,
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        height: 1.25,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 3),
+                                                    Text(
+                                                      option.detail,
+                                                      style: const TextStyle(
+                                                        color: Colors.white54,
+                                                        fontSize: 10,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              const SizedBox(width: 7),
+                                              Text(
+                                                option.trustChange > 0
+                                                    ? '+${option.trustChange}'
+                                                    : '${option.trustChange}',
+                                                style: TextStyle(
+                                                  color: accent,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w900,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            width: 31,
-                                            height: 31,
-                                            decoration: BoxDecoration(
-                                              color: accent.withValues(
-                                                alpha: 0.16,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(9),
-                                            ),
-                                            child: Icon(
-                                              option.icon,
-                                              color: accent,
-                                              size: 17,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  option.text,
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w700,
-                                                    height: 1.25,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 3),
-                                                Text(
-                                                  option.detail,
-                                                  style: const TextStyle(
-                                                    color: Colors.white54,
-                                                    fontSize: 10,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          const SizedBox(width: 7),
-                                          Text(
-                                            option.trustChange > 0
-                                                ? '+${option.trustChange}'
-                                                : '${option.trustChange}',
-                                            style: TextStyle(
-                                              color: accent,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w900,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                    ),
+                                  );
+                                }),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: TextButton.icon(
+                                    onPressed: () =>
+                                        Navigator.pop(dialogContext, 0),
+                                    // icon: const Icon(
+                                    //   Icons.chat_bubble_outline,
+                                    //   size: 15,
+                                    // ),
+                                    label: Text(skipLabel),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: Colors.white70,
                                     ),
                                   ),
                                 ),
-                              );
-                            }),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton.icon(
-                                onPressed: () =>
-                                    Navigator.pop(dialogContext, 0),
-                                // icon: const Icon(
-                                //   Icons.chat_bubble_outline,
-                                //   size: 15,
-                                // ),
-                                label: Text(skipLabel),
-                                style: TextButton.styleFrom(
-                                  foregroundColor: Colors.white70,
-                                ),
-                              ),
+                              ],
                             ),
-                          ],
                           ),
                         ),
                       ),

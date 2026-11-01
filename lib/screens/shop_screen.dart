@@ -103,7 +103,10 @@ class _ShopScreenState extends State<ShopScreen> {
   }
 
   Future<void> _buyRecovery() async {
-    if (!career.isInjured || career.injuryRecoveryUsed || career.money < _recoveryPrice) return;
+    if (!career.isInjured ||
+        career.injuryRecoveryUsed ||
+        career.money < _recoveryPrice)
+      return;
 
     final remaining = (career.injuryMatchesRemaining - 2).clamp(0, 10).toInt();
 
@@ -256,10 +259,10 @@ class _ShopScreenState extends State<ShopScreen> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           'Стоимость · покупка №${_trainingPurchaseCount + 1}',
-                          style: TextStyle(color: Colors.white70),
+                          style: const TextStyle(color: Colors.white70),
                         ),
                       ),
                       Text(
@@ -349,8 +352,8 @@ class _ShopScreenState extends State<ShopScreen> {
                     child: ElevatedButton(
                       onPressed:
                           career.isInjured &&
-                                  !career.injuryRecoveryUsed &&
-                                  career.money >= _recoveryPrice
+                              !career.injuryRecoveryUsed &&
+                              career.money >= _recoveryPrice
                           ? _buyRecovery
                           : null,
                       style: ElevatedButton.styleFrom(
