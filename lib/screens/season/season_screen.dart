@@ -1148,21 +1148,69 @@ class _SeasonScreenState extends State<SeasonScreen> {
                                   ],
                                 ),
                               ),
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 8),
-                              child: Text('КОМАНДА ГОДА', style: TextStyle(color: Color(0xFF8BE07F), fontWeight: FontWeight.w900)),
-                            ),
-                            for (final player in awards.where((item) => item.category == 'Команда года'))
-                              Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 4),
-                                child: Row(
+                            _buildLiquidGlassSurface(
+                              radius: 18,
+                              child: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    SizedBox(width: 34, child: Text(player.positionLabel, style: const TextStyle(color: Color(0xFF8BE07F), fontSize: 10, fontWeight: FontWeight.bold))),
-                                    Expanded(child: Text(player.playerName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700))),
-                                    Text(player.club, style: const TextStyle(color: Colors.white54, fontSize: 10)),
+                                    const Text(
+                                      'КОМАНДА ГОДА',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1.1,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 9),
+                                    for (final player in awards.where((item) => item.category == 'Команда года'))
+                                      Container(
+                                        margin: const EdgeInsets.only(bottom: 5),
+                                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withValues(alpha: 0.055),
+                                          borderRadius: BorderRadius.circular(10),
+                                          border: Border.all(
+                                            color: Colors.white.withValues(alpha: 0.09),
+                                          ),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 34,
+                                              child: Text(
+                                                player.positionLabel,
+                                                style: const TextStyle(
+                                                  color: Colors.white70,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Text(
+                                                player.playerName,
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                            ),
+                                            Text(
+                                              player.club,
+                                              style: const TextStyle(
+                                                color: Colors.white60,
+                                                fontSize: 10,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                   ],
                                 ),
                               ),
+                            ),
                           ],
                         ),
                       ),
@@ -1193,28 +1241,20 @@ class _SeasonScreenState extends State<SeasonScreen> {
         filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xE62B6540),
-                Color(0xD9144228),
-                Color(0xE6082112),
-              ],
-            ),
+            color: const Color(0xC91B1D20),
             borderRadius: BorderRadius.circular(radius),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.22),
+              color: Colors.white.withValues(alpha: 0.28),
               width: 1.2,
             ),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF5BE08A).withValues(alpha: 0.13),
-                blurRadius: 34,
+                color: Colors.white.withValues(alpha: 0.06),
+                blurRadius: 30,
                 spreadRadius: 1,
               ),
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.35),
+                color: Colors.black.withValues(alpha: 0.42),
                 blurRadius: 28,
                 offset: const Offset(0, 14),
               ),
