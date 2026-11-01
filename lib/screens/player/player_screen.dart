@@ -32,6 +32,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
       overall: player.overall,
       clubName: player.club,
       rivals: career.rivals,
+      coachTrust: career.coachTrust,
+      reputation: PlayerStatusCalculator.calculateReputation(
+        overall: player.overall,
+        averageRating: career.averageRating,
+        coachTrust: career.coachTrust,
+        trophies: career.history.fold<int>(0, (sum, item) => sum + item.achievements.length),
+      ),
+      averageRating: career.averageRating,
     );
   }
 
