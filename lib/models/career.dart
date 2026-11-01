@@ -14,6 +14,7 @@ import 'season_stats.dart';
 import 'player_of_month_award.dart';
 import 'season_award.dart';
 import 'position_rival.dart';
+import 'player_status.dart';
 import 'transfer_offer.dart';
 import 'league_table.dart';
 
@@ -815,8 +816,79 @@ class Career {
       );
     }
 
-    // Команда сыграла, но игрок не участвовал.
-    if (!match.playerPlayed) return trustedCareer;
+    // Изменение роли в команде фиксируется в новостях карьеры.
+    PlayerStatus roleFor(Career value) {
+      final reputation = PlayerStatusCalculator.calculateReputation(
+        overall: value.player.overall,
+        averageRating: value.averageRating,
+        coachTrust: value.coachTrust,
+        trophies: value.history.fold<int>(
+          0,
+          (sum, item) => sum + item.achievements.length,
+        ),
+      );
+      return PlayerStatusCalculator.calculate(
+        overall: value.player.overall,
+        clubName: value.player.club,
+        rivals: value.rivals,
+        coachTrust: value.coachTrust,
+        reputation: reputation,
+        averageRating: value.averageRating,
+      );
+    }
+
+    final oldRole = roleFor(this);
+    final newRole = roleFor(trustedCareer);
+    final competitionNews = <CareerNews>[];
+    final competitionRound =
+        seasonMatches.where((item) => item.isPlayed).length + 1;
+
+    if (oldRole != newRole) {
+      final improved = newRole.index < oldRole.index;
+      competitionNews.add(
+        CareerNews(
+          id: 's${season}_squad_role_${competitionRound}_${newRole.name}',
+          season: season,
+          matchNumber: competitionRound,
+          title: improved ? 'Новый статус в команде' : 'Изменение роли в составе',
+          description: improved
+              ? 'Благодаря выступлениям и доверию тренера ваша роль изменилась: ${newRole.displayName.toLowerCase()}.'
+              : 'Конкуренция за позицию усилилась. Теперь ваша роль: ${newRole.displayName.toLowerCase()}.',
+          type: CareerNewsType.season,
+        ),
+      );
+    }
+
+    // Команда сыграла, но игрок не участвовал: сохраняем причину в ленте,
+    // чтобы пропуск матча не выглядел как незаметное случайное событие.
+    if (!match.playerPlayed) {
+      final strongestRival = trustedCareer.rivals.isEmpty
+          ? null
+          : trustedCareer.rivals.reduce((a, b) {
+              final aScore = a.overall + a.form +
+                  ((a.averageRating - 6.5) * 2).round();
+              final bScore = b.overall + b.form +
+                  ((b.averageRating - 6.5) * 2).round();
+              return aScore >= bScore ? a : b;
+            });
+      if (strongestRival != null) {
+        competitionNews.add(
+          CareerNews(
+            id: 's${season}_bench_${competitionRound}_${strongestRival.id}',
+            season: season,
+            matchNumber: competitionRound,
+            title: 'Борьба за игровое время',
+            description:
+                '${strongestRival.name} продолжает конкурировать за вашу позицию. '
+                'Работа на тренировках и сильные выступления помогут вернуть место в составе.',
+            type: CareerNewsType.match,
+          ),
+        );
+      }
+      return trustedCareer.copyWith(
+        news: [...trustedCareer.news, ...competitionNews],
+      );
+    }
 
     final newMatches = matches + 1;
 
@@ -849,7 +921,7 @@ class Career {
           yellowCards: newYellowCards,
           redCards: newRedCards,
           averageRating: double.parse(newAverageRating.toStringAsFixed(2)),
-          news: [...trustedCareer.news, ...matchNews],
+          news: [...trustedCareer.news, ...matchNews, ...competitionNews],
         )
         .advanceAfterCompetitionMatch(playerParticipated: true);
 
