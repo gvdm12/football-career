@@ -728,10 +728,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       return;
     }
     if (action == 'twoOnOnePass') {
-      final passChance = (0.66 + (_player.skills.passing - 60) * 0.004).clamp(
-        0.35,
-        0.90,
-      );
+      final passChance = (0.76 +
+              (_player.skills.passing - 60) * 0.005 +
+              (_player.skills.vision - 60) * 0.002)
+          .clamp(0.48, 0.96);
       if (_random.nextDouble() < passChance) {
         _rating += 0.32;
         final partnerScores = _random.nextDouble() < 0.48;
@@ -840,13 +840,60 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         ? (_homeStrength - _awayStrength) * 0.003
         : (_awayStrength - _homeStrength) * 0.003;
 
-    // Навыки игрока дают заметное преимущество, но не гарантируют успех.
-    // Обычные передачи и удары не должны проваливаться чаще, чем удаваться.
-    final chance = ((isShot ? 0.62 : 0.58) +
-            (skill - 60) * 0.0065 +
-            advantage -
-            difficulty)
-        .clamp(0.22, 0.93);
+    // Для каждого действия используется профильный навык.
+    // Удар головой зависит прежде всего от heading, а не от shooting.
+    final double chance;
+    if (action == 'shoot') {
+      chance = (0.74 +
+              (_player.skills.shooting - 60) * 0.0045 +
+              advantage * 0.7 -
+              ( _phase == 'oneOnOne' ? -0.08 : 0.0))
+          .clamp(0.48, 0.96);
+    } else if (action == 'longShot') {
+      chance = (0.52 +
+              (_player.skills.shooting - 60) * 0.0038 +
+              advantage * 0.5)
+          .clamp(0.30, 0.84);
+    } else if (action == 'header') {
+      chance = (0.74 +
+              (_player.skills.heading - 60) * 0.005 +
+              (_player.skills.physical - 60) * 0.0015 +
+              advantage * 0.6)
+          .clamp(0.46, 0.95);
+    } else if (action == 'volley') {
+      chance = (0.66 +
+              (_player.skills.shooting - 60) * 0.0035 +
+              (_player.skills.heading - 60) * 0.0015 +
+              advantage * 0.5)
+          .clamp(0.38, 0.91);
+    } else if (action == 'pass') {
+      chance = (0.80 +
+              (_player.skills.passing - 60) * 0.0045 +
+              (_player.skills.vision - 60) * 0.0015 +
+              advantage * 0.4)
+          .clamp(0.54, 0.97);
+    } else if (action == 'throughPass') {
+      chance = (0.71 +
+              (_player.skills.passing - 60) * 0.0045 +
+              (_player.skills.vision - 60) * 0.002 +
+              advantage * 0.4)
+          .clamp(0.43, 0.94);
+    } else if (action == 'cross') {
+      chance = (0.76 +
+              (_player.skills.passing - 60) * 0.0038 +
+              (_player.skills.vision - 60) * 0.0015 +
+              advantage * 0.35)
+          .clamp(0.46, 0.95);
+    } else if (action == 'dribble') {
+      chance = (0.70 +
+              (_player.skills.dribbling - 60) * 0.0045 +
+              (_player.skills.pace - 60) * 0.0015 +
+              advantage * 0.4)
+          .clamp(0.42, 0.94);
+    } else {
+      chance = (0.66 + (skill - 60) * 0.0045 + advantage * 0.4)
+          .clamp(0.38, 0.92);
+    }
     final success = _random.nextDouble() < chance;
     if (success) _successfulActions++;
     String message;
@@ -858,19 +905,28 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _shots++;
       final isOneOnOne = _phase == 'oneOnOne';
       final isAerial = _phase == 'aerialChance';
-      final baseFinishingChance = isAerial
-          ? action == 'header'
-                ? 0.43
-                : 0.30
-          : isOneOnOne
-          ? 0.62
-          : action == 'longShot'
-          ? 0.22
-          : 0.42;
-      final finishingChance = (baseFinishingChance +
-              (_player.skills.shooting - 70) * 0.006 +
-              advantage * 0.7)
-          .clamp(0.12, 0.76);
+      final double baseFinishingChance;
+      final double skillFinishingBonus;
+      if (action == 'header') {
+        baseFinishingChance = isAerial ? 0.56 : 0.46;
+        skillFinishingBonus =
+            (_player.skills.heading - 70) * 0.005 +
+            (_player.skills.shooting - 70) * 0.002;
+      } else if (action == 'longShot') {
+        baseFinishingChance = 0.30;
+        skillFinishingBonus = (_player.skills.shooting - 70) * 0.004;
+      } else if (action == 'volley') {
+        baseFinishingChance = 0.45;
+        skillFinishingBonus =
+            (_player.skills.shooting - 70) * 0.003 +
+            (_player.skills.heading - 70) * 0.002;
+      } else {
+        baseFinishingChance = isOneOnOne ? 0.70 : 0.58;
+        skillFinishingBonus = (_player.skills.shooting - 70) * 0.004;
+      }
+      final finishingChance =
+          (baseFinishingChance + skillFinishingBonus + advantage * 0.5)
+              .clamp(0.18, 0.86);
       if (success && _random.nextDouble() < finishingChance) {
         if (widget.isHome) {
           _addGoal(home: true);
