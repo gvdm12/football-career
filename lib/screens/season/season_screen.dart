@@ -1290,7 +1290,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
             opponent: opponent,
             isHome: isHome,
             playerWillPlay: true,
-            isKnockout: true,
+            isKnockout: isFinal || !isFirstLeg,
+            homeAggregateGoalsBeforeMatch:
+                isFinal ? 0 : (tie.firstLegAwayGoals ?? 0),
+            awayAggregateGoalsBeforeMatch:
+                isFinal ? 0 : (tie.firstLegHomeGoals ?? 0),
           ),
         ),
       );
@@ -1536,7 +1540,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
             opponent: opponent,
             isHome: isHome,
             playerWillPlay: true,
-            isKnockout: true,
+            isKnockout: isFinal || !isFirstLeg,
+            homeAggregateGoalsBeforeMatch:
+                isFinal ? 0 : (tie.firstLegAwayGoals ?? 0),
+            awayAggregateGoalsBeforeMatch:
+                isFinal ? 0 : (tie.firstLegHomeGoals ?? 0),
           ),
         ),
       );
