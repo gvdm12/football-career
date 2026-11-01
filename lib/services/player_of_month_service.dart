@@ -66,6 +66,7 @@ class PlayerOfMonthService {
         club: player.club,
         position: player.position,
         overall: player.overall,
+        age: player.age,
         matches: monthPlayerMatches.length,
         goals: playerGoals,
         assists: playerAssists,
@@ -111,6 +112,7 @@ class PlayerOfMonthService {
           : realPlayers[random.nextInt(realPlayers.length)];
       final overall = realPlayer?.overall ??
           (68 + random.nextInt(22)).clamp(60, 90).toInt();
+      final age = realPlayer?.age ?? 18 + random.nextInt(18);
       final goals = scored == 0 ? 0 : min(scored, (scored * (0.35 + random.nextDouble() * 0.3)).round()).toInt();
       final assists = max(0, min(scored - goals, (scored * 0.22).round())).toInt();
       final rating = (6.15 +
@@ -124,6 +126,7 @@ class PlayerOfMonthService {
         month: month,
         name: realPlayer?.name ?? _names[random.nextInt(_names.length)],
         club: clubName,
+        age: age,
         position: position,
         overall: overall,
         matches: fixtures.length,
@@ -143,6 +146,7 @@ class PlayerOfMonthService {
     required int month,
     required String name,
     required String club,
+    required int age,
     required PlayerPosition position,
     required int overall,
     required int matches,
@@ -165,6 +169,7 @@ class PlayerOfMonthService {
       club: club,
       position: position,
       overall: overall,
+      age: age,
       matches: matches,
       goals: goals,
       assists: assists,
