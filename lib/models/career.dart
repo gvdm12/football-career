@@ -878,16 +878,18 @@ class Career {
         final rivalIsAhead =
             strongestRival != null &&
             strongestRival.selectionStrength > player.overall;
+        final rivalId = strongestRival?.id ?? 'rotation';
+        final rivalName = strongestRival?.name ?? 'Конкурент';
         competitionNews.add(
           CareerNews(
-            id: 's${season}_bench_${competitionRound}_${strongestRival?.id ?? 'rotation'}',
+            id: 's${season}_bench_${competitionRound}_$rivalId',
             season: season,
             matchNumber: competitionRound,
             title: rivalIsAhead
                 ? 'Борьба за игровое время'
                 : 'Ротация состава',
             description: rivalIsAhead
-                ? '${strongestRival.name} сейчас опережает вас в борьбе за позицию. '
+                ? '$rivalName сейчас опережает вас в борьбе за позицию. '
                     'Тренировки и сильные выступления помогут вернуть место в составе.'
                 : 'Тренер провёл ротацию состава. Следующие матчи — возможность '
                     'укрепить своё положение в команде.',
