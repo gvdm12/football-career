@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
@@ -1218,129 +1219,187 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     Navigator.pop(context, match);
   }
 
+  Widget _glassCard({required Widget child, EdgeInsets padding = const EdgeInsets.all(16)}) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          width: double.infinity,
+          padding: padding,
+          decoration: BoxDecoration(
+            color: const Color(0xFF123D2A).withOpacity(0.68),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white.withOpacity(0.14)),
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.14), blurRadius: 20, offset: const Offset(0, 8))],
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope<Match>(
       canPop: false,
       child: Scaffold(
-        backgroundColor: const Color(0xFF04160A),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                const Text(
-                  'МАТЧ',
-                  style: TextStyle(
-                    color: Color(0xFF8BE07F),
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '$_minute’',
-                  style: const TextStyle(
-                    color: Color(0xFF8BE07F),
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '$_homeTeam  $_homeGoals : $_awayGoals  $_awayTeam',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 19,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF123A1D),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFF24552C)),
-                  ),
-                  child: Column(
-                    children: [
-                      if (_momentReady && !_finished) ...[
-                        Text(
-                          _momentTitle,
-                          style: const TextStyle(
-                            color: Color(0xFF8BE07F),
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          _momentDescription,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.white70),
-                        ),
-                      ] else
-                        Text(
-                          _event,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 18),
-                if (!_playerPlayed)
-                  const Text(
-                    'Вы не попали в стартовый состав. Матч проходит без вашего участия.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white70),
-                  )
-                else if (_finished) ...[
-                  _buildMatchSummary(),
-                ] else if (_momentReady) ...[
-                  const Text(
-                    'Выберите действие',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  ..._positionActions(),
-                ],
-                const Spacer(),
-                if (_finished || !_playerPlayed)
-                  SizedBox(
-                    width: double.infinity,
-                    height: 44,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black,
-                      ),
-                      onPressed: _finish,
-                      child: const Text('Завершить матч'),
-                    ),
-                  ),
-                if (!_playerPlayed && !_finished) const SizedBox(height: 6),
-                if (_playerPlayed)
-                  Text(
-                    'Ваш рейтинг: ${_rating.clamp(4.0, 10.0).toStringAsFixed(1)}',
-                    style: const TextStyle(color: Colors.white60),
-                  ),
-              ],
+        backgroundColor: const Color(0xFF061B12),
+        body: Stack(children: [
+          const Positioned.fill(child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF174A32), Color(0xFF0A2D20), Color(0xFF04170F)],
+                stops: [0, 0.52, 1],
+              ),
+            ),
+          )),
+          Positioned(
+            top: -100,
+            right: -100,
+            child: Container(
+              width: 260,
+              height: 260,
+              decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFF4ADE80).withOpacity(0.08)),
             ),
           ),
-        ),
+          SafeArea(child: Column(children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 12, 18, 12),
+              child: Row(children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.09), borderRadius: BorderRadius.circular(14), border: Border.all(color: Colors.white.withOpacity(0.13))),
+                  child: const Icon(Icons.sports_soccer_rounded, color: Color(0xFF9AE6B4)),
+                ),
+                const SizedBox(width: 11),
+                const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('FOOTBALL CAREER', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.3)),
+                  SizedBox(height: 2),
+                  Text('Интерактивный матч', style: TextStyle(color: Color(0xFF9AB7A5), fontSize: 11)),
+                ])),
+                if (_playerPlayed)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
+                    decoration: BoxDecoration(color: const Color(0xFF14532D).withOpacity(0.7), borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0xFF4ADE80).withOpacity(0.25))),
+                    child: Text('ОЦЕНКА ' + _rating.clamp(4.0, 10.0).toStringAsFixed(1), style: const TextStyle(color: Color(0xFFBBF7D0), fontSize: 10, fontWeight: FontWeight.w900)),
+                  ),
+              ]),
+            ),
+            Expanded(child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                _glassCard(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+                  child: Column(children: [
+                    Row(children: [
+                      const Icon(Icons.circle, color: Color(0xFF4ADE80), size: 8),
+                      const SizedBox(width: 7),
+                      const Text('LIVE MATCH', style: TextStyle(color: Color(0xFF9AE6B4), fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.6)),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(color: Colors.white.withOpacity(0.09), borderRadius: BorderRadius.circular(20)),
+                        child: Text(_finished ? 'ФИНАЛ' : '$_minute’', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                      ),
+                    ]),
+                    const SizedBox(height: 20),
+                    Row(children: [
+                      Expanded(child: _teamBadge(_homeTeam, true)),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 7),
+                        child: Text('$_homeGoals : $_awayGoals', style: const TextStyle(color: Colors.white, fontSize: 31, fontWeight: FontWeight.w900, letterSpacing: -1)),
+                      ),
+                      Expanded(child: _teamBadge(_awayTeam, false)),
+                    ]),
+                    if (_homePenalties != null && _awayPenalties != null) ...[
+                      const SizedBox(height: 8),
+                      Text('ПЕНАЛЬТИ  $_homePenalties : $_awayPenalties', style: const TextStyle(color: Color(0xFFBBF7D0), fontWeight: FontWeight.w800, fontSize: 11)),
+                    ],
+                    const SizedBox(height: 18),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: LinearProgressIndicator(value: (_minute / 90).clamp(0.0, 1.0), minHeight: 5, backgroundColor: Colors.white.withOpacity(0.10), valueColor: const AlwaysStoppedAnimation(Color(0xFF4ADE80))),
+                    ),
+                  ]),
+                ),
+                const SizedBox(height: 15),
+                _glassCard(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Row(children: [
+                      const Icon(Icons.bolt_rounded, color: Color(0xFF86EFAC), size: 20),
+                      const SizedBox(width: 8),
+                      Text(_momentReady && !_finished ? 'ИГРОВОЙ МОМЕНТ' : _finished ? 'МАТЧ ЗАВЕРШЁН' : 'ХРОНИКА МАТЧА', style: const TextStyle(color: Color(0xFF9AE6B4), fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.2)),
+                      const Spacer(),
+                      if (_momentReady && !_finished) Text('$_minute’', style: const TextStyle(color: Color(0xFFBBF7D0), fontWeight: FontWeight.w800)),
+                    ]),
+                    const SizedBox(height: 12),
+                    Text(_momentReady && !_finished ? _momentTitle : _finished ? 'Финальный свисток' : 'Что происходит на поле', style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800)),
+                    const SizedBox(height: 8),
+                    Text(_momentReady && !_finished ? _momentDescription : _event, style: TextStyle(color: Colors.white.withOpacity(0.78), fontSize: 13, height: 1.55)),
+                  ]),
+                ),
+                const SizedBox(height: 15),
+                if (!_playerPlayed)
+                  _glassCard(child: const Text('Вы не попали в стартовый состав. Матч проходит без вашего участия.', style: TextStyle(color: Colors.white70, height: 1.5)))
+                else if (_finished)
+                  _buildMatchSummary()
+                else if (_momentReady) ...[
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(3, 2, 3, 10),
+                    child: Text('ВАШЕ РЕШЕНИЕ', style: TextStyle(color: Color(0xFF9AE6B4), fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.4)),
+                  ),
+                  ..._positionActions(),
+                ] else
+                  _glassCard(child: Row(children: [
+                    const Icon(Icons.hourglass_bottom_rounded, color: Color(0xFF86EFAC)),
+                    const SizedBox(width: 10),
+                    Expanded(child: Text('Матч продолжается. Следующий игровой эпизод скоро...', style: TextStyle(color: Colors.white.withOpacity(0.72), fontSize: 12))),
+                  ])),
+              ]),
+            )),
+            if (_finished || !_playerPlayed)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton.icon(
+                    onPressed: _finish,
+                    icon: const Icon(Icons.check_circle_outline_rounded),
+                    label: const Text('Завершить матч', style: TextStyle(fontWeight: FontWeight.w800)),
+                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF4ADE80), foregroundColor: const Color(0xFF052012), elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(17))),
+                  ),
+                ),
+              ),
+          ])),
+        ]),
       ),
     );
+  }
+
+  Widget _teamBadge(String name, bool home) {
+    return Column(mainAxisSize: MainAxisSize.min, children: [
+      Container(
+        width: 46,
+        height: 46,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(colors: home ? const [Color(0xFF4ADE80), Color(0xFF166534)] : const [Color(0xFF93C5FD), Color(0xFF1D4ED8)]),
+          border: Border.all(color: Colors.white.withOpacity(0.25)),
+        ),
+        child: Text(name.isEmpty ? '?' : name.substring(0, 1).toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.w900)),
+      ),
+      const SizedBox(height: 8),
+      Text(name, maxLines: 2, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 11, height: 1.2, fontWeight: FontWeight.w800)),
+      const SizedBox(height: 3),
+      Text(home ? 'ХОЗЯЕВА' : 'ГОСТИ', style: TextStyle(color: Colors.white.withOpacity(0.45), fontSize: 8, letterSpacing: 1, fontWeight: FontWeight.w800)),
+    ]);
   }
 
   Widget _buildMatchSummary() {
