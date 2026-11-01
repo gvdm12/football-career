@@ -403,7 +403,8 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                         'Матч сборной: ${playerMatch.homeTeam} '
                         '${playerMatch.isPlayed ? playerMatch.homeGoals : '-'} : '
                         '${playerMatch.isPlayed ? playerMatch.awayGoals : '-'} '
-                        '${playerMatch.awayTeam}',
+                        '${playerMatch.awayTeam}'
+                        '${playerMatch.homePenalties != null ? ' (пен. ${playerMatch.homePenalties}:${playerMatch.awayPenalties})' : ''}',
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
@@ -502,7 +503,8 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                                 horizontal: 8,
                               ),
                               child: Text(
-                                '${match.homeGoals} : ${match.awayGoals}',
+                                '${match.homeGoals} : ${match.awayGoals}'
+                                '${match.homePenalties != null ? ' (пен. ${match.homePenalties}:${match.awayPenalties})' : ''}',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
@@ -562,6 +564,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                           child: Text(
                             match.isPlayed
                                 ? '${match.homeGoals} : ${match.awayGoals}'
+                                    '${match.homePenalties != null ? ' (пен. ${match.homePenalties}:${match.awayPenalties})' : ''}'
                                 : '— : —',
                             style: const TextStyle(
                               color: Colors.white,
