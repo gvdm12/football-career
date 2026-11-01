@@ -1290,6 +1290,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
             opponent: opponent,
             isHome: isHome,
             playerWillPlay: true,
+            isKnockout: true,
           ),
         ),
       );
@@ -1326,13 +1327,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
       needsPenalties = homeTeamAggregate == awayTeamAggregate;
     }
 
-    // Генерируем пенальти ДО открытия экрана матча.
-    if (needsPenalties) {
+    // Интерактивный матч уже возвращает результат серии пенальти.
+    if (generatedMatch.hasPenalties) {
+      homePenalties = generatedMatch.homePenalties;
+      awayPenalties = generatedMatch.awayPenalties;
+    } else if (needsPenalties) {
       final random = Random();
-
       homePenalties = 3 + random.nextInt(3);
       awayPenalties = 3 + random.nextInt(3);
-
       while (homePenalties == awayPenalties) {
         awayPenalties = 3 + random.nextInt(3);
       }
@@ -1534,6 +1536,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
             opponent: opponent,
             isHome: isHome,
             playerWillPlay: true,
+            isKnockout: true,
           ),
         ),
       );
@@ -1570,13 +1573,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
       needsPenalties = homeTeamAggregate == awayTeamAggregate;
     }
 
-    // Генерируем пенальти ДО открытия экрана матча.
-    if (needsPenalties) {
+    // Интерактивный матч уже возвращает результат серии пенальти.
+    if (generatedMatch.hasPenalties) {
+      homePenalties = generatedMatch.homePenalties;
+      awayPenalties = generatedMatch.awayPenalties;
+    } else if (needsPenalties) {
       final random = Random();
-
       homePenalties = 3 + random.nextInt(3);
       awayPenalties = 3 + random.nextInt(3);
-
       while (homePenalties == awayPenalties) {
         awayPenalties = 3 + random.nextInt(3);
       }
@@ -1817,6 +1821,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
             opponent: opponent,
             isHome: isHome,
             playerWillPlay: true,
+            isKnockout: true,
           ),
         ),
       );
@@ -1835,12 +1840,13 @@ class _SeasonScreenState extends State<SeasonScreen> {
     int? homePenalties;
     int? awayPenalties;
 
-    if (generatedMatch.homeGoals == generatedMatch.awayGoals) {
+    if (generatedMatch.hasPenalties) {
+      homePenalties = generatedMatch.homePenalties;
+      awayPenalties = generatedMatch.awayPenalties;
+    } else if (generatedMatch.homeGoals == generatedMatch.awayGoals) {
       final random = Random();
-
       homePenalties = 3 + random.nextInt(3);
       awayPenalties = 3 + random.nextInt(3);
-
       while (homePenalties == awayPenalties) {
         awayPenalties = 3 + random.nextInt(3);
       }
