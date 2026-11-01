@@ -7,6 +7,7 @@ class PlayerOfMonthAward {
   final String club;
   final PlayerPosition position;
   final int overall;
+  final int age;
   final int matches;
   final int goals;
   final int assists;
@@ -21,6 +22,7 @@ class PlayerOfMonthAward {
     required this.club,
     required this.position,
     required this.overall,
+    this.age = 25,
     required this.matches,
     required this.goals,
     required this.assists,
@@ -36,6 +38,7 @@ class PlayerOfMonthAward {
     'club': club,
     'position': position.name,
     'overall': overall,
+    'age': age,
     'matches': matches,
     'goals': goals,
     'assists': assists,
@@ -55,6 +58,7 @@ class PlayerOfMonthAward {
         orElse: () => PlayerPosition.forward,
       ),
       overall: (json['overall'] as num?)?.toInt() ?? 60,
+      age: (json['age'] as num?)?.toInt() ?? 25,
       matches: (json['matches'] as num?)?.toInt() ?? 0,
       goals: (json['goals'] as num?)?.toInt() ?? 0,
       assists: (json['assists'] as num?)?.toInt() ?? 0,
