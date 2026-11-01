@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'player.dart';
+import 'real_club_squads.dart';
 
 class PositionRival {
   final String id;
@@ -124,12 +125,41 @@ class PositionRival {
     required int season,
     int count = 2,
   }) {
-    final random = Random(('${player.name}|${player.club}|$season').hashCode);
+    final random = Random(('\u0024{player.name}|\u0024{player.club}|\u0024season').hashCode);
+    final targetCount = count.clamp(1, 3).toInt();
+    final takenNumbers = <int>{player.jerseyNumber};
+    final realPlayers = RealClubSquads.squads[player.club]?[player.position.name];
+
+    if (realPlayers != null && realPlayers.isNotEmpty) {
+      final candidates = realPlayers
+          .where((item) => item.name != player.name)
+          .toList()
+        ..shuffle(random);
+      return candidates.take(targetCount).map((item) {
+        var number = item.jerseyNumber;
+        if (takenNumbers.contains(number)) {
+          final available = List<int>.generate(99, (i) => i + 1)
+            ..removeWhere(takenNumbers.contains);
+          number = available[random.nextInt(available.length)];
+        }
+        takenNumbers.add(number);
+        return PositionRival(
+          id: 'real_\u0024{player.club}_\u0024{player.position.name}_\u0024{item.name.hashCode}',
+          name: item.name,
+          position: player.position,
+          age: item.age,
+          overall: item.overall,
+          jerseyNumber: number,
+          averageRating: 6.5 + random.nextDouble() * 0.6,
+          form: random.nextInt(5) - 2,
+        );
+      }).toList();
+    }
+
     final names = List<String>.from(_names[player.position]!)
       ..removeWhere((name) => name == player.name)
       ..shuffle(random);
-    final takenNumbers = <int>{player.jerseyNumber};
-    return List.generate(count.clamp(1, 3).toInt(), (index) {
+    return List.generate(targetCount, (index) {
       final delta = random.nextInt(11) - 4;
       final overall = (player.overall + delta).clamp(55, 95).toInt();
       final available = List<int>.generate(99, (i) => i + 1)
@@ -137,7 +167,7 @@ class PositionRival {
       final number = available[random.nextInt(available.length)];
       takenNumbers.add(number);
       return PositionRival(
-        id: 's${season}_${player.position.name}_${index + 1}',
+        id: 's\u0024{season}_\u0024{player.position.name}_\u0024{index + 1}',
         name: names[index],
         position: player.position,
         age: 19 + random.nextInt(12),
@@ -148,6 +178,42 @@ class PositionRival {
       );
     });
   }
+
+  static List<PositionRival> ensureRealCompetitors({
+    required Player player,
+    required int season,
+    required List<PositionRival> existing,
+  }) {
+    if (RealClubSquads.squads[player.club]?[player.position.name] == null) {
+      return existing;
+    }
+    final generated = generate(
+      player: player,
+      season: season,
+      count: existing.isEmpty ? 2 : existing.length.clamp(1, 3).toInt(),
+    );
+    return generated.map((candidate) {
+      for (final old in existing) {
+        if (old.name == candidate.name) {
+          return PositionRival(
+            id: old.id,
+            name: candidate.name,
+            position: candidate.position,
+            age: candidate.age,
+            overall: candidate.overall,
+            jerseyNumber: candidate.jerseyNumber,
+            matches: old.matches,
+            goals: old.goals,
+            assists: old.assists,
+            averageRating: old.averageRating,
+            form: old.form,
+          );
+        }
+      }
+      return candidate;
+    }).toList();
+  }
+
   static List<PositionRival> advanceMatch(List<PositionRival> rivals) {
     final random = Random();
     return rivals.map((rival) {
