@@ -52,10 +52,7 @@ class Match {
     }
     final rivals = career?.rivals ?? const [];
     final strongerRivals = rivals.where((rival) {
-      final rivalLevel = rival.overall +
-          rival.form +
-          ((rival.averageRating - 6.5) * 2).round();
-      return rivalLevel > player.overall;
+      return rival.selectionStrength > player.overall;
     }).length;
     // Конкуренция оценивается по текущей форме и статистике сезона.
     // Хорошая игра самого футболиста постепенно компенсирует давление конкурентов.
