@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter_football/models/league_match.dart';
 import 'package:flutter_football/models/player.dart';
+import 'package:flutter_football/models/real_club_squads.dart';
 import 'package:flutter_football/models/player_of_month_award.dart';
 import 'package:flutter_football/models/season_match.dart';
 
@@ -104,7 +105,12 @@ class PlayerOfMonthService {
           : points >= fixtures.length * 2
               ? PlayerPosition.midfielder
               : PlayerPosition.defender;
-      final overall = (68 + random.nextInt(22)).clamp(60, 90).toInt();
+      final realPlayers = RealClubSquads.squads[clubName]?[position.name];
+      final realPlayer = realPlayers == null || realPlayers.isEmpty
+          ? null
+          : realPlayers[random.nextInt(realPlayers.length)];
+      final overall = realPlayer?.overall ??
+          (68 + random.nextInt(22)).clamp(60, 90).toInt();
       final goals = scored == 0 ? 0 : min(scored, (scored * (0.35 + random.nextDouble() * 0.3)).round()).toInt();
       final assists = max(0, min(scored - goals, (scored * 0.22).round())).toInt();
       final rating = (6.15 +
@@ -116,7 +122,7 @@ class PlayerOfMonthService {
       candidates.add(_candidate(
         season: season,
         month: month,
-        name: _names[random.nextInt(_names.length)],
+        name: realPlayer?.name ?? _names[random.nextInt(_names.length)],
         club: clubName,
         position: position,
         overall: overall,
