@@ -1403,40 +1403,58 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   }
 
   Widget _buildMatchSummary() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF102D19),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF24552C)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'СТАТИСТИКА МАТЧА',
-            style: TextStyle(
-              color: Color(0xFF8BE07F),
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1,
-            ),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(22),
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(17),
+          decoration: BoxDecoration(
+            color: const Color(0xFF123D2A).withOpacity(0.68),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: Colors.white.withOpacity(0.14)),
           ),
-          const SizedBox(height: 10),
-          _summaryRow('Голы', '$_playerGoals'),
-          _summaryRow('Голевые передачи', '$_playerAssists'),
-          _summaryRow('Удары', '$_shots'),
-          _summaryRow('Успешные действия', '$_successfulActions'),
-          _summaryRow('Жёлтые карточки', '$_yellowCards'),
-          _summaryRow('Красные карточки', '$_redCards'),
-          if (_homePenalties != null && _awayPenalties != null)
-            _summaryRow(
-              'Пенальти ($_homeTeam — $_awayTeam)',
-              '$_homePenalties : $_awayPenalties',
-            ),
-          _summaryRow('Оценка', _rating.clamp(4.0, 10.0).toStringAsFixed(1)),
-        ],
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Row(children: [
+              Icon(Icons.query_stats_rounded, color: Color(0xFF86EFAC), size: 19),
+              SizedBox(width: 9),
+              Text('ВАША СТАТИСТИКА', style: TextStyle(color: Color(0xFF9AE6B4), fontWeight: FontWeight.w900, letterSpacing: 1.2, fontSize: 10)),
+            ]),
+            const SizedBox(height: 15),
+            Row(children: [
+              Expanded(child: _summaryMetric('ГОЛЫ', '$_playerGoals')),
+              const SizedBox(width: 8),
+              Expanded(child: _summaryMetric('АССИСТЫ', '$_playerAssists')),
+              const SizedBox(width: 8),
+              Expanded(child: _summaryMetric('ОЦЕНКА', _rating.clamp(4.0, 10.0).toStringAsFixed(1))),
+            ]),
+            const SizedBox(height: 13),
+            _summaryRow('Удары', '$_shots'),
+            _summaryRow('Успешные действия', '$_successfulActions'),
+            _summaryRow('Жёлтые карточки', '$_yellowCards'),
+            _summaryRow('Красные карточки', '$_redCards'),
+            if (_homePenalties != null && _awayPenalties != null)
+              _summaryRow('Пенальти', '$_homePenalties : $_awayPenalties'),
+          ]),
+        ),
       ),
+    );
+  }
+
+  Widget _summaryMetric(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 5),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.055),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.white.withOpacity(0.08)),
+      ),
+      child: Column(children: [
+        Text(value, style: const TextStyle(color: Color(0xFF86EFAC), fontSize: 21, fontWeight: FontWeight.w900)),
+        const SizedBox(height: 4),
+        Text(label, style: TextStyle(color: Colors.white.withOpacity(0.48), fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 0.7)),
+      ]),
     );
   }
 
@@ -1460,19 +1478,74 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     );
   }
 
-  Widget _actionButton(String label, String action) => Padding(
-    padding: const EdgeInsets.only(bottom: 8),
-    child: SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () => _choose(action),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF14532D),
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 13),
+  Widget _actionButton(String label, String action) {
+    IconData icon;
+    switch (action) {
+      case 'shoot':
+      case 'longShot':
+      case 'header':
+      case 'volley':
+      case 'penaltyShoot':
+        icon = Icons.sports_soccer_rounded;
+        break;
+      case 'pass':
+      case 'backPass':
+      case 'throughPass':
+      case 'longPass':
+      case 'cross':
+        icon = Icons.compare_arrows_rounded;
+        break;
+      case 'dribble':
+        icon = Icons.directions_run_rounded;
+        break;
+      case 'keeper':
+      case 'block':
+        icon = Icons.pan_tool_alt_rounded;
+        break;
+      case 'intercept':
+      case 'defend':
+      case 'tackle':
+      case 'press':
+        icon = Icons.shield_outlined;
+        break;
+      default:
+        icon = Icons.flash_on_rounded;
+    }
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 9),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(17),
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Material(
+            color: Colors.white.withOpacity(0.075),
+            child: InkWell(
+              onTap: () => _choose(action),
+              borderRadius: BorderRadius.circular(17),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(17),
+                  border: Border.all(color: const Color(0xFF86EFAC).withOpacity(0.16)),
+                ),
+                child: Row(children: [
+                  Container(
+                    width: 37,
+                    height: 37,
+                    decoration: BoxDecoration(color: const Color(0xFF4ADE80).withOpacity(0.13), borderRadius: BorderRadius.circular(12)),
+                    child: Icon(icon, color: const Color(0xFF86EFAC), size: 19),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.25, fontWeight: FontWeight.w700))),
+                  Icon(Icons.arrow_forward_ios_rounded, size: 13, color: Colors.white.withOpacity(0.42)),
+                ]),
+              ),
+            ),
+          ),
         ),
-        child: Text(label),
       ),
-    ),
-  );
+    );
+  }
+
 }
