@@ -1518,9 +1518,12 @@ class Career {
       for (final entry in europeanLeagueStandings.entries)
         entry.key: List<LeagueTableEntry>.from(entry.value),
     };
-    final previousClub = newHistory
+    final archivedCurrentSeason = newHistory
         .where((stats) => stats.season == season)
-        .lastOrNull;
+        .toList();
+    final previousClub = archivedCurrentSeason.isEmpty
+        ? null
+        : archivedCurrentSeason.last;
     final previousLeague = previousClub == null
         ? null
         : Clubs.leagueOf(previousClub.club);
@@ -1531,7 +1534,7 @@ class Career {
     final updatedClubStrengths = ClubStrengthService.update(
       currentStrengths: clubStrengths,
       standings: performanceStandings,
-      domesticCup: DomesticCupResult(domesticCup?.champion),
+      domesticCupWinner: domesticCup?.champion,
       championsLeagueWinner: championsLeague?.champion,
       europaLeagueWinner: europaLeague?.champion,
     );
