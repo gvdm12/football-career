@@ -440,7 +440,7 @@ class Career {
         ? savedRivals
         : PositionRival.generate(player: loadedPlayer, season: currentSeason);
     final usedJerseyNumbers = <int>{loadedPlayer.jerseyNumber};
-    final restoredRivals = rivalsToRestore.map((rival) {
+    final normalizedRivals = rivalsToRestore.map((rival) {
       if (usedJerseyNumbers.add(rival.jerseyNumber)) return rival;
       final available = List<int>.generate(99, (index) => index + 1)
         ..removeWhere(usedJerseyNumbers.contains);
@@ -449,6 +449,11 @@ class Career {
       usedJerseyNumbers.add(number);
       return rival.copyWith(jerseyNumber: number);
     }).toList();
+    final restoredRivals = PositionRival.ensureRealCompetitors(
+      player: loadedPlayer,
+      season: currentSeason,
+      existing: normalizedRivals,
+    );
 
     return Career(
       player: loadedPlayer,
