@@ -266,6 +266,16 @@ class PositionRival {
     int season, {
     required Player player,
   }) {
+    // В топ-клубах обновляем список из реального состава нужной позиции:
+    // футболисты могут меняться между сезонами, но не превращаются в вымышленных.
+    if (RealClubSquads.squads[player.club]?[player.position.name] != null) {
+      return ensureRealCompetitors(
+        player: player,
+        season: season,
+        existing: rivals,
+      );
+    }
+
     final random = Random();
     final remaining = <PositionRival>[];
     final vacatedNumbers = <int>{};
