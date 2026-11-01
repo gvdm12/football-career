@@ -340,6 +340,75 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     ),
                   ),
 
+                  if (career.playerOfMonthAwards.isNotEmpty) ...[
+                    const SizedBox(height: 18),
+                    const Text(
+                      'Награды «Игрок месяца»',
+                      style: TextStyle(
+                        color: Color(0xFF8BE07F),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 9),
+                    SizedBox(
+                      height: 104,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: career.playerOfMonthAwards.reversed.map((award) {
+                          return Container(
+                            width: 190,
+                            margin: const EdgeInsets.only(right: 9),
+                            padding: const EdgeInsets.all(11),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF0B2A12),
+                              borderRadius: BorderRadius.circular(13),
+                              border: Border.all(
+                                color: award.isCareerPlayer
+                                    ? const Color(0xFFFFD54F)
+                                    : const Color(0xFF24552C),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  award.monthName + ' · ' + AppStrings.seasonNumber(award.season),
+                                  style: const TextStyle(
+                                    color: Color(0xFF8BE07F),
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  award.playerName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                                Text(
+                                  award.club + ' · ' + award.averageRating.toStringAsFixed(1),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.white60,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+
                   const SizedBox(height: 18),
 
                   Text(
