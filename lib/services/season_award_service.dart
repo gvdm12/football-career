@@ -65,8 +65,6 @@ class SeasonAwardService {
     double performanceScore(_Candidate item, {bool includeTeamSuccess = false}) {
       final contributionsPerMatch =
           (item.goals + item.assists) / item.matches;
-      final goalRate = item.goals / item.matches;
-      final assistRate = item.assists / item.matches;
       final teamPosition = positions[item.club];
       final teamBonus = !includeTeamSuccess || teamPosition == null
           ? 0.0
@@ -77,10 +75,11 @@ class SeasonAwardService {
                   : teamPosition <= (sortedTable.length / 2).ceil()
                       ? 0.2
                       : 0.0;
-      return item.rating * 10 +
-          contributionsPerMatch * 18 +
-          goalRate * 5 +
-          assistRate * 4 +
+      return item.rating * 8 +
+          item.goals * 0.30 +
+          item.assists * 0.22 +
+          item.matches * 0.035 +
+          contributionsPerMatch * 3 +
           teamBonus;
     }
 
