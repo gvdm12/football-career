@@ -9,6 +9,7 @@ import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/cup_match.dart';
 import 'package:flutter_football/models/league_match.dart';
+import 'package:flutter_football/models/league_player_season_stats.dart';
 import 'package:flutter_football/models/league_table.dart';
 import 'package:flutter_football/models/match.dart';
 import 'package:flutter_football/models/season_match.dart';
@@ -1500,6 +1501,16 @@ class _SeasonScreenState extends State<SeasonScreen> {
       completedLeagueMatches,
     );
 
+    // Обновляем сезонную статистику футболистов всех клубов лиги.
+    // Список обработанных матчей защищает от повторного начисления статистики
+    // при загрузке сохранения или повторном пересчёте календаря.
+    final leagueStatsUpdate = LeaguePlayerStatsService.update(
+      season: updatedCareer.season,
+      current: updatedCareer.leaguePlayerStats,
+      processedMatchKeys: updatedCareer.leagueStatsProcessedMatchKeys,
+      fixtures: completedLeagueMatches,
+    );
+
     var awards = List<PlayerOfMonthAward>.from(
       updatedCareer.playerOfMonthAwards,
     );
@@ -1525,6 +1536,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
       seasonMatches: updatedSeasonMatches,
       leagueMatches: completedLeagueMatches,
       leagueTable: updatedTable,
+      leaguePlayerStats: leagueStatsUpdate.players,
+      leagueStatsProcessedMatchKeys: leagueStatsUpdate.processedMatchKeys,
       playerOfMonthAwards: awards,
     );
 
