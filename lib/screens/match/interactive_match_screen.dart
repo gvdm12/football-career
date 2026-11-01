@@ -836,8 +836,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     if (action == 'shoot') {
       chance = (0.74 +
               (_player.skills.shooting - 60) * 0.0045 +
-              advantage * 0.7 -
-              ( _phase == 'oneOnOne' ? -0.08 : 0.0))
+              advantage * 0.7 +
+              (_phase == 'oneOnOne' ? 0.08 : 0.0))
           .clamp(0.48, 0.96);
     } else if (action == 'longShot') {
       chance = (0.52 +
