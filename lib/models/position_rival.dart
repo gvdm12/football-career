@@ -68,6 +68,14 @@ class PositionRival {
     );
   }
 
+  /// Условная сила конкурента для борьбы за игровое время.
+  /// Регулярные выходы в старте и хорошая форма повышают его вес.
+  int get selectionStrength =>
+      overall +
+      form +
+      ((averageRating - 6.5) * 2).round() +
+      (matches == 0 ? 0 : (starts / matches * 2).round());
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,
@@ -224,6 +232,7 @@ class PositionRival {
     required Player player,
     required int season,
     required List<PositionRival> existing,
+    bool preserveStats = true,
   }) {
     if (RealClubSquads.squads[player.club]?[player.position.name] == null) {
       return existing;
@@ -236,6 +245,27 @@ class PositionRival {
     return generated.map((candidate) {
       for (final old in existing) {
         if (old.name == candidate.name) {
+          if (!preserveStats) {
+            final age = old.age + 1;
+            final ageChange = age >= 33
+                ? -2
+                : age <= 23 && old.matches >= 8 && old.averageRating >= 7.0
+                    ? 1
+                    : age <= 23 &&
+                          old.matches >= 8 &&
+                          old.averageRating < 6.0
+                        ? -1
+                        : 0;
+            return PositionRival(
+              id: old.id,
+              name: candidate.name,
+              position: candidate.position,
+              age: age,
+              overall: (old.overall + ageChange).clamp(50, 95).toInt(),
+              jerseyNumber: candidate.jerseyNumber,
+              averageRating: 6.5,
+            );
+          }
           return PositionRival(
             id: old.id,
             name: candidate.name,
@@ -340,6 +370,7 @@ class PositionRival {
         player: player,
         season: season,
         existing: rivals,
+        preserveStats: false,
       );
     }
 
