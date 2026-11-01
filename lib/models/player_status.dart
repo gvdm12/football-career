@@ -53,15 +53,11 @@ class PlayerStatusCalculator {
     final playerPerformanceLevel =
         overall + (formBonus * 2).round() + (trustBonus * 0.35).round();
     final strongerRivals = rivals.where((rival) {
-      final rivalPerformanceLevel = rival.overall +
-          rival.form +
-          ((rival.averageRating - 6.5) * 2).round();
+      final rivalPerformanceLevel = rival.selectionStrength;
       return rivalPerformanceLevel > playerPerformanceLevel;
     }).toList();
     final clearlyStrongerRivals = strongerRivals.where((rival) {
-      final rivalPerformanceLevel = rival.overall +
-          rival.form +
-          ((rival.averageRating - 6.5) * 2).round();
+      final rivalPerformanceLevel = rival.selectionStrength;
       return rivalPerformanceLevel >= playerPerformanceLevel + 6;
     }).length;
 
@@ -75,7 +71,7 @@ class PlayerStatusCalculator {
       return PlayerStatus.starter;
     }
 
-    if (squadScore >= -7.0 || strongerRivals.length <= 1) {
+    if (squadScore >= -7.0 && clearlyStrongerRivals <= 1) {
       return PlayerStatus.rotation;
     }
 
