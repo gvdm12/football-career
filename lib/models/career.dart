@@ -1111,6 +1111,7 @@ class Career {
 
         if (contributions >= 18) {
           addBonus(SkillName.vision, 1);
+          addBonus(SkillName.passing, 1);
         }
 
         if (isExcellentSeason && goals >= 10) {
