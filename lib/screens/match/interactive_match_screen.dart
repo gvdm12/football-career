@@ -1369,7 +1369,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          _glassCard(
+                          _scoreboardGlass(
                             padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
                             child: Column(
                               children: [
@@ -1609,6 +1609,83 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _scoreboardGlass({
+    required Widget child,
+    EdgeInsets padding = const EdgeInsets.all(16),
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(26),
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        child: Container(
+          width: double.infinity,
+          padding: padding,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(26),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withOpacity(0.19),
+                const Color(0xFF4ADE80).withOpacity(0.12),
+                const Color(0xFF082B1C).withOpacity(0.58),
+                Colors.white.withOpacity(0.07),
+              ],
+              stops: const [0, 0.32, 0.72, 1],
+            ),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.28),
+              width: 1.2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF4ADE80).withOpacity(0.16),
+                blurRadius: 30,
+                spreadRadius: 1,
+                offset: const Offset(0, 8),
+              ),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.20),
+                blurRadius: 24,
+                offset: const Offset(0, 12),
+              ),
+              BoxShadow(
+                color: Colors.white.withOpacity(0.07),
+                blurRadius: 2,
+                spreadRadius: -1,
+                offset: const Offset(-1, -1),
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                top: 0,
+                left: 12,
+                right: 12,
+                child: IgnorePointer(
+                  child: Container(
+                    height: 1,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          Colors.white.withOpacity(0.42),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              child,
+            ],
+          ),
         ),
       ),
     );
