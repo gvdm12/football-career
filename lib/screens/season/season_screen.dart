@@ -2528,21 +2528,42 @@ class _SeasonScreenState extends State<SeasonScreen> {
     // Награды сезона формируются и сохраняются один раз после архивации статистики.
     if (!alreadyArchived &&
         !completedCareer.seasonAwards.any((item) => item.season == career.season)) {
+      final leagueAppearances = career.seasonMatches
+          .where((item) =>
+              item.isPlayed &&
+              item.result != null &&
+              item.result!.playerPlayed)
+          .toList();
+      final leagueGoals = leagueAppearances.fold<int>(
+        0,
+        (sum, item) => sum + item.result!.playerGoals,
+      );
+      final leagueAssists = leagueAppearances.fold<int>(
+        0,
+        (sum, item) => sum + item.result!.playerAssists,
+      );
+      final leagueRating = leagueAppearances.isEmpty
+          ? null
+          : leagueAppearances.fold<double>(
+                0,
+                (sum, item) => sum + item.result!.playerRating,
+              ) /
+              leagueAppearances.length;
+
       final seasonAwards = SeasonAwardService.create(
         season: career.season,
         player: career.player,
-        // Для наград чемпионата учитываем только клубную статистику.
-        // Матчи сборной остаются в общей истории сезона, но не смешиваются
-        // с результатами игроков национального чемпионата.
+        // Для наград чемпионата берём только матчи лиги игрока:
+        // кубки и сборная не смешиваются с национальным чемпионатом.
         seasonStats: SeasonStats(
           season: career.season,
           club: career.player.club,
-          matches: career.matches,
-          goals: career.goals,
-          assists: career.assists,
-          yellowCards: career.yellowCards,
-          redCards: career.redCards,
-          averageRating: career.averageRating,
+          matches: leagueAppearances.length,
+          goals: leagueGoals,
+          assists: leagueAssists,
+          yellowCards: 0,
+          redCards: 0,
+          averageRating: leagueRating,
         ),
         leaguePlayerStats: completedCareer.leaguePlayerStats,
         leagueTable: completedCareer.leagueTable,
