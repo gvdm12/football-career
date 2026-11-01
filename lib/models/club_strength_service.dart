@@ -72,7 +72,8 @@ class ClubStrengthService {
           ((updated[europaLeagueWinner] ??
                       Clubs.getByName(europaLeagueWinner).strength) +
                   1)
-              .clamp(45, 97);
+              .clamp(45, 97)
+              .toInt();
     }
 
     return updated;
