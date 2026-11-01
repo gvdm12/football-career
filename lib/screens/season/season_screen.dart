@@ -3112,10 +3112,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: RadialGradient(
-                        colors: [
-                          Colors.white.withValues(alpha: 0.15),
-                          Colors.white.withValues(alpha: 0),
-                        ],
+                        colors: [Colors.white.withValues(alpha: 0)],
                       ),
                     ),
                   ),
