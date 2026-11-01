@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/player_status.dart';
-import 'package:flutter_football/models/position_rival.dart';
 import 'package:flutter_football/services/app_strings.dart';
 
 class CoachScreen extends StatelessWidget {
@@ -197,125 +196,9 @@ class CoachScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          _panel(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppStrings.positionRivals,
-                  style: const TextStyle(
-                    color: Color(0xFF8BE07F),
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1,
-                    fontSize: 10,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                if (career.rivals.isEmpty)
-                  Text(
-                    AppStrings.isEnglish
-                        ? 'No direct competitors'
-                        : 'Прямых конкурентов пока нет',
-                    style: const TextStyle(color: Colors.white60),
-                  )
-                else
-                  ...career.rivals.map(
-                    (rival) => Container(
-                      margin: const EdgeInsets.only(top: 8),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.045),
-                        borderRadius: BorderRadius.circular(11),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.08),
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  rival.name,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                '${rival.overall} OVR',
-                                style: const TextStyle(
-                                  color: Color(0xFF8BE07F),
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            _rivalCompetitionLabel(rival),
-                            style: TextStyle(
-                              color: rival.selectionStrength >=
-                                      career.player.overall + 4
-                                  ? const Color(0xFFFFB86B)
-                                  : rival.selectionStrength >
-                                          career.player.overall
-                                      ? Colors.white70
-                                      : const Color(0xFF8BE07F),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 7),
-                          Wrap(
-                            spacing: 12,
-                            runSpacing: 5,
-                            children: [
-                              _rivalStat('Матчи', rival.matches.toString()),
-                              _rivalStat('В основе', rival.starts.toString()),
-                              _rivalStat('С замены', rival.substituteAppearances.toString()),
-                              _rivalStat('Голы', rival.goals.toString()),
-                              _rivalStat('Ассисты', rival.assists.toString()),
-                              _rivalStat('Средняя', rival.matches == 0
-                                  ? '—'
-                                  : rival.averageRating.toStringAsFixed(2)),
-                              _rivalStat('Последняя', rival.lastRating?.toStringAsFixed(1) ?? '—'),
-                              _rivalStat(
-                                'Форма',
-                                rival.form > 0 ? '+${rival.form}' : rival.form.toString(),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
+
         ],
       ),
-    );
-  }
-
-  String _rivalCompetitionLabel(PositionRival rival) {
-    if (rival.selectionStrength >= career.player.overall + 4) {
-      return 'Серьёзный конкурент за место в основе';
-    }
-    if (rival.selectionStrength > career.player.overall) {
-      return 'Претендент на игровое время';
-    }
-    return 'Пока уступает в борьбе за позицию';
-  }
-
-  Widget _rivalStat(String title, String value) {
-    return Text(
-      '$title: $value',
-      style: const TextStyle(color: Colors.white60, fontSize: 10),
     );
   }
 
