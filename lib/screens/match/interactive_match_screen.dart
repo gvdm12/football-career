@@ -93,6 +93,14 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       overall: _player.overall,
       clubName: _player.club,
       rivals: widget.career.rivals,
+      coachTrust: widget.career.coachTrust,
+      reputation: PlayerStatusCalculator.calculateReputation(
+        overall: _player.overall,
+        averageRating: widget.career.averageRating,
+        coachTrust: widget.career.coachTrust,
+        trophies: widget.career.history.fold<int>(0, (sum, item) => sum + item.achievements.length),
+      ),
+      averageRating: widget.career.averageRating,
     );
     _playerPlayed = widget.forcePlayerParticipation
         ? !widget.career.isInjured
