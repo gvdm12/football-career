@@ -103,20 +103,33 @@ class PositionRival {
       'Томас Берг',
     ],
     PlayerPosition.defender: [
-      'Илья Морозов', 'Лукас Мартин', 'Эрик Браун',
-      'Давид Гарсия', 'Маттиас Кляйн', 'Адам Новак',
+      'Zakariya Aynaoui',
+      'Lucas Martin',
+      'Erik Brown',
+      'David Garcia',
+      'Mathias Kleine',
+      'Adam Novak',
     ],
     PlayerPosition.midfielder: [
-      'Артём Соколов',
-      'Матео Ромеро',
-      'Оливер Кларк',
-      'Алекс Мюллер',
-      'Федерико Росси',
-      'Самир Хаддад',
+      'Julien Lacroix',
+      'Mateo Romero',
+      'Oliver Clarc',
+      'Alex Muller',
+      'Federico Rossi',
+      'Samir Haddad',
+      'Erik Costa',
+      'Martin Nunes',
     ],
     PlayerPosition.forward: [
-      'Даниэль Силва', 'Максим Орлов', 'Лео Мартинес',
-      'Рафаэль Коста', 'Тьяго Алвес', 'Юсуф Диалло',
+      'Daniel Silva',
+      'Maxim Orlov',
+      'Leo Martinez',
+      'Rafael Costa',
+      'Thiago Alves',
+      'Yusuf Diallo',
+      'Jeremy Claytor',
+      'Andre Santiago',
+      'Mathias Stiller',
     ],
   };
 
@@ -136,13 +149,13 @@ class PositionRival {
     final random = Random(_stableSeed('${player.name}|${player.club}|$season'));
     final targetCount = count.clamp(1, 3).toInt();
     final takenNumbers = <int>{player.jerseyNumber};
-    final realPlayers = RealClubSquads.squads[player.club]?[player.position.name];
+    final realPlayers =
+        RealClubSquads.squads[player.club]?[player.position.name];
 
     if (realPlayers != null && realPlayers.isNotEmpty) {
-      final candidates = realPlayers
-          .where((item) => item.name != player.name)
-          .toList()
-        ..shuffle(random);
+      final candidates =
+          realPlayers.where((item) => item.name != player.name).toList()
+            ..shuffle(random);
       return candidates.take(targetCount).map((item) {
         var number = item.jerseyNumber;
         if (takenNumbers.contains(number)) {
@@ -294,16 +307,22 @@ class PositionRival {
         continue;
       }
       final age = rival.age + 1;
-      final ageChange = age >= 33 ? -2 : age <= 23 ? 1 : 0;
-      remaining.add(PositionRival(
-        id: 's${season}_${rival.id}',
-        name: rival.name,
-        position: rival.position,
-        age: age,
-        overall: (rival.overall + ageChange).clamp(50, 95).toInt(),
-        jerseyNumber: rival.jerseyNumber,
-        averageRating: 6.5,
-      ));
+      final ageChange = age >= 33
+          ? -2
+          : age <= 23
+          ? 1
+          : 0;
+      remaining.add(
+        PositionRival(
+          id: 's${season}_${rival.id}',
+          name: rival.name,
+          position: rival.position,
+          age: age,
+          overall: (rival.overall + ageChange).clamp(50, 95).toInt(),
+          jerseyNumber: rival.jerseyNumber,
+          averageRating: 6.5,
+        ),
+      );
     }
     final targetCount = rivals.isEmpty ? 2 : rivals.length;
     final names = List<String>.from(_names[player.position]!)
@@ -326,16 +345,18 @@ class PositionRival {
           : 'Игрок ${season}_${index + 1}';
       final number = available[random.nextInt(available.length)];
       final delta = random.nextInt(11) - 4;
-      remaining.add(PositionRival(
-        id: 's${season}_new_${index + 1}_${random.nextInt(100000)}',
-        name: name,
-        position: player.position,
-        age: 18 + random.nextInt(13),
-        overall: (player.overall + delta).clamp(55, 95).toInt(),
-        jerseyNumber: number,
-        averageRating: 6.2 + random.nextDouble() * 0.9,
-        form: random.nextInt(7) - 3,
-      ));
+      remaining.add(
+        PositionRival(
+          id: 's${season}_new_${index + 1}_${random.nextInt(100000)}',
+          name: name,
+          position: player.position,
+          age: 18 + random.nextInt(13),
+          overall: (player.overall + delta).clamp(55, 95).toInt(),
+          jerseyNumber: number,
+          averageRating: 6.2 + random.nextDouble() * 0.9,
+          form: random.nextInt(7) - 3,
+        ),
+      );
     }
     return remaining;
   }
