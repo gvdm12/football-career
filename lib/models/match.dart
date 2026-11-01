@@ -235,26 +235,28 @@ class Match {
 
   bool isPlayerWin(String playerClub) {
     final isHome = homeTeam == playerClub;
+    if (hasPenalties) {
+      final playerPenalties = isHome ? homePenalties! : awayPenalties!;
+      final opponentPenalties = isHome ? awayPenalties! : homePenalties!;
+      return playerPenalties > opponentPenalties;
+    }
     final playerGoals = isHome ? homeGoals : awayGoals;
     final opponentGoals = isHome ? awayGoals : homeGoals;
-    if (playerGoals != opponentGoals) return playerGoals > opponentGoals;
-    if (!hasPenalties) return false;
-    final playerPenalties = isHome ? homePenalties! : awayPenalties!;
-    final opponentPenalties = isHome ? awayPenalties! : homePenalties!;
-    return playerPenalties > opponentPenalties;
+    return playerGoals > opponentGoals;
   }
 
   bool get hasPenalties => homePenalties != null && awayPenalties != null;
 
   bool isPlayerLoss(String playerClub) {
     final isHome = homeTeam == playerClub;
+    if (hasPenalties) {
+      final playerPenalties = isHome ? homePenalties! : awayPenalties!;
+      final opponentPenalties = isHome ? awayPenalties! : homePenalties!;
+      return playerPenalties < opponentPenalties;
+    }
     final playerGoals = isHome ? homeGoals : awayGoals;
     final opponentGoals = isHome ? awayGoals : homeGoals;
-    if (playerGoals != opponentGoals) return playerGoals < opponentGoals;
-    if (!hasPenalties) return false;
-    final playerPenalties = isHome ? homePenalties! : awayPenalties!;
-    final opponentPenalties = isHome ? awayPenalties! : homePenalties!;
-    return playerPenalties < opponentPenalties;
+    return playerGoals < opponentGoals;
   }
 
   factory Match.generate({
