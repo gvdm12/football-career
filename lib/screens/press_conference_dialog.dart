@@ -30,6 +30,8 @@ class PressConferenceContent {
 }
 
 class PressConferenceContentFactory {
+  static final List<String> _recentQuestions = [];
+
   static PressConferenceContent create({
     required String category,
     required bool english,
@@ -96,16 +98,24 @@ class PressConferenceContentFactory {
       ],
       'poor' => [
         choose(
-          'Сегодня команде было непросто. Что пошло не так?',
-          'It was a difficult match for the team. What went wrong?',
+          'Вы провели слабый матч. Почему сегодня не получилось проявить себя?',
+          'You had a poor match. Why could you not show your best today?',
         ),
         choose(
-          'Как собираетесь реагировать на неудачный результат?',
-          'How will you respond to this disappointing result?',
+          'В чём главная причина поражения: тактика, настрой или исполнение?',
+          'What caused the defeat: tactics, mentality or execution?',
         ),
         choose(
-          'Что нужно изменить перед следующей игрой?',
-          'What needs to change before the next match?',
+          'Можно ли сказать, что тренер ошибся с планом на игру?',
+          'Did the coach get the game plan wrong?',
+        ),
+        choose(
+          'Команда ждала от вас большего. Что помешало сыграть лучше?',
+          'The team expected more from you. What stopped you performing better?',
+        ),
+        choose(
+          'Какие оправдания можно найти этому результату — или их нет?',
+          'Are there any excuses for this result, or are there none?',
         ),
       ],
       'losingStreak' => [
@@ -130,12 +140,42 @@ class PressConferenceContentFactory {
       ],
       'poorSeason' => [
         choose(
-          'Сезон складывается провально. Можно ли винить тренерский штаб?',
-          'The season has been disappointing. Is the coaching staff to blame?',
+          'Сезон провален. В чём главная вина: игроков, тренера или руководства?',
+          'The season has failed. Who is most responsible: players, coach or board?',
         ),
         choose(
-          'Болельщики ждут объяснений. Почему команда выступает так слабо?',
-          'The fans want answers. Why is the team performing so poorly?',
+          'Вы сами недовольны своей игрой. Почему не удалось показать лучший футбол?',
+          'You are unhappy with your own season. Why could you not play better?',
+        ),
+        choose(
+          'Тренерский штаб должен отвечать за этот провал?',
+          'Should the coaching staff take responsibility for this failure?',
+        ),
+        choose(
+          'Что вы скажете болельщикам, которые весь сезон ждали большего?',
+          'What do you say to fans who expected much more this season?',
+        ),
+        choose(
+          'Вы хотите играть в клубе, который регулярно борется за трофеи?',
+          'Would you like to play for a club that regularly competes for trophies?',
+        ),
+      ],
+      'elimination' => [
+        choose(
+          'Команда вылетела из турнира. Почему не удалось пройти дальше?',
+          'Your team is out. Why could you not reach the next round?',
+        ),
+        choose(
+          'Чего сегодня не хватило: характера, качества или правильной тактики?',
+          'What was missing today: character, quality or the right tactics?',
+        ),
+        choose(
+          'Можно ли винить тренера в таком вылете?',
+          'Can the coach be blamed for this elimination?',
+        ),
+        choose(
+          'Вы лично довольны тем, как проявили себя в этом турнире?',
+          'Are you personally satisfied with your performances in this tournament?',
         ),
       ],
       'tournament' => [
@@ -154,16 +194,20 @@ class PressConferenceContentFactory {
       ],
       _ => [
         choose(
-          'Как оцените сегодняшний матч и свою роль в команде?',
-          'How do you assess today’s match and your role in the team?',
+          'Как оцените сегодняшний матч и вклад команды?',
+          'How do you assess today’s match and the team performance?',
         ),
         choose(
-          'Журналисты спрашивают о конкуренции за место в составе. Что ответите?',
-          'Journalists ask about the competition for a place in the team. What is your response?',
+          'Что команда должна улучшить в ближайших матчах?',
+          'What should the team improve in the coming matches?',
         ),
         choose(
-          'Что для вас сейчас важнее: личные показатели или успех команды?',
-          'What matters more right now: personal stats or team success?',
+          'Насколько важна поддержка болельщиков в такой момент?',
+          'How important is the fans’ support at this moment?',
+        ),
+        choose(
+          'Какой футбол вы хотели бы видеть от своей команды?',
+          'What kind of football would you like your team to play?',
         ),
       ],
     };
@@ -505,6 +549,65 @@ class PressConferenceContentFactory {
           trustChange: 2,
           icon: Icons.build_outlined,
         ),
+        PressConferenceOption(
+          text: choose(
+            'Я хочу играть за клуб, который каждый сезон борется за трофеи',
+            'I want to play for a club that fights for trophies every season',
+          ),
+          detail: choose(
+            'Амбициозное заявление: тренер может воспринять это как сомнение в проекте клуба',
+            'An ambitious statement that may be seen as doubt in the club project',
+          ),
+          trustChange: -3,
+          icon: Icons.emoji_events_outlined,
+        ),
+      ],
+      'elimination' => [
+        PressConferenceOption(
+          text: choose(
+            'Мы все должны взять ответственность, включая меня',
+            'We all must take responsibility, including me',
+          ),
+          detail: choose('Поддержка команды', 'Backing the team'),
+          trustChange: 3,
+          icon: Icons.groups_outlined,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Тренер должен объяснить выбранную тактику',
+            'The coach must explain the chosen tactics',
+          ),
+          detail: choose('Публичная критика тренера', 'Public criticism of the coach'),
+          trustChange: -5,
+          icon: Icons.warning_amber_rounded,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Нам не хватило качества в решающие моменты',
+            'We lacked quality in decisive moments',
+          ),
+          detail: choose('Критика командной игры', 'Criticism of team performance'),
+          trustChange: -2,
+          icon: Icons.groups_outlined,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Не ищу оправданий — мы должны были пройти дальше',
+            'I will not make excuses — we should have gone through',
+          ),
+          detail: choose('Честная и требовательная позиция', 'Honest and demanding response'),
+          trustChange: 2,
+          icon: Icons.shield_outlined,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Я сделал всё, что мог, но команда подвела',
+            'I did all I could, but the team let me down',
+          ),
+          detail: choose('Перекладывание ответственности на партнёров', 'Blaming teammates'),
+          trustChange: -3,
+          icon: Icons.person_off_outlined,
+        ),
       ],
       'tournament' => [
         PressConferenceOption(
@@ -584,8 +687,16 @@ class PressConferenceContentFactory {
       ],
     };
 
+    final availableQuestions = questions
+        .where((question) => !_recentQuestions.contains(question))
+        .toList();
+    final pool = availableQuestions.isEmpty ? questions : availableQuestions;
+    final selectedQuestion = pool[random.nextInt(pool.length)];
+    _recentQuestions.add(selectedQuestion);
+    if (_recentQuestions.length > 8) _recentQuestions.removeAt(0);
+
     return PressConferenceContent(
-      question: questions[random.nextInt(questions.length)],
+      question: selectedQuestion,
       options: options,
       english: english,
     );
