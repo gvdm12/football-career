@@ -826,20 +826,27 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       'cross',
       'dribble',
     ].contains(action);
+    final isShot = ['shoot', 'longShot', 'header', 'volley'].contains(action);
     final difficulty = action == 'longShot'
-        ? 0.27
+        ? 0.24
         : action == 'throughPass'
-        ? 0.16
+        ? 0.13
         : action == 'header' || action == 'volley'
-        ? 0.12
+        ? 0.07
         : action == 'shoot'
-        ? 0.10
-        : 0.04;
+        ? 0.04
+        : 0.02;
     final advantage = widget.isHome
         ? (_homeStrength - _awayStrength) * 0.003
         : (_awayStrength - _homeStrength) * 0.003;
-    final chance = (0.49 + (skill - 60) * 0.0055 + advantage - difficulty)
-        .clamp(0.16, 0.84);
+
+    // Навыки игрока дают заметное преимущество, но не гарантируют успех.
+    // Обычные передачи и удары не должны проваливаться чаще, чем удаваться.
+    final chance = ((isShot ? 0.62 : 0.58) +
+            (skill - 60) * 0.0065 +
+            advantage -
+            difficulty)
+        .clamp(0.22, 0.93);
     final success = _random.nextDouble() < chance;
     if (success) _successfulActions++;
     String message;
@@ -851,15 +858,19 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _shots++;
       final isOneOnOne = _phase == 'oneOnOne';
       final isAerial = _phase == 'aerialChance';
-      final finishingChance = isAerial
+      final baseFinishingChance = isAerial
           ? action == 'header'
-                ? 0.30
-                : 0.22
+                ? 0.43
+                : 0.30
           : isOneOnOne
-          ? 0.48
+          ? 0.62
           : action == 'longShot'
-          ? 0.16
-          : 0.27;
+          ? 0.22
+          : 0.42;
+      final finishingChance = (baseFinishingChance +
+              (_player.skills.shooting - 70) * 0.006 +
+              advantage * 0.7)
+          .clamp(0.12, 0.76);
       if (success && _random.nextDouble() < finishingChance) {
         if (widget.isHome) {
           _addGoal(home: true);
