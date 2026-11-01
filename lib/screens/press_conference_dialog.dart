@@ -659,10 +659,10 @@ class PressConferenceContentFactory {
         ),
         PressConferenceOption(
           text: choose(
-            'Конкуренция мотивирует меня становиться лучше',
-            'Competition motivates me to improve',
+            'Я хочу приносить команде ещё больше пользы',
+            'I want to contribute even more to the team',
           ),
-          detail: choose('Позитивный настрой', 'Positive attitude'),
+          detail: choose('Командный настрой', 'Team-first attitude'),
           trustChange: 2,
           icon: Icons.trending_up,
         ),
