@@ -15,6 +15,7 @@ import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/screens/development_screen.dart';
 import 'package:flutter_football/screens/home/home_screen.dart';
 import 'package:flutter_football/screens/player/player_screen.dart';
+import 'package:flutter_football/screens/shop_screen.dart';
 import 'package:flutter_football/screens/coach_screen.dart';
 import 'package:flutter_football/screens/team_screen.dart';
 import 'package:flutter_football/screens/agent_screen.dart';
@@ -2381,6 +2382,17 @@ class _SeasonScreenState extends State<SeasonScreen> {
     await _saveCareer(updatedCareer);
   }
 
+  Future<void> _openShop() async {
+    if (career.isCareerFinished) return;
+    final updatedCareer = await Navigator.push<Career>(
+      context,
+      MaterialPageRoute(builder: (_) => ShopScreen(career: career)),
+    );
+    if (!mounted || updatedCareer == null) return;
+    setState(() => career = updatedCareer);
+    await _saveCareer(updatedCareer);
+  }
+
   Future<void> _openTeam() async {
     final updatedCareer = await Navigator.push<Career>(
       context,
@@ -2499,6 +2511,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 onTap: () {
                   Navigator.pop(context);
                   _openPlayerProfile();
+                },
+              ),
+              _drawerItem(
+                icon: Icons.storefront_outlined,
+                title: 'Магазин карьеры',
+                onTap: () {
+                  Navigator.pop(context);
+                  _openShop();
                 },
               ),
               _drawerItem(
