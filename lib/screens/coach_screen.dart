@@ -219,27 +219,57 @@ class CoachScreen extends StatelessWidget {
                   )
                 else
                   ...career.rivals.map(
-                    (rival) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Row(
+                    (rival) => Container(
+                      margin: const EdgeInsets.only(top: 8),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.045),
+                        borderRadius: BorderRadius.circular(11),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.08),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: Text(
-                              rival.name,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 12,
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  rival.name,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 12,
+                                  ),
+                                ),
                               ),
-                            ),
+                              Text(
+                                '${rival.overall} OVR',
+                                style: const TextStyle(
+                                  color: Color(0xFF8BE07F),
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
                           ),
-                          Text(
-                            '${rival.overall} OVR',
-                            style: const TextStyle(
-                              color: Color(0xFF8BE07F),
-                              fontWeight: FontWeight.w800,
-                              fontSize: 12,
-                            ),
+                          const SizedBox(height: 7),
+                          Wrap(
+                            spacing: 12,
+                            runSpacing: 5,
+                            children: [
+                              _rivalStat('Матчи', rival.matches.toString()),
+                              _rivalStat('Голы', rival.goals.toString()),
+                              _rivalStat('Ассисты', rival.assists.toString()),
+                              _rivalStat('Оценка', rival.matches == 0
+                                  ? '—'
+                                  : rival.averageRating.toStringAsFixed(2)),
+                              _rivalStat(
+                                'Форма',
+                                rival.form > 0 ? '+${rival.form}' : rival.form.toString(),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -250,6 +280,13 @@ class CoachScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _rivalStat(String title, String value) {
+    return Text(
+      '$title: $value',
+      style: const TextStyle(color: Colors.white60, fontSize: 10),
     );
   }
 
