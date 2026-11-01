@@ -93,9 +93,7 @@ class _ShopScreenState extends State<ShopScreen> {
   Future<void> _buyRecovery() async {
     if (!career.isInjured || career.money < _recoveryPrice) return;
 
-    final remaining = (career.injuryMatchesRemaining - 2)
-        .clamp(0, 10)
-        .toInt();
+    final remaining = (career.injuryMatchesRemaining - 2).clamp(0, 10).toInt();
 
     setState(() {
       career = career.copyWith(
@@ -131,7 +129,7 @@ class _ShopScreenState extends State<ShopScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF0B3A1A),
         foregroundColor: Colors.white,
-        title: const Text('Магазин карьеры'),
+        title: const Text('Магазин'),
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -142,7 +140,7 @@ class _ShopScreenState extends State<ShopScreen> {
           ),
         ),
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(18),
           children: [
             Container(
               padding: const EdgeInsets.all(16),
@@ -153,8 +151,11 @@ class _ShopScreenState extends State<ShopScreen> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.account_balance_wallet,
-                      color: Color(0xFF8BE07F), size: 28),
+                  const Icon(
+                    Icons.account_balance_wallet,
+                    color: Color(0xFF8BE07F),
+                    size: 22,
+                  ),
                   const SizedBox(width: 12),
                   const Expanded(
                     child: Text(
@@ -169,14 +170,14 @@ class _ShopScreenState extends State<ShopScreen> {
                     '${career.money} €',
                     style: const TextStyle(
                       color: Color(0xFF8BE07F),
-                      fontSize: 18,
+                      fontSize: 14,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 10),
             _sectionTitle('ТРЕНИРОВКИ'),
             Container(
               padding: const EdgeInsets.all(16),
@@ -186,15 +187,18 @@ class _ShopScreenState extends State<ShopScreen> {
                 children: [
                   const Row(
                     children: [
-                      Icon(Icons.fitness_center,
-                          color: Color(0xFF8BE07F), size: 28),
+                      Icon(
+                        Icons.fitness_center,
+                        color: Color(0xFF8BE07F),
+                        size: 22,
+                      ),
                       SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           'Индивидуальная тренировка',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -204,7 +208,7 @@ class _ShopScreenState extends State<ShopScreen> {
                   const SizedBox(height: 8),
                   const Text(
                     'Повышает выбранную характеристику на +5 на следующие 3 матча. Базовые навыки и общий рейтинг не меняются.',
-                    style: TextStyle(color: Colors.white70, fontSize: 13),
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                   const SizedBox(height: 14),
                   DropdownButtonFormField<SkillName>(
@@ -236,7 +240,7 @@ class _ShopScreenState extends State<ShopScreen> {
                       if (value != null) setState(() => selectedSkill = value);
                     },
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       const Expanded(
@@ -254,7 +258,7 @@ class _ShopScreenState extends State<ShopScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 6),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -275,7 +279,7 @@ class _ShopScreenState extends State<ShopScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 10),
             _sectionTitle('ВОССТАНОВЛЕНИЕ'),
             Container(
               padding: const EdgeInsets.all(16),
@@ -285,14 +289,14 @@ class _ShopScreenState extends State<ShopScreen> {
                 children: [
                   const Row(
                     children: [
-                      Icon(Icons.healing, color: Color(0xFFFF9999), size: 28),
+                      Icon(Icons.healing, color: Color(0xFFFF9999), size: 22),
                       SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           'Ускоренное лечение',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -304,9 +308,9 @@ class _ShopScreenState extends State<ShopScreen> {
                     career.isInjured
                         ? 'Травма: ${career.injuryName ?? 'повреждение'}. Осталось пропустить матчей: ${career.injuryMatchesRemaining}.'
                         : 'Сейчас вы здоровы. Лечение станет доступно при получении травмы.',
-                    style: const TextStyle(color: Colors.white70, fontSize: 13),
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       const Expanded(
@@ -324,11 +328,12 @@ class _ShopScreenState extends State<ShopScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 6),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: career.isInjured && career.money >= _recoveryPrice
+                      onPressed:
+                          career.isInjured && career.money >= _recoveryPrice
                           ? _buyRecovery
                           : null,
                       style: ElevatedButton.styleFrom(
@@ -341,19 +346,13 @@ class _ShopScreenState extends State<ShopScreen> {
                         !career.isInjured
                             ? 'Лечение не требуется'
                             : career.money < _recoveryPrice
-                                ? 'Недостаточно денег'
-                                : 'Сократить травму на 2 матча',
+                            ? 'Недостаточно денег'
+                            : 'Сократить травму на 2 матча',
                       ),
                     ),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 18),
-            const Text(
-              'Покупки оплачиваются из обычного баланса игрока. Монеты агента не используются.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white54, fontSize: 12),
             ),
           ],
         ),
@@ -370,6 +369,7 @@ class _ShopScreenState extends State<ShopScreen> {
           color: Color(0xFF8BE07F),
           fontWeight: FontWeight.w900,
           letterSpacing: 1,
+          fontSize: 12,
         ),
       ),
     );
