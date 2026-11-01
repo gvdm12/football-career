@@ -161,7 +161,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
         updatedTournament.isCompleted &&
             updatedTournament.champion == player.nationality &&
             earnedNationalMatches > 0
-        ? 8
+        ? 10
         : 0;
     final nationalCurrencyReward =
         earnedNationalGoals * 2 +
