@@ -137,6 +137,8 @@ class WorldCupMatch {
   final String awayTeam;
   final int? homeGoals;
   final int? awayGoals;
+  final int? homePenalties;
+  final int? awayPenalties;
   final bool isPlayed;
   final String? winner;
   final int playerGoals;
@@ -149,6 +151,8 @@ class WorldCupMatch {
     required this.awayTeam,
     this.homeGoals,
     this.awayGoals,
+    this.homePenalties,
+    this.awayPenalties,
     this.isPlayed = false,
     this.winner,
     this.playerGoals = 0,
