@@ -500,15 +500,23 @@ class Career {
       leagueTable: leagueTable,
       money: (json['money'] as num?)?.toInt() ?? 0,
       agentCredits: (json['agentCredits'] as num?)?.toInt() ?? 0,
-      agentInterestedClubs: (json['agentInterestedClubs'] as List?)?.whereType<String>().toList() ?? const [],
+      agentInterestedClubs:
+          (json['agentInterestedClubs'] as List?)
+              ?.whereType<String>()
+              .toList() ??
+          const [],
       contractYears: (json['contractYears'] as num?)?.toInt() ?? 0,
       developmentPoints: (json['developmentPoints'] as num?)?.toInt() ?? 0,
       seasonMatches: seasonMatches,
       leagueMatches: leagueMatches,
       news: readList('news', CareerNews.fromJson),
       rivals: restoredRivals,
-      coachTrust: ((json['coachTrust'] as num?)?.toInt() ?? 65).clamp(0, 100).toInt(),
-      agentLevel: ((json['agentLevel'] as num?)?.toInt() ?? 1).clamp(1, 10).toInt(),
+      coachTrust: ((json['coachTrust'] as num?)?.toInt() ?? 65)
+          .clamp(0, 100)
+          .toInt(),
+      agentLevel: ((json['agentLevel'] as num?)?.toInt() ?? 1)
+          .clamp(1, 10)
+          .toInt(),
       coachName: json['coachName'] as String? ?? 'Главный тренер',
       monthlySalary: (json['monthlySalary'] as num?)?.toInt() ?? 0,
       isCareerFinished: json['isCareerFinished'] as bool? ?? false,
@@ -525,15 +533,21 @@ class Career {
               .toInt(),
       injuryName: json['injuryName'] as String?,
       injuryRecoveryUsed: json['injuryRecoveryUsed'] as bool? ?? false,
-      skillTrainingPurchases: (json['skillTrainingPurchases'] as Map?)?.map(
-        (key, value) => MapEntry(key.toString(), (value as num).toInt()),
-      ) ?? const {},
-      temporarySkillBoosts: (json['temporarySkillBoosts'] as Map?)?.map(
-        (key, value) => MapEntry(key.toString(), (value as num).toInt()),
-      ) ?? const {},
-      temporarySkillBoostMatches: (json['temporarySkillBoostMatches'] as Map?)?.map(
-        (key, value) => MapEntry(key.toString(), (value as num).toInt()),
-      ) ?? const {},
+      skillTrainingPurchases:
+          (json['skillTrainingPurchases'] as Map?)?.map(
+            (key, value) => MapEntry(key.toString(), (value as num).toInt()),
+          ) ??
+          const {},
+      temporarySkillBoosts:
+          (json['temporarySkillBoosts'] as Map?)?.map(
+            (key, value) => MapEntry(key.toString(), (value as num).toInt()),
+          ) ??
+          const {},
+      temporarySkillBoostMatches:
+          (json['temporarySkillBoostMatches'] as Map?)?.map(
+            (key, value) => MapEntry(key.toString(), (value as num).toInt()),
+          ) ??
+          const {},
     );
   }
 
@@ -614,9 +628,11 @@ class Career {
           injuryMatchesRemaining ?? this.injuryMatchesRemaining,
       injuryName: clearInjury ? null : injuryName ?? this.injuryName,
       injuryRecoveryUsed: injuryRecoveryUsed ?? this.injuryRecoveryUsed,
-      skillTrainingPurchases: skillTrainingPurchases ?? this.skillTrainingPurchases,
+      skillTrainingPurchases:
+          skillTrainingPurchases ?? this.skillTrainingPurchases,
       temporarySkillBoosts: temporarySkillBoosts ?? this.temporarySkillBoosts,
-      temporarySkillBoostMatches: temporarySkillBoostMatches ?? this.temporarySkillBoostMatches,
+      temporarySkillBoostMatches:
+          temporarySkillBoostMatches ?? this.temporarySkillBoostMatches,
     );
   }
 
@@ -652,8 +668,7 @@ class Career {
       description =
           'После очередного сильного выступления тренер высоко оценил '
           'вашу игру. Доверие тренерского штаба растёт.';
-    }
-    else if (rating <= 6.0 && coachTrust <= 45) {
+    } else if (rating <= 6.0 && coachTrust <= 45) {
       title = 'Тренер ждёт реакции';
       description =
           'После неудачного матча тренерский штаб ожидает от вас '
@@ -726,11 +741,21 @@ class Career {
           nextDurations[skillName] = remaining;
         }
       }
-      updatedCareer = copyWith(temporarySkillBoosts: nextBoosts, temporarySkillBoostMatches: nextDurations);
+      updatedCareer = copyWith(
+        temporarySkillBoosts: nextBoosts,
+        temporarySkillBoostMatches: nextDurations,
+      );
     }
 
-    if (!playerParticipated || Random().nextDouble() >= 0.030) return updatedCareer;
-    const injuries = ['Растяжение мышц', 'Ушиб', 'Повреждение голеностопа', 'Мышечная травма', 'Повреждение колена'];
+    if (!playerParticipated || Random().nextDouble() >= 0.030)
+      return updatedCareer;
+    const injuries = [
+      'Растяжение мышц',
+      'Ушиб',
+      'Повреждение голеностопа',
+      'Мышечная травма',
+      'Повреждение колена',
+    ];
     final random = Random();
     final duration = random.nextInt(10) + 1;
     return updatedCareer.copyWith(
@@ -749,9 +774,7 @@ class Career {
         ? 1
         : 0;
 
-    return match.playerGoals * 2 +
-        match.playerAssists +
-        performanceBonus;
+    return match.playerGoals * 2 + match.playerAssists + performanceBonus;
   }
 
   Career afterMatch(Match match) {
@@ -773,7 +796,9 @@ class Career {
 
     // Травмированный игрок пропускает матч, но срок восстановления уменьшается.
     if (isInjured) {
-      return trustedCareer.advanceAfterCompetitionMatch(playerParticipated: false);
+      return trustedCareer.advanceAfterCompetitionMatch(
+        playerParticipated: false,
+      );
     }
 
     // Команда сыграла, но игрок не участвовал.
@@ -800,16 +825,19 @@ class Career {
           ((averageRating! * matches) + match.playerRating) / newMatches;
     }
 
-    final updatedCareer = trustedCareer.copyWith(
-      agentCredits: trustedCareer.agentCredits + currencyRewardForMatch(match),
-      matches: newMatches,
-      goals: newGoals,
-      assists: newAssists,
-      yellowCards: newYellowCards,
-      redCards: newRedCards,
-      averageRating: double.parse(newAverageRating.toStringAsFixed(2)),
-      news: [...trustedCareer.news, ...matchNews],
-    ).advanceAfterCompetitionMatch(playerParticipated: true);
+    final updatedCareer = trustedCareer
+        .copyWith(
+          agentCredits:
+              trustedCareer.agentCredits + currencyRewardForMatch(match),
+          matches: newMatches,
+          goals: newGoals,
+          assists: newAssists,
+          yellowCards: newYellowCards,
+          redCards: newRedCards,
+          averageRating: double.parse(newAverageRating.toStringAsFixed(2)),
+          news: [...trustedCareer.news, ...matchNews],
+        )
+        .advanceAfterCompetitionMatch(playerParticipated: true);
 
     if (match.injuryName != null && match.injuryMatchesRemaining > 0) {
       return updatedCareer.copyWith(
@@ -964,7 +992,8 @@ class Career {
               totalSeasonMatches;
 
     final seasonRating = totalSeasonRating ?? 0;
-    if (totalSeasonMatches >= 15 && seasonRating >= 7.5 &&
+    if (totalSeasonMatches >= 15 &&
+        seasonRating >= 7.5 &&
         totalSeasonGoals + totalSeasonAssists >= 15) {
       achievements.add('Лучший игрок сезона');
     }
@@ -999,19 +1028,25 @@ class Career {
         : 3;
 
     final awardNews = achievements
-        .where((item) => item == 'Лучший игрок сезона' ||
-            item == 'Лучший молодой игрок сезона' ||
-            item == 'В сборной сезона' ||
-            item == 'Лучший ассистент' ||
-            item == 'Золотая бутса')
-        .map((award) => CareerNews(
-              id: 's${season}_award_${award.hashCode}',
-              season: season,
-              matchNumber: seasonMatches.length + 1,
-              title: award,
-              description: '${player.name} получил награду «$award» по итогам сезона.',
-              type: CareerNewsType.achievement,
-            ))
+        .where(
+          (item) =>
+              item == 'Лучший игрок сезона' ||
+              item == 'Лучший молодой игрок сезона' ||
+              item == 'В сборной сезона' ||
+              item == 'Лучший ассистент' ||
+              item == 'Золотая бутса',
+        )
+        .map(
+          (award) => CareerNews(
+            id: 's${season}_award_${award.hashCode}',
+            season: season,
+            matchNumber: seasonMatches.length + 1,
+            title: award,
+            description:
+                '${player.name} получил награду «$award» по итогам сезона.',
+            type: CareerNewsType.achievement,
+          ),
+        )
         .toList();
 
     const teamTrophies = {
@@ -1058,6 +1093,10 @@ class Career {
           addBonus(SkillName.shooting, 1);
         }
 
+        if (goals >= 15) {
+          addBonus(SkillName.heading, 1);
+        }
+
         if (goals >= 34) {
           addBonus(SkillName.shooting, 1);
         }
@@ -1068,6 +1107,10 @@ class Career {
 
         if (isGoodSeason && goals >= 14) {
           addBonus(SkillName.pace, 1);
+        }
+
+        if (contributions >= 18) {
+          addBonus(SkillName.vision, 1);
         }
 
         if (isExcellentSeason && goals >= 10) {
