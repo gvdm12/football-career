@@ -2520,9 +2520,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
         seasonStats: completedCareer.history.firstWhere(
           (item) => item.season == career.season,
         ),
-        monthlyAwards: completedCareer.playerOfMonthAwards
-            .where((item) => item.season == career.season)
-            .toList(),
+        leaguePlayerStats: completedCareer.leaguePlayerStats,
+        leagueTable: completedCareer.leagueTable,
       );
       completedCareer = completedCareer.copyWith(
         seasonAwards: [...completedCareer.seasonAwards, ...seasonAwards],
