@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/league_match.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/real_club_squads.dart';
@@ -162,9 +163,9 @@ class LeaguePlayerStatsService {
   static int _clubStrength(String club) {
     // Сила клуба передаётся через рейтинг реального состава, если он есть.
     final squad = RealClubSquads.squads[club];
-    if (squad == null) return 68;
+    if (squad == null) return Clubs.getByName(club).strength;
     final values = squad.values.expand((items) => items).map((item) => item.overall).toList();
-    if (values.isEmpty) return 68;
+    if (values.isEmpty) return Clubs.getByName(club).strength;
     return (values.reduce((a, b) => a + b) / values.length).round();
   }
 
