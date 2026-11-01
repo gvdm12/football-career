@@ -1,0 +1,87 @@
+import 'dart:math';
+
+import 'club.dart';
+import 'league_table.dart';
+
+/// Меняет силу клубов по итогам каждого завершённого сезона.
+class ClubStrengthService {
+  static Map<String, int> update({
+    required Map<String, int> currentStrengths,
+    required Map<League, List<LeagueTableEntry>> standings,
+    required DomesticCupResult? domesticCup,
+    required String? championsLeagueWinner,
+    required String? europaLeagueWinner,
+  }) {
+    final updated = <String, int>{...currentStrengths};
+
+    for (final league in League.values) {
+      final table = standings[league];
+      if (table == null || table.isEmpty) continue;
+
+      final ordered = [...table]
+        ..sort((a, b) {
+          final points = b.points.compareTo(a.points);
+          if (points != 0) return points;
+          return b.goalDifference.compareTo(a.goalDifference);
+        });
+
+      for (var index = 0; index < ordered.length; index++) {
+        final clubName = ordered[index].club;
+        final base = updated[clubName] ?? Clubs.all
+            .firstWhere((club) => club.name == clubName,
+                orElse: () => Clubs.all.first)
+            .baseStrength;
+        final expectedOrder = [...Clubs.byLeague(league)]
+          ..sort((a, b) => b.strength.compareTo(a.strength));
+        final expectedIndex = expectedOrder.indexWhere(
+          (club) => club.name == clubName,
+        );
+        if (expectedIndex < 0) continue;
+
+        final positionAdvantage = expectedIndex - index;
+        final performanceChange = (positionAdvantage / 4).round();
+        final pointsPerGame = ordered[index].played == 0
+            ? 0.0
+            : ordered[index].points / ordered[index].played;
+        final formChange = pointsPerGame >= 2.2
+            ? 1
+            : pointsPerGame <= 0.75
+                ? -1
+                : 0;
+        final change = (performanceChange + formChange).clamp(-3, 3);
+        updated[clubName] = (base + change).clamp(45, 97);
+      }
+    }
+
+    final cupWinner = domesticCup?.winner;
+    if (cupWinner != null) {
+      updated[cupWinner] = ((updated[cupWinner] ??
+              Clubs.getByName(cupWinner).strength) +
+          1).clamp(45, 97);
+    }
+
+    if (championsLeagueWinner != null) {
+      updated[championsLeagueWinner] =
+          ((updated[championsLeagueWinner] ??
+                      Clubs.getByName(championsLeagueWinner).strength) +
+                  2)
+              .clamp(45, 97);
+    }
+
+    if (europaLeagueWinner != null) {
+      updated[europaLeagueWinner] =
+          ((updated[europaLeagueWinner] ??
+                      Clubs.getByName(europaLeagueWinner).strength) +
+                  1)
+              .clamp(45, 97);
+    }
+
+    return updated;
+  }
+}
+
+class DomesticCupResult {
+  final String? winner;
+
+  const DomesticCupResult(this.winner);
+}
