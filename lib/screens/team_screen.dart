@@ -309,15 +309,48 @@ class TeamScreen extends StatelessWidget {
                         ],
                       ),
                       const Divider(color: Color(0xFF24552C), height: 18),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          rival.selectionStrength >= player.overall + 4
+                              ? 'Серьёзный конкурент за место в основе'
+                              : rival.selectionStrength > player.overall
+                                  ? 'Претендент на игровое время'
+                                  : 'Пока уступает в борьбе за позицию',
+                          style: TextStyle(
+                            color: rival.selectionStrength >= player.overall + 4
+                                ? const Color(0xFFFFB86B)
+                                : rival.selectionStrength > player.overall
+                                    ? Colors.white70
+                                    : _accent,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 9),
+                      Wrap(
+                        spacing: 14,
+                        runSpacing: 9,
                         children: [
                           _stat('Матчи', '${rival.matches}'),
+                          _stat('В основе', '${rival.starts}'),
+                          _stat('С замены', '${rival.substituteAppearances}'),
                           _stat('Голы', '${rival.goals}'),
                           _stat('Ассисты', '${rival.assists}'),
                           _stat(
-                            'Оценка',
-                            rival.averageRating.toStringAsFixed(1),
+                            'Средняя оценка',
+                            rival.matches == 0
+                                ? '—'
+                                : rival.averageRating.toStringAsFixed(2),
+                          ),
+                          _stat(
+                            'Последняя оценка',
+                            rival.lastRating?.toStringAsFixed(1) ?? '—',
+                          ),
+                          _stat(
+                            'Форма',
+                            rival.form > 0 ? '+${rival.form}' : '${rival.form}',
                           ),
                         ],
                       ),
