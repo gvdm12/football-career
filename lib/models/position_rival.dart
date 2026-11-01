@@ -291,14 +291,23 @@ class PositionRival {
   static List<PositionRival> advanceMatch(List<PositionRival> rivals) {
     final random = Random();
     return rivals.map((rival) {
+      // Без игровой практики форма постепенно возвращается к нейтральной.
+      PositionRival coolDownForm() => rival.copyWith(
+        form: rival.form > 0
+            ? rival.form - 1
+            : rival.form < 0
+                ? rival.form + 1
+                : 0,
+      );
+
       // Форма влияет и на попадание в заявку, и на вероятность выхода на поле.
       final squadChance =
           (0.88 + rival.form * 0.015).clamp(0.78, 0.96).toDouble();
-      if (random.nextDouble() > squadChance) return rival;
+      if (random.nextDouble() > squadChance) return coolDownForm();
 
       final appearanceChance =
           (0.68 + rival.form * 0.035).clamp(0.52, 0.88).toDouble();
-      if (random.nextDouble() > appearanceChance) return rival;
+      if (random.nextDouble() > appearanceChance) return coolDownForm();
 
       final startsChance =
           (0.72 + rival.form * 0.035 + (rival.overall - 70) * 0.006)
