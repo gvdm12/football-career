@@ -187,8 +187,8 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
           playerMatch.playerGoals + playerMatch.playerAssists >= 3;
       final poor = playerMatch.playerRating <= 5.5;
       final shouldAsk = isTournamentDecider ||
-          (outstanding && Random().nextDouble() < 0.72) ||
-          (poor && Random().nextDouble() < 0.62);
+          (outstanding && Random().nextDouble() < 0.42) ||
+          (poor && Random().nextDouble() < 0.52);
 
       if (shouldAsk) {
         final category = isTournamentDecider
