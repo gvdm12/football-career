@@ -1285,7 +1285,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         context,
         MaterialPageRoute(
           builder: (_) => InteractiveMatchScreen(
-            career: career,
+            career: career.copyWith(player: career.playerForMatch),
             opponent: opponent,
             isHome: isHome,
             playerWillPlay: true,
@@ -1297,7 +1297,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
       interactiveCareer = career.afterMatch(played);
     } else {
       generatedMatch = Match.generate(
-        player: career.player,
+        player: career.playerForMatch,
         career: career,
         opponent: opponent,
         isHome: isHome,
@@ -1529,7 +1529,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         context,
         MaterialPageRoute(
           builder: (_) => InteractiveMatchScreen(
-            career: career,
+            career: career.copyWith(player: career.playerForMatch),
             opponent: opponent,
             isHome: isHome,
             playerWillPlay: true,
@@ -1541,7 +1541,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
       interactiveCareer = career.afterMatch(played);
     } else {
       generatedMatch = Match.generate(
-        player: career.player,
+        player: career.playerForMatch,
         career: career,
         opponent: opponent,
         isHome: isHome,
@@ -1812,7 +1812,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         context,
         MaterialPageRoute(
           builder: (_) => InteractiveMatchScreen(
-            career: career,
+            career: career.copyWith(player: career.playerForMatch),
             opponent: opponent,
             isHome: isHome,
             playerWillPlay: true,
@@ -1824,7 +1824,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
       interactiveCareer = career.afterMatch(played);
     } else {
       generatedMatch = Match.generate(
-        player: career.player,
+        player: career.playerForMatch,
         career: career,
         opponent: opponent,
         isHome: isHome,
