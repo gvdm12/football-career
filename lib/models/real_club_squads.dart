@@ -86,7 +86,7 @@ class RealClubSquads {
     },
     'Chelsea': {
       'goalkeeper': [RealClubPlayer('Robert Sánchez', 28, 83, 1), RealClubPlayer('Filip Jørgensen', 24, 81, 12)],
-      'defender': [RealClubPlayer('Levi Colwill', 23, 85, 6), RealClubPlayer('Wesley Fofana', 25, 84,   fofanaNumber), RealClubPlayer('Reece James', 26, 87, 24), RealClubPlayer('Marc Cucurella', 27, 85, 3)],
+      'defender': [RealClubPlayer('Levi Colwill', 23, 85, 6), RealClubPlayer('Wesley Fofana', 25, 84,   29), RealClubPlayer('Reece James', 26, 87, 24), RealClubPlayer('Marc Cucurella', 27, 85, 3)],
       'midfielder': [RealClubPlayer('Enzo Fernández', 25, 88, 8), RealClubPlayer('Moisés Caicedo', 24, 89, 25), RealClubPlayer('Cole Palmer', 24, 91, 10), RealClubPlayer('Roméo Lavia', 22, 83, 45)],
       'forward': [RealClubPlayer('João Pedro', 25, 87, 20), RealClubPlayer('Liam Delap', 23, 83, 9), RealClubPlayer('Pedro Neto', 26, 86, 7), RealClubPlayer('Alejandro Garnacho', 22, 85, 49)],
     },
