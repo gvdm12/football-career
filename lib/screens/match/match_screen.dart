@@ -44,24 +44,31 @@ class MatchScreen extends StatelessWidget {
   String? _pressConferenceCategory() {
     if (!match.playerPlayed) return null;
 
-    final playedBefore = career.seasonMatches.where((item) => item.isPlayed).length;
+    final playedBefore = career.seasonMatches
+        .where((item) => item.isPlayed)
+        .length;
     final totalMatches = career.seasonMatches.length;
 
     if (isTournamentDecider) {
       return isPlayerLoss ? 'elimination' : 'tournament';
     }
-    if (!isCupMatch && playedBefore == 0 && Random().nextDouble() < 0.35) return 'seasonStart';
+    if (!isCupMatch && playedBefore == 0 && Random().nextDouble() < 0.35)
+      return 'seasonStart';
     if (!isCupMatch &&
         totalMatches > 2 &&
         playedBefore == (totalMatches / 2).round() &&
         Random().nextDouble() < 0.25) {
       return 'seasonMiddle';
     }
-    if (!isCupMatch && totalMatches > 0 && playedBefore >= totalMatches - 1 && Random().nextDouble() < 0.65) {
+    if (!isCupMatch &&
+        totalMatches > 0 &&
+        playedBefore >= totalMatches - 1 &&
+        Random().nextDouble() < 0.65) {
       return 'seasonEnd';
     }
 
-    final outstanding = match.playerRating >= 8.5 ||
+    final outstanding =
+        match.playerRating >= 8.5 ||
         match.playerGoals >= 2 ||
         match.playerGoals + match.playerAssists >= 3;
     final poor = match.playerRating <= 5.5;
@@ -76,7 +83,7 @@ class MatchScreen extends StatelessWidget {
     }
 
     // Иногда журналисты задают обычные вопросы даже после рядового матча.
-    if (Random().nextDouble() < 0.04) return 'normal';
+    if (Random().nextDouble() < 0.07) return 'normal';
     return null;
   }
 
@@ -363,7 +370,10 @@ class MatchScreen extends StatelessWidget {
               value: match.playerRating.toStringAsFixed(1),
             ),
             _StatRow(title: AppStrings.goals, value: '${match.playerGoals}'),
-            _StatRow(title: AppStrings.assists, value: '${match.playerAssists}'),
+            _StatRow(
+              title: AppStrings.assists,
+              value: '${match.playerAssists}',
+            ),
             _StatRow(
               title: AppStrings.yellowCards,
               value: '${match.yellowCards}',
