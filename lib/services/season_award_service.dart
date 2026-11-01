@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/player_of_month_award.dart';
 import 'package:flutter_football/models/season_award.dart';
@@ -30,7 +28,7 @@ class SeasonAwardService {
         0, (sum, item) => sum + item.averageRating * item.matches,
       ) / matches;
       final first = items.first;
-      final age = 18 + (_stableHash(entry.key) % 18);
+      final age = first.age;
       candidates.add(_Candidate(
         name: first.playerName,
         club: first.club,
@@ -102,18 +100,26 @@ class SeasonAwardService {
       result.add(convert(assistLeaders.first, 'Лучший ассистент', assistLeaders.first.assists.toDouble()));
     }
 
-    final positions = PlayerPosition.values;
-    for (final position in positions) {
-      final positionCandidates = eligible.where((item) => item.position == position).toList()
+    // Схема команды года: 1 вратарь, 4 защитника, 3 полузащитника, 3 нападающих.
+    const formation = <PlayerPosition, int>{
+      PlayerPosition.goalkeeper: 1,
+      PlayerPosition.defender: 4,
+      PlayerPosition.midfielder: 3,
+      PlayerPosition.forward: 3,
+    };
+    final selected = <String>{};
+    for (final entry in formation.entries) {
+      final positionCandidates = eligible
+          .where((item) => item.position == entry.key)
+          .toList()
         ..sort((a, b) => overallScore(b).compareTo(overallScore(a)));
-      if (positionCandidates.isNotEmpty) {
-        result.add(convert(positionCandidates.first, 'Команда года', overallScore(positionCandidates.first)));
+      for (final item in positionCandidates.take(entry.value)) {
+        selected.add('${item.name}|${item.club}');
+        result.add(convert(item, 'Команда года', overallScore(item)));
       }
     }
 
-    // Добираем состав до 11 футболистов, не повторяя уже выбранных.
-    final selected = result.where((item) => item.category == 'Команда года')
-        .map((item) => '${item.playerName}|${item.club}').toSet();
+    // Если для позиции не хватает кандидатов, добираем лучших по общей оценке.
     final remaining = [...eligible]
       ..sort((a, b) => overallScore(b).compareTo(overallScore(a)));
     for (final item in remaining) {
