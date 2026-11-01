@@ -47,14 +47,17 @@ class MatchScreen extends StatelessWidget {
     final playedBefore = career.seasonMatches.where((item) => item.isPlayed).length;
     final totalMatches = career.seasonMatches.length;
 
-    if (isTournamentDecider) return 'tournament';
-    if (!isCupMatch && playedBefore == 0) return 'seasonStart';
+    if (isTournamentDecider) {
+      return isPlayerLoss ? 'elimination' : 'tournament';
+    }
+    if (!isCupMatch && playedBefore == 0 && Random().nextDouble() < 0.35) return 'seasonStart';
     if (!isCupMatch &&
         totalMatches > 2 &&
-        playedBefore == (totalMatches / 2).round()) {
+        playedBefore == (totalMatches / 2).round() &&
+        Random().nextDouble() < 0.25) {
       return 'seasonMiddle';
     }
-    if (!isCupMatch && totalMatches > 0 && playedBefore >= totalMatches - 1) {
+    if (!isCupMatch && totalMatches > 0 && playedBefore >= totalMatches - 1 && Random().nextDouble() < 0.65) {
       return 'seasonEnd';
     }
 
@@ -63,17 +66,17 @@ class MatchScreen extends StatelessWidget {
         match.playerGoals + match.playerAssists >= 3;
     final poor = match.playerRating <= 5.5;
 
-    if (outstanding && Random().nextDouble() < 0.82) return 'great';
-    if (poor && Random().nextDouble() < 0.72) return 'poor';
+    if (outstanding && Random().nextDouble() < 0.42) return 'great';
+    if (poor && Random().nextDouble() < 0.52) return 'poor';
 
     if (isCupMatch &&
         (match.isPlayerLoss(career.player.club) || outstanding) &&
-        Random().nextDouble() < 0.55) {
-      return 'tournament';
+        Random().nextDouble() < 0.70) {
+      return isPlayerLoss ? 'elimination' : 'tournament';
     }
 
     // Иногда журналисты задают обычные вопросы даже после рядового матча.
-    if (Random().nextDouble() < 0.18) return 'normal';
+    if (Random().nextDouble() < 0.04) return 'normal';
     return null;
   }
 
