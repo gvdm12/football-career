@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/player_status.dart';
+import 'package:flutter_football/models/position_rival.dart';
 import 'package:flutter_football/services/app_strings.dart';
 
 class CoachScreen extends StatelessWidget {
@@ -301,7 +302,7 @@ class CoachScreen extends StatelessWidget {
     );
   }
 
-  String _rivalCompetitionLabel(dynamic rival) {
+  String _rivalCompetitionLabel(PositionRival rival) {
     if (rival.selectionStrength >= career.player.overall + 4) {
       return 'Серьёзный конкурент за место в основе';
     }
