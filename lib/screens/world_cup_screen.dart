@@ -192,7 +192,9 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
 
       if (shouldAsk) {
         final category = isTournamentDecider
-            ? 'tournament'
+            ? (playerMatch.isPlayerLoss(updatedCareer.player.club)
+                ? 'elimination'
+                : 'tournament')
             : outstanding
             ? 'great'
             : 'poor';
