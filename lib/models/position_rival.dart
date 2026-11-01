@@ -11,6 +11,9 @@ class PositionRival {
   final int overall;
   final int jerseyNumber;
   final int matches;
+  final int starts;
+  final int substituteAppearances;
+  final double? lastRating;
   final int goals;
   final int assists;
   final double averageRating;
@@ -24,6 +27,9 @@ class PositionRival {
     required this.overall,
     this.jerseyNumber = 11,
     this.matches = 0,
+    this.starts = 0,
+    this.substituteAppearances = 0,
+    this.lastRating,
     this.goals = 0,
     this.assists = 0,
     this.averageRating = 6.5,
@@ -35,6 +41,9 @@ class PositionRival {
     int? overall,
     int? jerseyNumber,
     int? matches,
+    int? starts,
+    int? substituteAppearances,
+    double? lastRating,
     int? goals,
     int? assists,
     double? averageRating,
@@ -48,6 +57,10 @@ class PositionRival {
       overall: overall ?? this.overall,
       jerseyNumber: jerseyNumber ?? this.jerseyNumber,
       matches: matches ?? this.matches,
+      starts: starts ?? this.starts,
+      substituteAppearances:
+          substituteAppearances ?? this.substituteAppearances,
+      lastRating: lastRating ?? this.lastRating,
       goals: goals ?? this.goals,
       assists: assists ?? this.assists,
       averageRating: averageRating ?? this.averageRating,
@@ -63,6 +76,9 @@ class PositionRival {
     'overall': overall,
     'jerseyNumber': jerseyNumber,
     'matches': matches,
+    'starts': starts,
+    'substituteAppearances': substituteAppearances,
+    'lastRating': lastRating,
     'goals': goals,
     'assists': assists,
     'averageRating': averageRating,
@@ -86,6 +102,10 @@ class PositionRival {
               .clamp(1, 99)
               .toInt(),
       matches: (json['matches'] as num?)?.toInt() ?? 0,
+      starts: (json['starts'] as num?)?.toInt() ?? 0,
+      substituteAppearances:
+          (json['substituteAppearances'] as num?)?.toInt() ?? 0,
+      lastRating: (json['lastRating'] as num?)?.toDouble(),
       goals: (json['goals'] as num?)?.toInt() ?? 0,
       assists: (json['assists'] as num?)?.toInt() ?? 0,
       averageRating: (json['averageRating'] as num?)?.toDouble() ?? 6.5,
@@ -224,6 +244,9 @@ class PositionRival {
             overall: candidate.overall,
             jerseyNumber: candidate.jerseyNumber,
             matches: old.matches,
+            starts: old.starts,
+            substituteAppearances: old.substituteAppearances,
+            lastRating: old.lastRating,
             goals: old.goals,
             assists: old.assists,
             averageRating: old.averageRating,
@@ -238,13 +261,25 @@ class PositionRival {
   static List<PositionRival> advanceMatch(List<PositionRival> rivals) {
     final random = Random();
     return rivals.map((rival) {
-      // Игроки с хорошей формой чаще выходят на поле, но тренер
-      // продолжает ротировать состав, поэтому гарантированных выходов нет.
+      // Форма влияет и на попадание в заявку, и на вероятность выхода на поле.
+      final squadChance =
+          (0.88 + rival.form * 0.015).clamp(0.78, 0.96).toDouble();
+      if (random.nextDouble() > squadChance) return rival;
+
       final appearanceChance =
-          (0.72 + rival.form * 0.025).clamp(0.60, 0.86).toDouble();
+          (0.68 + rival.form * 0.035).clamp(0.52, 0.88).toDouble();
       if (random.nextDouble() > appearanceChance) return rival;
 
+      final startsChance =
+          (0.72 + rival.form * 0.035 + (rival.overall - 70) * 0.006)
+              .clamp(0.55, 0.91)
+              .toDouble();
+      final started = random.nextDouble() < startsChance;
       final matches = rival.matches + 1;
+      final starts = rival.starts + (started ? 1 : 0);
+      final substituteAppearances =
+          rival.substituteAppearances + (started ? 0 : 1);
+
       var goals = 0;
       var assists = 0;
       switch (rival.position) {
@@ -264,8 +299,6 @@ class PositionRival {
           break;
       }
 
-      // Рейтинг зависит от уровня футболиста и текущей формы,
-      // а не генерируется полностью независимо от его характеристик.
       final performanceBase =
           6.35 + (rival.overall - 70) * 0.018 + rival.form * 0.035;
       final rating = (performanceBase + random.nextDouble() * 1.25 - 0.45)
@@ -284,6 +317,9 @@ class PositionRival {
 
       return rival.copyWith(
         matches: matches,
+        starts: starts,
+        substituteAppearances: substituteAppearances,
+        lastRating: double.parse(rating.toStringAsFixed(2)),
         goals: rival.goals + goals,
         assists: rival.assists + assists,
         averageRating: double.parse(average.toStringAsFixed(2)),
@@ -319,8 +355,10 @@ class PositionRival {
       final age = rival.age + 1;
       final ageChange = age >= 33
           ? -2
-          : age <= 23
+          : age <= 23 && rival.matches >= 8 && rival.averageRating >= 7.0
           ? 1
+          : age <= 23 && rival.matches >= 8 && rival.averageRating < 6.0
+          ? -1
           : 0;
       remaining.add(
         PositionRival(
