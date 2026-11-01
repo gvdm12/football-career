@@ -2512,6 +2512,19 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     var completedCareer = career.archiveCurrentSeason();
 
+    // На случай старого сохранения восстанавливаем статистику по уже
+    // сыгранным матчам календаря, не начисляя повторно обработанные матчи.
+    final finalLeagueStats = LeaguePlayerStatsService.update(
+      season: career.season,
+      current: completedCareer.leaguePlayerStats,
+      processedMatchKeys: completedCareer.leagueStatsProcessedMatchKeys,
+      fixtures: completedCareer.leagueMatches,
+    );
+    completedCareer = completedCareer.copyWith(
+      leaguePlayerStats: finalLeagueStats.players,
+      leagueStatsProcessedMatchKeys: finalLeagueStats.processedMatchKeys,
+    );
+
     // Награды сезона формируются и сохраняются один раз после архивации статистики.
     if (!alreadyArchived &&
         !completedCareer.seasonAwards.any((item) => item.season == career.season)) {
