@@ -1544,7 +1544,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
       isSaving = false;
     });
 
-    if (monthlyWinner?.isCareerPlayer == true) {
+    if (monthlyWinner != null && monthlyWinner.isCareerPlayer) {
       await _showPlayerOfMonthAward(monthlyWinner);
     }
   }
