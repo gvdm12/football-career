@@ -130,13 +130,6 @@ class SeasonAwardService {
     return result;
   }
 
-  static int _stableHash(String value) {
-    var hash = 17;
-    for (final unit in value.codeUnits) {
-      hash = (hash * 31 + unit) & 0x7fffffff;
-    }
-    return hash;
-  }
 }
 
 class _Candidate {
