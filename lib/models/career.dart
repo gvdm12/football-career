@@ -865,10 +865,8 @@ class Career {
       final strongestRival = trustedCareer.rivals.isEmpty
           ? null
           : trustedCareer.rivals.reduce((a, b) {
-              final aScore = a.overall + a.form +
-                  ((a.averageRating - 6.5) * 2).round();
-              final bScore = b.overall + b.form +
-                  ((b.averageRating - 6.5) * 2).round();
+              final aScore = a.selectionStrength;
+              final bScore = b.selectionStrength;
               return aScore >= bScore ? a : b;
             });
       if (strongestRival != null) {
