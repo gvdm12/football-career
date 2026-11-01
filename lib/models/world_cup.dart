@@ -164,6 +164,8 @@ class WorldCupMatch {
   WorldCupMatch play({
     int? homeScore,
     int? awayScore,
+    int? homePenalties,
+    int? awayPenalties,
     String? playerTeam,
     int playerOverall = 70,
     String playerPosition = 'forward',
@@ -199,13 +201,18 @@ class WorldCupMatch {
     var home = homeScore ?? _randomGoals(homeExpectedGoals, random);
     var away = awayScore ?? _randomGoals(awayExpectedGoals, random);
 
-    // В плей-офф ничья решается в дополнительное время/серии пенальти.
-    if (home == away) {
+    // Если интерактивный матч передал счёт серии, сохраняем ничью
+    // в основное время и определяем победителя по пенальти.
+    var shootoutHome = homePenalties;
+    var shootoutAway = awayPenalties;
+    if (home == away && (shootoutHome == null || shootoutAway == null)) {
       if (random.nextBool()) {
         home++;
       } else {
         away++;
       }
+      shootoutHome = null;
+      shootoutAway = null;
     }
 
     var scoredByPlayer = 0;
@@ -272,8 +279,16 @@ class WorldCupMatch {
       awayTeam: awayTeam,
       homeGoals: home,
       awayGoals: away,
+      homePenalties: shootoutHome,
+      awayPenalties: shootoutAway,
       isPlayed: true,
-      winner: home > away ? homeTeam : awayTeam,
+      winner: home > away
+          ? homeTeam
+          : away > home
+          ? awayTeam
+          : (shootoutHome ?? 0) > (shootoutAway ?? 0)
+          ? homeTeam
+          : awayTeam,
       playerGoals: scoredByPlayer,
       playerAssists: assistedByPlayer,
       playerRating: rating,
@@ -298,6 +313,8 @@ class WorldCupMatch {
     'awayTeam': awayTeam,
     'homeGoals': homeGoals,
     'awayGoals': awayGoals,
+    'homePenalties': homePenalties,
+    'awayPenalties': awayPenalties,
     'isPlayed': isPlayed,
     'winner': winner,
     'playerGoals': playerGoals,
@@ -311,6 +328,8 @@ class WorldCupMatch {
     awayTeam: json['awayTeam'] as String? ?? '',
     homeGoals: (json['homeGoals'] as num?)?.toInt(),
     awayGoals: (json['awayGoals'] as num?)?.toInt(),
+    homePenalties: (json['homePenalties'] as num?)?.toInt(),
+    awayPenalties: (json['awayPenalties'] as num?)?.toInt(),
     isPlayed: json['isPlayed'] as bool? ?? false,
     winner: json['winner'] as String?,
     playerGoals: (json['playerGoals'] as num?)?.toInt() ?? 0,
@@ -408,6 +427,8 @@ class WorldCup {
     int index, {
     int? homeGoals,
     int? awayGoals,
+    int? homePenalties,
+    int? awayPenalties,
     String? playerTeam,
     int playerOverall = 70,
     String playerPosition = 'forward',
@@ -425,6 +446,8 @@ class WorldCup {
     final played = match.play(
       homeScore: homeGoals,
       awayScore: awayGoals,
+      homePenalties: homePenalties,
+      awayPenalties: awayPenalties,
       playerTeam: playerTeam,
       playerOverall: playerOverall,
       playerPosition: playerPosition,
