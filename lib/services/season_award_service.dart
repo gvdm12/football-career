@@ -1,5 +1,6 @@
+import 'package:flutter_football/models/league_player_season_stats.dart';
+import 'package:flutter_football/models/league_table.dart';
 import 'package:flutter_football/models/player.dart';
-import 'package:flutter_football/models/player_of_month_award.dart';
 import 'package:flutter_football/models/season_award.dart';
 import 'package:flutter_football/models/season_stats.dart';
 
@@ -8,47 +9,29 @@ class SeasonAwardService {
     required int season,
     required Player player,
     required SeasonStats seasonStats,
-    required List<PlayerOfMonthAward> monthlyAwards,
+    required List<LeaguePlayerSeasonStats> leaguePlayerStats,
+    required List<LeagueTableEntry> leagueTable,
   }) {
     final candidates = <_Candidate>[];
-    final grouped = <String, List<PlayerOfMonthAward>>{};
 
-    // В список соперников попадают только реальные победители награды месяца.
-    // Их месячные показатели суммируются, чтобы не учитывать один месяц дважды.
-    for (final award in monthlyAwards.where((item) => item.season == season)) {
-      final key = '${award.playerName}|${award.club}|${award.position.name}';
-      grouped.putIfAbsent(key, () => []).add(award);
-    }
-
-    for (final items in grouped.values) {
-      final matches = items.fold<int>(0, (sum, item) => sum + item.matches);
-      if (matches <= 0) continue;
-      final goals = items.fold<int>(0, (sum, item) => sum + item.goals);
-      final assists = items.fold<int>(0, (sum, item) => sum + item.assists);
-      final rating = items.fold<double>(
-            0,
-            (sum, item) => sum + item.averageRating * item.matches,
-          ) /
-          matches;
-      final first = items.first;
+    for (final item in leaguePlayerStats) {
+      if (item.matches == 0) continue;
+      if (item.club == player.club && item.playerName == player.name) continue;
       candidates.add(_Candidate(
-        name: first.playerName,
-        club: first.club,
-        position: first.position,
-        age: first.age,
-        matches: matches,
-        goals: goals,
-        assists: assists,
-        rating: rating,
+        name: item.playerName,
+        club: item.club,
+        position: item.position,
+        age: item.age,
+        matches: item.matches,
+        goals: item.goals,
+        assists: item.assists,
+        rating: item.averageRating,
         isCareerPlayer: false,
       ));
     }
 
-    // Не добавляем игрока карьеры автоматически: он участвует наравне
-    // с остальными и только при достаточном количестве матчей.
-    candidates.removeWhere(
-      (item) => item.club == player.club && item.name == player.name,
-    );
+    // Игрок карьеры участвует на тех же условиях, но его статистика берётся
+    // из реальных матчей карьеры, а не из искусственно смоделированного состава.
     if (seasonStats.matches >= 10 && (seasonStats.averageRating ?? 0) >= 6.0) {
       candidates.add(_Candidate(
         name: player.name,
@@ -63,18 +46,42 @@ class SeasonAwardService {
       ));
     }
 
-    final eligible = candidates.where((item) => item.matches >= 10).toList();
+    final eligible = candidates
+        .where((item) => item.matches >= 10 && item.rating >= 6.0)
+        .toList();
     if (eligible.isEmpty) return [];
 
-    // Оцениваем именно сезонную игру: средняя оценка и результативность
-    // важнее количества матчей. Overall не даёт бонуса за силу карточки.
-    double performanceScore(_Candidate item) {
+    final sortedTable = [...leagueTable]
+      ..sort((a, b) => b.points != a.points
+          ? b.points.compareTo(a.points)
+          : b.goalDifference.compareTo(a.goalDifference));
+    final positions = <String, int>{
+      for (var i = 0; i < sortedTable.length; i++)
+        sortedTable[i].club: i + 1,
+    };
+
+    // Индивидуальная результативность и оценка имеют основной вес.
+    // Позиция клуба даёт небольшой контекстный бонус, как в реальных премиях.
+    double performanceScore(_Candidate item, {bool includeTeamSuccess = false}) {
       final contributionsPerMatch =
           (item.goals + item.assists) / item.matches;
+      final goalRate = item.goals / item.matches;
+      final assistRate = item.assists / item.matches;
+      final teamPosition = positions[item.club];
+      final teamBonus = !includeTeamSuccess || teamPosition == null
+          ? 0.0
+          : teamPosition == 1
+              ? 0.8
+              : teamPosition <= 4
+                  ? 0.45
+                  : teamPosition <= (sortedTable.length / 2).ceil()
+                      ? 0.2
+                      : 0.0;
       return item.rating * 10 +
           contributionsPerMatch * 18 +
-          (item.goals / item.matches) * 5 +
-          (item.assists / item.matches) * 4;
+          goalRate * 5 +
+          assistRate * 4 +
+          teamBonus;
     }
 
     SeasonAward convert(_Candidate item, String category, double score) =>
@@ -97,20 +104,22 @@ class SeasonAwardService {
 
     final playerOfSeason = [...eligible]
       ..sort((a, b) {
-        final scoreCompare =
-            performanceScore(b).compareTo(performanceScore(a));
+        final scoreCompare = performanceScore(
+          b,
+          includeTeamSuccess: true,
+        ).compareTo(performanceScore(a, includeTeamSuccess: true));
         if (scoreCompare != 0) return scoreCompare;
         final ratingCompare = b.rating.compareTo(a.rating);
         if (ratingCompare != 0) return ratingCompare;
         return (b.goals + b.assists).compareTo(a.goals + a.assists);
       });
+    final seasonWinner = playerOfSeason.first;
     result.add(convert(
-      playerOfSeason.first,
+      seasonWinner,
       'Игрок сезона',
-      performanceScore(playerOfSeason.first),
+      performanceScore(seasonWinner, includeTeamSuccess: true),
     ));
 
-    // Молодой игрок: до 21 года включительно, минимум 10 матчей.
     final youngPlayers = eligible.where((item) => item.age <= 21).toList()
       ..sort((a, b) => performanceScore(b).compareTo(performanceScore(a)));
     if (youngPlayers.isNotEmpty) {
@@ -121,11 +130,11 @@ class SeasonAwardService {
       ));
     }
 
-    // Лучший ассистент определяется количеством передач, а не общей формулой.
+    // Лидер ассистов определяется только количеством голевых передач.
     final assistLeaders = eligible.where((item) => item.assists > 0).toList()
       ..sort((a, b) {
-        final assistsCompare = b.assists.compareTo(a.assists);
-        if (assistsCompare != 0) return assistsCompare;
+        final compare = b.assists.compareTo(a.assists);
+        if (compare != 0) return compare;
         final ratingCompare = b.rating.compareTo(a.rating);
         if (ratingCompare != 0) return ratingCompare;
         return b.goals.compareTo(a.goals);
@@ -159,12 +168,10 @@ class SeasonAwardService {
       }
     }
 
-    // Если в какой-то линии не хватает игроков, добираем лучших из оставшихся.
     final remaining = [...eligible]
       ..sort((a, b) => performanceScore(b).compareTo(performanceScore(a)));
     for (final item in remaining) {
-      if (result.where((award) => award.category == 'Команда года').length >=
-          11) {
+      if (result.where((award) => award.category == 'Команда года').length >= 11) {
         break;
       }
       final key = '${item.name}|${item.club}';
