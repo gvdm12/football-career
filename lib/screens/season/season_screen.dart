@@ -13,6 +13,7 @@ import 'package:flutter_football/models/league_player_season_stats.dart';
 import 'package:flutter_football/models/league_table.dart';
 import 'package:flutter_football/models/match.dart';
 import 'package:flutter_football/models/season_match.dart';
+import 'package:flutter_football/models/season_stats.dart';
 import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/models/player_of_month_award.dart';
 import 'package:flutter_football/models/season_award.dart';
@@ -2517,8 +2518,18 @@ class _SeasonScreenState extends State<SeasonScreen> {
       final seasonAwards = SeasonAwardService.create(
         season: career.season,
         player: career.player,
-        seasonStats: completedCareer.history.firstWhere(
-          (item) => item.season == career.season,
+        // Для наград чемпионата учитываем только клубную статистику.
+        // Матчи сборной остаются в общей истории сезона, но не смешиваются
+        // с результатами игроков национального чемпионата.
+        seasonStats: SeasonStats(
+          season: career.season,
+          club: career.player.club,
+          matches: career.matches,
+          goals: career.goals,
+          assists: career.assists,
+          yellowCards: career.yellowCards,
+          redCards: career.redCards,
+          averageRating: career.averageRating,
         ),
         leaguePlayerStats: completedCareer.leaguePlayerStats,
         leagueTable: completedCareer.leagueTable,
