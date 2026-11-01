@@ -3083,8 +3083,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
               end: Alignment.bottomRight,
               colors: [
                 Colors.white.withValues(alpha: 0.16),
-                const Color(0xFF7FE8A1).withValues(alpha: 0.075),
-                const Color(0xFF071B12).withValues(alpha: 0.62),
+                Colors.white.withValues(alpha: 0.075),
+                Colors.black.withValues(alpha: 0.34),
               ],
             ),
             borderRadius: BorderRadius.circular(24),
@@ -3093,12 +3093,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
               width: 1.1,
             ),
             boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF65E69A).withValues(alpha: 0.10),
-                blurRadius: 24,
-                spreadRadius: 1,
-                offset: const Offset(0, 8),
-              ),
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.20),
                 blurRadius: 16,
@@ -3137,12 +3131,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
                         width: 5,
                         height: 5,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF9BFFC0),
+                          color: Colors.white.withValues(alpha: 0.9),
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF9BFFC0)
-                                  .withValues(alpha: 0.75),
+                              color: Colors.white.withValues(alpha: 0.35),
                               blurRadius: 8,
                             ),
                           ],
