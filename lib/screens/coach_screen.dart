@@ -254,6 +254,21 @@ class CoachScreen extends StatelessWidget {
                               ),
                             ],
                           ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _rivalCompetitionLabel(rival),
+                            style: TextStyle(
+                              color: rival.selectionStrength >=
+                                      career.player.overall + 4
+                                  ? const Color(0xFFFFB86B)
+                                  : rival.selectionStrength >
+                                          career.player.overall
+                                      ? Colors.white70
+                                      : const Color(0xFF8BE07F),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                           const SizedBox(height: 7),
                           Wrap(
                             spacing: 12,
@@ -284,6 +299,16 @@ class CoachScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _rivalCompetitionLabel(dynamic rival) {
+    if (rival.selectionStrength >= career.player.overall + 4) {
+      return 'Серьёзный конкурент за место в основе';
+    }
+    if (rival.selectionStrength > career.player.overall) {
+      return 'Претендент на игровое время';
+    }
+    return 'Пока уступает в борьбе за позицию';
   }
 
   Widget _rivalStat(String title, String value) {
