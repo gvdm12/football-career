@@ -1466,7 +1466,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          _glassCard(
+                          _scoreboardGlass(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
