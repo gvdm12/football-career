@@ -18,6 +18,8 @@ class InteractiveMatchScreen extends StatefulWidget {
   final bool forcePlayerParticipation;
   final bool? playerWillPlay;
   final bool isKnockout;
+  final int homeAggregateGoalsBeforeMatch;
+  final int awayAggregateGoalsBeforeMatch;
 
   const InteractiveMatchScreen({
     super.key,
@@ -30,6 +32,8 @@ class InteractiveMatchScreen extends StatefulWidget {
     this.forcePlayerParticipation = false,
     this.playerWillPlay,
     this.isKnockout = false,
+    this.homeAggregateGoalsBeforeMatch = 0,
+    this.awayAggregateGoalsBeforeMatch = 0,
   });
 
   @override
@@ -231,7 +235,11 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _minute = 90;
       _finished = true;
       _rating = _rating.clamp(4.0, 10.0).toDouble();
-      if (widget.isKnockout && _homeGoals == _awayGoals) {
+      final homeAggregate =
+          _homeGoals + widget.homeAggregateGoalsBeforeMatch;
+      final awayAggregate =
+          _awayGoals + widget.awayAggregateGoalsBeforeMatch;
+      if (widget.isKnockout && homeAggregate == awayAggregate) {
         _homePenalties = 3 + _random.nextInt(3);
         _awayPenalties = 3 + _random.nextInt(3);
         while (_homePenalties == _awayPenalties) {
@@ -622,7 +630,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       return [
         _actionButton('Сыграть назад и сохранить мяч', 'backPass'),
         _actionButton('Длинная передача вперёд', 'longPass'),
-        _actionButton('Перевести длинным пасом на фланг', 'longPass'),
+        _actionButton('Отдать разрезающий пас вперёд', 'throughPass'),
         _actionButton('Продвинуться с мячом', 'dribble'),
         _actionButton('Пробить издали', 'longShot'),
       ];
@@ -1171,7 +1179,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           _phase == 'chance' ||
           _phase == 'aerialChance' ||
           _phase == 'finalThird' ||
-          _phase == 'cutback';
+          _phase == 'cutback' ||
+          _phase == 'keeperBeaten';
       _nextMomentMinute = min(
         88,
         _minute + (isFollowUp ? 1 : 6 + _random.nextInt(7)),
