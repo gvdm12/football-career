@@ -79,6 +79,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                 ((player.overall - 70) * 0.12).clamp(0, 3).toInt(),
             opponentStrength: worldCupStrengthOf(opponent),
             forcePlayerParticipation: true,
+            isKnockout: true,
           ),
         ),
       );
@@ -92,6 +93,8 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
         playerMatchIndex,
         homeGoals: playedMatch.homeGoals,
         awayGoals: playedMatch.awayGoals,
+        homePenalties: playedMatch.homePenalties,
+        awayPenalties: playedMatch.awayPenalties,
         playerTeam: player.nationality,
         playerOverall: player.overall,
         playerPosition: player.position.name,
