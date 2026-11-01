@@ -962,8 +962,8 @@ class Career {
       'Чемпион мира',
     };
     final trophyReward =
-        achievements.where(teamTrophies.contains).length * 15 +
-        (achievements.contains('Золотая бутса') ? 8 : 0);
+        achievements.where(teamTrophies.contains).length * 20 +
+        (achievements.contains('Золотая бутса') ? 10 : 0);
 
     var updatedCareer = copyWith(
       agentCredits: agentCredits + trophyReward,
