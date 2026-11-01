@@ -868,16 +868,29 @@ class Career {
               final bScore = b.selectionStrength;
               return aScore >= bScore ? a : b;
             });
-      if (strongestRival != null) {
+      final hasRecentCompetitionNews = news.any(
+        (item) =>
+            item.season == season &&
+            item.title == 'Борьба за игровое время' &&
+            item.matchNumber >= competitionRound - 2,
+      );
+      if (!hasRecentCompetitionNews) {
+        final rivalIsAhead =
+            strongestRival != null &&
+            strongestRival.selectionStrength > player.overall;
         competitionNews.add(
           CareerNews(
-            id: 's${season}_bench_${competitionRound}_${strongestRival.id}',
+            id: 's${season}_bench_${competitionRound}_${strongestRival?.id ?? 'rotation'}',
             season: season,
             matchNumber: competitionRound,
-            title: 'Борьба за игровое время',
-            description:
-                '${strongestRival.name} продолжает конкурировать за вашу позицию. '
-                'Работа на тренировках и сильные выступления помогут вернуть место в составе.',
+            title: rivalIsAhead
+                ? 'Борьба за игровое время'
+                : 'Ротация состава',
+            description: rivalIsAhead
+                ? '${strongestRival.name} сейчас опережает вас в борьбе за позицию. '
+                    'Тренировки и сильные выступления помогут вернуть место в составе.'
+                : 'Тренер провёл ротацию состава. Следующие матчи — возможность '
+                    'укрепить своё положение в команде.',
             type: CareerNewsType.match,
           ),
         );
