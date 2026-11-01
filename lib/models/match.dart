@@ -231,7 +231,7 @@ class Match {
     this.awayPenalties,
   });
 
-  bool get isDraw => homeGoals == awayGoals;
+  bool get isDraw => homeGoals == awayGoals && !hasPenalties;
 
   bool isPlayerWin(String playerClub) {
     final isHome = homeTeam == playerClub;
