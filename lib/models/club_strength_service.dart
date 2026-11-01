@@ -20,8 +20,14 @@ class ClubStrengthService {
         ..sort((a, b) {
           final points = b.points.compareTo(a.points);
           if (points != 0) return points;
-          return b.goalDifference.compareTo(a.goalDifference);
+          final difference = b.goalDifference.compareTo(a.goalDifference);
+          if (difference != 0) return difference;
+          return b.goalsFor.compareTo(a.goalsFor);
         });
+      // Сравниваем итоговое место с силой команд до обновления сезона,
+      // чтобы изменения одной команды не влияли на расчёт остальных.
+      final expectedOrder = [...Clubs.byLeague(league)]
+        ..sort((a, b) => b.strength.compareTo(a.strength));
 
       for (var index = 0; index < ordered.length; index++) {
         final clubName = ordered[index].club;
@@ -29,8 +35,6 @@ class ClubStrengthService {
             .firstWhere((club) => club.name == clubName,
                 orElse: () => Clubs.all.first)
             .baseStrength;
-        final expectedOrder = [...Clubs.byLeague(league)]
-          ..sort((a, b) => b.strength.compareTo(a.strength));
         final expectedIndex = expectedOrder.indexWhere(
           (club) => club.name == clubName,
         );
