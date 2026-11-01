@@ -125,7 +125,7 @@ class PositionRival {
     required int season,
     int count = 2,
   }) {
-    final random = Random(('\u0024{player.name}|\u0024{player.club}|\u0024season').hashCode);
+    final random = Random(('${player.name}|${player.club}|$season').hashCode);
     final targetCount = count.clamp(1, 3).toInt();
     final takenNumbers = <int>{player.jerseyNumber};
     final realPlayers = RealClubSquads.squads[player.club]?[player.position.name];
@@ -144,7 +144,7 @@ class PositionRival {
         }
         takenNumbers.add(number);
         return PositionRival(
-          id: 'real_\u0024{player.club}_\u0024{player.position.name}_\u0024{item.name.hashCode}',
+          id: 'real_${player.club}_${player.position.name}_${item.name.hashCode}',
           name: item.name,
           position: player.position,
           age: item.age,
@@ -167,7 +167,7 @@ class PositionRival {
       final number = available[random.nextInt(available.length)];
       takenNumbers.add(number);
       return PositionRival(
-        id: 's\u0024{season}_\u0024{player.position.name}_\u0024{index + 1}',
+        id: 's${season}_${player.position.name}_${index + 1}',
         name: names[index],
         position: player.position,
         age: 19 + random.nextInt(12),
