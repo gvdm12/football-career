@@ -50,15 +50,20 @@ class Match {
     for (final unit in seedText.codeUnits) {
       seed = (seed * 31 + unit) & 0x7fffffff;
     }
-    final strongerRivals = career?.rivals
-            .where((rival) => rival.overall + rival.form > player.overall)
-            .length ??
-        0;
-    // Конкуренты влияют на выбор состава, но доверие и репутация
-    // должны реально помогать игроку закрепиться в основе.
-    final rivalPenalty = strongerRivals * 0.04;
+    final rivals = career?.rivals ?? const [];
+    final strongerRivals = rivals.where((rival) {
+      final rivalLevel = rival.overall +
+          rival.form +
+          ((rival.averageRating - 6.5) * 2).round();
+      return rivalLevel > player.overall;
+    }).length;
+    // Конкуренция оценивается по текущей форме и статистике сезона.
+    // Хорошая игра самого футболиста постепенно компенсирует давление конкурентов.
+    final rivalPenalty = (strongerRivals * 0.035).clamp(0.0, 0.12);
     final trustBonus = ((career?.coachTrust ?? 65) - 65) * 0.004;
     final averageRating = career?.averageRating ?? 6.0;
+    final playerFormBonus =
+        ((averageRating - 6.5) * 0.025).clamp(-0.06, 0.08);
     final trophyCount = career?.history.fold<int>(
           0,
           (sum, season) => sum + season.achievements.length,
@@ -76,7 +81,8 @@ class Match {
     playChance = (playChance -
             rivalPenalty +
             trustBonus +
-            reputationBonus)
+            reputationBonus +
+            playerFormBonus)
         .clamp(0.25, 0.99)
         .toDouble();
 
