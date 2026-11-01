@@ -35,11 +35,25 @@ class PressConferenceContentFactory {
   static PressConferenceContent create({
     required String category,
     required bool english,
+    String? interestedClub,
+    String? clubName,
   }) {
     String choose(String ru, String en) => english ? en : ru;
     final random = Random();
 
     final questions = switch (category) {
+      'transferInterest' => [
+        choose(
+          '${interestedClub ?? 'Другой клуб'} следит за вашими выступлениями. Что думаете об этом интересе?',
+          '${interestedClub ?? 'Another club'} is following your performances. What do you think about this interest?',
+        ),
+      ],
+      'newClub' => [
+        choose(
+          'Вы перешли в ${clubName ?? 'новый клуб'}. Какие цели ставите перед собой?',
+          'You have joined ${clubName ?? 'your new club'}. What goals have you set?',
+        ),
+      ],
       'seasonStart' => [
         choose(
           'Какие задачи вы ставите перед собой на новый сезон?',
@@ -213,6 +227,82 @@ class PressConferenceContentFactory {
     };
 
     var options = switch (category) {
+      'transferInterest' => [
+        PressConferenceOption(
+          text: choose(
+            'Приятно, что мной интересуются, но сейчас я сосредоточен на своей команде',
+            'It is flattering, but my focus is on my current team',
+          ),
+          detail: choose('Лояльность нынешнему клубу', 'Loyalty to the current club'),
+          trustChange: 3,
+          icon: Icons.shield_outlined,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Я открыт к новым возможностям, но решение будет взвешенным',
+            'I am open to new opportunities, but any decision will be carefully considered',
+          ),
+          detail: choose('Открытость к предложениям', 'Open to opportunities'),
+          trustChange: 0,
+          icon: Icons.swap_horiz,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Не хочу отвлекаться на слухи — впереди важные матчи',
+            'I do not want distractions from rumours — important matches are ahead',
+          ),
+          detail: choose('Фокус на футболе', 'Focused on football'),
+          trustChange: 2,
+          icon: Icons.sports_soccer,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Если появится серьёзное предложение, я готов его рассмотреть',
+            'If a serious offer arrives, I will consider it',
+          ),
+          detail: choose('Честный ответ о будущем', 'Honest answer about the future'),
+          trustChange: -1,
+          icon: Icons.forum_outlined,
+        ),
+      ],
+      'newClub' => [
+        PressConferenceOption(
+          text: choose(
+            'Хочу помочь клубу бороться за самые высокие места',
+            'I want to help the club compete for the highest places',
+          ),
+          detail: choose('Высокие командные амбиции', 'High team ambitions'),
+          trustChange: 3,
+          icon: Icons.emoji_events_outlined,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Сначала нужно заслужить доверие тренера и место в составе',
+            'First I need to earn the coach’s trust and my place in the team',
+          ),
+          detail: choose('Профессиональный настрой', 'Professional attitude'),
+          trustChange: 3,
+          icon: Icons.fitness_center,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Я пришёл сюда, чтобы развиваться и приносить пользу',
+            'I came here to develop and contribute to the team',
+          ),
+          detail: choose('Настрой на развитие', 'Determination to improve'),
+          trustChange: 2,
+          icon: Icons.trending_up,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Посмотрим, как всё сложится, пока рано обещать результат',
+            'We will see how things go; it is too early to make promises',
+          ),
+          detail: choose('Осторожные ожидания', 'Measured expectations'),
+          trustChange: 1,
+          icon: Icons.more_horiz,
+        ),
+      ],
       'seasonStart' => [
         PressConferenceOption(
           text: choose(
