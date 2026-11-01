@@ -2402,7 +2402,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
     if (category == null) return updatedCareer;
 
     final interestedClubs = Clubs.all
-        .where((club) => club.name != updatedCareer.player.club)
+        .where(
+          (club) =>
+              club.name != updatedCareer.player.club &&
+              club.strength >= updatedCareer.player.overall - 10,
+        )
         .toList();
     final interestedClub = category == 'transferInterest' &&
             interestedClubs.isNotEmpty
