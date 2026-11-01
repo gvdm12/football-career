@@ -168,7 +168,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   Future<void> playMatch() async {
     final match = Match.generate(
-      player: career.player,
+      player: career.playerForMatch,
       career: career,
       opponent: 'Спартак',
       isHome: true,
