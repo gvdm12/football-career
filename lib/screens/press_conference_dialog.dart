@@ -764,6 +764,182 @@ class PressConferenceContentFactory {
       ];
     }
 
+    final isPersonalTournamentQuestion =
+        selectedQuestion.contains('лично довольны') ||
+        selectedQuestion.contains('personally satisfied');
+    final isTeamImprovementQuestion =
+        selectedQuestion.contains('важнее всего улучшить вашей команде') ||
+        selectedQuestion.contains('most important thing for your team to improve');
+    final isFanExpectationsQuestion =
+        selectedQuestion.contains('болельщикам ждать от вас') ||
+        selectedQuestion.contains('what should the fans expect from you') ||
+        selectedQuestion.contains('сказать болельщикам перед концом сезона') ||
+        selectedQuestion.contains('tell the fans before the season ends');
+    final isPoorSeasonPersonalQuestion =
+        selectedQuestion.contains('недовольны своей игрой') ||
+        selectedQuestion.contains('unhappy with your own season');
+    final isPoorSeasonFansQuestion =
+        selectedQuestion.contains('болельщикам, которые весь сезон') ||
+        selectedQuestion.contains('fans who expected much more');
+
+    if (isPersonalTournamentQuestion) {
+      options = [
+        PressConferenceOption(
+          text: choose(
+            'Я выложился полностью и старался помочь команде',
+            'I gave everything and tried to help the team',
+          ),
+          detail: choose('Профессиональная самооценка', 'Professional self-assessment'),
+          trustChange: 2,
+          icon: Icons.shield_outlined,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Я мог сыграть лучше и должен это признать',
+            'I could have performed better, and I must admit that',
+          ),
+          detail: choose('Честная самокритика', 'Honest self-criticism'),
+          trustChange: 2,
+          icon: Icons.trending_up,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'В целом доволен своей игрой, но результат команды важнее',
+            'I am mostly satisfied, but the team result matters more',
+          ),
+          detail: choose('Баланс личного и командного результата', 'Balancing individual and team performance'),
+          trustChange: 1,
+          icon: Icons.groups_outlined,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Этот турнир получился не таким, как я ожидал',
+            'This tournament did not go as I expected',
+          ),
+          detail: choose('Сдержанное признание', 'Measured admission'),
+          trustChange: 0,
+          icon: Icons.more_horiz,
+        ),
+      ];
+    } else if (isTeamImprovementQuestion) {
+      options = [
+        PressConferenceOption(
+          text: choose(
+            'Нам нужно лучше использовать свои моменты',
+            'We need to make better use of our chances',
+          ),
+          detail: choose('Работа над реализацией', 'Improving our finishing'),
+          trustChange: 2,
+          icon: Icons.sports_soccer,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Важно добавить надёжности в обороне',
+            'We need to be more solid in defence',
+          ),
+          detail: choose('Командная дисциплина', 'Team discipline'),
+          trustChange: 2,
+          icon: Icons.shield_outlined,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Нужно быстрее двигать мяч и играть смелее',
+            'We need to move the ball faster and play with more courage',
+          ),
+          detail: choose('Улучшение командной игры', 'Improving our team play'),
+          trustChange: 1,
+          icon: Icons.bolt,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Будем разбирать ошибки и работать над всеми аспектами',
+            'We will review our mistakes and work on every aspect',
+          ),
+          detail: choose('Комплексный подход', 'A complete approach'),
+          trustChange: 2,
+          icon: Icons.build_outlined,
+        ),
+      ];
+    } else if (isFanExpectationsQuestion || isPoorSeasonFansQuestion) {
+      options = [
+        PressConferenceOption(
+          text: choose(
+            'Болельщики заслуживают большего, и мы постараемся их порадовать',
+            'The fans deserve more, and we will try to make them proud',
+          ),
+          detail: choose('Уважение к болельщикам', 'Respect for the supporters'),
+          trustChange: 3,
+          icon: Icons.favorite_outline,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Их поддержка очень важна для команды',
+            'Their support means a lot to the team',
+          ),
+          detail: choose('Благодарность фанатам', 'Gratitude to the fans'),
+          trustChange: 2,
+          icon: Icons.groups_outlined,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Мы понимаем разочарование и должны отвечать результатом',
+            'We understand the disappointment and must respond with results',
+          ),
+          detail: choose('Ответственность перед болельщиками', 'Responsibility to supporters'),
+          trustChange: 2,
+          icon: Icons.shield_outlined,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Сейчас нам нужно сосредоточиться на работе',
+            'Right now, we need to focus on our work',
+          ),
+          detail: choose('Сдержанная позиция', 'Measured response'),
+          trustChange: 1,
+          icon: Icons.fitness_center,
+        ),
+      ];
+    } else if (isPoorSeasonPersonalQuestion) {
+      options = [
+        PressConferenceOption(
+          text: choose(
+            'Я должен взять ответственность за свою игру',
+            'I must take responsibility for my performances',
+          ),
+          detail: choose('Личная ответственность', 'Personal responsibility'),
+          trustChange: 3,
+          icon: Icons.shield_outlined,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Мне не хватило стабильности на протяжении сезона',
+            'I was not consistent enough throughout the season',
+          ),
+          detail: choose('Честная самооценка', 'Honest self-assessment'),
+          trustChange: 2,
+          icon: Icons.analytics_outlined,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Я сделал выводы и хочу исправить это в следующем сезоне',
+            'I have learned from this and want to improve next season',
+          ),
+          detail: choose('Настрой на развитие', 'Determination to improve'),
+          trustChange: 2,
+          icon: Icons.trending_up,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Не всё зависело от меня, но я мог сделать больше',
+            'Not everything was in my control, but I could have done more',
+          ),
+          detail: choose('Взвешенный ответ', 'Balanced response'),
+          trustChange: 1,
+          icon: Icons.more_horiz,
+        ),
+      ];
+    }
+
     return PressConferenceContent(
       question: selectedQuestion,
       options: options,
