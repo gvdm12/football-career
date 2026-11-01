@@ -260,11 +260,14 @@ class CoachScreen extends StatelessWidget {
                             runSpacing: 5,
                             children: [
                               _rivalStat('Матчи', rival.matches.toString()),
+                              _rivalStat('В основе', rival.starts.toString()),
+                              _rivalStat('С замены', rival.substituteAppearances.toString()),
                               _rivalStat('Голы', rival.goals.toString()),
                               _rivalStat('Ассисты', rival.assists.toString()),
-                              _rivalStat('Оценка', rival.matches == 0
+                              _rivalStat('Средняя', rival.matches == 0
                                   ? '—'
                                   : rival.averageRating.toStringAsFixed(2)),
+                              _rivalStat('Последняя', rival.lastRating?.toStringAsFixed(1) ?? '—'),
                               _rivalStat(
                                 'Форма',
                                 rival.form > 0 ? '+${rival.form}' : rival.form.toString(),
