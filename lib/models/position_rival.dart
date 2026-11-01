@@ -238,18 +238,23 @@ class PositionRival {
   static List<PositionRival> advanceMatch(List<PositionRival> rivals) {
     final random = Random();
     return rivals.map((rival) {
-      if (random.nextDouble() > 0.78) return rival;
+      // Игроки с хорошей формой чаще выходят на поле, но тренер
+      // продолжает ротировать состав, поэтому гарантированных выходов нет.
+      final appearanceChance =
+          (0.72 + rival.form * 0.025).clamp(0.60, 0.86).toDouble();
+      if (random.nextDouble() > appearanceChance) return rival;
+
       final matches = rival.matches + 1;
       var goals = 0;
       var assists = 0;
       switch (rival.position) {
         case PlayerPosition.forward:
           if (random.nextDouble() < rival.overall / 260) goals = 1;
-          if (random.nextDouble() < 0.12) assists = 1;
+          if (random.nextDouble() < 0.16) assists = 1;
           break;
         case PlayerPosition.midfielder:
           if (random.nextDouble() < rival.overall / 500) goals = 1;
-          if (random.nextDouble() < 0.22) assists = 1;
+          if (random.nextDouble() < 0.24) assists = 1;
           break;
         case PlayerPosition.defender:
           if (random.nextDouble() < 0.055) goals = 1;
@@ -258,20 +263,25 @@ class PositionRival {
         case PlayerPosition.goalkeeper:
           break;
       }
-      final rating = (6.0 + random.nextDouble() * 2.0)
-          .clamp(5.0, 9.0)
+
+      // Рейтинг зависит от уровня футболиста и текущей формы,
+      // а не генерируется полностью независимо от его характеристик.
+      final performanceBase =
+          6.35 + (rival.overall - 70) * 0.018 + rival.form * 0.035;
+      final rating = (performanceBase + random.nextDouble() * 1.25 - 0.45)
+          .clamp(5.0, 9.2)
           .toDouble();
       final average =
           ((rival.averageRating * rival.matches) + rating) / matches;
-      final form =
-          (rival.form +
-                  (rating >= 7.2
-                      ? 1
-                      : rating < 6.0
+      final form = (rival.form +
+              (rating >= 7.4
+                  ? 1
+                  : rating < 5.9
                       ? -1
                       : 0))
-              .clamp(-5, 5)
-              .toInt();
+          .clamp(-5, 5)
+          .toInt();
+
       return rival.copyWith(
         matches: matches,
         goals: rival.goals + goals,
