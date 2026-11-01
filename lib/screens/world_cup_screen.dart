@@ -40,7 +40,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
           match.homeTeam == career.player.nationality ||
           match.awayTeam == career.player.nationality,
     );
-    final player = career.player;
+    final player = career.playerForMatch;
     final playerCanPlay =
         tournament.isPlayerCalledUp && playerHasMatch && !career.isInjured;
     final playerNationalTeamHasMatch = tournament.isPlayerCalledUp &&
@@ -71,7 +71,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
         context,
         MaterialPageRoute(
           builder: (_) => InteractiveMatchScreen(
-            career: career,
+            career: career.copyWith(player: player),
             opponent: opponent,
             isHome: isHome,
             playerTeamName: player.nationality,
