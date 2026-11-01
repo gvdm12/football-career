@@ -124,7 +124,6 @@ class _ShopScreenState extends State<ShopScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedValue = _skillValue(career.player.skills, selectedSkill);
     final canTrain = career.money >= _trainingPrice;
 
     return Scaffold(
