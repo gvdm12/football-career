@@ -15,6 +15,7 @@ class ShopScreen extends StatefulWidget {
 class _ShopScreenState extends State<ShopScreen> {
   late Career career;
   SkillName selectedSkill = SkillName.shooting;
+  bool _allowPop = false;
 
   @override
   void initState() {
@@ -76,6 +77,14 @@ class _ShopScreenState extends State<ShopScreen> {
       (career.temporarySkillBoostMatches[selectedSkill.name] ?? 0) > 0;
 
   int get _recoveryPrice => 25000;
+
+  void _closeShop() {
+    if (_allowPop) return;
+    setState(() => _allowPop = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) Navigator.of(context).pop<Career>(career);
+    });
+  }
 
   Future<void> _buyTraining() async {
     if (_trainingActive || career.money < _trainingPrice) return;
@@ -140,11 +149,20 @@ class _ShopScreenState extends State<ShopScreen> {
   Widget build(BuildContext context) {
     final canTrain = !_trainingActive && career.money >= _trainingPrice;
 
-    return Scaffold(
+    return PopScope<Career>(
+      canPop: _allowPop,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) _closeShop();
+      },
+      child: Scaffold(
       backgroundColor: const Color(0xFF061B0C),
       appBar: AppBar(
         backgroundColor: const Color(0xFF0B3A1A),
         foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: _closeShop,
+        ),
         title: const Text('Магазин'),
       ),
       body: Container(
@@ -378,6 +396,7 @@ class _ShopScreenState extends State<ShopScreen> {
             ),
           ],
         ),
+      ),
       ),
     );
   }
