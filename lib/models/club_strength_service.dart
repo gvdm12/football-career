@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'club.dart';
 import 'league_table.dart';
 
@@ -8,7 +6,7 @@ class ClubStrengthService {
   static Map<String, int> update({
     required Map<String, int> currentStrengths,
     required Map<League, List<LeagueTableEntry>> standings,
-    required DomesticCupResult? domesticCup,
+    required String? domesticCupWinner,
     required String? championsLeagueWinner,
     required String? europaLeagueWinner,
   }) {
@@ -49,15 +47,15 @@ class ClubStrengthService {
                 ? -1
                 : 0;
         final change = (performanceChange + formChange).clamp(-3, 3);
-        updated[clubName] = (base + change).clamp(45, 97);
+        updated[clubName] = (base + change).clamp(45, 97).toInt();
       }
     }
 
-    final cupWinner = domesticCup?.winner;
+    final cupWinner = domesticCupWinner;
     if (cupWinner != null) {
       updated[cupWinner] = ((updated[cupWinner] ??
               Clubs.getByName(cupWinner).strength) +
-          1).clamp(45, 97);
+          1).clamp(45, 97).toInt();
     }
 
     if (championsLeagueWinner != null) {
@@ -65,7 +63,8 @@ class ClubStrengthService {
           ((updated[championsLeagueWinner] ??
                       Clubs.getByName(championsLeagueWinner).strength) +
                   2)
-              .clamp(45, 97);
+              .clamp(45, 97)
+              .toInt();
     }
 
     if (europaLeagueWinner != null) {
@@ -78,10 +77,4 @@ class ClubStrengthService {
 
     return updated;
   }
-}
-
-class DomesticCupResult {
-  final String? winner;
-
-  const DomesticCupResult(this.winner);
 }
