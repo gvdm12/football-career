@@ -1004,16 +1004,20 @@ class _SeasonScreenState extends State<SeasonScreen> {
         children: [
           Positioned.fill(
             child: BackdropFilter(
-              filter: ui.ImageFilter.blur(sigmaX: 7, sigmaY: 7),
+              filter: ui.ImageFilter.blur(sigmaX: 11, sigmaY: 11),
               child: Container(color: Colors.black.withValues(alpha: 0.48)),
             ),
           ),
           Center(
-            child: AlertDialog(
-        backgroundColor: const Color(0xFF0B2B14),
+            child: _buildLiquidGlassSurface(
+              radius: 24,
+              child: AlertDialog(
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: Color(0xFF2D7D3D)),
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide.none,
         ),
         title: const Row(
           children: [
@@ -1069,6 +1073,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
             child: const Text('Продолжить', style: TextStyle(color: Color(0xFF8BE07F))),
           ),
         ],
+              ),
             ),
           ),
         ],
@@ -1086,18 +1091,19 @@ class _SeasonScreenState extends State<SeasonScreen> {
         children: [
           Positioned.fill(
             child: BackdropFilter(
-              filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+              filter: ui.ImageFilter.blur(sigmaX: 11, sigmaY: 11),
               child: Container(color: Colors.black.withValues(alpha: 0.58)),
             ),
           ),
           Center(
             child: Dialog(
-              backgroundColor: const Color(0xFF092511),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(22),
-                side: const BorderSide(color: Color(0xFF2D7D3D)),
-              ),
-              child: ConstrainedBox(
+              backgroundColor: Colors.transparent,
+              surfaceTintColor: Colors.transparent,
+              elevation: 0,
+              insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
+              child: _buildLiquidGlassSurface(
+                radius: 26,
+                child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 430, maxHeight: 560),
                 child: Padding(
                   padding: const EdgeInsets.all(18),
@@ -1168,10 +1174,67 @@ class _SeasonScreenState extends State<SeasonScreen> {
                     ],
                   ),
                 ),
+                ),
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLiquidGlassSurface({
+    required Widget child,
+    double radius = 24,
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xE62B6540),
+                Color(0xD9144228),
+                Color(0xE6082112),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(radius),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.22),
+              width: 1.2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF5BE08A).withValues(alpha: 0.13),
+                blurRadius: 34,
+                spreadRadius: 1,
+              ),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.35),
+                blurRadius: 28,
+                offset: const Offset(0, 14),
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 1,
+                child: Container(
+                  color: Colors.white.withValues(alpha: 0.35),
+                ),
+              ),
+              child,
+            ],
+          ),
+        ),
       ),
     );
   }
