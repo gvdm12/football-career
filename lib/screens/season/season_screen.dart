@@ -55,6 +55,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
   late Career career;
   bool isSaving = false;
   bool seasonFinishing = false;
+  PlayerOfMonthAward? recentMonthlyAward;
 
   @override
   void initState() {
@@ -994,6 +995,66 @@ class _SeasonScreenState extends State<SeasonScreen> {
     );
   }
 
+  Widget _buildRecentMonthlyAwardCard() {
+    final award = recentMonthlyAward;
+    if (award == null || award.isCareerPlayer) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 11),
+      decoration: BoxDecoration(
+        color: const Color(0xFF102719).withValues(alpha: 0.96),
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(color: const Color(0xFFB99A45).withValues(alpha: 0.65)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.emoji_events_rounded, color: Color(0xFFFFD54F), size: 25),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Игрок месяца · ${award.monthName}',
+                  style: const TextStyle(
+                    color: Color(0xFFFFD54F),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  award.playerName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                ),
+                Text(
+                  '${award.club}  ·  ${award.matches} матч.  ·  ${award.goals} гол.  ·  ${award.assists} асс.',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.white70, fontSize: 10),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            award.averageRating.toStringAsFixed(1),
+            style: const TextStyle(
+              color: Color(0xFF8BE07F),
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _showPlayerOfMonthAward(PlayerOfMonthAward award) async {
     if (!mounted) return;
     await showGeneralDialog<void>(
@@ -1469,6 +1530,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     setState(() {
       career = completeCareer;
+      recentMonthlyAward = monthlyWinner != null && !monthlyWinner.isCareerPlayer
+          ? monthlyWinner
+          : null;
       isSaving = true;
     });
 
@@ -1480,7 +1544,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
       isSaving = false;
     });
 
-    if (monthlyWinner != null) {
+    if (monthlyWinner?.isCareerPlayer == true) {
       await _showPlayerOfMonthAward(monthlyWinner);
     }
   }
@@ -3216,6 +3280,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
                                 _buildNextCupMatchCard(nextCupMatch)
                               else if (!seasonFinished && nextMatch != null)
                                 _buildNextMatchCard(nextMatch),
+                              if (recentMonthlyAward != null && !worldCupBlocksSeason)
+                                _buildRecentMonthlyAwardCard(),
                               const SizedBox(height: 10),
                               if (!worldCupBlocksSeason) _buildSeasonButton(),
                             ],
