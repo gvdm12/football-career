@@ -778,6 +778,9 @@ class PressConferenceDialog {
                 vertical: 24,
               ),
               child: Container(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(dialogContext).size.height * 0.9,
+                ),
                 decoration: BoxDecoration(
                   color: _panel,
                   borderRadius: BorderRadius.circular(22),
@@ -866,8 +869,10 @@ class PressConferenceDialog {
                           ],
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                      Flexible(
+                        child: SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1045,6 +1050,7 @@ class PressConferenceDialog {
                               ),
                             ),
                           ],
+                          ),
                         ),
                       ),
                     ],
