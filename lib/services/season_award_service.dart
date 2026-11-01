@@ -131,6 +131,22 @@ class SeasonAwardService {
     }
 
     // Лидер ассистов определяется только количеством голевых передач.
+    final goalLeaders = eligible.where((item) => item.goals > 0).toList()
+      ..sort((a, b) {
+        final compare = b.goals.compareTo(a.goals);
+        if (compare != 0) return compare;
+        final ratingCompare = b.rating.compareTo(a.rating);
+        if (ratingCompare != 0) return ratingCompare;
+        return b.assists.compareTo(a.assists);
+      });
+    if (goalLeaders.isNotEmpty) {
+      result.add(convert(
+        goalLeaders.first,
+        'Лучший бомбардир',
+        goalLeaders.first.goals.toDouble(),
+      ));
+    }
+
     final assistLeaders = eligible.where((item) => item.assists > 0).toList()
       ..sort((a, b) {
         final compare = b.assists.compareTo(a.assists);
