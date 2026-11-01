@@ -47,8 +47,30 @@ class Career {
   final WorldCup? worldCup;
   final int injuryMatchesRemaining;
   final String? injuryName;
+  final Map<String, int> temporarySkillBoosts;
+  final Map<String, int> temporarySkillBoostMatches;
 
   bool get isInjured => injuryMatchesRemaining > 0;
+
+  Player get playerForMatch {
+    var skills = player.skills;
+    for (final skill in SkillName.values) {
+      final bonus = temporarySkillBoosts[skill.name] ?? 0;
+      if (bonus <= 0) continue;
+      final value = (skills.getSkill(skill) + bonus).clamp(0, 99).toInt();
+      skills = switch (skill) {
+        SkillName.pace => skills.copyWith(pace: value),
+        SkillName.physical => skills.copyWith(physical: value),
+        SkillName.shooting => skills.copyWith(shooting: value),
+        SkillName.passing => skills.copyWith(passing: value),
+        SkillName.dribbling => skills.copyWith(dribbling: value),
+        SkillName.defending => skills.copyWith(defending: value),
+        SkillName.heading => skills.copyWith(heading: value),
+        SkillName.vision => skills.copyWith(vision: value),
+      };
+    }
+    return player.copyWith(skills: skills);
+  }
 
   /// Все матчи чемпионата, включая матчи других клубов.
   final List<LeagueMatch> leagueMatches;
@@ -90,6 +112,8 @@ class Career {
     this.worldCup,
     this.injuryMatchesRemaining = 0,
     this.injuryName,
+    this.temporarySkillBoosts = const {},
+    this.temporarySkillBoostMatches = const {},
   });
 
   // ============================================================
@@ -321,6 +345,8 @@ class Career {
       'worldCup': worldCup?.toJson(),
       'injuryMatchesRemaining': injuryMatchesRemaining,
       'injuryName': injuryName,
+      'temporarySkillBoosts': temporarySkillBoosts,
+      'temporarySkillBoostMatches': temporarySkillBoostMatches,
     };
   }
 
@@ -492,6 +518,12 @@ class Career {
               .clamp(0, 10)
               .toInt(),
       injuryName: json['injuryName'] as String?,
+      temporarySkillBoosts: (json['temporarySkillBoosts'] as Map?)?.map(
+        (key, value) => MapEntry(key.toString(), (value as num).toInt()),
+      ) ?? const {},
+      temporarySkillBoostMatches: (json['temporarySkillBoostMatches'] as Map?)?.map(
+        (key, value) => MapEntry(key.toString(), (value as num).toInt()),
+      ) ?? const {},
     );
   }
 
@@ -531,6 +563,8 @@ class Career {
     WorldCup? worldCup,
     int? injuryMatchesRemaining,
     String? injuryName,
+    Map<String, int>? temporarySkillBoosts,
+    Map<String, int>? temporarySkillBoostMatches,
     bool clearInjury = false,
   }) {
     return Career(
@@ -567,6 +601,8 @@ class Career {
       injuryMatchesRemaining:
           injuryMatchesRemaining ?? this.injuryMatchesRemaining,
       injuryName: clearInjury ? null : injuryName ?? this.injuryName,
+      temporarySkillBoosts: temporarySkillBoosts ?? this.temporarySkillBoosts,
+      temporarySkillBoostMatches: temporarySkillBoostMatches ?? this.temporarySkillBoostMatches,
     );
   }
 
@@ -663,18 +699,27 @@ class Career {
       );
     }
 
-    if (!playerParticipated || Random().nextDouble() >= 0.030) return this;
+    var updatedCareer = this;
+    if (playerParticipated) {
+      final nextBoosts = Map<String, int>.from(temporarySkillBoosts);
+      final nextDurations = Map<String, int>.from(temporarySkillBoostMatches);
+      for (final skillName in nextDurations.keys.toList()) {
+        final remaining = (nextDurations[skillName] ?? 0) - 1;
+        if (remaining <= 0) {
+          nextDurations.remove(skillName);
+          nextBoosts.remove(skillName);
+        } else {
+          nextDurations[skillName] = remaining;
+        }
+      }
+      updatedCareer = copyWith(temporarySkillBoosts: nextBoosts, temporarySkillBoostMatches: nextDurations);
+    }
 
-    const injuries = [
-      'Растяжение мышц',
-      'Ушиб',
-      'Повреждение голеностопа',
-      'Мышечная травма',
-      'Повреждение колена',
-    ];
+    if (!playerParticipated || Random().nextDouble() >= 0.030) return updatedCareer;
+    const injuries = ['Растяжение мышц', 'Ушиб', 'Повреждение голеностопа', 'Мышечная травма', 'Повреждение колена'];
     final random = Random();
     final duration = random.nextInt(10) + 1;
-    return copyWith(
+    return updatedCareer.copyWith(
       injuryName: injuries[random.nextInt(injuries.length)],
       injuryMatchesRemaining: duration,
     );
@@ -1409,6 +1454,8 @@ class Career {
       // независимо от того, остался игрок в клубе или сменил его.
       injuryMatchesRemaining: injuryMatchesRemaining,
       injuryName: injuryName,
+      temporarySkillBoosts: temporarySkillBoosts,
+      temporarySkillBoostMatches: temporarySkillBoostMatches,
     );
   }
 }
