@@ -120,12 +120,20 @@ class PositionRival {
     ],
   };
 
+  static int _stableSeed(String value) {
+    var hash = 17;
+    for (final unit in value.codeUnits) {
+      hash = (hash * 31 + unit) & 0x7fffffff;
+    }
+    return hash;
+  }
+
   static List<PositionRival> generate({
     required Player player,
     required int season,
     int count = 2,
   }) {
-    final random = Random(('${player.name}|${player.club}|$season').hashCode);
+    final random = Random(_stableSeed('${player.name}|${player.club}|$season'));
     final targetCount = count.clamp(1, 3).toInt();
     final takenNumbers = <int>{player.jerseyNumber};
     final realPlayers = RealClubSquads.squads[player.club]?[player.position.name];
