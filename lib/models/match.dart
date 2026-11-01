@@ -54,10 +54,10 @@ class Match {
             .where((rival) => rival.overall + rival.form > player.overall)
             .length ??
         0;
-    // Конкуренты влияют на игровое время, но не должны почти
-    // полностью лишать игрока шанса выйти на поле в каждом матче.
-    final rivalPenalty = strongerRivals * 0.07;
-    final trustBonus = ((career?.coachTrust ?? 65) - 65) * 0.003;
+    // Конкуренты влияют на выбор состава, но доверие и репутация
+    // должны реально помогать игроку закрепиться в основе.
+    final rivalPenalty = strongerRivals * 0.04;
+    final trustBonus = ((career?.coachTrust ?? 65) - 65) * 0.004;
     final averageRating = career?.averageRating ?? 6.0;
     final trophyCount = career?.history.fold<int>(
           0,
@@ -71,13 +71,13 @@ class Match {
         .round()
         .clamp(1, 100)
         .toInt();
-    final reputationBonus = (reputation - 60) * 0.004;
+    final reputationBonus = (reputation - 60) * 0.005;
 
     playChance = (playChance -
             rivalPenalty +
             trustBonus +
             reputationBonus)
-        .clamp(0.20, 0.98)
+        .clamp(0.25, 0.99)
         .toDouble();
 
     return Random(seed).nextDouble() < playChance;
