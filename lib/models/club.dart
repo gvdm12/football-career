@@ -177,11 +177,8 @@ class Club {
 
   Color get secondaryColor => ClubColors.secondary(name);
 
-  const Club({
-    required this.name,
-    required this.league,
-    required int strength,
-  }) : baseStrength = strength;
+  const Club({required this.name, required this.league, required int strength})
+    : baseStrength = strength;
 }
 
 class Clubs {

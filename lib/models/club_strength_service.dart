@@ -31,10 +31,14 @@ class ClubStrengthService {
 
       for (var index = 0; index < ordered.length; index++) {
         final clubName = ordered[index].club;
-        final base = updated[clubName] ?? Clubs.all
-            .firstWhere((club) => club.name == clubName,
-                orElse: () => Clubs.all.first)
-            .baseStrength;
+        final base =
+            updated[clubName] ??
+            Clubs.all
+                .firstWhere(
+                  (club) => club.name == clubName,
+                  orElse: () => Clubs.all.first,
+                )
+                .baseStrength;
         final expectedIndex = expectedOrder.indexWhere(
           (club) => club.name == clubName,
         );
@@ -48,8 +52,8 @@ class ClubStrengthService {
         final formChange = pointsPerGame >= 2.2
             ? 1
             : pointsPerGame <= 0.75
-                ? -1
-                : 0;
+            ? -1
+            : 0;
         final change = (performanceChange + formChange).clamp(-3, 3);
         updated[clubName] = (base + change).clamp(45, 97).toInt();
       }
@@ -57,9 +61,10 @@ class ClubStrengthService {
 
     final cupWinner = domesticCupWinner;
     if (cupWinner != null) {
-      updated[cupWinner] = ((updated[cupWinner] ??
-              Clubs.getByName(cupWinner).strength) +
-          1).clamp(45, 97).toInt();
+      updated[cupWinner] =
+          ((updated[cupWinner] ?? Clubs.getByName(cupWinner).strength) + 1)
+              .clamp(67, 93)
+              .toInt();
     }
 
     if (championsLeagueWinner != null) {
@@ -67,7 +72,7 @@ class ClubStrengthService {
           ((updated[championsLeagueWinner] ??
                       Clubs.getByName(championsLeagueWinner).strength) +
                   2)
-              .clamp(45, 97)
+              .clamp(67, 93)
               .toInt();
     }
 
@@ -76,7 +81,7 @@ class ClubStrengthService {
           ((updated[europaLeagueWinner] ??
                       Clubs.getByName(europaLeagueWinner).strength) +
                   1)
-              .clamp(45, 97)
+              .clamp(67, 93)
               .toInt();
     }
 
