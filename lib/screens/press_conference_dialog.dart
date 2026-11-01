@@ -212,7 +212,7 @@ class PressConferenceContentFactory {
       ],
     };
 
-    final options = switch (category) {
+    var options = switch (category) {
       'seasonStart' => [
         PressConferenceOption(
           text: choose(
@@ -694,6 +694,51 @@ class PressConferenceContentFactory {
     final selectedQuestion = pool[random.nextInt(pool.length)];
     _recentQuestions.add(selectedQuestion);
     if (_recentQuestions.length > 8) _recentQuestions.removeAt(0);
+
+    final isFansSupportQuestion =
+        selectedQuestion.contains('поддержка болельщиков') ||
+        selectedQuestion.contains('fans’ support');
+
+    if (isFansSupportQuestion) {
+      options = [
+        PressConferenceOption(
+          text: choose(
+            'Поддержка болельщиков даёт мне дополнительную мотивацию',
+            'The fans’ support gives me extra motivation',
+          ),
+          detail: choose('Благодарность и связь с фанатами', 'Grateful and connected to the fans'),
+          trustChange: 3,
+          icon: Icons.favorite_outline,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Я всегда чувствую ответственность перед нашими болельщиками',
+            'I always feel responsible to our supporters',
+          ),
+          detail: choose('Уважение к болельщикам', 'Respect for the supporters'),
+          trustChange: 2,
+          icon: Icons.groups_outlined,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Их поддержка важна, но на поле нужно сосредоточиться на игре',
+            'Their support matters, but on the pitch I must focus on the game',
+          ),
+          detail: choose('Профессиональный и сдержанный ответ', 'Professional and measured response'),
+          trustChange: 1,
+          icon: Icons.sports_soccer,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Я стараюсь не обращать внимания на трибуны',
+            'I try not to pay attention to the stands',
+          ),
+          detail: choose('Независимость от внешнего давления', 'Unaffected by outside pressure'),
+          trustChange: 0,
+          icon: Icons.hearing_disabled_outlined,
+        ),
+      ];
+    }
 
     return PressConferenceContent(
       question: selectedQuestion,
