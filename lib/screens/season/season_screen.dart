@@ -2362,12 +2362,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
       category = match.isPlayerLoss(updatedCareer.player.club)
           ? 'elimination'
           : 'tournament';
-    } else if (losingStreak) {
-      category = 'losingStreak';
-    } else if (badRun) {
-      category = 'badRun';
-    } else if (poorSeason) {
-      category = 'poorSeason';
     } else if (includeSeasonMilestones &&
         totalMatches >= 8 &&
         playedBefore + 1 == firstInterestCheckpoint) {
@@ -2377,6 +2371,12 @@ class _SeasonScreenState extends State<SeasonScreen> {
         playedBefore + 1 == secondInterestCheckpoint &&
         Random().nextDouble() < 0.55) {
       category = 'transferInterest';
+    } else if (losingStreak) {
+      category = 'losingStreak';
+    } else if (badRun) {
+      category = 'badRun';
+    } else if (poorSeason) {
+      category = 'poorSeason';
     } else if (includeSeasonMilestones &&
         playedBefore == 0 &&
         Random().nextDouble() < 0.35) {
