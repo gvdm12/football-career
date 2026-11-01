@@ -171,7 +171,8 @@ extension LeagueInfo on League {
 class Club {
   final String name;
   final League league;
-  final int strength;
+  final int baseStrength;
+  int get strength => Clubs.strengthOverrides[name] ?? baseStrength;
   Color get primaryColor => ClubColors.primary(name);
 
   Color get secondaryColor => ClubColors.secondary(name);
@@ -179,11 +180,20 @@ class Club {
   const Club({
     required this.name,
     required this.league,
-    required this.strength,
-  });
+    required int strength,
+  }) : baseStrength = strength;
 }
 
 class Clubs {
+  /// Сезонные изменения силы клубов в рамках текущей карьеры.
+  static final Map<String, int> strengthOverrides = {};
+
+  static void applyStrengthOverrides(Map<String, int> values) {
+    strengthOverrides
+      ..clear()
+      ..addAll(values);
+  }
+
   static const List<Club> all = [
     // =====================================================
     // АНГЛИЯ — PREMIER LEAGUE 2026/27 (20)
@@ -510,12 +520,23 @@ class Clubs {
   /// Находит клуб по названию.
   /// Старое поведение сохранено для совместимости.
   static Club getByName(String name) {
-    return all.firstWhere((club) => club.name == name, orElse: () => all.last);
+    final club = all.firstWhere(
+      (club) => club.name == name,
+      orElse: () => all.last,
+    );
+    return Club(
+      name: club.name,
+      league: club.league,
+      strength: strengthOverrides[club.name] ?? club.baseStrength,
+    );
   }
 
   /// Возвращает клубы выбранного чемпионата.
   static List<Club> byLeague(League league) {
-    return all.where((club) => club.league == league).toList();
+    return all
+        .where((club) => club.league == league)
+        .map((club) => getByName(club.name))
+        .toList();
   }
 
   /// Возвращает чемпионат по названию клуба.
