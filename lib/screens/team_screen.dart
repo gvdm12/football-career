@@ -334,8 +334,6 @@ class TeamScreen extends StatelessWidget {
                         runSpacing: 9,
                         children: [
                           _stat('Матчи', '${rival.matches}'),
-                          _stat('В основе', '${rival.starts}'),
-                          _stat('С замены', '${rival.substituteAppearances}'),
                           _stat('Голы', '${rival.goals}'),
                           _stat('Ассисты', '${rival.assists}'),
                           _stat(
@@ -343,10 +341,6 @@ class TeamScreen extends StatelessWidget {
                             rival.matches == 0
                                 ? '—'
                                 : rival.averageRating.toStringAsFixed(2),
-                          ),
-                          _stat(
-                            'Последняя оценка',
-                            rival.lastRating?.toStringAsFixed(1) ?? '—',
                           ),
                           _stat(
                             'Форма',
