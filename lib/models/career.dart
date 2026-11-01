@@ -838,30 +838,29 @@ class Career {
     }
 
     final oldRole = roleFor(this);
-    final newRole = roleFor(trustedCareer);
     final competitionNews = <CareerNews>[];
     final competitionRound =
         seasonMatches.where((item) => item.isPlayed).length + 1;
 
-    if (oldRole != newRole) {
-      final improved = newRole.index < oldRole.index;
-      competitionNews.add(
-        CareerNews(
-          id: 's${season}_squad_role_${competitionRound}_${newRole.name}',
-          season: season,
-          matchNumber: competitionRound,
-          title: improved ? 'Новый статус в команде' : 'Изменение роли в составе',
-          description: improved
-              ? 'Благодаря выступлениям и доверию тренера ваша роль изменилась: ${newRole.displayName.toLowerCase()}.'
-              : 'Конкуренция за позицию усилилась. Теперь ваша роль: ${newRole.displayName.toLowerCase()}.',
-          type: CareerNewsType.season,
-        ),
-      );
-    }
-
     // Команда сыграла, но игрок не участвовал: сохраняем причину в ленте,
     // чтобы пропуск матча не выглядел как незаметное случайное событие.
     if (!match.playerPlayed) {
+      final newRole = roleFor(trustedCareer);
+      if (oldRole != newRole) {
+        final improved = newRole.index < oldRole.index;
+        competitionNews.add(
+          CareerNews(
+            id: 's${season}_squad_role_${competitionRound}_${newRole.name}',
+            season: season,
+            matchNumber: competitionRound,
+            title: improved ? 'Новый статус в команде' : 'Изменение роли в составе',
+            description: improved
+                ? 'Благодаря выступлениям и доверию тренера ваша роль изменилась: ${newRole.displayName.toLowerCase()}.'
+                : 'Конкуренция за позицию усилилась. Теперь ваша роль: ${newRole.displayName.toLowerCase()}.',
+            type: CareerNewsType.season,
+          ),
+        );
+      }
       final strongestRival = trustedCareer.rivals.isEmpty
           ? null
           : trustedCareer.rivals.reduce((a, b) {
@@ -923,13 +922,34 @@ class Career {
         )
         .advanceAfterCompetitionMatch(playerParticipated: true);
 
+    final newRole = roleFor(updatedCareer);
+    var careerWithCompetitionNews = updatedCareer;
+    if (oldRole != newRole) {
+      final improved = newRole.index < oldRole.index;
+      careerWithCompetitionNews = updatedCareer.copyWith(
+        news: [
+          ...updatedCareer.news,
+          CareerNews(
+            id: 's${season}_squad_role_${competitionRound}_${newRole.name}',
+            season: season,
+            matchNumber: competitionRound,
+            title: improved ? 'Новый статус в команде' : 'Изменение роли в составе',
+            description: improved
+                ? 'Благодаря выступлениям и доверию тренера ваша роль изменилась: ${newRole.displayName.toLowerCase()}.'
+                : 'Конкуренция за позицию усилилась. Теперь ваша роль: ${newRole.displayName.toLowerCase()}.',
+            type: CareerNewsType.season,
+          ),
+        ],
+      );
+    }
+
     if (match.injuryName != null && match.injuryMatchesRemaining > 0) {
-      return updatedCareer.copyWith(
+      return careerWithCompetitionNews.copyWith(
         injuryName: match.injuryName,
         injuryMatchesRemaining: match.injuryMatchesRemaining,
       );
     }
-    return updatedCareer;
+    return careerWithCompetitionNews;
   }
 
   // ============================================================
