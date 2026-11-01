@@ -47,6 +47,8 @@ class Career {
   final WorldCup? worldCup;
   final int injuryMatchesRemaining;
   final String? injuryName;
+  final bool injuryRecoveryUsed;
+  final Map<String, int> skillTrainingPurchases;
   final Map<String, int> temporarySkillBoosts;
   final Map<String, int> temporarySkillBoostMatches;
 
@@ -112,6 +114,8 @@ class Career {
     this.worldCup,
     this.injuryMatchesRemaining = 0,
     this.injuryName,
+    this.injuryRecoveryUsed = false,
+    this.skillTrainingPurchases = const {},
     this.temporarySkillBoosts = const {},
     this.temporarySkillBoostMatches = const {},
   });
@@ -345,6 +349,8 @@ class Career {
       'worldCup': worldCup?.toJson(),
       'injuryMatchesRemaining': injuryMatchesRemaining,
       'injuryName': injuryName,
+      'injuryRecoveryUsed': injuryRecoveryUsed,
+      'skillTrainingPurchases': skillTrainingPurchases,
       'temporarySkillBoosts': temporarySkillBoosts,
       'temporarySkillBoostMatches': temporarySkillBoostMatches,
     };
@@ -518,6 +524,10 @@ class Career {
               .clamp(0, 10)
               .toInt(),
       injuryName: json['injuryName'] as String?,
+      injuryRecoveryUsed: json['injuryRecoveryUsed'] as bool? ?? false,
+      skillTrainingPurchases: (json['skillTrainingPurchases'] as Map?)?.map(
+        (key, value) => MapEntry(key.toString(), (value as num).toInt()),
+      ) ?? const {},
       temporarySkillBoosts: (json['temporarySkillBoosts'] as Map?)?.map(
         (key, value) => MapEntry(key.toString(), (value as num).toInt()),
       ) ?? const {},
@@ -563,6 +573,8 @@ class Career {
     WorldCup? worldCup,
     int? injuryMatchesRemaining,
     String? injuryName,
+    bool? injuryRecoveryUsed,
+    Map<String, int>? skillTrainingPurchases,
     Map<String, int>? temporarySkillBoosts,
     Map<String, int>? temporarySkillBoostMatches,
     bool clearInjury = false,
@@ -601,6 +613,8 @@ class Career {
       injuryMatchesRemaining:
           injuryMatchesRemaining ?? this.injuryMatchesRemaining,
       injuryName: clearInjury ? null : injuryName ?? this.injuryName,
+      injuryRecoveryUsed: injuryRecoveryUsed ?? this.injuryRecoveryUsed,
+      skillTrainingPurchases: skillTrainingPurchases ?? this.skillTrainingPurchases,
       temporarySkillBoosts: temporarySkillBoosts ?? this.temporarySkillBoosts,
       temporarySkillBoostMatches: temporarySkillBoostMatches ?? this.temporarySkillBoostMatches,
     );
@@ -722,6 +736,7 @@ class Career {
     return updatedCareer.copyWith(
       injuryName: injuries[random.nextInt(injuries.length)],
       injuryMatchesRemaining: duration,
+      injuryRecoveryUsed: false,
     );
   }
 
@@ -1454,6 +1469,8 @@ class Career {
       // независимо от того, остался игрок в клубе или сменил его.
       injuryMatchesRemaining: injuryMatchesRemaining,
       injuryName: injuryName,
+      injuryRecoveryUsed: injuryRecoveryUsed,
+      skillTrainingPurchases: skillTrainingPurchases,
       temporarySkillBoosts: temporarySkillBoosts,
       temporarySkillBoostMatches: temporarySkillBoostMatches,
     );
