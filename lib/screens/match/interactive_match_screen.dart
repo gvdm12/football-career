@@ -826,16 +826,6 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       'cross',
       'dribble',
     ].contains(action);
-    final isShot = ['shoot', 'longShot', 'header', 'volley'].contains(action);
-    final difficulty = action == 'longShot'
-        ? 0.24
-        : action == 'throughPass'
-        ? 0.13
-        : action == 'header' || action == 'volley'
-        ? 0.07
-        : action == 'shoot'
-        ? 0.04
-        : 0.02;
     final advantage = widget.isHome
         ? (_homeStrength - _awayStrength) * 0.003
         : (_awayStrength - _homeStrength) * 0.003;
