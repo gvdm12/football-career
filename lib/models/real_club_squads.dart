@@ -48,5 +48,29 @@ class RealClubSquads {
       'midfielder': [RealClubPlayer('Йозуа Киммих', 31, 89, 6), RealClubPlayer('Джамал Мусиала', 23, 92, 10), RealClubPlayer('Александар Павлович', 22, 85, 45), RealClubPlayer('Том Бишоф', 21, 82, 8)],
       'forward': [RealClubPlayer('Гарри Кейн', 33, 92, 9), RealClubPlayer('Майкл Олисе', 24, 90, 17), RealClubPlayer('Луис Диас', 29, 89, 14), RealClubPlayer('Серж Гнабри', 31, 85, 7)],
     },
+    'Arsenal': {
+      'goalkeeper': [RealClubPlayer('Давид Райя', 31, 89, 1), RealClubPlayer('Кепа Аррисабалага', 32, 82, 13)],
+      'defender': [RealClubPlayer('Уильям Салиба', 25, 90, 2), RealClubPlayer('Габриэл Магальяйнс', 28, 88, 6), RealClubPlayer('Юрриен Тимбер', 25, 87, 12), RealClubPlayer('Риккардо Калафьори', 24, 85, 33)],
+      'midfielder': [RealClubPlayer('Деклан Райс', 27, 91, 41), RealClubPlayer('Мартин Эдегор', 27, 89, 8), RealClubPlayer('Мартин Субименди', 27, 87, 36), RealClubPlayer('Эберечи Эзе', 28, 86, 10)],
+      'forward': [RealClubPlayer('Букайо Сака', 25, 91, 7), RealClubPlayer('Виктор Дьёкереш', 28, 89, 14), RealClubPlayer('Кай Хаверц', 27, 87, 29), RealClubPlayer('Нони Мадуэке', 24, 85, 20)],
+    },
+    'Atletico Madrid': {
+      'goalkeeper': [RealClubPlayer('Ян Облак', 33, 89, 13), RealClubPlayer('Хуан Муссо', 32, 83, 1)],
+      'defender': [RealClubPlayer('Давид Ханцко', 28, 86, 17), RealClubPlayer('Робен Ле Норман', 30, 85, 24), RealClubPlayer('Марк Пубиль', 23, 83, 18), RealClubPlayer('Маркос Льоренте', 31, 86, 14)],
+      'midfielder': [RealClubPlayer('Пабло Барриос', 23, 87, 8), RealClubPlayer('Коке', 34, 84, 6), RealClubPlayer('Джонни Кардозо', 25, 85, 5), RealClubPlayer('Конор Галлахер', 26, 85, 4)],
+      'forward': [RealClubPlayer('Хулиан Альварес', 26, 91, 19), RealClubPlayer('Александр Сёрлот', 30, 87, 9), RealClubPlayer('Адемола Лукман', 28, 87, 11), RealClubPlayer('Джонатан Дэвид', 26, 85, 15)],
+    },
+    'Inter': {
+      'goalkeeper': [RealClubPlayer('Жозеп Мартинес', 28, 84, 1), RealClubPlayer('Иван Проведель', 32, 83, 49)],
+      'defender': [RealClubPlayer('Алессандро Бастони', 27, 89, 95), RealClubPlayer('Джон Стоунз', 32, 86, 6), RealClubPlayer('Мануэль Аканжи', 31, 86, 25), RealClubPlayer('Федерико Димарко', 28, 88, 32)],
+      'midfielder': [RealClubPlayer('Николо Барелла', 29, 90, 23), RealClubPlayer('Хакан Чалханоглу', 32, 88, 20), RealClubPlayer('Пётр Зелиньски', 32, 85, 7), RealClubPlayer('Петр Сучич', 23, 84, 8)],
+      'forward': [RealClubPlayer('Лаутаро Мартинес', 29, 91, 10), RealClubPlayer('Маркус Тюрам', 29, 89, 9), RealClubPlayer('Анже-Йоан Бонни', 23, 84, 14), RealClubPlayer('Луис Энрике', 24, 84, 11)],
+    },
+    'Napoli': {
+      'goalkeeper': [RealClubPlayer('Алекс Мерет', 29, 85, 1), RealClubPlayer('Ваня Милинкович-Савич', 29, 84, 32)],
+      'defender': [RealClubPlayer('Бенуа Бадиашиле', 25, 84, 5), RealClubPlayer('Амир Ррахмани', 32, 85, 13), RealClubPlayer('Джованни Ди Лоренцо', 33, 86, 22), RealClubPlayer('Сэм Бёкема', 27, 84, 31)],
+      'midfielder': [RealClubPlayer('Кевин Де Брёйне', 35, 88, 11), RealClubPlayer('Скотт Мактоминей', 29, 87, 8), RealClubPlayer('Станислав Лоботка', 31, 86, 68), RealClubPlayer('Билли Гилмор', 25, 83, 6)],
+      'forward': [RealClubPlayer('Расмус Хёйлунн', 23, 87, 19), RealClubPlayer('Давид Нерес', 29, 85, 7), RealClubPlayer('Маттео Политано', 33, 84, 21), RealClubPlayer('Ноа Ланг', 27, 85, 70)],
+    },
   };
 }
