@@ -61,16 +61,27 @@ class _ShopScreenState extends State<ShopScreen> {
     return skills.getSkill(skill);
   }
 
-  int get _trainingPrice {
+  int get _trainingBasePrice {
     final value = _skillValue(career.player.skills, selectedSkill);
     return 20000 + value * 250;
   }
 
+  int get _trainingPurchaseCount =>
+      career.skillTrainingPurchases[selectedSkill.name] ?? 0;
+
+  int get _trainingPrice =>
+      (_trainingBasePrice * (100 + _trainingPurchaseCount * 50) / 100).round();
+
+  bool get _trainingActive =>
+      (career.temporarySkillBoostMatches[selectedSkill.name] ?? 0) > 0;
+
   int get _recoveryPrice => 25000;
 
   Future<void> _buyTraining() async {
-    if (career.money < _trainingPrice) return;
+    if (_trainingActive || career.money < _trainingPrice) return;
 
+    final purchases = Map<String, int>.from(career.skillTrainingPurchases);
+    purchases[selectedSkill.name] = _trainingPurchaseCount + 1;
     final boosts = Map<String, int>.from(career.temporarySkillBoosts);
     final durations = Map<String, int>.from(career.temporarySkillBoostMatches);
     boosts[selectedSkill.name] = 5;
@@ -79,6 +90,7 @@ class _ShopScreenState extends State<ShopScreen> {
     setState(() {
       career = career.copyWith(
         money: career.money - _trainingPrice,
+        skillTrainingPurchases: purchases,
         temporarySkillBoosts: boosts,
         temporarySkillBoostMatches: durations,
       );
@@ -91,7 +103,7 @@ class _ShopScreenState extends State<ShopScreen> {
   }
 
   Future<void> _buyRecovery() async {
-    if (!career.isInjured || career.money < _recoveryPrice) return;
+    if (!career.isInjured || career.injuryRecoveryUsed || career.money < _recoveryPrice) return;
 
     final remaining = (career.injuryMatchesRemaining - 2).clamp(0, 10).toInt();
 
@@ -99,6 +111,7 @@ class _ShopScreenState extends State<ShopScreen> {
       career = career.copyWith(
         money: career.money - _recoveryPrice,
         injuryMatchesRemaining: remaining,
+        injuryRecoveryUsed: true,
         clearInjury: remaining == 0,
       );
     });
@@ -122,7 +135,7 @@ class _ShopScreenState extends State<ShopScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final canTrain = career.money >= _trainingPrice;
+    final canTrain = !_trainingActive && career.money >= _trainingPrice;
 
     return Scaffold(
       backgroundColor: const Color(0xFF061B0C),
@@ -207,7 +220,7 @@ class _ShopScreenState extends State<ShopScreen> {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'Повышает выбранную характеристику на +5 на следующие 3 матча. Базовые навыки и общий рейтинг не меняются.',
+                    'Повышает выбранную характеристику на +5 на следующие 3 матча. Пока бустер активен, повторная покупка недоступна. После окончания можно купить снова, но цена вырастет на 50% за каждую предыдущую покупку этого навыка.',
                     style: TextStyle(color: Colors.white70, fontSize: 12),
                   ),
                   const SizedBox(height: 14),
@@ -232,7 +245,7 @@ class _ShopScreenState extends State<ShopScreen> {
                         value: skill,
                         child: Text(
                           '${_skillName(skill)} · ${_skillValue(career.player.skills, skill)}/99'
-                          '${career.temporarySkillBoostMatches[skill.name] != null ? '  (+5 · ${career.temporarySkillBoostMatches[skill.name]} мат.)' : ''}',
+                          '${(career.temporarySkillBoostMatches[skill.name] ?? 0) > 0 ? '  (+5 · ${career.temporarySkillBoostMatches[skill.name]} мат.)' : ''}',
                         ),
                       );
                     }).toList(),
@@ -245,7 +258,7 @@ class _ShopScreenState extends State<ShopScreen> {
                     children: [
                       const Expanded(
                         child: Text(
-                          'Стоимость',
+                          'Стоимость · покупка №${_trainingPurchaseCount + 1}',
                           style: TextStyle(color: Colors.white70),
                         ),
                       ),
@@ -270,7 +283,9 @@ class _ShopScreenState extends State<ShopScreen> {
                         disabledForegroundColor: Colors.white38,
                       ),
                       child: Text(
-                        career.money < _trainingPrice
+                        _trainingActive
+                            ? 'Бустер уже активен'
+                            : career.money < _trainingPrice
                             ? 'Недостаточно денег'
                             : 'Купить бустер +5 на 3 матча',
                       ),
@@ -306,7 +321,7 @@ class _ShopScreenState extends State<ShopScreen> {
                   const SizedBox(height: 8),
                   Text(
                     career.isInjured
-                        ? 'Травма: ${career.injuryName ?? 'повреждение'}. Осталось пропустить матчей: ${career.injuryMatchesRemaining}.'
+                        ? 'Травма: ${career.injuryName ?? 'повреждение'}. Осталось пропустить матчей: ${career.injuryMatchesRemaining}. ${career.injuryRecoveryUsed ? 'Лечение уже использовано для этой травмы.' : 'Можно воспользоваться лечением один раз.'}'
                         : 'Сейчас вы здоровы. Лечение станет доступно при получении травмы.',
                     style: const TextStyle(color: Colors.white70, fontSize: 12),
                   ),
@@ -333,7 +348,9 @@ class _ShopScreenState extends State<ShopScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed:
-                          career.isInjured && career.money >= _recoveryPrice
+                          career.isInjured &&
+                                  !career.injuryRecoveryUsed &&
+                                  career.money >= _recoveryPrice
                           ? _buyRecovery
                           : null,
                       style: ElevatedButton.styleFrom(
@@ -345,6 +362,8 @@ class _ShopScreenState extends State<ShopScreen> {
                       child: Text(
                         !career.isInjured
                             ? 'Лечение не требуется'
+                            : career.injuryRecoveryUsed
+                            ? 'Уже использовано для этой травмы'
                             : career.money < _recoveryPrice
                             ? 'Недостаточно денег'
                             : 'Сократить травму на 2 матча',
