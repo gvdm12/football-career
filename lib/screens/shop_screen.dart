@@ -69,39 +69,25 @@ class _ShopScreenState extends State<ShopScreen> {
   int get _recoveryPrice => 25000;
 
   Future<void> _buyTraining() async {
-    final player = career.player;
-    final currentValue = _skillValue(player.skills, selectedSkill);
+    if (career.money < _trainingPrice) return;
 
-    if (career.money < _trainingPrice || currentValue >= 99) return;
-
-    final nextValue = currentValue + 1;
-    final updatedSkills = switch (selectedSkill) {
-      SkillName.pace => player.skills.copyWith(pace: nextValue),
-      SkillName.physical => player.skills.copyWith(physical: nextValue),
-      SkillName.shooting => player.skills.copyWith(shooting: nextValue),
-      SkillName.passing => player.skills.copyWith(passing: nextValue),
-      SkillName.dribbling => player.skills.copyWith(dribbling: nextValue),
-      SkillName.defending => player.skills.copyWith(defending: nextValue),
-      SkillName.heading => player.skills.copyWith(heading: nextValue),
-      SkillName.vision => player.skills.copyWith(vision: nextValue),
-    };
-    final updatedPlayer = player.copyWith(
-      skills: updatedSkills,
-      overall: calculateOverall(
-        skills: updatedSkills,
-        position: player.position,
-      ),
-    );
+    final boosts = Map<String, int>.from(career.temporarySkillBoosts);
+    final durations = Map<String, int>.from(career.temporarySkillBoostMatches);
+    boosts[selectedSkill.name] = 5;
+    durations[selectedSkill.name] = 3;
 
     setState(() {
       career = career.copyWith(
-        player: updatedPlayer,
         money: career.money - _trainingPrice,
+        temporarySkillBoosts: boosts,
+        temporarySkillBoostMatches: durations,
       );
     });
 
     await CareerStorage.save(career);
-    _showMessage('Тренировка куплена: ${_skillName(selectedSkill)} +1');
+    _showMessage(
+      'Тренировка куплена: ${_skillName(selectedSkill)} +5 на 3 матча',
+    );
   }
 
   Future<void> _buyRecovery() async {
@@ -139,7 +125,7 @@ class _ShopScreenState extends State<ShopScreen> {
   @override
   Widget build(BuildContext context) {
     final selectedValue = _skillValue(career.player.skills, selectedSkill);
-    final canTrain = selectedValue < 99 && career.money >= _trainingPrice;
+    final canTrain = career.money >= _trainingPrice;
 
     return Scaffold(
       backgroundColor: const Color(0xFF061B0C),
@@ -218,7 +204,7 @@ class _ShopScreenState extends State<ShopScreen> {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'Навсегда повышает выбранную характеристику на 1 пункт.',
+                    'Повышает выбранную характеристику на +5 на следующие 3 матча. Базовые навыки и общий рейтинг не меняются.',
                     style: TextStyle(color: Colors.white70, fontSize: 13),
                   ),
                   const SizedBox(height: 14),
@@ -242,7 +228,8 @@ class _ShopScreenState extends State<ShopScreen> {
                       return DropdownMenuItem(
                         value: skill,
                         child: Text(
-                          '${_skillName(skill)} · ${_skillValue(career.player.skills, skill)}/99',
+                          '${_skillName(skill)} · ${_skillValue(career.player.skills, skill)}/99'
+                          '${career.temporarySkillBoostMatches[skill.name] != null ? '  (+5 · ${career.temporarySkillBoostMatches[skill.name]} мат.)' : ''}',
                         ),
                       );
                     }).toList(),
@@ -260,7 +247,7 @@ class _ShopScreenState extends State<ShopScreen> {
                         ),
                       ),
                       Text(
-                        selectedValue >= 99 ? 'Максимум' : '$_trainingPrice €',
+                        '$_trainingPrice €',
                         style: const TextStyle(
                           color: Color(0xFF8BE07F),
                           fontWeight: FontWeight.bold,
@@ -280,11 +267,9 @@ class _ShopScreenState extends State<ShopScreen> {
                         disabledForegroundColor: Colors.white38,
                       ),
                       child: Text(
-                        selectedValue >= 99
-                            ? 'Характеристика максимальная'
-                            : career.money < _trainingPrice
-                                ? 'Недостаточно денег'
-                                : 'Купить тренировку',
+                        career.money < _trainingPrice
+                            ? 'Недостаточно денег'
+                            : 'Купить бустер +5 на 3 матча',
                       ),
                     ),
                   ),
