@@ -1400,7 +1400,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         match.playerPlayed &&
         _playerWonMatchWithPenalties(match, career.player.club)) {
       updatedCareer = updatedCareer.copyWith(
-        agentCredits: updatedCareer.agentCredits + 8,
+        agentCredits: updatedCareer.agentCredits + 10,
       );
     }
 
@@ -1644,7 +1644,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         match.playerPlayed &&
         _playerWonMatchWithPenalties(match, career.player.club)) {
       updatedCareer = updatedCareer.copyWith(
-        agentCredits: updatedCareer.agentCredits + 8,
+        agentCredits: updatedCareer.agentCredits + 10,
       );
     }
 
@@ -1894,7 +1894,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     if (cupMatch.round == 4 && cupWinner == playerClub && match.playerPlayed) {
       updatedCareer = updatedCareer.copyWith(
-        agentCredits: updatedCareer.agentCredits + 8,
+        agentCredits: updatedCareer.agentCredits + 10,
       );
     }
 
