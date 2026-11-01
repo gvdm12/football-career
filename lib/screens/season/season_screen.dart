@@ -14,6 +14,8 @@ import 'package:flutter_football/models/match.dart';
 import 'package:flutter_football/models/season_match.dart';
 import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/models/player_of_month_award.dart';
+import 'package:flutter_football/models/season_award.dart';
+import 'package:flutter_football/services/season_award_service.dart';
 import 'package:flutter_football/services/player_of_month_service.dart';
 import 'package:flutter_football/screens/development_screen.dart';
 import 'package:flutter_football/screens/home/home_screen.dart';
@@ -994,9 +996,20 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Future<void> _showPlayerOfMonthAward(PlayerOfMonthAward award) async {
     if (!mounted) return;
-    await showDialog<void>(
+    await showGeneralDialog<void>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
+      barrierDismissible: false,
+      barrierColor: Colors.transparent,
+      pageBuilder: (dialogContext, animation, secondaryAnimation) => Stack(
+        children: [
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ui.ImageFilter.blur(sigmaX: 7, sigmaY: 7),
+              child: Container(color: Colors.black.withValues(alpha: 0.48)),
+            ),
+          ),
+          Center(
+            child: AlertDialog(
         backgroundColor: const Color(0xFF0B2B14),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -1054,6 +1067,109 @@ class _SeasonScreenState extends State<SeasonScreen> {
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Продолжить', style: TextStyle(color: Color(0xFF8BE07F))),
+          ),
+        ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showSeasonAwards(List<SeasonAward> awards) async {
+    if (!mounted || awards.isEmpty) return;
+    await showGeneralDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.transparent,
+      pageBuilder: (dialogContext, animation, secondaryAnimation) => Stack(
+        children: [
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+              child: Container(color: Colors.black.withValues(alpha: 0.58)),
+            ),
+          ),
+          Center(
+            child: Dialog(
+              backgroundColor: const Color(0xFF092511),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(22),
+                side: const BorderSide(color: Color(0xFF2D7D3D)),
+              ),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 430, maxHeight: 560),
+                child: Padding(
+                  padding: const EdgeInsets.all(18),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.emoji_events, color: Color(0xFFFFD54F), size: 38),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'ИТОГИ СЕЗОНА',
+                        style: TextStyle(color: Color(0xFF8BE07F), fontSize: 18, fontWeight: FontWeight.w900),
+                      ),
+                      const SizedBox(height: 12),
+                      Flexible(
+                        child: ListView(
+                          shrinkWrap: true,
+                          children: [
+                            for (final award in awards.where((item) => item.category != 'Команда года'))
+                              Container(
+                                margin: const EdgeInsets.only(bottom: 8),
+                                padding: const EdgeInsets.all(11),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF10351A),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.military_tech, color: Color(0xFFFFD54F)),
+                                    const SizedBox(width: 9),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(award.category.toUpperCase(), style: const TextStyle(color: Color(0xFF8BE07F), fontSize: 10, fontWeight: FontWeight.w900)),
+                                          Text(award.playerName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                                          Text(award.club, style: const TextStyle(color: Colors.white60, fontSize: 11)),
+                                        ],
+                                      ),
+                                    ),
+                                    if (award.isCareerPlayer)
+                                      const Icon(Icons.stars, color: Color(0xFFFFD54F)),
+                                  ],
+                                ),
+                              ),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8),
+                              child: Text('КОМАНДА ГОДА', style: TextStyle(color: Color(0xFF8BE07F), fontWeight: FontWeight.w900)),
+                            ),
+                            for (final player in awards.where((item) => item.category == 'Команда года'))
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4),
+                                child: Row(
+                                  children: [
+                                    SizedBox(width: 34, child: Text(player.positionLabel, style: const TextStyle(color: Color(0xFF8BE07F), fontSize: 10, fontWeight: FontWeight.bold))),
+                                    Expanded(child: Text(player.playerName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700))),
+                                    Text(player.club, style: const TextStyle(color: Colors.white54, fontSize: 10)),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextButton(
+                        onPressed: () => Navigator.pop(dialogContext),
+                        child: const Text('Продолжить', style: TextStyle(color: Color(0xFF8BE07F), fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -2215,6 +2331,24 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     var completedCareer = career.archiveCurrentSeason();
 
+    // Награды сезона формируются и сохраняются один раз после архивации статистики.
+    if (!alreadyArchived &&
+        !completedCareer.seasonAwards.any((item) => item.season == career.season)) {
+      final seasonAwards = SeasonAwardService.create(
+        season: career.season,
+        player: career.player,
+        seasonStats: completedCareer.history.firstWhere(
+          (item) => item.season == career.season,
+        ),
+        monthlyAwards: completedCareer.playerOfMonthAwards
+            .where((item) => item.season == career.season)
+            .toList(),
+      );
+      completedCareer = completedCareer.copyWith(
+        seasonAwards: [...completedCareer.seasonAwards, ...seasonAwards],
+      );
+    }
+
     // Зарплата и очки развития начисляются только один раз.
     if (!alreadyArchived) {
       completedCareer = completedCareer.copyWith(
@@ -2229,6 +2363,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
     await _saveCareer(completedCareer);
 
     if (!mounted) return;
+
+    if (!alreadyArchived) {
+      final awards = completedCareer.seasonAwards
+          .where((item) => item.season == completedCareer.season)
+          .toList();
+      await _showSeasonAwards(awards);
+      if (!mounted) return;
+    }
 
     setState(() {
       isSaving = false;
