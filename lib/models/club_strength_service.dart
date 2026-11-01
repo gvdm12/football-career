@@ -55,7 +55,7 @@ class ClubStrengthService {
             ? -1
             : 0;
         final change = (performanceChange + formChange).clamp(-3, 3);
-        updated[clubName] = (base + change).clamp(45, 97).toInt();
+        updated[clubName] = (base + change).clamp(67, 93).toInt();
       }
     }
 
