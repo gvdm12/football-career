@@ -2210,6 +2210,26 @@ class _SeasonScreenState extends State<SeasonScreen> {
       career = transferResult;
     }
 
+    if (career.player.club != previousClub) {
+      final transferConference = PressConferenceContentFactory.create(
+        category: 'newClub',
+        english: AppStrings.isEnglish,
+        clubName: career.player.club,
+      );
+      final trustChange = await PressConferenceDialog.show(
+        context: context,
+        content: transferConference,
+        title: AppStrings.pressConferenceTitle,
+        skipLabel: AppStrings.skipPressConference,
+      );
+      if (!mounted) return;
+      if (trustChange != null && trustChange != 0) {
+        career = career.copyWith(
+          coachTrust: (career.coachTrust + trustChange).clamp(0, 100).toInt(),
+        );
+      }
+    }
+
     // После трансферов сразу начинаем следующий сезон.
     // История текущего сезона уже сохранена до смены клуба.
     var nextCareer = career.startNextSeason();
@@ -2336,6 +2356,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 (completedResults.length * 0.55).ceil());
 
     String? category;
+    final firstInterestCheckpoint = max(2, (totalMatches / 3).round());
+    final secondInterestCheckpoint = max(4, (totalMatches * 2 / 3).round());
     if (isTournamentDecider) {
       category = match.isPlayerLoss(updatedCareer.player.club)
           ? 'elimination'
@@ -2346,6 +2368,15 @@ class _SeasonScreenState extends State<SeasonScreen> {
       category = 'badRun';
     } else if (poorSeason) {
       category = 'poorSeason';
+    } else if (includeSeasonMilestones &&
+        totalMatches >= 8 &&
+        playedBefore + 1 == firstInterestCheckpoint) {
+      category = 'transferInterest';
+    } else if (includeSeasonMilestones &&
+        totalMatches >= 8 &&
+        playedBefore + 1 == secondInterestCheckpoint &&
+        Random().nextDouble() < 0.55) {
+      category = 'transferInterest';
     } else if (includeSeasonMilestones &&
         playedBefore == 0 &&
         Random().nextDouble() < 0.35) {
@@ -2370,9 +2401,17 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     if (category == null) return updatedCareer;
 
+    final interestedClubs = Clubs.all
+        .where((club) => club.name != updatedCareer.player.club)
+        .toList();
+    final interestedClub = category == 'transferInterest' &&
+            interestedClubs.isNotEmpty
+        ? interestedClubs[Random().nextInt(interestedClubs.length)].name
+        : null;
     final content = PressConferenceContentFactory.create(
       category: category,
       english: AppStrings.isEnglish,
+      interestedClub: interestedClub,
     );
     final trustChange = await PressConferenceDialog.show(
       context: context,
