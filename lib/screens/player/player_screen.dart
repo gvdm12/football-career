@@ -10,8 +10,6 @@ import 'package:flutter_football/screens/career_end_screen.dart';
 import 'package:flutter_football/screens/home/home_screen.dart';
 import 'package:flutter_football/screens/match/match_screen.dart';
 import 'package:flutter_football/screens/season/season_screen.dart';
-import 'package:flutter_football/screens/shop_screen.dart';
-import 'package:flutter_football/services/career_storage.dart';
 import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -148,18 +146,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
   //     });
   //   }
   // }
-
-  Future<void> _openShop() async {
-    final updatedCareer = await Navigator.push<Career>(
-      context,
-      MaterialPageRoute(builder: (_) => ShopScreen(career: career)),
-    );
-
-    if (!mounted || updatedCareer == null) return;
-
-    setState(() => career = updatedCareer);
-    await CareerStorage.save(updatedCareer);
-  }
 
   Future<void> _openSeason() async {
     if (career.isCareerFinished) {
@@ -552,27 +538,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 //     ),
                 //   ),
                 // ),
-                SizedBox(
-                  width: double.infinity,
-                  height: 46,
-                  child: ElevatedButton.icon(
-                    onPressed: career.isCareerFinished ? null : _openShop,
-                    icon: const Icon(Icons.storefront),
-                    label: const Text(
-                      'МАГАЗИН КАРЬЕРЫ',
-                      style: TextStyle(fontWeight: FontWeight.w900),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF14532D),
-                      foregroundColor: const Color(0xFFB7F7A8),
-                      side: const BorderSide(color: Color(0xFF3E9950)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
                 SizedBox(
                   width: double.infinity,
                   height: 40,
