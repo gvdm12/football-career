@@ -606,7 +606,7 @@ class PressConferenceContentFactory {
           ),
           detail: choose('Перекладывание ответственности на партнёров', 'Blaming teammates'),
           trustChange: -3,
-          icon: Icons.person_off_outlined,
+          icon: Icons.person_outline,
         ),
       ],
       'tournament' => [
