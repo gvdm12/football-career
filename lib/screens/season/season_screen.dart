@@ -1049,7 +1049,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         context,
         MaterialPageRoute(
           builder: (_) => InteractiveMatchScreen(
-            career: career,
+            career: career.copyWith(player: career.playerForMatch),
             opponent: seasonMatch.opponent,
             isHome: seasonMatch.isHome,
             playerWillPlay: true,
@@ -1058,7 +1058,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
       );
     } else {
       match = Match.generate(
-        player: career.player,
+        player: career.playerForMatch,
         career: career,
         opponent: seasonMatch.opponent,
         isHome: seasonMatch.isHome,
