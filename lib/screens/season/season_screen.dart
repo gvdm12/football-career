@@ -2331,15 +2331,19 @@ class _SeasonScreenState extends State<SeasonScreen> {
       category = 'badRun';
     } else if (poorSeason) {
       category = 'poorSeason';
-    } else if (includeSeasonMilestones && playedBefore == 0 && Random().nextDouble() < 0.35) {
+    } else if (includeSeasonMilestones &&
+        playedBefore == 0 &&
+        Random().nextDouble() < 0.35) {
       category = 'seasonStart';
     } else if (includeSeasonMilestones &&
         totalMatches > 2 &&
-        playedBefore == (totalMatches / 2).round() && Random().nextDouble() < 0.25) {
+        playedBefore == (totalMatches / 2).round() &&
+        Random().nextDouble() < 0.25) {
       category = 'seasonMiddle';
     } else if (includeSeasonMilestones &&
         totalMatches > 0 &&
-        playedBefore >= totalMatches - 1 && Random().nextDouble() < 0.65) {
+        playedBefore >= totalMatches - 1 &&
+        Random().nextDouble() < 0.65) {
       category = 'seasonEnd';
     } else if (outstanding && Random().nextDouble() < 0.42) {
       category = 'great';
@@ -2515,7 +2519,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
               ),
               _drawerItem(
                 icon: Icons.storefront_outlined,
-                title: 'Магазин карьеры',
+                title: 'Магазин',
                 onTap: () {
                   Navigator.pop(context);
                   _openShop();
