@@ -13,6 +13,8 @@ import 'package:flutter_football/models/league_table.dart';
 import 'package:flutter_football/models/match.dart';
 import 'package:flutter_football/models/season_match.dart';
 import 'package:flutter_football/models/world_cup.dart';
+import 'package:flutter_football/models/player_of_month_award.dart';
+import 'package:flutter_football/services/player_of_month_service.dart';
 import 'package:flutter_football/screens/development_screen.dart';
 import 'package:flutter_football/screens/home/home_screen.dart';
 import 'package:flutter_football/screens/player/player_screen.dart';
@@ -990,6 +992,84 @@ class _SeasonScreenState extends State<SeasonScreen> {
     );
   }
 
+  Future<void> _showPlayerOfMonthAward(PlayerOfMonthAward award) async {
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFF0B2B14),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: Color(0xFF2D7D3D)),
+        ),
+        title: const Row(
+          children: [
+            Icon(Icons.emoji_events, color: Color(0xFFFFD54F), size: 28),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'Игрок месяца',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              award.monthName,
+              style: const TextStyle(color: Color(0xFF8BE07F), fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              award.playerName,
+              style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900),
+            ),
+            Text(award.club, style: const TextStyle(color: Colors.white70)),
+            const SizedBox(height: 14),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _awardStat('МАТЧИ', award.matches.toString()),
+                _awardStat('ГОЛЫ', award.goals.toString()),
+                _awardStat('АССИСТЫ', award.assists.toString()),
+                _awardStat('ОЦЕНКА', award.averageRating.toStringAsFixed(1)),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Text(
+              award.isCareerPlayer
+                  ? 'Поздравляем! Вы стали лучшим игроком месяца.'
+                  : 'В этом месяце награду получил другой футболист.',
+              style: TextStyle(
+                color: award.isCareerPlayer ? const Color(0xFF8BE07F) : Colors.white70,
+                height: 1.35,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Продолжить', style: TextStyle(color: Color(0xFF8BE07F))),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _awardStat(String title, String value) {
+    return Column(
+      children: [
+        Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16)),
+        const SizedBox(height: 3),
+        Text(title, style: const TextStyle(color: Colors.white54, fontSize: 8)),
+      ],
+    );
+  }
+
   Future<void> _saveCareer(Career value) async {
     try {
       await CareerStorage.save(value);
@@ -1140,10 +1220,32 @@ class _SeasonScreenState extends State<SeasonScreen> {
       completedLeagueMatches,
     );
 
+    var awards = List<PlayerOfMonthAward>.from(
+      updatedCareer.playerOfMonthAwards,
+    );
+    PlayerOfMonthAward? monthlyWinner;
+    final totalRounds = updatedSeasonMatches.length;
+    if (totalRounds > 0) {
+      final month = (((seasonMatch.number - 1) * 12) ~/ totalRounds) + 1;
+      final monthEndRound = (month * totalRounds / 12).ceil();
+      if (seasonMatch.number == monthEndRound) {
+        monthlyWinner = PlayerOfMonthService.create(
+          season: updatedCareer.season,
+          month: month,
+          player: updatedCareer.player,
+          playerMatches: updatedSeasonMatches,
+          leagueMatches: completedLeagueMatches,
+          previousAwards: awards,
+        );
+        if (monthlyWinner != null) awards.add(monthlyWinner);
+      }
+    }
+
     final completeCareer = updatedCareer.copyWith(
       seasonMatches: updatedSeasonMatches,
       leagueMatches: completedLeagueMatches,
       leagueTable: updatedTable,
+      playerOfMonthAwards: awards,
     );
 
     setState(() {
@@ -1158,6 +1260,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
     setState(() {
       isSaving = false;
     });
+
+    if (monthlyWinner != null) {
+      await _showPlayerOfMonthAward(monthlyWinner);
+    }
   }
 
   Widget _buildChampionsLeagueMatchRow() {
