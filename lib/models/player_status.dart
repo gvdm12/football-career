@@ -50,12 +50,20 @@ class PlayerStatusCalculator {
     // При высоком доверии и репутации игрок своего уровня не должен
     // постоянно оставаться запасным только из-за случайной генерации конкурентов.
     final clearlyTrusted = coachTrust >= 85 && reputation >= 85;
-    final strongerRivals = rivals.where(
-      (rival) => rival.overall + rival.form > overall,
-    ).toList();
-    final clearlyStrongerRivals = strongerRivals.where(
-      (rival) => rival.overall + rival.form >= overall + 6,
-    ).length;
+    final playerPerformanceLevel =
+        overall + (formBonus * 2).round() + (trustBonus * 0.35).round();
+    final strongerRivals = rivals.where((rival) {
+      final rivalPerformanceLevel = rival.overall +
+          rival.form +
+          ((rival.averageRating - 6.5) * 2).round();
+      return rivalPerformanceLevel > playerPerformanceLevel;
+    }).toList();
+    final clearlyStrongerRivals = strongerRivals.where((rival) {
+      final rivalPerformanceLevel = rival.overall +
+          rival.form +
+          ((rival.averageRating - 6.5) * 2).round();
+      return rivalPerformanceLevel >= playerPerformanceLevel + 6;
+    }).length;
 
     if (clearlyTrusted &&
         difference >= -5 &&
