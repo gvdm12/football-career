@@ -1,3 +1,4 @@
+import 'dart:ui' as ui;
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -3069,56 +3070,160 @@ class _SeasonScreenState extends State<SeasonScreen> {
   }
 
   Widget _buildProgressCard() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color.fromARGB(122, 83, 87, 194),
-            Color.fromARGB(121, 53, 37, 142),
-            Color.fromARGB(95, 12, 15, 100),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF24552C)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            AppStrings.seasonStats,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withValues(alpha: 0.16),
+                const Color(0xFF7FE8A1).withValues(alpha: 0.075),
+                const Color(0xFF071B12).withValues(alpha: 0.62),
+              ],
             ),
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              _statItem(AppStrings.matchesLabel, '$_seasonMatchesForDisplay'),
-              _statItem(AppStrings.goalsStat, '$_seasonGoalsForDisplay'),
-              _statItem(AppStrings.assistsStat, '$_seasonAssistsForDisplay'),
-            ],
-          ),
-          const SizedBox(height: 5),
-          Row(
-            children: [
-              _statItem(AppStrings.yellowStat, '${career.yellowCards}'),
-              _statItem(AppStrings.redStat, '${career.redCards}'),
-              _statItem(
-                AppStrings.ratingStat,
-                _seasonAverageRatingForDisplay?.toStringAsFixed(1) ?? '—',
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.24),
+              width: 1.1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF65E69A).withValues(alpha: 0.10),
+                blurRadius: 24,
+                spreadRadius: 1,
+                offset: const Offset(0, 8),
+              ),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.20),
+                blurRadius: 16,
+                offset: const Offset(0, 7),
               ),
             ],
           ),
-          SizedBox(height: 4),
-          Divider(height: 0.5, color: const Color.fromARGB(255, 131, 130, 130)),
-          if (seasonFinished) ...[
-            const SizedBox(height: 5),
-            _buildTrophiesSection(),
-          ],
-        ],
+          child: Stack(
+            children: [
+              Positioned(
+                top: -42,
+                right: -24,
+                child: IgnorePointer(
+                  child: Container(
+                    width: 150,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          Colors.white.withValues(alpha: 0.15),
+                          Colors.white.withValues(alpha: 0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 5,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF9BFFC0),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF9BFFC0)
+                                  .withValues(alpha: 0.75),
+                              blurRadius: 8,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        AppStrings.seasonStats,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.7,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 13),
+                  Row(
+                    children: [
+                      _statItem(
+                        AppStrings.matchesLabel,
+                        '$_seasonMatchesForDisplay',
+                      ),
+                      _statItem(
+                        AppStrings.goalsStat,
+                        '$_seasonGoalsForDisplay',
+                      ),
+                      _statItem(
+                        AppStrings.assistsStat,
+                        '$_seasonAssistsForDisplay',
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 13),
+                  Container(
+                    height: 1,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.white.withValues(alpha: 0),
+                          Colors.white.withValues(alpha: 0.22),
+                          Colors.white.withValues(alpha: 0),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      _statItem(AppStrings.yellowStat, '${career.yellowCards}'),
+                      _statItem(AppStrings.redStat, '${career.redCards}'),
+                      _statItem(
+                        AppStrings.ratingStat,
+                        _seasonAverageRatingForDisplay?.toStringAsFixed(1) ??
+                            '—',
+                      ),
+                    ],
+                  ),
+                  if (seasonFinished) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      height: 1,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.white.withValues(alpha: 0),
+                            Colors.white.withValues(alpha: 0.22),
+                            Colors.white.withValues(alpha: 0),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildTrophiesSection(),
+                  ],
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
