@@ -1670,7 +1670,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                 right: 12,
                 child: IgnorePointer(
                   child: Container(
-                    height: 1,
+                    height: 0,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
