@@ -1231,10 +1231,69 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     Navigator.pop(context, match);
   }
 
+<<<<<<< HEAD
   Widget _glassCard({
     required Widget child,
     EdgeInsets padding = const EdgeInsets.all(16),
   }) {
+=======
+  Widget _scoreboardGlass({required Widget child, EdgeInsets padding = const EdgeInsets.fromLTRB(16, 17, 16, 15)}) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        child: Container(
+          width: double.infinity,
+          padding: padding,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withOpacity(0.19),
+                const Color(0xFF3C9568).withOpacity(0.22),
+                const Color(0xFF082B1D).withOpacity(0.52),
+              ],
+              stops: const [0, 0.42, 1],
+            ),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: Colors.white.withOpacity(0.25), width: 1.2),
+            boxShadow: [
+              BoxShadow(color: const Color(0xFF7EF0AD).withOpacity(0.10), blurRadius: 32, spreadRadius: 1),
+              BoxShadow(color: Colors.black.withOpacity(0.20), blurRadius: 28, offset: const Offset(0, 12)),
+              BoxShadow(color: Colors.white.withOpacity(0.05), blurRadius: 1, spreadRadius: 1),
+            ],
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                top: -18,
+                left: 8,
+                right: 8,
+                height: 64,
+                child: IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.white.withOpacity(0.10), Colors.white.withOpacity(0)],
+                      ),
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                  ),
+                ),
+              ),
+              child,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _glassCard({required Widget child, EdgeInsets padding = const EdgeInsets.all(16)}) {
+>>>>>>> bf41565224912f4657c46fe40cd9218088e4ecba
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
       child: BackdropFilter(
@@ -1266,6 +1325,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       canPop: false,
       child: Scaffold(
         backgroundColor: const Color(0xFF061B12),
+<<<<<<< HEAD
         body: Stack(
           children: [
             const Positioned.fill(
@@ -1278,6 +1338,82 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                       Color(0xFF174A32),
                       Color(0xFF0A2D20),
                       Color(0xFF04170F),
+=======
+        body: Stack(children: [
+          const Positioned.fill(child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF174A32), Color(0xFF0A2D20), Color(0xFF04170F)],
+                stops: [0, 0.52, 1],
+              ),
+            ),
+          )),
+          Positioned(
+            top: -100,
+            right: -100,
+            child: Container(
+              width: 260,
+              height: 260,
+              decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFF4ADE80).withOpacity(0.08)),
+            ),
+          ),
+          SafeArea(child: Column(children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 12, 18, 12),
+              child: Row(children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.09), borderRadius: BorderRadius.circular(14), border: Border.all(color: Colors.white.withOpacity(0.13))),
+                  child: const Icon(Icons.sports_soccer_rounded, color: Color(0xFF9AE6B4)),
+                ),
+                const SizedBox(width: 11),
+                const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('FOOTBALL CAREER', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.3)),
+                  SizedBox(height: 2),
+                  Text('Интерактивный матч', style: TextStyle(color: Color(0xFF9AB7A5), fontSize: 11)),
+                ])),
+                if (_playerPlayed)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
+                    decoration: BoxDecoration(color: const Color(0xFF14532D).withOpacity(0.7), borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0xFF4ADE80).withOpacity(0.25))),
+                    child: Text('ОЦЕНКА ' + _rating.clamp(4.0, 10.0).toStringAsFixed(1), style: const TextStyle(color: Color(0xFFBBF7D0), fontSize: 10, fontWeight: FontWeight.w900)),
+                  ),
+              ]),
+            ),
+            Expanded(child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                _scoreboardGlass(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+                  child: Column(children: [
+                    Row(children: [
+                      const Icon(Icons.circle, color: Color(0xFF4ADE80), size: 8),
+                      const SizedBox(width: 7),
+                      const Text('LIVE MATCH', style: TextStyle(color: Color(0xFF9AE6B4), fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.6)),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(color: Colors.white.withOpacity(0.09), borderRadius: BorderRadius.circular(20)),
+                        child: Text(_finished ? 'ФИНАЛ' : '$_minute’', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                      ),
+                    ]),
+                    const SizedBox(height: 20),
+                    Row(children: [
+                      Expanded(child: _teamBadge(_homeTeam, true)),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 7),
+                        child: Text('$_homeGoals : $_awayGoals', style: const TextStyle(color: Colors.white, fontSize: 31, fontWeight: FontWeight.w900, letterSpacing: -1)),
+                      ),
+                      Expanded(child: _teamBadge(_awayTeam, false)),
+                    ]),
+                    if (_homePenalties != null && _awayPenalties != null) ...[
+                      const SizedBox(height: 8),
+                      Text('ПЕНАЛЬТИ  $_homePenalties : $_awayPenalties', style: const TextStyle(color: Color(0xFFBBF7D0), fontWeight: FontWeight.w800, fontSize: 11)),
+>>>>>>> bf41565224912f4657c46fe40cd9218088e4ecba
                     ],
                     stops: [0, 0.52, 1],
                   ),
