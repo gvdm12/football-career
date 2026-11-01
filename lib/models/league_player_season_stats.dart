@@ -234,27 +234,43 @@ class LeaguePlayerStatsService {
       selected.addAll(group.take(count));
     }
 
+    final goalsByPlayer = <String, int>{};
+    final assistsByPlayer = <String, int>{};
+
+    for (var goal = 0; goal < goalsFor; goal++) {
+      final scorer = _weightedPick(selected, random, (item) {
+        return switch (item.position) {
+          PlayerPosition.goalkeeper => 0.01,
+          PlayerPosition.defender => 0.08,
+          PlayerPosition.midfielder => 0.28,
+          PlayerPosition.forward => 0.63,
+        };
+      });
+      goalsByPlayer[scorer.playerName] =
+          (goalsByPlayer[scorer.playerName] ?? 0) + 1;
+
+      if (random.nextDouble() < 0.76) {
+        final possibleAssisters = selected
+            .where((item) => item.playerName != scorer.playerName)
+            .toList();
+        if (possibleAssisters.isNotEmpty) {
+          final assister = _weightedPick(possibleAssisters, random, (item) {
+            return switch (item.position) {
+              PlayerPosition.goalkeeper => 0.02,
+              PlayerPosition.defender => 0.10,
+              PlayerPosition.midfielder => 0.50,
+              PlayerPosition.forward => 0.38,
+            };
+          });
+          assistsByPlayer[assister.playerName] =
+              (assistsByPlayer[assister.playerName] ?? 0) + 1;
+        }
+      }
+    }
+
     for (final player in selected) {
-      var playerGoals = 0;
-      var playerAssists = 0;
-      final goalWeight = switch (player.position) {
-        PlayerPosition.goalkeeper => 0.0,
-        PlayerPosition.defender => 0.08,
-        PlayerPosition.midfielder => 0.28,
-        PlayerPosition.forward => 0.64,
-      };
-      for (var i = 0; i < goalsFor; i++) {
-        if (random.nextDouble() < goalWeight / 3) playerGoals++;
-      }
-      final assistWeight = switch (player.position) {
-        PlayerPosition.goalkeeper => 0.0,
-        PlayerPosition.defender => 0.10,
-        PlayerPosition.midfielder => 0.48,
-        PlayerPosition.forward => 0.38,
-      };
-      for (var i = 0; i < goalsFor; i++) {
-        if (random.nextDouble() < assistWeight / 2) playerAssists++;
-      }
+      final playerGoals = goalsByPlayer[player.playerName] ?? 0;
+      final playerAssists = assistsByPlayer[player.playerName] ?? 0;
 
       var rating = 6.25 + random.nextDouble() * 1.15;
       rating += (player.overall - 70) * 0.012;
@@ -282,5 +298,19 @@ class LeaguePlayerStatsService {
         );
       }
     }
+  }
+
+  static T _weightedPick<T>(
+    List<T> items,
+    Random random,
+    double Function(T item) weightOf,
+  ) {
+    final total = items.fold<double>(0, (sum, item) => sum + weightOf(item));
+    var target = random.nextDouble() * total;
+    for (final item in items) {
+      target -= weightOf(item);
+      if (target <= 0) return item;
+    }
+    return items.last;
   }
 }
