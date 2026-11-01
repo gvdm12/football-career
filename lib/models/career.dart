@@ -19,6 +19,7 @@ import 'position_rival.dart';
 import 'player_status.dart';
 import 'transfer_offer.dart';
 import 'league_table.dart';
+import 'league_player_season_stats.dart';
 
 class Career {
   final Player player;
@@ -26,6 +27,8 @@ class Career {
   final List<SeasonStats> history;
   final List<PlayerOfMonthAward> playerOfMonthAwards;
   final List<SeasonAward> seasonAwards;
+  final List<LeaguePlayerSeasonStats> leaguePlayerStats;
+  final List<String> leagueStatsProcessedMatchKeys;
   final List<CareerNews> news;
   final List<PositionRival> rivals;
   final int coachTrust;
@@ -106,6 +109,8 @@ class Career {
     required this.history,
     this.playerOfMonthAwards = const [],
     this.seasonAwards = const [],
+    this.leaguePlayerStats = const [],
+    this.leagueStatsProcessedMatchKeys = const [],
     required this.leagueTable,
     required this.leagueMatches,
     this.news = const [],
@@ -332,6 +337,8 @@ class Career {
       'history': history.map((item) => item.toJson()).toList(),
       'playerOfMonthAwards': playerOfMonthAwards.map((item) => item.toJson()).toList(),
       'seasonAwards': seasonAwards.map((item) => item.toJson()).toList(),
+      'leaguePlayerStats': leaguePlayerStats.map((item) => item.toJson()).toList(),
+      'leagueStatsProcessedMatchKeys': leagueStatsProcessedMatchKeys,
       'matches': matches,
       'goals': goals,
       'assists': assists,
@@ -515,6 +522,9 @@ class Career {
       history: readList('history', SeasonStats.fromJson),
       playerOfMonthAwards: readList('playerOfMonthAwards', PlayerOfMonthAward.fromJson),
       seasonAwards: readList('seasonAwards', SeasonAward.fromJson),
+      leaguePlayerStats: readList('leaguePlayerStats', LeaguePlayerSeasonStats.fromJson),
+      leagueStatsProcessedMatchKeys:
+          (json['leagueStatsProcessedMatchKeys'] as List?)?.whereType<String>().toList() ?? const [],
       matches: (json['matches'] as num?)?.toInt() ?? 0,
       goals: (json['goals'] as num?)?.toInt() ?? 0,
       assists: (json['assists'] as num?)?.toInt() ?? 0,
@@ -598,6 +608,8 @@ class Career {
     List<SeasonStats>? history,
     List<PlayerOfMonthAward>? playerOfMonthAwards,
     List<SeasonAward>? seasonAwards,
+    List<LeaguePlayerSeasonStats>? leaguePlayerStats,
+    List<String>? leagueStatsProcessedMatchKeys,
     List<LeagueTableEntry>? leagueTable,
     List<LeagueMatch>? leagueMatches,
     List<CareerNews>? news,
@@ -639,6 +651,9 @@ class Career {
       history: history ?? this.history,
       playerOfMonthAwards: playerOfMonthAwards ?? this.playerOfMonthAwards,
       seasonAwards: seasonAwards ?? this.seasonAwards,
+      leaguePlayerStats: leaguePlayerStats ?? this.leaguePlayerStats,
+      leagueStatsProcessedMatchKeys:
+          leagueStatsProcessedMatchKeys ?? this.leagueStatsProcessedMatchKeys,
       leagueTable: leagueTable ?? this.leagueTable,
       leagueMatches: leagueMatches ?? this.leagueMatches,
       news: news ?? this.news,
