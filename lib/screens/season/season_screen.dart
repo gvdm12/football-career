@@ -70,15 +70,16 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   bool _playerWonMatchWithPenalties(Match match, String team) {
     final isHome = match.homeTeam == team;
+    if (match.hasPenalties) {
+      final teamPenalties = isHome ? match.homePenalties! : match.awayPenalties!;
+      final opponentPenalties = isHome
+          ? match.awayPenalties!
+          : match.homePenalties!;
+      return teamPenalties > opponentPenalties;
+    }
     final teamGoals = isHome ? match.homeGoals : match.awayGoals;
     final opponentGoals = isHome ? match.awayGoals : match.homeGoals;
-    if (teamGoals != opponentGoals) return teamGoals > opponentGoals;
-    if (!match.hasPenalties) return false;
-    final teamPenalties = isHome ? match.homePenalties! : match.awayPenalties!;
-    final opponentPenalties = isHome
-        ? match.awayPenalties!
-        : match.homePenalties!;
-    return teamPenalties > opponentPenalties;
+    return teamGoals > opponentGoals;
   }
 
   bool get worldCupBlocksSeason {
