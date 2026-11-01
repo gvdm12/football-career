@@ -8,10 +8,14 @@ import 'package:flutter_football/models/season_match.dart';
 
 class PlayerOfMonthService {
   static const _names = [
-    'Александр Волков', 'Даниэль Коста', 'Марк Фишер',
-    'Лукас Мартин', 'Матео Ромеро', 'Давид Гарсия',
-    'Юсуф Диалло', 'Рафаэль Силва', 'Оливер Кларк',
-    'Федерико Росси', 'Томас Берг', 'Никита Смирнов',
+    'James Wilson', 'Oliver Bennett', 'Lucas Mitchell',
+    'Ethan Parker', 'Daniel Foster', 'Alexander Brooks',
+    'Noah Carter', 'Leo Anderson', 'Mateo Rivera',
+    'Gabriel Santos', 'Ryan Cooper', 'Thomas Reed',
+    'William Turner', 'Nathan Collins', 'Adrian Morris',
+    'Samuel Hayes', 'Jack Robinson', 'David Morgan',
+    'Benjamin Scott', 'Oscar Hughes', 'Felix Wagner',
+    'Marco Romano', 'Hugo Laurent', 'Victor Almeida',
   ];
 
   static int _seed(String value) {
