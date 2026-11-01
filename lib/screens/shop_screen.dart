@@ -63,10 +63,10 @@ class _ShopScreenState extends State<ShopScreen> {
 
   int get _trainingPrice {
     final value = _skillValue(career.player.skills, selectedSkill);
-    return 2000 + value * 75;
+    return 20000 + value * 250;
   }
 
-  int get _recoveryPrice => 3500;
+  int get _recoveryPrice => 25000;
 
   Future<void> _buyTraining() async {
     final player = career.player;
