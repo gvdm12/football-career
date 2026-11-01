@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/player.dart';
+import 'package:flutter_football/services/career_storage.dart';
 
 class ShopScreen extends StatefulWidget {
   final Career career;
@@ -67,7 +68,7 @@ class _ShopScreenState extends State<ShopScreen> {
 
   int get _recoveryPrice => 3500;
 
-  void _buyTraining() {
+  Future<void> _buyTraining() async {
     final player = career.player;
     final currentValue = _skillValue(player.skills, selectedSkill);
 
@@ -99,10 +100,11 @@ class _ShopScreenState extends State<ShopScreen> {
       );
     });
 
+    await CareerStorage.save(career);
     _showMessage('Тренировка куплена: ${_skillName(selectedSkill)} +1');
   }
 
-  void _buyRecovery() {
+  Future<void> _buyRecovery() async {
     if (!career.isInjured || career.money < _recoveryPrice) return;
 
     final remaining = (career.injuryMatchesRemaining - 2)
@@ -117,6 +119,7 @@ class _ShopScreenState extends State<ShopScreen> {
       );
     });
 
+    await CareerStorage.save(career);
     _showMessage(
       remaining == 0
           ? 'Вы полностью восстановились!'
@@ -328,7 +331,7 @@ class _ShopScreenState extends State<ShopScreen> {
                           style: TextStyle(color: Colors.white70),
                         ),
                       ),
-                      const Text(
+                      Text(
                         '$_recoveryPrice €',
                         style: TextStyle(
                           color: Color(0xFF8BE07F),
