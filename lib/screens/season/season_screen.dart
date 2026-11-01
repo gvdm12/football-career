@@ -2321,28 +2321,30 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     String? category;
     if (isTournamentDecider) {
-      category = 'tournament';
+      category = match.isPlayerLoss(updatedCareer.player.club)
+          ? 'elimination'
+          : 'tournament';
     } else if (losingStreak) {
       category = 'losingStreak';
     } else if (badRun) {
       category = 'badRun';
     } else if (poorSeason) {
       category = 'poorSeason';
-    } else if (includeSeasonMilestones && playedBefore == 0) {
+    } else if (includeSeasonMilestones && playedBefore == 0 && Random().nextDouble() < 0.35) {
       category = 'seasonStart';
     } else if (includeSeasonMilestones &&
         totalMatches > 2 &&
-        playedBefore == (totalMatches / 2).round()) {
+        playedBefore == (totalMatches / 2).round() && Random().nextDouble() < 0.25) {
       category = 'seasonMiddle';
     } else if (includeSeasonMilestones &&
         totalMatches > 0 &&
-        playedBefore >= totalMatches - 1) {
+        playedBefore >= totalMatches - 1 && Random().nextDouble() < 0.65) {
       category = 'seasonEnd';
-    } else if (outstanding && Random().nextDouble() < 0.82) {
+    } else if (outstanding && Random().nextDouble() < 0.42) {
       category = 'great';
-    } else if (poor && Random().nextDouble() < 0.72) {
+    } else if (poor && Random().nextDouble() < 0.52) {
       category = 'poor';
-    } else if (Random().nextDouble() < 0.18) {
+    } else if (Random().nextDouble() < 0.04) {
       category = 'normal';
     }
 
