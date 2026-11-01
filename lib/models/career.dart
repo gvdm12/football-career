@@ -11,6 +11,7 @@ import 'player.dart';
 import 'match.dart';
 import 'season_match.dart';
 import 'season_stats.dart';
+import 'player_of_month_award.dart';
 import 'position_rival.dart';
 import 'transfer_offer.dart';
 import 'league_table.dart';
@@ -19,6 +20,7 @@ class Career {
   final Player player;
   final int season;
   final List<SeasonStats> history;
+  final List<PlayerOfMonthAward> playerOfMonthAwards;
   final List<CareerNews> news;
   final List<PositionRival> rivals;
   final int coachTrust;
@@ -96,6 +98,7 @@ class Career {
     required this.developmentPoints,
     required this.seasonMatches,
     required this.history,
+    this.playerOfMonthAwards = const [],
     required this.leagueTable,
     required this.leagueMatches,
     this.news = const [],
@@ -318,6 +321,7 @@ class Career {
       'player': player.toJson(),
       'season': season,
       'history': history.map((item) => item.toJson()).toList(),
+      'playerOfMonthAwards': playerOfMonthAwards.map((item) => item.toJson()).toList(),
       'matches': matches,
       'goals': goals,
       'assists': assists,
@@ -491,6 +495,7 @@ class Career {
       player: loadedPlayer,
       season: (json['season'] as num?)?.toInt() ?? 1,
       history: readList('history', SeasonStats.fromJson),
+      playerOfMonthAwards: readList('playerOfMonthAwards', PlayerOfMonthAward.fromJson),
       matches: (json['matches'] as num?)?.toInt() ?? 0,
       goals: (json['goals'] as num?)?.toInt() ?? 0,
       assists: (json['assists'] as num?)?.toInt() ?? 0,
@@ -571,6 +576,7 @@ class Career {
     int? developmentPoints,
     List<SeasonMatch>? seasonMatches,
     List<SeasonStats>? history,
+    List<PlayerOfMonthAward>? playerOfMonthAwards,
     List<LeagueTableEntry>? leagueTable,
     List<LeagueMatch>? leagueMatches,
     List<CareerNews>? news,
@@ -609,6 +615,7 @@ class Career {
       developmentPoints: developmentPoints ?? this.developmentPoints,
       seasonMatches: seasonMatches ?? this.seasonMatches,
       history: history ?? this.history,
+      playerOfMonthAwards: playerOfMonthAwards ?? this.playerOfMonthAwards,
       leagueTable: leagueTable ?? this.leagueTable,
       leagueMatches: leagueMatches ?? this.leagueMatches,
       news: news ?? this.news,
