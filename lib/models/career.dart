@@ -4,6 +4,8 @@ import 'package:flutter_football/models/champions_league.dart';
 import 'package:flutter_football/models/europa_league.dart';
 import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/models/club.dart';
+import 'package:flutter_football/models/club_strength_service.dart';
+
 import 'package:flutter_football/models/league_match.dart';
 import 'package:flutter_football/models/league_season_simulator.dart';
 import 'domestic_cup.dart';
@@ -56,6 +58,7 @@ class Career {
   final Map<String, int> skillTrainingPurchases;
   final Map<String, int> temporarySkillBoosts;
   final Map<String, int> temporarySkillBoostMatches;
+  final Map<String, int> clubStrengths;
 
   bool get isInjured => injuryMatchesRemaining > 0;
 
@@ -125,6 +128,7 @@ class Career {
     this.skillTrainingPurchases = const {},
     this.temporarySkillBoosts = const {},
     this.temporarySkillBoostMatches = const {},
+    this.clubStrengths = const {},
   });
 
   // ============================================================
@@ -251,6 +255,7 @@ class Career {
   }
 
   factory Career.create(Player player) {
+    Clubs.applyStrengthOverrides(const {});
     final leagueMatches = _createLeagueMatches(player.club);
 
     final seasonMatches = _createSeasonMatches(player.club, leagueMatches);
@@ -362,6 +367,7 @@ class Career {
       'skillTrainingPurchases': skillTrainingPurchases,
       'temporarySkillBoosts': temporarySkillBoosts,
       'temporarySkillBoostMatches': temporarySkillBoostMatches,
+      'clubStrengths': clubStrengths,
     };
   }
 
@@ -386,6 +392,13 @@ class Career {
     }
 
     final loadedPlayer = Player.fromJson(Map<String, dynamic>.from(rawPlayer));
+    final rawClubStrengths = json['clubStrengths'];
+    final restoredClubStrengths = rawClubStrengths is Map
+        ? rawClubStrengths.map(
+            (key, value) => MapEntry(key.toString(), (value as num).toInt()),
+          )
+        : <String, int>{};
+    Clubs.applyStrengthOverrides(restoredClubStrengths);
 
     final savedLeagueMatches = readList('leagueMatches', LeagueMatch.fromJson);
 
@@ -554,6 +567,7 @@ class Career {
             (key, value) => MapEntry(key.toString(), (value as num).toInt()),
           ) ??
           const {},
+      clubStrengths: restoredClubStrengths,
       temporarySkillBoostMatches:
           (json['temporarySkillBoostMatches'] as Map?)?.map(
             (key, value) => MapEntry(key.toString(), (value as num).toInt()),
@@ -604,6 +618,7 @@ class Career {
     Map<String, int>? skillTrainingPurchases,
     Map<String, int>? temporarySkillBoosts,
     Map<String, int>? temporarySkillBoostMatches,
+    Map<String, int>? clubStrengths,
     bool clearInjury = false,
   }) {
     return Career(
@@ -648,6 +663,7 @@ class Career {
       temporarySkillBoosts: temporarySkillBoosts ?? this.temporarySkillBoosts,
       temporarySkillBoostMatches:
           temporarySkillBoostMatches ?? this.temporarySkillBoostMatches,
+      clubStrengths: clubStrengths ?? this.clubStrengths,
     );
   }
 
@@ -1497,6 +1513,30 @@ class Career {
             ),
           ];
 
+    // Сила клубов меняется только один раз при переходе в новый сезон.
+    final performanceStandings = <League, List<LeagueTableEntry>>{
+      for (final entry in europeanLeagueStandings.entries)
+        entry.key: List<LeagueTableEntry>.from(entry.value),
+    };
+    final previousClub = newHistory
+        .where((stats) => stats.season == season)
+        .lastOrNull;
+    final previousLeague = previousClub == null
+        ? null
+        : Clubs.leagueOf(previousClub.club);
+    if (previousLeague != null && leagueTable.isNotEmpty) {
+      performanceStandings[previousLeague] =
+          List<LeagueTableEntry>.from(leagueTable);
+    }
+    final updatedClubStrengths = ClubStrengthService.update(
+      currentStrengths: clubStrengths,
+      standings: performanceStandings,
+      domesticCup: DomesticCupResult(domesticCup?.champion),
+      championsLeagueWinner: championsLeague?.champion,
+      europaLeagueWinner: europaLeague?.champion,
+    );
+    Clubs.applyStrengthOverrides(updatedClubStrengths);
+
     final newSeason = season + 1;
 
     final newAge = player.age + 1;
@@ -1600,6 +1640,7 @@ class Career {
     return Career(
       player: newPlayer,
       season: newSeason,
+      clubStrengths: updatedClubStrengths,
       matches: 0,
       goals: 0,
       assists: 0,
