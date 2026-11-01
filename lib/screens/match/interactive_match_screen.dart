@@ -1219,6 +1219,61 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     Navigator.pop(context, match);
   }
 
+  Widget _scoreboardGlass({required Widget child, EdgeInsets padding = const EdgeInsets.fromLTRB(16, 17, 16, 15)}) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        child: Container(
+          width: double.infinity,
+          padding: padding,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withOpacity(0.19),
+                const Color(0xFF3C9568).withOpacity(0.22),
+                const Color(0xFF082B1D).withOpacity(0.52),
+              ],
+              stops: const [0, 0.42, 1],
+            ),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: Colors.white.withOpacity(0.25), width: 1.2),
+            boxShadow: [
+              BoxShadow(color: const Color(0xFF7EF0AD).withOpacity(0.10), blurRadius: 32, spreadRadius: 1),
+              BoxShadow(color: Colors.black.withOpacity(0.20), blurRadius: 28, offset: const Offset(0, 12)),
+              BoxShadow(color: Colors.white.withOpacity(0.05), blurRadius: 1, spreadRadius: 1),
+            ],
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                top: -18,
+                left: 8,
+                right: 8,
+                height: 64,
+                child: IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.white.withOpacity(0.10), Colors.white.withOpacity(0)],
+                      ),
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                  ),
+                ),
+              ),
+              child,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _glassCard({required Widget child, EdgeInsets padding = const EdgeInsets.all(16)}) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
@@ -1293,7 +1348,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
               child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                _glassCard(
+                _scoreboardGlass(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
                   child: Column(children: [
                     Row(children: [
