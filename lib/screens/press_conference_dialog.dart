@@ -781,8 +781,94 @@ class PressConferenceContentFactory {
     final isPoorSeasonFansQuestion =
         selectedQuestion.contains('болельщикам, которые весь сезон') ||
         selectedQuestion.contains('fans who expected much more');
+    final isCoachTacticsQuestion =
+        selectedQuestion.contains('тренер ошибся с планом на игру') ||
+        selectedQuestion.contains('coach get the game plan wrong') ||
+        selectedQuestion.contains('главная причина поражения') ||
+        selectedQuestion.contains('what caused the defeat');
+    final isTrophyClubQuestion =
+        selectedQuestion.contains('клубе, который регулярно борется за трофеи') ||
+        selectedQuestion.contains('club that regularly competes for trophies');
 
-    if (isPersonalTournamentQuestion) {
+    if (isCoachTacticsQuestion) {
+      options = [
+        PressConferenceOption(
+          text: choose(
+            'Мы должны были лучше выполнить игровой план на поле',
+            'We should have executed the game plan better on the pitch',
+          ),
+          detail: choose('Ответственность игроков', 'Players take responsibility'),
+          trustChange: 3,
+          icon: Icons.shield_outlined,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Тренерскому штабу стоит пересмотреть тактические решения',
+            'The coaching staff should review its tactical decisions',
+          ),
+          detail: choose('Критика тактики', 'Criticism of the tactics'),
+          trustChange: -4,
+          icon: Icons.warning_amber_rounded,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Соперник лучше использовал свои моменты',
+            'The opponent made better use of their chances',
+          ),
+          detail: choose('Признание силы соперника', 'Giving credit to the opponent'),
+          trustChange: 1,
+          icon: Icons.sports_soccer,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Нужно разобрать ошибки всей команды, а не искать одного виноватого',
+            'We need to review the whole team’s mistakes instead of blaming one person',
+          ),
+          detail: choose('Конструктивная позиция', 'Constructive response'),
+          trustChange: 2,
+          icon: Icons.groups_outlined,
+        ),
+      ];
+    } else if (isTrophyClubQuestion) {
+      options = [
+        PressConferenceOption(
+          text: choose(
+            'Конечно, я хочу бороться за трофеи, но сейчас сосредоточен на своём клубе',
+            'Of course I want to compete for trophies, but my focus is on my current club',
+          ),
+          detail: choose('Амбиции без ультиматумов', 'Ambition without an ultimatum'),
+          trustChange: 2,
+          icon: Icons.emoji_events_outlined,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Каждый игрок мечтает выступать на самом высоком уровне',
+            'Every player dreams of competing at the highest level',
+          ),
+          detail: choose('Уверенные амбиции', 'Confident ambition'),
+          trustChange: 1,
+          icon: Icons.trending_up,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Сначала нужно помочь нынешней команде добиться успеха',
+            'First, I need to help my current team succeed',
+          ),
+          detail: choose('Лояльность клубу', 'Loyalty to the club'),
+          trustChange: 3,
+          icon: Icons.groups_outlined,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Не хочу сейчас обсуждать своё будущее',
+            'I do not want to discuss my future right now',
+          ),
+          detail: choose('Осторожный ответ', 'Cautious response'),
+          trustChange: 0,
+          icon: Icons.more_horiz,
+        ),
+      ];
+    } else if (isPersonalTournamentQuestion) {
       options = [
         PressConferenceOption(
           text: choose(
