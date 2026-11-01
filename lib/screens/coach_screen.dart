@@ -50,6 +50,14 @@ class CoachScreen extends StatelessWidget {
       overall: career.player.overall,
       clubName: career.player.club,
       rivals: career.rivals,
+      coachTrust: career.coachTrust,
+      reputation: PlayerStatusCalculator.calculateReputation(
+        overall: career.player.overall,
+        averageRating: career.averageRating,
+        coachTrust: career.coachTrust,
+        trophies: career.history.fold<int>(0, (sum, item) => sum + item.achievements.length),
+      ),
+      averageRating: career.averageRating,
     );
 
     return Scaffold(
