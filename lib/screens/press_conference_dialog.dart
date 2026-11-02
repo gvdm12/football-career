@@ -32,6 +32,13 @@ class PressConferenceContent {
 class PressConferenceContentFactory {
   static final List<String> _recentQuestions = [];
   static int _matchesSinceLastConference = 100;
+  static int _activeSeason = 0;
+
+  static void beginSeason(int season) {
+    if (_activeSeason == season) return;
+    _activeSeason = season;
+    _matchesSinceLastConference = 100;
+  }
 
   /// Общий лимит для обычной симуляции и интерактивных матчей.
   static bool registerMatch() {
