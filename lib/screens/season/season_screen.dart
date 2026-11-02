@@ -59,6 +59,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
   bool seasonFinishing = false;
   PlayerOfMonthAward? recentMonthlyAward;
   int _lastPressConferenceMatchCount = -100;
+  int _lastPressConferenceSeason = 0;
 
   @override
   void initState() {
@@ -2825,6 +2826,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
         .where((item) => item.isPlayed)
         .length;
     final totalMatches = career.seasonMatches.length;
+    if (_lastPressConferenceSeason != updatedCareer.season) {
+      _lastPressConferenceSeason = updatedCareer.season;
+      _lastPressConferenceMatchCount = -100;
+    }
     final conferenceMatchCount = playedBefore + 1;
     if (conferenceMatchCount - _lastPressConferenceMatchCount < 4) {
       return updatedCareer;
