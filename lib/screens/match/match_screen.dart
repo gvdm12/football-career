@@ -48,6 +48,7 @@ class MatchScreen extends StatelessWidget {
         .where((item) => item.isPlayed)
         .length;
     final totalMatches = career.seasonMatches.length;
+    final cooldownReady = PressConferenceContentFactory.registerMatch();
 
     // Вылет обсуждаем только после действительно решающего матча.
     // Для двухматчевых противостояний флаг передаётся только после подсчёта
@@ -63,6 +64,13 @@ class MatchScreen extends StatelessWidget {
     final seasonEnd = !isCupMatch &&
         totalMatches > 0 &&
         playedBefore >= totalMatches - 1;
+
+    if (!cooldownReady &&
+        !seasonStart &&
+        !seasonMiddle &&
+        !seasonEnd) {
+      return null;
+    }
 
     // Обычные вопросы не появляются после каждого матча:
     // минимум один редкий слот примерно на четыре матча,
@@ -97,6 +105,7 @@ class MatchScreen extends StatelessWidget {
     final category = _pressConferenceCategory();
 
     if (category != null) {
+      PressConferenceContentFactory.markConferenceShown();
       final content = PressConferenceContentFactory.create(
         category: category,
         english: AppStrings.isEnglish,
