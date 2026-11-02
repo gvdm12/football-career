@@ -835,7 +835,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF0A2110),
+        color: const Color(0xFF0A2110).withValues(alpha: 0.68),
         borderRadius: BorderRadius.circular(10),
         border: const Border(
           left: BorderSide(color: Color(0xFF8DB8FF), width: 4),
@@ -4946,7 +4946,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
           const Color(0xFF0A2110),
           ClubColors.primary(match.opponent),
           0.12,
-        )!,
+        )!.withValues(alpha: 0.68),
         borderRadius: BorderRadius.circular(10),
         border: Border(
           left: BorderSide(color: ClubColors.primary(match.opponent), width: 4),
