@@ -222,10 +222,17 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _addGoal(home: false);
       _event = 'ГОЛ! $_awayTeam забивает после быстрой атаки.';
     }
-    if (!homeScored && !awayScored && _random.nextDouble() < 0.025) {
-      _event = _random.nextBool()
-          ? 'Соперник проводит атаку, но защита успевает вернуться.'
-          : 'Ваша команда контролирует мяч и ищет свободные зоны.';
+    if (!homeScored && !awayScored && _random.nextDouble() < 0.085) {
+      final homePressing = _random.nextDouble() <
+          (_homeXgRemaining / max(0.1, _homeXgRemaining + _awayXgRemaining));
+      final attackingTeam = homePressing ? _homeTeam : _awayTeam;
+      final defendingTeam = homePressing ? _awayTeam : _homeTeam;
+      _event = switch (_random.nextInt(4)) {
+        0 => '$attackingTeam развивает позиционную атаку, но $defendingTeam сохраняет компактность.',
+        1 => '$attackingTeam переводит мяч на фланг и готовит подачу.',
+        2 => '$defendingTeam перехватывает передачу и начинает быструю контратаку.',
+        _ => '$attackingTeam наносит удар издали, но мяч проходит рядом со штангой.',
+      };
     }
 
     if (_minute >= 90) {
@@ -511,11 +518,16 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           _momentTitle = 'Получение между линиями';
           _momentDescription =
               'Вы опустились за мячом в средней трети поля. Нужно сохранить владение или ускорить атаку передачей.';
-        } else {
-          _phase = 'defend';
-          _momentTitle = 'Прессинг';
+        } else if (roll < 0.92) {
+          _phase = 'oneOnOne';
+          _momentTitle = 'Рывок за спину защитникам';
           _momentDescription =
-              'Защитник соперника контролирует мяч при начале атаки. Вы можете перекрыть передачу или начать прессинг.';
+              'Полузащитник поднял голову и готовит передачу за линию обороны. Вы можете открыться на ход, принять мяч и выйти на ударную позицию.';
+        } else {
+          _phase = 'secondBall';
+          _momentTitle = 'Борьба за отскок';
+          _momentDescription =
+              'После единоборства мяч отскочил к вам у границы штрафной. Нужно быстрее соперника обработать мяч и продолжить атаку.';
         }
         break;
       case PlayerPosition.midfielder:
@@ -534,11 +546,16 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           _momentTitle = 'Возврат в оборону';
           _momentDescription =
               'Соперник начинает атаку через центр. Можно перекрыть линию паса или вступить в отбор.';
-        } else {
-          _phase = 'wideAttack';
-          _momentTitle = 'Поддержка фланговой атаки';
+        } else if (roll < 0.92) {
+          _phase = 'counterAttack';
+          _momentTitle = 'Перехват и быстрый выход';
           _momentDescription =
-              'Партнёр продвинулся по флангу, а вы подключились к атаке и предлагаете вариант для передачи.';
+              'Вы выиграли мяч в центре, соперник ещё не успел перестроиться. Можно ускорить контратаку передачей или пройти вперёд самостоятельно.';
+        } else {
+          _phase = 'pressingTrap';
+          _momentTitle = 'Выход из-под прессинга';
+          _momentDescription =
+              'Соперник перекрыл центральные зоны и давит на мяч. Нужно найти свободного партнёра или обыграть первую линию давления.';
         }
         break;
       case PlayerPosition.defender:
@@ -557,11 +574,16 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           _momentTitle = 'Подключение по внешнему флангу';
           _momentDescription =
               'Партнёр сместился с мячом в центр, а вы свободны на фланге. Можно сделать рывок, получить передачу и прострелить.';
-        } else {
-          _phase = 'midfield';
-          _momentTitle = 'Продвижение с мячом';
+        } else if (roll < 0.96) {
+          _phase = 'defensiveLine';
+          _momentTitle = 'Страховка партнёра';
           _momentDescription =
-              'Перед вами свободное пространство в средней трети. Можно продвинуть мяч или перевести игру.';
+              'Партнёр по обороне выдвинулся на соперника, а за его спиной появилась зона. Нужно решить, подстраховать его или удержать линию.';
+        } else {
+          _phase = 'secondBall';
+          _momentTitle = 'Подбор после выноса';
+          _momentDescription =
+              'Соперник вынес мяч из штрафной, и он направляется в вашу зону. Можно выиграть подбор и сразу начать новую атаку.';
         }
         break;
       case PlayerPosition.goalkeeper:
@@ -797,7 +819,11 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
               .clamp(0.48, 0.96);
       if (_random.nextDouble() < passChance) {
         _rating += 0.32;
-        final partnerScores = _random.nextDouble() < 0.48;
+        final attackXg = widget.isHome ? _homeXgRemaining : _awayXgRemaining;
+        final partnerScoreChance = attackXg <= 0.02
+            ? 0.0
+            : (0.18 * (attackXg / 1.1).clamp(0.15, 1.0)).clamp(0.0, 0.22);
+        final partnerScores = _random.nextDouble() < partnerScoreChance;
         _phase = 'buildUp';
         if (partnerScores) {
           _playerAssists++;
@@ -852,10 +878,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     }
     if (action == 'penaltyShoot') {
       final penaltyChance =
-          (0.68 +
-                  (_player.skills.shooting - 60) * 0.006 +
-                  (_player.skills.vision - 60) * 0.001)
-              .clamp(0.42, 0.91);
+          (0.76 +
+                  (_player.skills.shooting - 70) * 0.0035 +
+                  (_player.skills.vision - 70) * 0.001)
+              .clamp(0.62, 0.91);
       final scored = _random.nextDouble() < penaltyChance;
       String penaltyMessage;
       if (scored) {
@@ -958,6 +984,13 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                   (_player.skills.vision - 60) * 0.0015 +
                   advantage * 0.35)
               .clamp(0.46, 0.95);
+    } else if (action == 'keeper') {
+      final opponentXg = widget.isHome ? _awayXgRemaining : _homeXgRemaining;
+      final shotThreat = (opponentXg / 1.2).clamp(0.0, 1.0);
+      chance = (0.88 +
+              (skill - 70) * 0.003 -
+              shotThreat * 0.18)
+          .clamp(0.55, 0.96);
     } else if (action == 'dribble') {
       chance =
           (0.70 +
@@ -985,27 +1018,31 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       final double baseFinishingChance;
       final double skillFinishingBonus;
       if (action == 'header') {
-        baseFinishingChance = isAerial ? 0.56 : 0.46;
+        baseFinishingChance = isAerial ? 0.22 : 0.16;
         skillFinishingBonus =
-            (_player.skills.heading - 70) * 0.005 +
-            (_player.skills.shooting - 70) * 0.002;
+            (_player.skills.heading - 70) * 0.003 +
+            (_player.skills.shooting - 70) * 0.001;
       } else if (action == 'longShot') {
-        baseFinishingChance = 0.30;
-        skillFinishingBonus = (_player.skills.shooting - 70) * 0.004;
+        baseFinishingChance = 0.075;
+        skillFinishingBonus = (_player.skills.shooting - 70) * 0.002;
       } else if (action == 'volley') {
-        baseFinishingChance = 0.45;
+        baseFinishingChance = 0.16;
         skillFinishingBonus =
-            (_player.skills.shooting - 70) * 0.003 +
-            (_player.skills.heading - 70) * 0.002;
+            (_player.skills.shooting - 70) * 0.002 +
+            (_player.skills.heading - 70) * 0.001;
       } else {
-        baseFinishingChance = isOneOnOne ? 0.70 : 0.58;
-        skillFinishingBonus = (_player.skills.shooting - 70) * 0.004;
+        baseFinishingChance = isOneOnOne ? 0.43 : 0.23;
+        skillFinishingBonus = (_player.skills.shooting - 70) * 0.0025;
       }
-      final finishingChance =
-          (baseFinishingChance + skillFinishingBonus + advantage * 0.5).clamp(
-            0.18,
-            0.86,
-          );
+      final attackingXg = widget.isHome ? _homeXgRemaining : _awayXgRemaining;
+      final xgBudgetFactor = attackingXg <= 0.02
+          ? 0.0
+          : (attackingXg / 1.1).clamp(0.12, 1.0);
+      final finishingChance = ((baseFinishingChance +
+                  skillFinishingBonus +
+                  advantage * 0.35) *
+              xgBudgetFactor)
+          .clamp(0.0, 0.62);
       if (success && _random.nextDouble() < finishingChance) {
         if (widget.isHome) {
           _addGoal(home: true);
