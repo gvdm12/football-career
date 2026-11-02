@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -262,6 +263,41 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
     }
   }
 
+  Widget _buildWorldCupMatchGlass({required Widget child}) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(14),
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withValues(alpha: 0.12),
+                green.withValues(alpha: 0.08),
+                const Color(0xFF061B0C).withValues(alpha: 0.18),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.22),
+              width: 1.1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: green.withValues(alpha: 0.10),
+                blurRadius: 20,
+                offset: const Offset(0, 7),
+              ),
+            ],
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+
   Widget _playerStat(String label, String value) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -472,13 +508,13 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                   final isPlayerTeam =
                       match.homeTeam == career.player.nationality ||
                       match.awayTeam == career.player.nationality;
-                  return Container(
+                  return _buildWorldCupMatchGlass(child: Container(
                     margin: const EdgeInsets.only(bottom: 4),
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: isPlayerTeam
-                          ? const Color(0xFF123A1D)
-                          : const Color(0xFF0A2110),
+                          ? const Color(0xFF123A1D).withValues(alpha: 0.68)
+                          : const Color(0xFF0A2110).withValues(alpha: 0.62),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: isPlayerTeam ? green : Colors.white12,
@@ -516,7 +552,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                         ),
                       ],
                     ),
-                  );
+                  ));
                 }),
               ],
               const SizedBox(height: 6),
@@ -534,7 +570,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                   final isPlayerTeam =
                       match.homeTeam == career.player.nationality ||
                       match.awayTeam == career.player.nationality;
-                  return Container(
+                  return _buildWorldCupMatchGlass(child: Container(
                     margin: const EdgeInsets.only(bottom: 7),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -575,7 +611,7 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                         _teamLabel(match.awayTeam, alignEnd: true),
                       ],
                     ),
-                  );
+                  ));
                 }),
               const SizedBox(height: 12),
               if (!tournament.isCompleted) ...[
