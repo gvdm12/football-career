@@ -3541,14 +3541,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
                                 _buildNextCupMatchCard(nextCupMatch)
                               else if (!seasonFinished && nextMatch != null)
                                 _buildNextMatchCard(nextMatch),
-                              if (career.worldCup != null && !worldCupBlocksSeason)
-                                _buildWorldCupCalendarSection(
-                                  blocksSeason: false,
-                                ),
                               if (recentMonthlyAward != null && !worldCupBlocksSeason)
                                 _buildRecentMonthlyAwardCard(),
                               const SizedBox(height: 10),
                               if (!worldCupBlocksSeason) _buildSeasonButton(),
+                              if (career.worldCup != null && !worldCupBlocksSeason)
+                                _buildWorldCupCalendarSection(
+                                  blocksSeason: false,
+                                ),
                             ],
                           ),
                   ),
