@@ -110,7 +110,6 @@ class PlayerOfMonthService {
             averageRating: rival.averageRating,
           ));
         }
-        continue;
       }
 
       final fixtures = monthFixtures.where((match) =>
@@ -135,9 +134,14 @@ class PlayerOfMonthService {
               ? PlayerPosition.midfielder
               : PlayerPosition.defender;
       final realPlayers = RealClubSquads.squads[clubName]?[position.name];
-      final realPlayer = realPlayers == null || realPlayers.isEmpty
+      final availableRealPlayers = (realPlayers ?? const <RealClubPlayer>[])
+          .where((item) =>
+              clubName != player.club ||
+              !rivals.any((rival) => rival.name == item.name))
+          .toList();
+      final realPlayer = availableRealPlayers.isEmpty
           ? null
-          : realPlayers[random.nextInt(realPlayers.length)];
+          : availableRealPlayers[random.nextInt(availableRealPlayers.length)];
       final overall = realPlayer?.overall ??
           (68 + random.nextInt(22)).clamp(60, 90).toInt();
       final age = realPlayer?.age ?? 18 + random.nextInt(18);
