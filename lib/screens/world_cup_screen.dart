@@ -578,8 +578,8 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
                     ),
                     decoration: BoxDecoration(
                       color: isPlayerTeam
-                          ? const Color(0xFF123A1D)
-                          : const Color(0xFF0A2110),
+                          ? const Color(0xFF123A1D).withValues(alpha: 0.68)
+                          : const Color(0xFF0A2110).withValues(alpha: 0.62),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: isPlayerTeam ? green : Colors.white12,
