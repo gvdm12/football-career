@@ -18,7 +18,11 @@ class SeasonAwardService {
 
     for (final item in leaguePlayerStats) {
       if (item.matches == 0) continue;
-      if (item.club == player.club && item.playerName == player.name) continue;
+      if (item.club == player.club &&
+          (item.playerName == player.name ||
+              rivals.any((rival) => rival.name == item.playerName))) {
+        continue;
+      }
       candidates.add(_Candidate(
         name: item.playerName,
         club: item.club,
