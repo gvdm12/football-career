@@ -1037,7 +1037,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
             (_player.skills.shooting - 70) * 0.001;
       } else if (action == 'longShot') {
         // Дальний удар.
-        baseFinishingChance = 0.14;
+        baseFinishingChance = 0.20;
 
         skillFinishingBonus = (_player.skills.shooting - 70) * 0.002;
       } else if (action == 'volley') {
@@ -1772,12 +1772,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [primaryColor, secondaryColor],
-            ),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.25),
-            ),
+            gradient: LinearGradient(colors: [primaryColor, secondaryColor]),
+            border: Border.all(color: Colors.white.withOpacity(0.25)),
           ),
           child: Text(
             name.isEmpty ? '?' : name.substring(0, 1).toUpperCase(),
