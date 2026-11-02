@@ -31,6 +31,17 @@ class PressConferenceContent {
 
 class PressConferenceContentFactory {
   static final List<String> _recentQuestions = [];
+  static int _matchesSinceLastConference = 100;
+
+  /// Общий лимит для обычной симуляции и интерактивных матчей.
+  static bool registerMatch() {
+    _matchesSinceLastConference++;
+    return _matchesSinceLastConference >= 4;
+  }
+
+  static void markConferenceShown() {
+    _matchesSinceLastConference = 0;
+  }
 
   static PressConferenceContent create({
     required String category,
