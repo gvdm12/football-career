@@ -671,7 +671,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF0A2110),
+        color: const Color(0xFF0A2110).withValues(alpha: 0.68),
         borderRadius: BorderRadius.circular(10),
         border: const Border(
           left: BorderSide(color: Color(0xFF8DB8FF), width: 4),
@@ -944,7 +944,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
       result = isHome ? '$homeGoals : $awayGoals' : '$awayGoals : $homeGoals';
     }
 
-    return Container(
+    return _buildMatchGlassSurface(child: Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -995,7 +995,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildRecentMonthlyAwardCard() {
@@ -1291,6 +1291,49 @@ class _SeasonScreenState extends State<SeasonScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMatchGlassSurface({
+    required Widget child,
+    double radius = 18,
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withValues(alpha: 0.13),
+                const Color(0xFF4ADE80).withValues(alpha: 0.08),
+                const Color(0xFF071B10).withValues(alpha: 0.24),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(radius),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.24),
+              width: 1.1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF4ADE80).withValues(alpha: 0.10),
+                blurRadius: 22,
+                offset: const Offset(0, 7),
+              ),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.18),
+                blurRadius: 20,
+                offset: const Offset(0, 9),
+              ),
+            ],
+          ),
+          child: child,
+        ),
       ),
     );
   }
@@ -1607,7 +1650,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
       result = isHome ? '$homeGoals : $awayGoals' : '$awayGoals : $homeGoals';
     }
 
-    return Container(
+    return _buildMatchGlassSurface(child: Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -1658,7 +1701,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   Future<void> _playChampionsLeagueMatch({required bool interactive}) async {
@@ -4127,14 +4170,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
       opponent: match.opponent,
       isHome: match.isHome,
     );
-    return Container(
+    return _buildMatchGlassSurface(child: Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            playerColor,
-            Color.lerp(playerColor, opponentColor, 0.45)!,
-            const Color(0xFF102B17),
+            playerColor.withValues(alpha: 0.72),
+            Color.lerp(playerColor, opponentColor, 0.45)!.withValues(alpha: 0.70),
+            const Color(0xFF102B17).withValues(alpha: 0.78),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -4213,7 +4256,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildNextCupMatchCard(CupMatch match) {
@@ -4236,7 +4279,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
       isHome: isHome,
     );
 
-    return Container(
+    return _buildMatchGlassSurface(child: Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -4329,7 +4372,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildSeasonMatches() {
@@ -4491,7 +4534,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         ? AppStrings.firstLegLabel
         : AppStrings.secondLegLabel;
 
-    return Container(
+    return _buildMatchGlassSurface(child: Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFF5688D8)),
@@ -4618,7 +4661,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildNextEuropaLeagueMatchCard() {
@@ -4648,7 +4691,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         ? AppStrings.firstLegLabel
         : AppStrings.secondLegLabel;
 
-    return Container(
+    return _buildMatchGlassSurface(child: Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFFFC857)),
@@ -4773,7 +4816,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildCupMatchRow(CupMatch cupMatch) {
@@ -4807,7 +4850,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
       }
     }
 
-    return Container(
+    return _buildMatchGlassSurface(child: Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -4815,7 +4858,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
           const Color(0xFF0A2110),
           ClubColors.primary(opponent),
           0.12,
-        )!,
+        )!.withValues(alpha: 0.68),
         borderRadius: BorderRadius.circular(10),
         border: Border(
           left: BorderSide(color: const Color(0xFF8BE07F), width: 4),
@@ -4868,7 +4911,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
             ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildMatchRow(SeasonMatch match) {
@@ -4895,7 +4938,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
       }
     }
 
-    return Container(
+    return _buildMatchGlassSurface(child: Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -4936,7 +4979,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
             ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildSeasonButton() {
