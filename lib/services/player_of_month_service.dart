@@ -5,6 +5,7 @@ import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/real_club_squads.dart';
 import 'package:flutter_football/models/player_of_month_award.dart';
 import 'package:flutter_football/models/season_match.dart';
+import 'package:flutter_football/models/position_rival.dart';
 
 class PlayerOfMonthService {
   static const _names = [
@@ -33,6 +34,7 @@ class PlayerOfMonthService {
     required List<SeasonMatch> playerMatches,
     required List<LeagueMatch> leagueMatches,
     required List<PlayerOfMonthAward> previousAwards,
+    required List<PositionRival> rivals,
   }) {
     if (previousAwards.any((award) =>
         award.season == season && award.month == month)) {
@@ -89,6 +91,28 @@ class PlayerOfMonthService {
     };
 
     for (final clubName in clubs) {
+      if (clubName == player.club) {
+        // Для клуба игрока используем реальные данные его конкурентов.
+        // Так цифры в награде совпадают с экраном команды.
+        for (final rival in rivals) {
+          if (rival.matches == 0) continue;
+          candidates.add(_candidate(
+            season: season,
+            month: month,
+            name: rival.name,
+            club: player.club,
+            age: rival.age,
+            position: rival.position,
+            overall: rival.overall,
+            matches: rival.matches,
+            goals: rival.goals,
+            assists: rival.assists,
+            averageRating: rival.averageRating,
+          ));
+        }
+        continue;
+      }
+
       final fixtures = monthFixtures.where((match) =>
           match.homeTeam == clubName || match.awayTeam == clubName).toList();
       if (fixtures.isEmpty) continue;
