@@ -58,8 +58,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
   bool isSaving = false;
   bool seasonFinishing = false;
   PlayerOfMonthAward? recentMonthlyAward;
-  int _lastPressConferenceMatchCount = -100;
-  int _lastPressConferenceSeason = 0;
 
   @override
   void initState() {
@@ -2822,18 +2820,13 @@ class _SeasonScreenState extends State<SeasonScreen> {
   }) async {
     if (!match.playerPlayed) return updatedCareer;
 
+    final cooldownReady = PressConferenceContentFactory.registerMatch();
+    if (!cooldownReady && !isTournamentDecider) return updatedCareer;
+
     final playedBefore = career.seasonMatches
         .where((item) => item.isPlayed)
         .length;
     final totalMatches = career.seasonMatches.length;
-    if (_lastPressConferenceSeason != updatedCareer.season) {
-      _lastPressConferenceSeason = updatedCareer.season;
-      _lastPressConferenceMatchCount = -100;
-    }
-    final conferenceMatchCount = playedBefore + 1;
-    if (conferenceMatchCount - _lastPressConferenceMatchCount < 4) {
-      return updatedCareer;
-    }
     final outstanding =
         match.playerRating >= 8.8 ||
         match.playerGoals >= 3 ||
@@ -2950,7 +2943,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
             interestedClubs.isNotEmpty
         ? interestedClubs[Random().nextInt(interestedClubs.length)].name
         : null;
-    _lastPressConferenceMatchCount = conferenceMatchCount;
+    PressConferenceContentFactory.markConferenceShown();
     final content = PressConferenceContentFactory.create(
       category: category,
       english: AppStrings.isEnglish,
@@ -2974,6 +2967,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Future<void> _showTournamentPreviewConference() async {
     if (!mounted) return;
+    PressConferenceContentFactory.markConferenceShown();
     final content = PressConferenceContentFactory.create(
       category: 'tournament',
       english: AppStrings.isEnglish,
