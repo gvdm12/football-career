@@ -2835,12 +2835,23 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     PressConferenceContentFactory.beginSeason(updatedCareer.season);
     final cooldownReady = PressConferenceContentFactory.registerMatch();
-    if (!cooldownReady && !isTournamentDecider) return updatedCareer;
 
     final playedBefore = career.seasonMatches
         .where((item) => item.isPlayed)
         .length;
     final totalMatches = career.seasonMatches.length;
+    final seasonStart = includeSeasonMilestones && playedBefore == 0;
+    final seasonEnd = includeSeasonMilestones &&
+        totalMatches > 0 &&
+        playedBefore >= totalMatches - 1;
+
+    // Сезонные контрольные вопросы не должны блокироваться общей паузой.
+    if (!cooldownReady &&
+        !isTournamentDecider &&
+        !seasonStart &&
+        !seasonEnd) {
+      return updatedCareer;
+    }
     final outstanding =
         match.playerRating >= 8.8 ||
         match.playerGoals >= 3 ||
@@ -2907,6 +2918,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
       category = match.isPlayerLoss(updatedCareer.player.club)
           ? 'elimination'
           : 'tournament';
+    } else if (seasonStart) {
+      category = 'seasonStart';
+    } else if (seasonEnd) {
+      category = 'seasonEnd';
     } else if (includeSeasonMilestones &&
         totalMatches >= 8 &&
         playedBefore + 1 == firstInterestCheckpoint) {
@@ -2923,19 +2938,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
     } else if (poorSeason) {
       category = 'poorSeason';
     } else if (includeSeasonMilestones &&
-        playedBefore == 0 &&
-        Random().nextDouble() < 0.20) {
-      category = 'seasonStart';
-    } else if (includeSeasonMilestones &&
         totalMatches > 2 &&
         playedBefore == (totalMatches / 2).round() &&
         Random().nextDouble() < 0.15) {
       category = 'seasonMiddle';
-    } else if (includeSeasonMilestones &&
-        totalMatches > 0 &&
-        playedBefore >= totalMatches - 1 &&
-        Random().nextDouble() < 0.35) {
-      category = 'seasonEnd';
     } else if (outstanding && Random().nextDouble() < 0.22) {
       category = 'great';
     } else if (poor && Random().nextDouble() < 0.30) {
