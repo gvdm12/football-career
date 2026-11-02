@@ -3500,6 +3500,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                                     style: TextStyle(color: Colors.white70),
                                   ),
                                 ),
+                              ],
                             ],
                           )
                         : ListView(
@@ -3515,6 +3516,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
                                       color: Color(0xFF8BE07F),
                                     ),
                                   ),
+                                ),
+                              if (worldCupBlocksSeason &&
+                                  career.worldCup != null)
+                                _buildWorldCupCalendarSection(
+                                  blocksSeason: true,
                                 ),
                               if (worldCupBlocksSeason)
                                 const Padding(
