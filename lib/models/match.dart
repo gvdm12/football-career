@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter_football/models/club.dart';
 import 'player.dart';
 import 'career.dart';
+import 'player_status.dart';
 
 class Match {
   /// Стабильное решение о выходе игрока именно в этот матч.
@@ -75,12 +76,39 @@ class Match {
         .toInt();
     final reputationBonus = (reputation - 60) * 0.005;
 
+    // Роль рассчитывается той же моделью, что используется в карьере
+    // и новостях тренера: учитываются рейтинг, форма, доверие и конкуренты.
+    final playerStatus = PlayerStatusCalculator.calculate(
+      overall: player.overall,
+      clubName: player.club,
+      rivals: rivals,
+      coachTrust: career?.coachTrust ?? 65,
+      reputation: reputation,
+      averageRating: averageRating,
+    );
+
+    final rolePlayChance = switch (playerStatus) {
+      PlayerStatus.starter => 0.96,
+      PlayerStatus.rotation => 0.75,
+      PlayerStatus.substitute => 0.40,
+    };
+
+    // Даже статус основного состава не гарантирует выход в каждом матче.
+    playChance = min(playChance, rolePlayChance);
+
+    // С 16-го сезона возраст постепенно сокращает игровое время.
+    // К 20-му сезону штраф достигает 60 процентных пунктов.
+    final ageRelatedPenalty = career == null
+        ? 0.0
+        : ((career.season - 15) * 0.12).clamp(0.0, 0.60).toDouble();
+
     playChance = (playChance -
             rivalPenalty +
             trustBonus +
             reputationBonus +
-            playerFormBonus)
-        .clamp(0.25, 0.99)
+            playerFormBonus -
+            ageRelatedPenalty)
+        .clamp(0.05, 0.99)
         .toDouble();
 
     return Random(seed).nextDouble() < playChance;
