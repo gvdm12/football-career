@@ -98,11 +98,11 @@ class SeasonAwardService {
                   : teamPosition <= (sortedTable.length / 2).ceil()
                       ? 0.2
                       : 0.0;
-      return item.rating * 8 +
-          item.goals * 0.30 +
-          item.assists * 0.22 +
+      return item.rating * 7.5 +
+          item.goals * 0.75 +
+          item.assists * 0.55 +
           item.matches * 0.035 +
-          contributionsPerMatch * 3 +
+          contributionsPerMatch * 2 +
           teamBonus;
     }
 
