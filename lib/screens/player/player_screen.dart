@@ -693,12 +693,32 @@ class _PlayerScreenState extends State<PlayerScreen> {
           ),
         ),
         const SizedBox(width: 14),
-        Text(
-          AppStrings.myPlayer,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w900,
+        Expanded(
+          child: Text(
+            AppStrings.myPlayer,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ),
+        const SizedBox(width: 6),
+        TextButton.icon(
+          onPressed: career.isCareerFinished ? _openCareerEnd : _openSeason,
+          style: TextButton.styleFrom(
+            foregroundColor: const Color(0xFF8BE07F),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            backgroundColor: const Color(0x1FFFFFFF),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(color: Color(0xFF3E9950)),
+            ),
+          ),
+          icon: const Icon(Icons.calendar_month, size: 17),
+          label: Text(
+            career.isCareerFinished ? 'ИТОГИ' : AppStrings.seasonButton,
+            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900),
           ),
         ),
       ],
@@ -708,7 +728,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
   Widget _buildPlayerCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: const Color(0x0DFFFFFF),
         borderRadius: BorderRadius.circular(24),
@@ -782,8 +802,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   Widget _buildAvatar() {
     return Container(
-      width: 90,
-      height: 90,
+      width: 76,
+      height: 76,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(26),
         gradient: const LinearGradient(
@@ -856,63 +876,27 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   Widget _buildStatRows() {
     final stats = [
-      _Stat(
-        AppStrings.pace,
-        player.skills.pace,
-        Icons.bolt,
-        const Color(0xFFC8E04A),
-      ),
-      _Stat(
-        AppStrings.physical,
-        player.skills.physical,
-        Icons.fitness_center,
-        const Color(0xFFFFC94A),
-      ),
-      _Stat(
-        AppStrings.passing,
-        player.skills.passing,
-        Icons.adjust,
-        const Color(0xFF5FD070),
-      ),
-      _Stat(
-        AppStrings.shooting,
-        player.skills.shooting,
-        Icons.gps_fixed,
-        const Color(0xFFFF6B4A),
-      ),
-      _Stat(
-        AppStrings.defending,
-        player.skills.defending,
-        Icons.shield,
-        const Color(0xFF7EA7FF),
-      ),
-      _Stat(
-        AppStrings.dribbling,
-        player.skills.dribbling,
-        Icons.blur_circular,
-        const Color(0xFF4AA8FF),
-      ),
-      _Stat(
-        AppStrings.heading,
-        player.skills.heading,
-        Icons.sports_soccer,
-        const Color(0xFFFF9F43),
-      ),
-      _Stat(
-        AppStrings.vision,
-        player.skills.vision,
-        Icons.visibility,
-        const Color(0xFFB78BFA),
-      ),
+      _Stat(AppStrings.pace, player.skills.pace, Icons.bolt, const Color(0xFFC8E04A)),
+      _Stat(AppStrings.physical, player.skills.physical, Icons.fitness_center, const Color(0xFFFFC94A)),
+      _Stat(AppStrings.passing, player.skills.passing, Icons.adjust, const Color(0xFF5FD070)),
+      _Stat(AppStrings.shooting, player.skills.shooting, Icons.gps_fixed, const Color(0xFFFF6B4A)),
+      _Stat(AppStrings.defending, player.skills.defending, Icons.shield, const Color(0xFF7EA7FF)),
+      _Stat(AppStrings.dribbling, player.skills.dribbling, Icons.blur_circular, const Color(0xFF4AA8FF)),
+      _Stat(AppStrings.heading, player.skills.heading, Icons.sports_soccer, const Color(0xFFFF9F43)),
+      _Stat(AppStrings.vision, player.skills.vision, Icons.visibility, const Color(0xFFB78BFA)),
     ];
 
-    return Column(
-      children: [
-        for (int i = 0; i < stats.length; i++) ...[
-          _StatRow(stat: stats[i]),
-          if (i != stats.length - 1) const SizedBox(height: 14),
-        ],
-      ],
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: stats.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 14,
+        mainAxisSpacing: 12,
+        mainAxisExtent: 48,
+      ),
+      itemBuilder: (context, index) => _CompactStatTile(stat: stats[index]),
     );
   }
 
@@ -1161,6 +1145,50 @@ class _InfoRow extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+
+class _CompactStatTile extends StatelessWidget {
+  final _Stat stat;
+
+  const _CompactStatTile({required this.stat});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Row(
+          children: [
+            Icon(stat.icon, color: stat.color, size: 15),
+            const SizedBox(width: 5),
+            Expanded(
+              child: Text(
+                stat.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Color(0xFFD5E8D8),
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Text(
+              '${stat.value}',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+        _StatBar(value: stat.value),
+      ],
     );
   }
 }
