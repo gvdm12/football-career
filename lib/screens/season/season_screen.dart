@@ -2820,6 +2820,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
   }) async {
     if (!match.playerPlayed) return updatedCareer;
 
+    PressConferenceContentFactory.beginSeason(updatedCareer.season);
     final cooldownReady = PressConferenceContentFactory.registerMatch();
     if (!cooldownReady && !isTournamentDecider) return updatedCareer;
 
@@ -2967,6 +2968,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Future<void> _showTournamentPreviewConference() async {
     if (!mounted) return;
+    PressConferenceContentFactory.beginSeason(career.season);
     PressConferenceContentFactory.markConferenceShown();
     final content = PressConferenceContentFactory.create(
       category: 'tournament',
