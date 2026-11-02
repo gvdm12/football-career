@@ -102,12 +102,15 @@ class Match {
         ? 0.0
         : ((career.season - 15) * 0.12).clamp(0.0, 0.60).toDouble();
 
-    playChance = (playChance -
+    final chanceBeforeAgeDecline = (playChance -
             rivalPenalty +
             trustBonus +
             reputationBonus +
-            playerFormBonus -
-            ageRelatedPenalty)
+            playerFormBonus)
+        .clamp(0.05, 0.99)
+        .toDouble();
+
+    playChance = (chanceBeforeAgeDecline - ageRelatedPenalty)
         .clamp(0.05, 0.99)
         .toDouble();
 
