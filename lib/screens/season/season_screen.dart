@@ -1034,6 +1034,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
                 ),
+                if (career.rivals.any((rival) => rival.name == award.playerName))
+                  const Text(
+                    'Накопленная статистика за сезон',
+                    style: TextStyle(color: Colors.white54, fontSize: 9),
+                  ),
                 Text(
                   '${award.club}  ·  ${award.matches} матч.  ·  ${award.goals} гол.  ·  ${award.assists} асс.',
                   maxLines: 1,
@@ -1108,6 +1113,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
               style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900),
             ),
             Text(award.club, style: const TextStyle(color: Colors.white70)),
+            if (career.rivals.any((rival) => rival.name == award.playerName))
+              const Padding(
+                padding: EdgeInsets.only(top: 3),
+                child: Text(
+                  'Накопленная статистика за сезон',
+                  style: TextStyle(color: Colors.white54, fontSize: 10),
+                ),
+              ),
             const SizedBox(height: 14),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
