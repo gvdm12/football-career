@@ -73,9 +73,10 @@ class MatchScreen extends StatelessWidget {
       return null;
     }
 
-    if (seasonStart && Random().nextDouble() < 0.20) return 'seasonStart';
+    // Начало и конец сезона — обязательные контрольные пресс-конференции.
+    if (seasonStart) return 'seasonStart';
+    if (seasonEnd) return 'seasonEnd';
     if (seasonMiddle && Random().nextDouble() < 0.15) return 'seasonMiddle';
-    if (seasonEnd && Random().nextDouble() < 0.35) return 'seasonEnd';
 
     final outstanding =
         match.playerRating >= 8.8 ||

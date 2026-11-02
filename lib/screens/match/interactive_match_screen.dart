@@ -5,6 +5,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/club.dart';
+import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/match.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/player_status.dart';
@@ -1755,6 +1756,13 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   }
 
   Widget _teamBadge(String name, bool home) {
+    final primaryColor = ClubColors.primary(name);
+    final secondaryColor = ClubColors.secondary(name);
+    final foregroundColor =
+        ThemeData.estimateBrightnessForColor(primaryColor) == Brightness.dark
+        ? Colors.white
+        : Colors.black;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1765,16 +1773,16 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: LinearGradient(
-              colors: home
-                  ? const [Color(0xFF4ADE80), Color(0xFF166534)]
-                  : const [Color(0xFF93C5FD), Color(0xFF1D4ED8)],
+              colors: [primaryColor, secondaryColor],
             ),
-            border: Border.all(color: Colors.white.withOpacity(0.25)),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.25),
+            ),
           ),
           child: Text(
             name.isEmpty ? '?' : name.substring(0, 1).toUpperCase(),
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: foregroundColor,
               fontSize: 20,
               fontWeight: FontWeight.w900,
             ),
