@@ -3,6 +3,7 @@ import 'package:flutter_football/models/league_table.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/season_award.dart';
 import 'package:flutter_football/models/season_stats.dart';
+import 'package:flutter_football/models/position_rival.dart';
 
 class SeasonAwardService {
   static List<SeasonAward> create({
@@ -11,6 +12,7 @@ class SeasonAwardService {
     required SeasonStats seasonStats,
     required List<LeaguePlayerSeasonStats> leaguePlayerStats,
     required List<LeagueTableEntry> leagueTable,
+    required List<PositionRival> rivals,
   }) {
     final candidates = <_Candidate>[];
 
@@ -26,6 +28,23 @@ class SeasonAwardService {
         goals: item.goals,
         assists: item.assists,
         rating: item.averageRating,
+        isCareerPlayer: false,
+      ));
+    }
+
+    // Конкуренты за позицию входят в общий список наград с той же
+    // статистикой, которая отображается на экране команды.
+    for (final rival in rivals) {
+      if (rival.matches == 0) continue;
+      candidates.add(_Candidate(
+        name: rival.name,
+        club: player.club,
+        position: rival.position,
+        age: rival.age,
+        matches: rival.matches,
+        goals: rival.goals,
+        assists: rival.assists,
+        rating: rival.averageRating,
         isCareerPlayer: false,
       ));
     }
