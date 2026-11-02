@@ -1528,6 +1528,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
           playerMatches: updatedSeasonMatches,
           leagueMatches: completedLeagueMatches,
           previousAwards: awards,
+          rivals: updatedCareer.rivals,
         );
         if (monthlyWinner != null) awards.add(monthlyWinner);
       }
@@ -2567,6 +2568,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         ),
         leaguePlayerStats: completedCareer.leaguePlayerStats,
         leagueTable: completedCareer.leagueTable,
+        rivals: completedCareer.rivals,
       );
       completedCareer = completedCareer.copyWith(
         seasonAwards: [...completedCareer.seasonAwards, ...seasonAwards],
