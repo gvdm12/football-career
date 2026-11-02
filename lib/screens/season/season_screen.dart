@@ -2083,7 +2083,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 playerPenalties != null &&
                 opponentPenalties != null &&
                 playerPenalties < opponentPenalties));
-    final isTournamentDecider = isFinal || playerEliminated;
+    final isTournamentDecider = !isFinal && playerEliminated;
 
     var updatedCareer = interactive
         ? interactiveCareer
