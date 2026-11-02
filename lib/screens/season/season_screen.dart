@@ -3076,148 +3076,228 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Widget _buildNavigationDrawer() {
     return Drawer(
-      backgroundColor: const Color(0xFFE7EAF0),
-      child: SafeArea(
-        child: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color.fromARGB(255, 248, 248, 249),
-                Color.fromARGB(255, 226, 222, 222),
-                Color.fromARGB(255, 171, 170, 170),
+      width: 304,
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.horizontal(right: Radius.circular(30)),
+      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.horizontal(
+          right: Radius.circular(30),
+        ),
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withValues(alpha: 0.24),
+                  Colors.white.withValues(alpha: 0.12),
+                  const Color(0xFF777777).withValues(alpha: 0.16),
+                  Colors.black.withValues(alpha: 0.20),
+                ],
+                stops: const [0, 0.34, 0.72, 1],
+              ),
+              border: Border(
+                right: BorderSide(
+                  color: Colors.white.withValues(alpha: 0.34),
+                  width: 1.1,
+                ),
+                top: BorderSide(
+                  color: Colors.white.withValues(alpha: 0.22),
+                ),
+                bottom: BorderSide(
+                  color: Colors.white.withValues(alpha: 0.16),
+                ),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.18),
+                  blurRadius: 32,
+                  offset: const Offset(10, 0),
+                ),
               ],
             ),
-          ),
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              Container(
-                padding: const EdgeInsets.fromLTRB(20, 26, 20, 22),
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color.fromARGB(255, 188, 177, 177),
-                      Color(0xFFFFFFFF),
+            child: Stack(
+              children: [
+                Positioned(
+                  top: -100,
+                  left: -70,
+                  child: IgnorePointer(
+                    child: Container(
+                      width: 280,
+                      height: 230,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            Colors.white.withValues(alpha: 0.22),
+                            Colors.white.withValues(alpha: 0),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SafeArea(
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(10, 8, 10, 18),
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.fromLTRB(4, 4, 4, 14),
+                        padding: const EdgeInsets.fromLTRB(18, 22, 18, 18),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(23),
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.white.withValues(alpha: 0.24),
+                              Colors.white.withValues(alpha: 0.08),
+                            ],
+                          ),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.30),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.white.withValues(alpha: 0.08),
+                              blurRadius: 18,
+                              spreadRadius: -5,
+                              offset: const Offset(-4, -4),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/player.svg',
+                              width: 36,
+                              height: 36,
+                              fit: BoxFit.contain,
+                              colorFilter: ColorFilter.mode(
+                                Colors.white.withValues(alpha: 0.92),
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                            Text(
+                              career.player.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 19,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.35,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              '${career.player.club}  ·  OVR ${career.player.overall}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.72),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      _drawerItem(
+                        icon: Icons.person_outline_rounded,
+                        title: 'Игрок',
+                        onTap: () {
+                          Navigator.pop(context);
+                          _openPlayerProfile();
+                        },
+                      ),
+                      _drawerItem(
+                        icon: Icons.storefront_outlined,
+                        title: 'Магазин',
+                        onTap: () {
+                          Navigator.pop(context);
+                          _openShop();
+                        },
+                      ),
+                      _drawerItem(
+                        icon: Icons.groups_2_outlined,
+                        title: AppStrings.isEnglish ? 'Team' : 'Команда',
+                        onTap: () {
+                          Navigator.pop(context);
+                          _openTeam();
+                        },
+                      ),
+                      _drawerItem(
+                        icon: Icons.sports,
+                        title: AppStrings.coachMenu,
+                        onTap: () {
+                          Navigator.pop(context);
+                          _openCoach();
+                        },
+                      ),
+                      _drawerItem(
+                        icon: Icons.handshake_outlined,
+                        title: AppStrings.agentMenu,
+                        onTap: () {
+                          Navigator.pop(context);
+                          _openAgent();
+                        },
+                      ),
+                      _drawerItem(
+                        icon: Icons.newspaper_outlined,
+                        title: AppStrings.newsMenu,
+                        onTap: () {
+                          Navigator.pop(context);
+                          _openNews();
+                        },
+                      ),
+                      _drawerItem(
+                        assetPath: 'assets/icons/table.svg',
+                        title: 'Таблица',
+                        onTap: () {
+                          Navigator.pop(context);
+                          _openLeagueTable();
+                        },
+                      ),
+                      _drawerItem(
+                        icon: Icons.calendar_month_rounded,
+                        title: 'Календарь',
+                        onTap: () {
+                          Navigator.pop(context);
+                          _openCalendar();
+                        },
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        child: Divider(
+                          color: Colors.white.withValues(alpha: 0.22),
+                          height: 1,
+                        ),
+                      ),
+                      _drawerItem(
+                        icon: Icons.home_outlined,
+                        title: 'Главный экран',
+                        onTap: () {
+                          Navigator.pop(context);
+                          _returnToHome();
+                        },
+                      ),
                     ],
                   ),
-                  border: Border(bottom: BorderSide(color: Color(0xFFB8C0CC))),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/player.svg',
-                      width: 36,
-                      height: 36,
-                      fit: BoxFit.contain,
-                    ),
-                    const SizedBox(height: 14),
-                    Text(
-                      career.player.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Color(0xFF202833),
-                        fontSize: 19,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${career.player.club}  ·  OVR ${career.player.overall}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Color(0xFF657080),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              _drawerItem(
-                icon: Icons.person_outline_rounded,
-                title: 'Игрок',
-                onTap: () {
-                  Navigator.pop(context);
-                  _openPlayerProfile();
-                },
-              ),
-              _drawerItem(
-                icon: Icons.storefront_outlined,
-                title: 'Магазин',
-                onTap: () {
-                  Navigator.pop(context);
-                  _openShop();
-                },
-              ),
-              _drawerItem(
-                icon: Icons.groups_2_outlined,
-                title: AppStrings.isEnglish ? 'Team' : 'Команда',
-                onTap: () {
-                  Navigator.pop(context);
-                  _openTeam();
-                },
-              ),
-              _drawerItem(
-                icon: Icons.sports,
-                title: AppStrings.coachMenu,
-                onTap: () {
-                  Navigator.pop(context);
-                  _openCoach();
-                },
-              ),
-              _drawerItem(
-                icon: Icons.handshake_outlined,
-                title: AppStrings.agentMenu,
-                onTap: () {
-                  Navigator.pop(context);
-                  _openAgent();
-                },
-              ),
-              _drawerItem(
-                icon: Icons.newspaper_outlined,
-                title: AppStrings.newsMenu,
-                onTap: () {
-                  Navigator.pop(context);
-                  _openNews();
-                },
-              ),
-              _drawerItem(
-                assetPath: 'assets/icons/table.svg',
-                title: 'Таблица',
-                onTap: () {
-                  Navigator.pop(context);
-                  _openLeagueTable();
-                },
-              ),
-              _drawerItem(
-                icon: Icons.calendar_month_rounded,
-                title: 'Календарь',
-                onTap: () {
-                  Navigator.pop(context);
-                  _openCalendar();
-                },
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                child: Divider(color: Color(0xFFB8C0CC), height: 1),
-              ),
-              _drawerItem(
-                icon: Icons.home_outlined,
-                title: 'Главный экран',
-                onTap: () {
-                  Navigator.pop(context);
-                  _returnToHome();
-                },
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -3230,30 +3310,46 @@ class _SeasonScreenState extends State<SeasonScreen> {
     required String title,
     required VoidCallback onTap,
   }) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 22),
-      leading: assetPath != null
-          ? SvgPicture.asset(
-              assetPath,
-              width: 23,
-              height: 23,
-              colorFilter: const ColorFilter.mode(
-                Color(0xFF596575),
-                BlendMode.srcIn,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+        minLeadingWidth: 28,
+        leading: assetPath != null
+            ? SvgPicture.asset(
+                assetPath,
+                width: 22,
+                height: 22,
+                colorFilter: ColorFilter.mode(
+                  Colors.white.withValues(alpha: 0.86),
+                  BlendMode.srcIn,
+                ),
+              )
+            : Icon(
+                icon,
+                color: Colors.white.withValues(alpha: 0.88),
+                size: 22,
               ),
-            )
-          : Icon(icon, color: const Color(0xFF596575), size: 23),
-      title: Text(
-        title,
-        style: const TextStyle(
-          color: Color(0xFF28313D),
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
+        title: Text(
+          title,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.94),
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.1,
+          ),
+        ),
+        onTap: onTap,
+        dense: true,
+        visualDensity: const VisualDensity(vertical: -1),
+        tileColor: Colors.white.withValues(alpha: 0.045),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+          side: BorderSide(
+            color: Colors.white.withValues(alpha: 0.075),
+          ),
         ),
       ),
-      onTap: onTap,
-      dense: true,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
     );
   }
 
@@ -3382,15 +3478,20 @@ class _SeasonScreenState extends State<SeasonScreen> {
                         ? ListView(
                             padding: const EdgeInsets.all(16),
                             children: [
-                              if (career.worldCup != null)
-                                _buildWorldCupCalendarSection(
-                                  blocksSeason: worldCupBlocksSeason,
-                                ),
                               if (!worldCupBlocksSeason) ...[
                                 _buildSeasonMatches(),
+                                const SizedBox(height: 12),
+                                if (career.worldCup != null)
+                                  _buildWorldCupCalendarSection(
+                                    blocksSeason: false,
+                                  ),
                                 const SizedBox(height: 16),
                                 _buildSeasonButton(),
-                              ] else
+                              ] else ...[
+                                if (career.worldCup != null)
+                                  _buildWorldCupCalendarSection(
+                                    blocksSeason: true,
+                                  ),
                                 const Padding(
                                   padding: EdgeInsets.symmetric(vertical: 18),
                                   child: Text(
@@ -3415,10 +3516,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
                                     ),
                                   ),
                                 ),
-                              if (career.worldCup != null)
-                                _buildWorldCupCalendarSection(
-                                  blocksSeason: worldCupBlocksSeason,
-                                ),
                               if (worldCupBlocksSeason)
                                 const Padding(
                                   padding: EdgeInsets.symmetric(vertical: 18),
@@ -3438,6 +3535,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
                                 _buildNextCupMatchCard(nextCupMatch)
                               else if (!seasonFinished && nextMatch != null)
                                 _buildNextMatchCard(nextMatch),
+                              if (career.worldCup != null && !worldCupBlocksSeason)
+                                _buildWorldCupCalendarSection(
+                                  blocksSeason: false,
+                                ),
                               if (recentMonthlyAward != null && !worldCupBlocksSeason)
                                 _buildRecentMonthlyAwardCard(),
                               const SizedBox(height: 10),
