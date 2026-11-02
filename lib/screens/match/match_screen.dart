@@ -49,41 +49,46 @@ class MatchScreen extends StatelessWidget {
         .length;
     final totalMatches = career.seasonMatches.length;
 
+    // Вылет обсуждаем только после действительно решающего матча.
+    // Для двухматчевых противостояний флаг передаётся только после подсчёта
+    // общего счёта, поэтому поражение в первой игре не вызывает этот вопрос.
     if (isTournamentDecider) {
       return isPlayerLoss ? 'elimination' : 'tournament';
     }
-    if (!isCupMatch && playedBefore == 0 && Random().nextDouble() < 0.35)
-      return 'seasonStart';
-    if (!isCupMatch &&
+
+    final seasonStart = !isCupMatch && playedBefore == 0;
+    final seasonMiddle = !isCupMatch &&
         totalMatches > 2 &&
-        playedBefore == (totalMatches / 2).round() &&
-        Random().nextDouble() < 0.25) {
-      return 'seasonMiddle';
-    }
-    if (!isCupMatch &&
+        playedBefore == (totalMatches / 2).round();
+    final seasonEnd = !isCupMatch &&
         totalMatches > 0 &&
-        playedBefore >= totalMatches - 1 &&
-        Random().nextDouble() < 0.65) {
-      return 'seasonEnd';
+        playedBefore >= totalMatches - 1;
+
+    // Обычные вопросы не появляются после каждого матча:
+    // минимум один редкий слот примерно на четыре матча,
+    // при этом сезонные контрольные точки сохраняются.
+    if (!seasonStart &&
+        !seasonMiddle &&
+        !seasonEnd &&
+        playedBefore > 0 &&
+        playedBefore % 4 != 0) {
+      return null;
     }
+
+    if (seasonStart && Random().nextDouble() < 0.20) return 'seasonStart';
+    if (seasonMiddle && Random().nextDouble() < 0.15) return 'seasonMiddle';
+    if (seasonEnd && Random().nextDouble() < 0.35) return 'seasonEnd';
 
     final outstanding =
-        match.playerRating >= 8.5 ||
-        match.playerGoals >= 2 ||
-        match.playerGoals + match.playerAssists >= 3;
+        match.playerRating >= 8.8 ||
+        match.playerGoals >= 3 ||
+        match.playerGoals + match.playerAssists >= 4;
     final poor = match.playerRating <= 5.5;
 
-    if (outstanding && Random().nextDouble() < 0.42) return 'great';
-    if (poor && Random().nextDouble() < 0.52) return 'poor';
+    if (outstanding && Random().nextDouble() < 0.22) return 'great';
+    if (poor && Random().nextDouble() < 0.30) return 'poor';
 
-    if (isCupMatch &&
-        (match.isPlayerLoss(career.player.club) || outstanding) &&
-        Random().nextDouble() < 0.70) {
-      return isPlayerLoss ? 'elimination' : 'tournament';
-    }
-
-    // Иногда журналисты задают обычные вопросы даже после рядового матча.
-    if (Random().nextDouble() < 0.07) return 'normal';
+    if (Random().nextDouble() < 0.015) return 'normal';
     return null;
   }
 
