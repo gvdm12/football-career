@@ -37,7 +37,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
         overall: player.overall,
         averageRating: career.averageRating,
         coachTrust: career.coachTrust,
-        trophies: career.history.fold<int>(0, (sum, item) => sum + item.achievements.length),
+        trophies: career.history.fold<int>(
+          0,
+          (sum, item) => sum + item.achievements.length,
+        ),
       ),
       averageRating: career.averageRating,
     );
@@ -460,7 +463,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                               ),
                                             ),
                                             child: Text(
-                                              AppStrings.achievementName(achievement),
+                                              AppStrings.achievementName(
+                                                achievement,
+                                              ),
                                               style: const TextStyle(
                                                 color: Color(0xFF8BE07F),
                                                 fontSize: 11,
@@ -619,7 +624,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFF351717),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFFF7777).withValues(alpha: 0.65)),
+        border: Border.all(
+          color: const Color(0xFFFF7777).withValues(alpha: 0.65),
+        ),
       ),
       child: Row(
         children: [
@@ -631,7 +638,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
               children: [
                 const Text(
                   'Травма',
-                  style: TextStyle(color: Color(0xFFFF7777), fontWeight: FontWeight.w900, fontSize: 15),
+                  style: TextStyle(
+                    color: Color(0xFFFF7777),
+                    fontWeight: FontWeight.w900,
+                    fontSize: 15,
+                  ),
                 ),
                 const SizedBox(height: 3),
                 Text(
@@ -640,7 +651,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  'До восстановления: $remaining ${remaining == 1 ? 'матч' : remaining < 5 ? 'матча' : 'матчей'}',
+                  'До восстановления: $remaining ${remaining == 1
+                      ? 'матч'
+                      : remaining < 5
+                      ? 'матча'
+                      : 'матчей'}',
                   style: const TextStyle(color: Colors.white70, fontSize: 12),
                 ),
               ],
@@ -877,8 +892,18 @@ class _PlayerScreenState extends State<PlayerScreen> {
         Icons.blur_circular,
         const Color(0xFF4AA8FF),
       ),
-      _Stat(AppStrings.heading, player.skills.heading, Icons.sports_soccer, const Color(0xFFFF9F43)),
-      _Stat(AppStrings.vision, player.skills.vision, Icons.visibility, const Color(0xFFB78BFA)),
+      _Stat(
+        AppStrings.heading,
+        player.skills.heading,
+        Icons.sports_soccer,
+        const Color(0xFFFF9F43),
+      ),
+      _Stat(
+        AppStrings.vision,
+        player.skills.vision,
+        Icons.visibility,
+        const Color(0xFFB78BFA),
+      ),
     ];
 
     return Column(
@@ -1037,7 +1062,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
             title: AppStrings.gameCurrency,
             value: '🪙 ${_formatMoney(career.agentCredits)}',
           ),
-
         ],
       ),
     );
@@ -1085,7 +1109,7 @@ class _CareerStat extends StatelessWidget {
           value,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 21,
+            fontSize: 16,
             fontWeight: FontWeight.w900,
           ),
         ),
