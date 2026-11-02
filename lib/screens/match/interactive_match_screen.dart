@@ -223,15 +223,19 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _event = 'ГОЛ! $_awayTeam забивает после быстрой атаки.';
     }
     if (!homeScored && !awayScored && _random.nextDouble() < 0.085) {
-      final homePressing = _random.nextDouble() <
+      final homePressing =
+          _random.nextDouble() <
           (_homeXgRemaining / max(0.1, _homeXgRemaining + _awayXgRemaining));
       final attackingTeam = homePressing ? _homeTeam : _awayTeam;
       final defendingTeam = homePressing ? _awayTeam : _homeTeam;
       _event = switch (_random.nextInt(4)) {
-        0 => '$attackingTeam развивает позиционную атаку, но $defendingTeam сохраняет компактность.',
+        0 =>
+          '$attackingTeam развивает позиционную атаку, но $defendingTeam сохраняет компактность.',
         1 => '$attackingTeam переводит мяч на фланг и готовит подачу.',
-        2 => '$defendingTeam перехватывает передачу и начинает быструю контратаку.',
-        _ => '$attackingTeam наносит удар издали, но мяч проходит рядом со штангой.',
+        2 =>
+          '$defendingTeam перехватывает передачу и начинает быструю контратаку.',
+        _ =>
+          '$attackingTeam наносит удар издали, но мяч проходит рядом со штангой.',
       };
     }
 
@@ -987,10 +991,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     } else if (action == 'keeper') {
       final opponentXg = widget.isHome ? _awayXgRemaining : _homeXgRemaining;
       final shotThreat = (opponentXg / 1.2).clamp(0.0, 1.0);
-      chance = (0.88 +
-              (skill - 70) * 0.003 -
-              shotThreat * 0.18)
-          .clamp(0.55, 0.96);
+      chance = (0.88 + (skill - 70) * 0.003 - shotThreat * 0.18).clamp(
+        0.55,
+        0.96,
+      );
     } else if (action == 'dribble') {
       chance =
           (0.70 +
@@ -1013,42 +1017,63 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         action == 'header' ||
         action == 'volley') {
       _shots++;
+
       final isOneOnOne = _phase == 'oneOnOne' || _phase == 'keeperBeaten';
       final isAerial = _phase == 'aerialChance';
+
       final double baseFinishingChance;
       final double skillFinishingBonus;
+
+      // Бонус за общий рейтинг игрока.
+      final overallBonus = (_player.overall - 70) * 0.0015;
+
       if (action == 'header') {
-        baseFinishingChance = isAerial ? 0.22 : 0.16;
+        // Удар головой: основной бонус зависит от heading.
+        baseFinishingChance = isAerial ? 0.22 : 0.20;
+
         skillFinishingBonus =
-            (_player.skills.heading - 70) * 0.003 +
+            (_player.skills.heading - 70) * 0.004 +
             (_player.skills.shooting - 70) * 0.001;
       } else if (action == 'longShot') {
-        baseFinishingChance = 0.075;
+        // Дальний удар.
+        baseFinishingChance = 0.14;
+
         skillFinishingBonus = (_player.skills.shooting - 70) * 0.002;
       } else if (action == 'volley') {
-        baseFinishingChance = 0.16;
+        // Удар с лёта.
+        baseFinishingChance = 0.20;
+
         skillFinishingBonus =
             (_player.skills.shooting - 70) * 0.002 +
             (_player.skills.heading - 70) * 0.001;
       } else {
-        baseFinishingChance = isOneOnOne ? 0.43 : 0.23;
-        skillFinishingBonus = (_player.skills.shooting - 70) * 0.0025;
+        // Обычный удар.
+        baseFinishingChance = isOneOnOne ? 0.43 : 0.37;
+
+        skillFinishingBonus = (_player.skills.shooting - 70) * 0.0026667;
       }
+
       final attackingXg = widget.isHome ? _homeXgRemaining : _awayXgRemaining;
+
       final xgBudgetFactor = attackingXg <= 0.02
           ? 0.0
           : (attackingXg / 1.1).clamp(0.12, 1.0);
-      final finishingChance = ((baseFinishingChance +
-                  skillFinishingBonus +
-                  advantage * 0.35) *
-              xgBudgetFactor)
-          .clamp(0.0, 0.62);
+
+      final finishingChance =
+          ((baseFinishingChance +
+                      skillFinishingBonus +
+                      overallBonus +
+                      advantage * 0.35) *
+                  xgBudgetFactor)
+              .clamp(0.0, 0.70);
+
       if (success && _random.nextDouble() < finishingChance) {
         if (widget.isHome) {
           _addGoal(home: true);
         } else {
           _addGoal(home: false);
         }
+
         _playerGoals++;
         _rating += 1.1;
         message = 'ГОЛ! Отличное завершение атаки!';
@@ -1061,6 +1086,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
             ? 'Промах! Мяч прошёл рядом со штангой.'
             : 'Защитник успел заблокировать удар.';
       }
+
       _phase = 'buildUp';
     } else if (action == 'keeper') {
       if (success) {
