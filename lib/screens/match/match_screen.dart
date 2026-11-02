@@ -48,6 +48,7 @@ class MatchScreen extends StatelessWidget {
         .where((item) => item.isPlayed)
         .length;
     final totalMatches = career.seasonMatches.length;
+    PressConferenceContentFactory.beginSeason(career.season);
     final cooldownReady = PressConferenceContentFactory.registerMatch();
 
     // Вылет обсуждаем только после действительно решающего матча.
@@ -69,17 +70,6 @@ class MatchScreen extends StatelessWidget {
         !seasonStart &&
         !seasonMiddle &&
         !seasonEnd) {
-      return null;
-    }
-
-    // Обычные вопросы не появляются после каждого матча:
-    // минимум один редкий слот примерно на четыре матча,
-    // при этом сезонные контрольные точки сохраняются.
-    if (!seasonStart &&
-        !seasonMiddle &&
-        !seasonEnd &&
-        playedBefore > 0 &&
-        playedBefore % 4 != 0) {
       return null;
     }
 
