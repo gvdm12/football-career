@@ -58,6 +58,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
   bool isSaving = false;
   bool seasonFinishing = false;
   PlayerOfMonthAward? recentMonthlyAward;
+  int _lastPressConferenceMatchCount = -100;
 
   @override
   void initState() {
@@ -1679,6 +1680,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     final opponent = tie.homeTeam == club ? tie.awayTeam : tie.homeTeam;
 
+    if (isFinal) {
+      await _showTournamentPreviewConference();
+      if (!mounted) return;
+    }
+
     if (interactive &&
         !_canPlayInteractiveMatch(opponent: opponent, isHome: isHome)) {
       return;
@@ -1783,7 +1789,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 playerPenalties != null &&
                 opponentPenalties != null &&
                 playerPenalties < opponentPenalties));
-    final isTournamentDecider = isFinal || playerEliminated;
+    final isTournamentDecider = !isFinal && playerEliminated;
 
     var updatedCareer = interactive
         ? interactiveCareer
@@ -2218,6 +2224,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     final isHome = cupMatch.homeTeam == playerClub;
 
+    if (cupMatch.round == 4) {
+      await _showTournamentPreviewConference();
+      if (!mounted) return;
+    }
+
     if (interactive &&
         !_canPlayInteractiveMatch(opponent: opponent, isHome: isHome)) {
       return;
@@ -2287,7 +2298,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         : (homePenalties ?? 0) > (awayPenalties ?? 0)
         ? match.homeTeam
         : match.awayTeam;
-    final isTournamentDecider = cupMatch.round == 4 || cupWinner != playerClub;
+    final isTournamentDecider = cupWinner != playerClub;
 
     var updatedCareer = interactive
         ? interactiveCareer
@@ -2771,10 +2782,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
         .where((item) => item.isPlayed)
         .length;
     final totalMatches = career.seasonMatches.length;
+    final conferenceMatchCount = playedBefore + 1;
+    if (conferenceMatchCount - _lastPressConferenceMatchCount < 4) {
+      return updatedCareer;
+    }
     final outstanding =
-        match.playerRating >= 8.5 ||
-        match.playerGoals >= 2 ||
-        match.playerGoals + match.playerAssists >= 3;
+        match.playerRating >= 8.8 ||
+        match.playerGoals >= 3 ||
+        match.playerGoals + match.playerAssists >= 4;
     final poor = match.playerRating <= 5.5;
     final completedResults = updatedCareer.seasonMatches
         .where((item) => item.isPlayed && item.result != null)
@@ -2844,7 +2859,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
     } else if (includeSeasonMilestones &&
         totalMatches >= 8 &&
         playedBefore + 1 == secondInterestCheckpoint &&
-        Random().nextDouble() < 0.55) {
+        Random().nextDouble() < 0.25) {
       category = 'transferInterest';
     } else if (losingStreak) {
       category = 'losingStreak';
@@ -2854,23 +2869,23 @@ class _SeasonScreenState extends State<SeasonScreen> {
       category = 'poorSeason';
     } else if (includeSeasonMilestones &&
         playedBefore == 0 &&
-        Random().nextDouble() < 0.35) {
+        Random().nextDouble() < 0.20) {
       category = 'seasonStart';
     } else if (includeSeasonMilestones &&
         totalMatches > 2 &&
         playedBefore == (totalMatches / 2).round() &&
-        Random().nextDouble() < 0.25) {
+        Random().nextDouble() < 0.15) {
       category = 'seasonMiddle';
     } else if (includeSeasonMilestones &&
         totalMatches > 0 &&
         playedBefore >= totalMatches - 1 &&
-        Random().nextDouble() < 0.65) {
+        Random().nextDouble() < 0.35) {
       category = 'seasonEnd';
-    } else if (outstanding && Random().nextDouble() < 0.42) {
+    } else if (outstanding && Random().nextDouble() < 0.22) {
       category = 'great';
-    } else if (poor && Random().nextDouble() < 0.52) {
+    } else if (poor && Random().nextDouble() < 0.30) {
       category = 'poor';
-    } else if (Random().nextDouble() < 0.04) {
+    } else if (Random().nextDouble() < 0.015) {
       category = 'normal';
     }
 
@@ -2887,6 +2902,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
             interestedClubs.isNotEmpty
         ? interestedClubs[Random().nextInt(interestedClubs.length)].name
         : null;
+    _lastPressConferenceMatchCount = conferenceMatchCount;
     final content = PressConferenceContentFactory.create(
       category: category,
       english: AppStrings.isEnglish,
@@ -2906,6 +2922,26 @@ class _SeasonScreenState extends State<SeasonScreen> {
           .clamp(0, 100)
           .toInt(),
     );
+  }
+
+  Future<void> _showTournamentPreviewConference() async {
+    if (!mounted) return;
+    final content = PressConferenceContentFactory.create(
+      category: 'tournament',
+      english: AppStrings.isEnglish,
+    );
+    final trustChange = await PressConferenceDialog.show(
+      context: context,
+      content: content,
+      title: AppStrings.pressConferenceTitle,
+      skipLabel: AppStrings.skipPressConference,
+    );
+    if (!mounted || trustChange == null || trustChange == 0) return;
+    final updated = career.copyWith(
+      coachTrust: (career.coachTrust + trustChange).clamp(0, 100).toInt(),
+    );
+    setState(() => career = updated);
+    await _saveCareer(updated);
   }
 
   Future<void> _openPlayerProfile() async {
