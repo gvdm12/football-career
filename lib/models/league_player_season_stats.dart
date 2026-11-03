@@ -151,7 +151,7 @@ class LeaguePlayerSeasonStats {
           const {},
     );
   }
-String _cleanGeneratedPlayerName(String name) {
+static String _cleanGeneratedPlayerName(String name) {
   final trimmed = name.trim();
   final separator = trimmed.lastIndexOf(' ');
   if (separator < 0) return trimmed;
