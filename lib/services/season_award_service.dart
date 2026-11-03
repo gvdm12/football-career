@@ -17,9 +17,11 @@ class SeasonAwardService {
     List<String> additionalTrophyWinningClubs = const [],
   }) {
     final sortedTable = [...leagueTable]
-      ..sort((a, b) => b.points != a.points
-          ? b.points.compareTo(a.points)
-          : b.goalDifference.compareTo(a.goalDifference));
+      ..sort(
+        (a, b) => b.points != a.points
+            ? b.points.compareTo(a.points)
+            : b.goalDifference.compareTo(a.goalDifference),
+      );
     final trophyWinningClubs = <String>{
       ...additionalTrophyWinningClubs,
       if (sortedTable.isNotEmpty) sortedTable.first.club,
@@ -33,36 +35,40 @@ class SeasonAwardService {
               rivals.any((rival) => rival.name == item.playerName))) {
         continue;
       }
-      candidates.add(_Candidate(
-        name: item.playerName,
-        club: item.club,
-        position: item.position,
-        age: item.age,
-        matches: item.matches,
-        goals: item.goals,
-        assists: item.assists,
-        rating: item.averageRating,
-        isCareerPlayer: false,
-        wonTrophy: trophyWinningClubs.contains(item.club),
-      ));
+      candidates.add(
+        _Candidate(
+          name: item.playerName,
+          club: item.club,
+          position: item.position,
+          age: item.age,
+          matches: item.matches,
+          goals: item.goals,
+          assists: item.assists,
+          rating: item.averageRating,
+          isCareerPlayer: false,
+          wonTrophy: trophyWinningClubs.contains(item.club),
+        ),
+      );
     }
 
     // Конкуренты за позицию входят в общий список наград с той же
     // статистикой, которая отображается на экране команды.
     for (final rival in rivals) {
       if (rival.matches == 0) continue;
-      candidates.add(_Candidate(
-        name: rival.name,
-        club: player.club,
-        position: rival.position,
-        age: rival.age,
-        matches: rival.matches,
-        goals: rival.goals,
-        assists: rival.assists,
-        rating: rival.averageRating,
-        isCareerPlayer: false,
-        wonTrophy: trophyWinningClubs.contains(player.club),
-      ));
+      candidates.add(
+        _Candidate(
+          name: rival.name,
+          club: player.club,
+          position: rival.position,
+          age: rival.age,
+          matches: rival.matches,
+          goals: rival.goals,
+          assists: rival.assists,
+          rating: rival.averageRating,
+          isCareerPlayer: false,
+          wonTrophy: trophyWinningClubs.contains(player.club),
+        ),
+      );
     }
 
     // Игрок карьеры участвует на тех же условиях, но его статистика берётся
@@ -70,18 +76,20 @@ class SeasonAwardService {
     if (seasonStats.matches > 0) {
       // Игрок карьеры участвует в гонке бомбардиров даже при малом числе
       // матчей; минимальный порог применяется отдельно к другим наградам.
-      candidates.add(_Candidate(
-        name: player.name,
-        club: player.club,
-        position: player.position,
-        age: player.age,
-        matches: seasonStats.matches,
-        goals: seasonStats.goals,
-        assists: seasonStats.assists,
-        rating: seasonStats.averageRating ?? 0,
-        isCareerPlayer: true,
-        wonTrophy: trophyWinningClubs.contains(player.club),
-      ));
+      candidates.add(
+        _Candidate(
+          name: player.name,
+          club: player.club,
+          position: player.position,
+          age: player.age,
+          matches: seasonStats.matches,
+          goals: seasonStats.goals,
+          assists: seasonStats.assists,
+          rating: seasonStats.averageRating ?? 0,
+          isCareerPlayer: true,
+          wonTrophy: trophyWinningClubs.contains(player.club),
+        ),
+      );
     }
 
     final eligible = candidates
@@ -90,25 +98,26 @@ class SeasonAwardService {
     if (eligible.isEmpty) return [];
 
     final positions = <String, int>{
-      for (var i = 0; i < sortedTable.length; i++)
-        sortedTable[i].club: i + 1,
+      for (var i = 0; i < sortedTable.length; i++) sortedTable[i].club: i + 1,
     };
 
     // Индивидуальная результативность и оценка имеют основной вес.
     // Позиция клуба даёт небольшой контекстный бонус, как в реальных премиях.
-    double performanceScore(_Candidate item, {bool includeTeamSuccess = false}) {
-      final contributionsPerMatch =
-          (item.goals + item.assists) / item.matches;
+    double performanceScore(
+      _Candidate item, {
+      bool includeTeamSuccess = false,
+    }) {
+      final contributionsPerMatch = (item.goals + item.assists) / item.matches;
       final teamPosition = positions[item.club];
       final teamBonus = !includeTeamSuccess || teamPosition == null
           ? 0.0
           : teamPosition == 1
-              ? 0.8
-              : teamPosition <= 4
-                  ? 0.45
-                  : teamPosition <= (sortedTable.length / 2).ceil()
-                      ? 0.2
-                      : 0.0;
+          ? 0.8
+          : teamPosition <= 4
+          ? 0.45
+          : teamPosition <= (sortedTable.length / 2).ceil()
+          ? 0.2
+          : 0.0;
       return item.rating * 7.5 +
           item.goals * 0.75 +
           item.assists * 0.55 +
@@ -138,71 +147,87 @@ class SeasonAwardService {
 
     // Награда «Игрок сезона» выдаётся только при действительно сильном сезоне.
     // Условия совпадают с критериями достижения в архиве карьеры.
-    final playerOfSeason = eligible
-        .where((item) =>
-            item.matches >= 20 &&
-            item.rating >= 7.8 &&
-            item.goals + item.assists >= 30 &&
-            item.wonTrophy)
-        .toList()
-      ..sort((a, b) {
-        final scoreCompare = performanceScore(
-          b,
-          includeTeamSuccess: true,
-        ).compareTo(performanceScore(a, includeTeamSuccess: true));
-        if (scoreCompare != 0) return scoreCompare;
-        final ratingCompare = b.rating.compareTo(a.rating);
-        if (ratingCompare != 0) return ratingCompare;
-        return (b.goals + b.assists).compareTo(a.goals + a.assists);
-      });
+    final playerOfSeason =
+        eligible
+            .where(
+              (item) =>
+                  item.matches >= 20 &&
+                  item.rating >= 7.8 &&
+                  item.goals + item.assists >= 35 &&
+                  item.wonTrophy,
+            )
+            .toList()
+          ..sort((a, b) {
+            final scoreCompare = performanceScore(
+              b,
+              includeTeamSuccess: true,
+            ).compareTo(performanceScore(a, includeTeamSuccess: true));
+            if (scoreCompare != 0) return scoreCompare;
+            final ratingCompare = b.rating.compareTo(a.rating);
+            if (ratingCompare != 0) return ratingCompare;
+            return (b.goals + b.assists).compareTo(a.goals + a.assists);
+          });
     if (playerOfSeason.isNotEmpty) {
       final seasonWinner = playerOfSeason.first;
-      result.add(convert(
-        seasonWinner,
-        'Игрок сезона',
-        performanceScore(seasonWinner, includeTeamSuccess: true),
-      ));
+      result.add(
+        convert(
+          seasonWinner,
+          'Игрок сезона',
+          performanceScore(seasonWinner, includeTeamSuccess: true),
+        ),
+      );
     }
 
-    final youngPlayers = eligible
-        .where((item) => item.age <= 21 && item.matches >= 15 && item.rating >= 7.0)
-        .toList()
-      ..sort((a, b) => performanceScore(b).compareTo(performanceScore(a)));
+    final youngPlayers =
+        eligible
+            .where(
+              (item) =>
+                  item.age <= 21 && item.matches >= 15 && item.rating >= 7.0,
+            )
+            .toList()
+          ..sort((a, b) => performanceScore(b).compareTo(performanceScore(a)));
     if (youngPlayers.isNotEmpty) {
-      result.add(convert(
-        youngPlayers.first,
-        'Лучший молодой игрок',
-        performanceScore(youngPlayers.first),
-      ));
+      result.add(
+        convert(
+          youngPlayers.first,
+          'Лучший молодой игрок',
+          performanceScore(youngPlayers.first),
+        ),
+      );
     }
 
     // «Золотая бутса» появляется только при достижении порога конкретной лиги.
     final league = Clubs.leagueOf(player.club);
     final goldenBootThreshold = league?.goldenBootGoalThreshold ?? 21;
-    final goalLeaders = candidates
-        .where((item) =>
-            item.matches >= 10 &&
-            item.goals > 0 &&
-            item.goals >= goldenBootThreshold)
-        .toList()
-      ..sort((a, b) {
-        final compare = b.goals.compareTo(a.goals);
-        if (compare != 0) return compare;
-        final ratingCompare = b.rating.compareTo(a.rating);
-        if (ratingCompare != 0) return ratingCompare;
-        return b.assists.compareTo(a.assists);
-      });
+    final goalLeaders =
+        candidates
+            .where(
+              (item) =>
+                  item.matches >= 10 &&
+                  item.goals > 0 &&
+                  item.goals >= goldenBootThreshold,
+            )
+            .toList()
+          ..sort((a, b) {
+            final compare = b.goals.compareTo(a.goals);
+            if (compare != 0) return compare;
+            final ratingCompare = b.rating.compareTo(a.rating);
+            if (ratingCompare != 0) return ratingCompare;
+            return b.assists.compareTo(a.assists);
+          });
     if (goalLeaders.isNotEmpty) {
-      result.add(convert(
-        goalLeaders.first,
-        'Лучший бомбардир',
-        goalLeaders.first.goals.toDouble(),
-      ));
+      result.add(
+        convert(
+          goalLeaders.first,
+          'Лучший бомбардир',
+          goalLeaders.first.goals.toDouble(),
+        ),
+      );
     }
 
     // Не выдаём награду ассистента за несколько случайных передач.
-    final assistLeaders = candidates
-        .where((item) {
+    final assistLeaders =
+        candidates.where((item) {
           if (item.matches < 20) return false;
           final league = Clubs.leagueOf(item.club);
           if (league == null) return false;
@@ -210,21 +235,21 @@ class SeasonAwardService {
           final isTopLeague =
               league == League.england || league == League.spain;
           return isTopLeague && item.assists >= 18 && item.rating >= 8.0;
-        })
-        .toList()
-      ..sort((a, b) {
-        final compare = b.assists.compareTo(a.assists);
-        if (compare != 0) return compare;
-        final ratingCompare = b.rating.compareTo(a.rating);
-        if (ratingCompare != 0) return ratingCompare;
-        return b.goals.compareTo(a.goals);
-      });
+        }).toList()..sort((a, b) {
+          final compare = b.assists.compareTo(a.assists);
+          if (compare != 0) return compare;
+          final ratingCompare = b.rating.compareTo(a.rating);
+          if (ratingCompare != 0) return ratingCompare;
+          return b.goals.compareTo(a.goals);
+        });
     if (assistLeaders.isNotEmpty) {
-      result.add(convert(
-        assistLeaders.first,
-        'Лучший ассистент',
-        assistLeaders.first.assists.toDouble(),
-      ));
+      result.add(
+        convert(
+          assistLeaders.first,
+          'Лучший ассистент',
+          assistLeaders.first.assists.toDouble(),
+        ),
+      );
     }
 
     // Сборная сезона: 1 вратарь, 4 защитника, 3 полузащитника, 3 нападающих.
@@ -236,10 +261,10 @@ class SeasonAwardService {
     };
     final selected = <String>{};
     for (final entry in formation.entries) {
-      final positionCandidates = eligible
-          .where((item) => item.position == entry.key)
-          .toList()
-        ..sort((a, b) => performanceScore(b).compareTo(performanceScore(a)));
+      final positionCandidates =
+          eligible.where((item) => item.position == entry.key).toList()..sort(
+            (a, b) => performanceScore(b).compareTo(performanceScore(a)),
+          );
       for (final item in positionCandidates.take(entry.value)) {
         final key = '${item.name}|${item.club}';
         if (selected.add(key)) {
@@ -251,7 +276,8 @@ class SeasonAwardService {
     final remaining = [...eligible]
       ..sort((a, b) => performanceScore(b).compareTo(performanceScore(a)));
     for (final item in remaining) {
-      if (result.where((award) => award.category == 'Команда года').length >= 11) {
+      if (result.where((award) => award.category == 'Команда года').length >=
+          11) {
         break;
       }
       final key = '${item.name}|${item.club}';
