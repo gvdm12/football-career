@@ -1122,11 +1122,8 @@ class Career {
       achievements.add('Финалист чемпионата мира');
     }
 
-    final league = Clubs.leagueOf(player.club);
-
-    if (league != null && goals >= league.goldenBootGoalThreshold) {
-      achievements.add('Золотая бутса');
-    }
+    // «Золотая бутса» добавляется после расчёта общей таблицы бомбардиров
+    // в SeasonAwardService, а не по произвольному порогу голов.
 
     // В итогах сезона объединяем клубную статистику и личные показатели
     // игрока за сборную. Поля Career.matches/goals/assists остаются клубными,
