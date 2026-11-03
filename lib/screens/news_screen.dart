@@ -183,9 +183,11 @@ class NewsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  news.matchNumber == 0
+                  news.matchNumber == 0 && news.type == CareerNewsType.transfer
                       ? 'ТРАНСФЕРНОЕ ОКНО · СЕЗОН ${news.season}'
-                      : AppStrings.newsSeasonAndMatch(news.season, news.matchNumber),
+                      : news.matchNumber < 0
+                          ? 'ПРЕДСЕЗОННАЯ ПОДГОТОВКА · СЕЗОН ${news.season}'
+                          : AppStrings.newsSeasonAndMatch(news.season, news.matchNumber),
                   style: const TextStyle(color: Colors.white38, fontSize: 11),
                 ),
               ],
