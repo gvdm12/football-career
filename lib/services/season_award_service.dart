@@ -1,3 +1,4 @@
+import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/league_player_season_stats.dart';
 import 'package:flutter_football/models/league_table.dart';
 import 'package:flutter_football/models/player.dart';
@@ -126,7 +127,14 @@ class SeasonAwardService {
 
     final result = <SeasonAward>[];
 
-    final playerOfSeason = [...eligible]
+    // Награда «Игрок сезона» выдаётся только при действительно сильном сезоне.
+    // Условия совпадают с критериями достижения в архиве карьеры.
+    final playerOfSeason = eligible
+        .where((item) =>
+            item.matches >= 15 &&
+            item.rating >= 7.5 &&
+            item.goals + item.assists >= 15)
+        .toList()
       ..sort((a, b) {
         final scoreCompare = performanceScore(
           b,
@@ -137,14 +145,18 @@ class SeasonAwardService {
         if (ratingCompare != 0) return ratingCompare;
         return (b.goals + b.assists).compareTo(a.goals + a.assists);
       });
-    final seasonWinner = playerOfSeason.first;
-    result.add(convert(
-      seasonWinner,
-      'Игрок сезона',
-      performanceScore(seasonWinner, includeTeamSuccess: true),
-    ));
+    if (playerOfSeason.isNotEmpty) {
+      final seasonWinner = playerOfSeason.first;
+      result.add(convert(
+        seasonWinner,
+        'Игрок сезона',
+        performanceScore(seasonWinner, includeTeamSuccess: true),
+      ));
+    }
 
-    final youngPlayers = eligible.where((item) => item.age <= 21).toList()
+    final youngPlayers = eligible
+        .where((item) => item.age <= 21 && item.matches >= 15 && item.rating >= 7.0)
+        .toList()
       ..sort((a, b) => performanceScore(b).compareTo(performanceScore(a)));
     if (youngPlayers.isNotEmpty) {
       result.add(convert(
@@ -154,8 +166,15 @@ class SeasonAwardService {
       ));
     }
 
-    // Лидер ассистов определяется только количеством голевых передач.
-    final goalLeaders = candidates.where((item) => item.goals > 0).toList()
+    // «Золотая бутса» появляется только при достижении порога конкретной лиги.
+    final league = Clubs.leagueOf(player.club);
+    final goldenBootThreshold = league?.goldenBootGoalThreshold ?? 0;
+    final goalLeaders = candidates
+        .where((item) =>
+            item.matches >= 10 &&
+            item.goals > 0 &&
+            item.goals >= goldenBootThreshold)
+        .toList()
       ..sort((a, b) {
         final compare = b.goals.compareTo(a.goals);
         if (compare != 0) return compare;
@@ -171,7 +190,10 @@ class SeasonAwardService {
       ));
     }
 
-    final assistLeaders = candidates.where((item) => item.assists > 0).toList()
+    // Не выдаём награду ассистента за несколько случайных передач.
+    final assistLeaders = candidates
+        .where((item) => item.matches >= 10 && item.assists >= 10)
+        .toList()
       ..sort((a, b) {
         final compare = b.assists.compareTo(a.assists);
         if (compare != 0) return compare;
