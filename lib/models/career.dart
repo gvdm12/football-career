@@ -524,15 +524,78 @@ class Career {
       existing: normalizedRivals,
     );
 
+    // Миграция старых сохранений: удаляем индивидуальные награды,
+    // которые ранее могли выдаваться без реальных сезонных показателей.
+    final savedSeasonAwards = readList('seasonAwards', SeasonAward.fromJson);
+    final validSeasonAwards = savedSeasonAwards.where((award) {
+      switch (award.category) {
+        case 'Игрок сезона':
+          return award.matches >= 15 &&
+              award.averageRating >= 7.5 &&
+              award.goals + award.assists >= 15;
+        case 'Лучший бомбардир':
+          final league = Clubs.leagueOf(award.club);
+          final threshold = league?.goldenBootGoalThreshold ?? 21;
+          return award.matches >= 10 && award.goals >= threshold;
+        case 'Лучший ассистент':
+          return award.matches >= 10 && award.assists >= 10;
+        default:
+          return true;
+      }
+    }).toList();
+
+    final validGoldenBootSeasons = validSeasonAwards
+        .where((award) =>
+            award.isCareerPlayer && award.category == 'Лучший бомбардир')
+        .map((award) => award.season)
+        .toSet();
+    final validAssisterSeasons = validSeasonAwards
+        .where((award) =>
+            award.isCareerPlayer && award.category == 'Лучший ассистент')
+        .map((award) => award.season)
+        .toSet();
+
+    final normalizedHistory = readList('history', SeasonStats.fromJson)
+        .map((stats) {
+          final achievements = stats.achievements.where((achievement) {
+            if (achievement == 'Золотая бутса' ||
+                achievement == 'Бомбардир сезона') {
+              return validGoldenBootSeasons.contains(stats.season);
+            }
+            if (achievement == 'Лучший ассистент') {
+              return validAssisterSeasons.contains(stats.season);
+            }
+            if (achievement == 'Лучший игрок сезона') {
+              return stats.matches >= 15 &&
+                  (stats.averageRating ?? 0) >= 7.5 &&
+                  stats.goals + stats.assists >= 15;
+            }
+            return true;
+          }).toList();
+
+          return SeasonStats(
+            season: stats.season,
+            club: stats.club,
+            matches: stats.matches,
+            goals: stats.goals,
+            assists: stats.assists,
+            yellowCards: stats.yellowCards,
+            redCards: stats.redCards,
+            averageRating: stats.averageRating,
+            achievements: achievements,
+          );
+        })
+        .toList();
+
     return Career(
       player: loadedPlayer,
       season: (json['season'] as num?)?.toInt() ?? 1,
-      history: readList('history', SeasonStats.fromJson),
+      history: normalizedHistory,
       playerOfMonthAwards: readList(
         'playerOfMonthAwards',
         PlayerOfMonthAward.fromJson,
       ),
-      seasonAwards: readList('seasonAwards', SeasonAward.fromJson),
+      seasonAwards: validSeasonAwards,
       leaguePlayerStats: readList(
         'leaguePlayerStats',
         LeaguePlayerSeasonStats.fromJson,
