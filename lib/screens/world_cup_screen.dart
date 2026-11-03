@@ -264,38 +264,8 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
   }
 
   Widget _buildWorldCupMatchGlass({required Widget child}) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(14),
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withValues(alpha: 0.12),
-                green.withValues(alpha: 0.08),
-                const Color(0xFF061B0C).withValues(alpha: 0.18),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.22),
-              width: 1.1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: green.withValues(alpha: 0.10),
-                blurRadius: 20,
-                offset: const Offset(0, 7),
-              ),
-            ],
-          ),
-          child: child,
-        ),
-      ),
-    );
+    // В календаре ЧМ используем обычные карточки без liquid glass.
+    return child;
   }
 
   Widget _playerStat(String label, String value) {
