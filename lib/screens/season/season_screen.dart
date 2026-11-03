@@ -2735,6 +2735,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
             completedCareer.championsLeague!.champion!,
           if (completedCareer.europaLeague?.champion != null)
             completedCareer.europaLeague!.champion!,
+          if (completedCareer.worldCup?.isCompleted == true &&
+              completedCareer.worldCup?.isPlayerCalledUp == true &&
+              completedCareer.worldCup?.champion == career.player.nationality)
+            career.player.club,
         ],
       );
       final wonGoldenBoot = seasonAwards.any(
