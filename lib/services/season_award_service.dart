@@ -299,11 +299,13 @@ class SeasonAwardService {
             PlayerPosition.forward =>
               ((realPlayer.overall - 65) * 0.72 + random.nextInt(9))
                   .round()
-                  .clamp(0, 45),
+                  .clamp(0, 45)
+                  .toInt(),
             PlayerPosition.midfielder =>
               ((realPlayer.overall - 65) * 0.27 + random.nextInt(6))
                   .round()
-                  .clamp(0, 25),
+                  .clamp(0, 25)
+                  .toInt(),
             PlayerPosition.defender => random.nextInt(5),
             PlayerPosition.goalkeeper => 0,
           };
@@ -315,7 +317,8 @@ class SeasonAwardService {
             PlayerPosition.midfielder =>
               ((realPlayer.overall - 65) * 0.43 + random.nextInt(9))
                   .round()
-                  .clamp(0, 30),
+                  .clamp(0, 30)
+                  .toInt(),
             PlayerPosition.defender => random.nextInt(6),
             PlayerPosition.goalkeeper => 0,
           };
