@@ -1681,6 +1681,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
           player: updatedCareer.player,
           playerMatches: updatedSeasonMatches,
           leagueMatches: completedLeagueMatches,
+          leaguePlayerStats: leagueStatsUpdate.players,
           previousAwards: awards,
           rivals: updatedCareer.rivals,
         );
