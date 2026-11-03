@@ -3,6 +3,8 @@ import 'package:flutter_football/models/career_news.dart';
 import 'package:flutter_football/models/career_settings.dart';
 import 'package:flutter_football/models/career_world_transfer.dart';
 import 'package:flutter_football/models/real_club_squads.dart';
+import 'package:flutter_football/models/friendly_match.dart';
+import 'package:flutter_football/services/pre_season_service.dart';
 import 'package:flutter_football/services/world_transfer_service.dart';
 import 'package:flutter_football/models/champions_league.dart';
 import 'package:flutter_football/models/europa_league.dart';
@@ -29,6 +31,7 @@ class Career {
   final Player player;
   final CareerSettings settings;
   final List<CareerWorldTransfer> worldTransfers;
+  final List<FriendlyMatch> friendlyMatches;
   final int season;
   final List<SeasonStats> history;
   final List<PlayerOfMonthAward> playerOfMonthAwards;
@@ -104,6 +107,7 @@ class Career {
     required this.player,
     this.settings = const CareerSettings(),
     this.worldTransfers = const [],
+    this.friendlyMatches = const [],
     required this.season,
     required this.matches,
     required this.goals,
@@ -278,6 +282,10 @@ class Career {
     final leagueMatches = _createLeagueMatches(player.club);
 
     final seasonMatches = _createSeasonMatches(player.club, leagueMatches);
+    final friendlyMatches = PreSeasonService.create(
+      playerClub: player.club,
+      season: 1,
+    );
 
     final leagueTable = _createLeagueTable(player.club, seasonMatches);
     final startingSalary = _startingClubSalary(player.club);
@@ -350,6 +358,7 @@ class Career {
       'player': player.toJson(),
       'settings': settings.toJson(),
       'worldTransfers': worldTransfers.map((item) => item.toJson()).toList(),
+      'friendlyMatches': friendlyMatches.map((item) => item.toJson()).toList(),
       'season': season,
       'history': history.map((item) => item.toJson()).toList(),
       'playerOfMonthAwards': playerOfMonthAwards
@@ -625,6 +634,7 @@ class Career {
             : null,
       ),
       worldTransfers: restoredWorldTransfers,
+      friendlyMatches: readList('friendlyMatches', FriendlyMatch.fromJson),
       season: (json['season'] as num?)?.toInt() ?? 1,
       history: normalizedHistory,
       playerOfMonthAwards: readList(
@@ -712,6 +722,7 @@ class Career {
     Player? player,
     CareerSettings? settings,
     List<CareerWorldTransfer>? worldTransfers,
+    List<FriendlyMatch>? friendlyMatches,
     int? season,
     int? matches,
     int? goals,
@@ -758,6 +769,7 @@ class Career {
       player: player ?? this.player,
       settings: settings ?? this.settings,
       worldTransfers: worldTransfers ?? this.worldTransfers,
+      friendlyMatches: friendlyMatches ?? this.friendlyMatches,
       season: season ?? this.season,
       matches: matches ?? this.matches,
       goals: goals ?? this.goals,
@@ -1696,6 +1708,10 @@ class Career {
     );
     final allWorldTransfers = [...worldTransfers, ...newWorldTransfers];
     RealClubSquads.applyCareerTransfers(allWorldTransfers);
+    final newFriendlyMatches = PreSeasonService.create(
+      playerClub: player.club,
+      season: newSeason,
+    );
     final worldTransferNews = newWorldTransfers.map((transfer) => CareerNews(
       id: 'world_transfer_s${newSeason}_${transfer.playerName.hashCode}',
       season: newSeason,
@@ -1804,6 +1820,7 @@ class Career {
       player: newPlayer,
       settings: settings,
       worldTransfers: allWorldTransfers,
+      friendlyMatches: newFriendlyMatches,
       season: newSeason,
       clubStrengths: updatedClubStrengths,
       matches: 0,
