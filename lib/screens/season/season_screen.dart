@@ -78,7 +78,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
   bool _playerWonMatchWithPenalties(Match match, String team) {
     final isHome = match.homeTeam == team;
     if (match.hasPenalties) {
-      final teamPenalties = isHome ? match.homePenalties! : match.awayPenalties!;
+      final teamPenalties = isHome
+          ? match.homePenalties!
+          : match.awayPenalties!;
       final opponentPenalties = isHome
           ? match.awayPenalties!
           : match.homePenalties!;
@@ -943,58 +945,60 @@ class _SeasonScreenState extends State<SeasonScreen> {
       result = isHome ? '$homeGoals : $awayGoals' : '$awayGoals : $homeGoals';
     }
 
-    return _buildMatchGlassSurface(child: Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0A2110),
-        borderRadius: BorderRadius.circular(10),
-        border: const Border(
-          left: BorderSide(color: Color(0xFF8DB8FF), width: 4),
+    return _buildMatchGlassSurface(
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0A2110),
+          borderRadius: BorderRadius.circular(10),
+          border: const Border(
+            left: BorderSide(color: Color(0xFF8DB8FF), width: 4),
+          ),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 46,
+              child: SvgPicture.asset(
+                'assets/icons/europaleague.svg',
+                width: 28,
+                height: 28,
+                fit: BoxFit.contain,
+              ),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${AppStrings.europaLeague} · ${AppStrings.tournamentStageName(tournament.stage.title)}',
+                    style: const TextStyle(
+                      color: Color(0xFF8DB8FF),
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${isHome ? AppStrings.homeVenue : AppStrings.awayVenue}: $opponent',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              result,
+              style: TextStyle(
+                color: isPlayed ? const Color(0xFF8BE07F) : Colors.white54,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
       ),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 46,
-            child: SvgPicture.asset(
-              'assets/icons/europaleague.svg',
-              width: 28,
-              height: 28,
-              fit: BoxFit.contain,
-            ),
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${AppStrings.europaLeague} · ${AppStrings.tournamentStageName(tournament.stage.title)}',
-                  style: const TextStyle(
-                    color: Color(0xFF8DB8FF),
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${isHome ? AppStrings.homeVenue : AppStrings.awayVenue}: $opponent',
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            result,
-            style: TextStyle(
-              color: isPlayed ? const Color(0xFF8BE07F) : Colors.white54,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    ));
+    );
   }
 
   Widget _buildRecentMonthlyAwardCard() {
@@ -1009,11 +1013,17 @@ class _SeasonScreenState extends State<SeasonScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFF102719).withValues(alpha: 0.96),
         borderRadius: BorderRadius.circular(13),
-        border: Border.all(color: const Color(0xFFB99A45).withValues(alpha: 0.65)),
+        border: Border.all(
+          color: const Color(0xFFB99A45).withValues(alpha: 0.65),
+        ),
       ),
       child: Row(
         children: [
-          const Icon(Icons.emoji_events_rounded, color: Color(0xFFFFD54F), size: 25),
+          const Icon(
+            Icons.emoji_events_rounded,
+            color: Color(0xFFFFD54F),
+            size: 25,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -1032,9 +1042,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
                   award.playerName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-                if (career.rivals.any((rival) => rival.name == award.playerName))
+                if (career.rivals.any(
+                  (rival) => rival.name == award.playerName,
+                ))
                   const Text(
                     'Накопленная статистика за сезон',
                     style: TextStyle(color: Colors.white54, fontSize: 9),
@@ -1080,75 +1095,102 @@ class _SeasonScreenState extends State<SeasonScreen> {
             child: _buildLiquidGlassSurface(
               radius: 24,
               child: AlertDialog(
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-          side: BorderSide.none,
-        ),
-        title: const Row(
-          children: [
-            Icon(Icons.emoji_events, color: Color(0xFFFFD54F), size: 28),
-            SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                'Игрок месяца',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              award.monthName,
-              style: const TextStyle(color: Color(0xFF8BE07F), fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              award.playerName,
-              style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900),
-            ),
-            Text(award.club, style: const TextStyle(color: Colors.white70)),
-            if (career.rivals.any((rival) => rival.name == award.playerName))
-              const Padding(
-                padding: EdgeInsets.only(top: 3),
-                child: Text(
-                  'Накопленная статистика за сезон',
-                  style: TextStyle(color: Colors.white54, fontSize: 10),
+                backgroundColor: Colors.transparent,
+                surfaceTintColor: Colors.transparent,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                  side: BorderSide.none,
                 ),
-              ),
-            const SizedBox(height: 14),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _awardStat('МАТЧИ', award.matches.toString()),
-                _awardStat('ГОЛЫ', award.goals.toString()),
-                _awardStat('АССИСТЫ', award.assists.toString()),
-                _awardStat('ОЦЕНКА', award.averageRating.toStringAsFixed(1)),
-              ],
-            ),
-            const SizedBox(height: 14),
-            Text(
-              award.isCareerPlayer
-                  ? 'Поздравляем! Вы стали лучшим игроком месяца.'
-                  : 'В этом месяце награду получил другой футболист.',
-              style: TextStyle(
-                color: award.isCareerPlayer ? const Color(0xFF8BE07F) : Colors.white70,
-                height: 1.35,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Продолжить', style: TextStyle(color: Color(0xFF8BE07F))),
-          ),
-        ],
+                title: const Row(
+                  children: [
+                    Icon(
+                      Icons.emoji_events,
+                      color: Color(0xFFFFD54F),
+                      size: 28,
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Игрок месяца',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      award.monthName,
+                      style: const TextStyle(
+                        color: Color(0xFF8BE07F),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      award.playerName,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    Text(
+                      award.club,
+                      style: const TextStyle(color: Colors.white70),
+                    ),
+                    if (career.rivals.any(
+                      (rival) => rival.name == award.playerName,
+                    ))
+                      const Padding(
+                        padding: EdgeInsets.only(top: 3),
+                        child: Text(
+                          'Накопленная статистика за сезон',
+                          style: TextStyle(color: Colors.white54, fontSize: 10),
+                        ),
+                      ),
+                    const SizedBox(height: 14),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _awardStat('МАТЧИ', award.matches.toString()),
+                        _awardStat('ГОЛЫ', award.goals.toString()),
+                        _awardStat('АССИСТЫ', award.assists.toString()),
+                        _awardStat(
+                          'ОЦЕНКА',
+                          award.averageRating.toStringAsFixed(1),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      award.isCareerPlayer
+                          ? 'Поздравляем! Вы стали лучшим игроком месяца.'
+                          : 'В этом месяце награду получил другой футболист.',
+                      style: TextStyle(
+                        color: award.isCareerPlayer
+                            ? const Color(0xFF8BE07F)
+                            : Colors.white70,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(dialogContext),
+                    child: const Text(
+                      'Продолжить',
+                      style: TextStyle(color: Color(0xFF8BE07F)),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -1176,128 +1218,191 @@ class _SeasonScreenState extends State<SeasonScreen> {
               backgroundColor: Colors.transparent,
               surfaceTintColor: Colors.transparent,
               elevation: 0,
-              insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 18,
+                vertical: 24,
+              ),
               child: _buildLiquidGlassSurface(
                 radius: 26,
                 child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 430, maxHeight: 560),
-                child: Padding(
-                  padding: const EdgeInsets.all(18),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.emoji_events, color: Color(0xFFFFD54F), size: 38),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'ИТОГИ СЕЗОНА',
-                        style: TextStyle(color: Color(0xFF8BE07F), fontSize: 18, fontWeight: FontWeight.w900),
-                      ),
-                      const SizedBox(height: 12),
-                      Flexible(
-                        child: ListView(
-                          shrinkWrap: true,
-                          children: [
-                            for (final award in awards.where((item) => item.category != 'Команда года'))
-                              Container(
-                                margin: const EdgeInsets.only(bottom: 8),
-                                padding: const EdgeInsets.all(11),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF10351A),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.military_tech, color: Color(0xFFFFD54F)),
-                                    const SizedBox(width: 9),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(award.category.toUpperCase(), style: const TextStyle(color: Color(0xFF8BE07F), fontSize: 10, fontWeight: FontWeight.w900)),
-                                          Text(award.playerName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-                                          Text(award.club, style: const TextStyle(color: Colors.white60, fontSize: 11)),
-                                        ],
+                  constraints: const BoxConstraints(
+                    maxWidth: 430,
+                    maxHeight: 560,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(18),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.emoji_events,
+                          color: Color(0xFFFFD54F),
+                          size: 38,
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'ИТОГИ СЕЗОНА',
+                          style: TextStyle(
+                            color: Color(0xFF8BE07F),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Flexible(
+                          child: ListView(
+                            shrinkWrap: true,
+                            children: [
+                              for (final award in awards.where(
+                                (item) => item.category != 'Команда года',
+                              ))
+                                Container(
+                                  margin: const EdgeInsets.only(bottom: 8),
+                                  padding: const EdgeInsets.all(11),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF10351A),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.military_tech,
+                                        color: Color(0xFFFFD54F),
                                       ),
-                                    ),
-                                    if (award.isCareerPlayer)
-                                      const Icon(Icons.stars, color: Color(0xFFFFD54F)),
-                                  ],
-                                ),
-                              ),
-                            _buildLiquidGlassSurface(
-                              radius: 18,
-                              child: Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'КОМАНДА ГОДА',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w900,
-                                        letterSpacing: 1.1,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 9),
-                                    for (final player in awards.where((item) => item.category == 'Команда года'))
-                                      Container(
-                                        margin: const EdgeInsets.only(bottom: 5),
-                                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withValues(alpha: 0.055),
-                                          borderRadius: BorderRadius.circular(10),
-                                          border: Border.all(
-                                            color: Colors.white.withValues(alpha: 0.09),
-                                          ),
-                                        ),
-                                        child: Row(
+                                      const SizedBox(width: 9),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            SizedBox(
-                                              width: 34,
-                                              child: Text(
-                                                player.positionLabel,
-                                                style: const TextStyle(
-                                                  color: Colors.white70,
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Text(
-                                                player.playerName,
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.w700,
-                                                ),
+                                            Text(
+                                              award.category.toUpperCase(),
+                                              style: const TextStyle(
+                                                color: Color(0xFF8BE07F),
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w900,
                                               ),
                                             ),
                                             Text(
-                                              player.club,
+                                              award.playerName,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                            ),
+                                            Text(
+                                              award.club,
                                               style: const TextStyle(
                                                 color: Colors.white60,
-                                                fontSize: 10,
+                                                fontSize: 11,
                                               ),
                                             ),
                                           ],
                                         ),
                                       ),
-                                  ],
+                                      if (award.isCareerPlayer)
+                                        const Icon(
+                                          Icons.stars,
+                                          color: Color(0xFFFFD54F),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              _buildLiquidGlassSurface(
+                                radius: 18,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'КОМАНДА ГОДА',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: 1.1,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 9),
+                                      for (final player in awards.where(
+                                        (item) =>
+                                            item.category == 'Команда года',
+                                      ))
+                                        Container(
+                                          margin: const EdgeInsets.only(
+                                            bottom: 5,
+                                          ),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 9,
+                                            vertical: 8,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withValues(
+                                              alpha: 0.055,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                            border: Border.all(
+                                              color: Colors.white.withValues(
+                                                alpha: 0.09,
+                                              ),
+                                            ),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              SizedBox(
+                                                width: 34,
+                                                child: Text(
+                                                  player.positionLabel,
+                                                  style: const TextStyle(
+                                                    color: Colors.white70,
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  player.playerName,
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                ),
+                                              ),
+                                              Text(
+                                                player.club,
+                                                style: const TextStyle(
+                                                  color: Colors.white60,
+                                                  fontSize: 10,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      TextButton(
-                        onPressed: () => Navigator.pop(dialogContext),
-                        child: const Text('Продолжить', style: TextStyle(color: Color(0xFF8BE07F), fontWeight: FontWeight.bold)),
-                      ),
-                    ],
+                        const SizedBox(height: 12),
+                        TextButton(
+                          onPressed: () => Navigator.pop(dialogContext),
+                          child: const Text(
+                            'Продолжить',
+                            style: TextStyle(
+                              color: Color(0xFF8BE07F),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
                 ),
               ),
             ),
@@ -1307,10 +1412,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
     );
   }
 
-  Widget _buildMatchGlassSurface({
-    required Widget child,
-    double radius = 18,
-  }) {
+  Widget _buildMatchGlassSurface({required Widget child, double radius = 18}) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),
       child: BackdropFilter(
@@ -1350,10 +1452,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
     );
   }
 
-  Widget _buildLiquidGlassSurface({
-    required Widget child,
-    double radius = 24,
-  }) {
+  Widget _buildLiquidGlassSurface({required Widget child, double radius = 24}) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),
       child: BackdropFilter(
@@ -1386,9 +1485,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 left: 0,
                 right: 0,
                 height: 1,
-                child: Container(
-                  color: Colors.white.withValues(alpha: 0.35),
-                ),
+                child: Container(color: Colors.white.withValues(alpha: 0.35)),
               ),
               child,
             ],
@@ -1401,7 +1498,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
   Widget _awardStat(String title, String value) {
     return Column(
       children: [
-        Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16)),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w900,
+            fontSize: 16,
+          ),
+        ),
         const SizedBox(height: 3),
         Text(title, style: const TextStyle(color: Colors.white54, fontSize: 8)),
       ],
@@ -1601,7 +1705,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     setState(() {
       career = completeCareer;
-      recentMonthlyAward = monthlyWinner != null && !monthlyWinner.isCareerPlayer
+      recentMonthlyAward =
+          monthlyWinner != null && !monthlyWinner.isCareerPlayer
           ? monthlyWinner
           : null;
       isSaving = true;
@@ -1662,58 +1767,60 @@ class _SeasonScreenState extends State<SeasonScreen> {
       result = isHome ? '$homeGoals : $awayGoals' : '$awayGoals : $homeGoals';
     }
 
-    return _buildMatchGlassSurface(child: Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0A2110),
-        borderRadius: BorderRadius.circular(10),
-        border: const Border(
-          left: BorderSide(color: Color(0xFF8DB8FF), width: 4),
+    return _buildMatchGlassSurface(
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0A2110),
+          borderRadius: BorderRadius.circular(10),
+          border: const Border(
+            left: BorderSide(color: Color(0xFF8DB8FF), width: 4),
+          ),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 46,
+              child: SvgPicture.asset(
+                'assets/icons/ucl.svg',
+                width: 28,
+                height: 28,
+                fit: BoxFit.contain,
+              ),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${AppStrings.championsLeague} · ${AppStrings.tournamentStageName(tournament.stage.title)}',
+                    style: const TextStyle(
+                      color: Color(0xFF8DB8FF),
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${isHome ? AppStrings.homeVenue : AppStrings.awayVenue}: $opponent',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              result,
+              style: TextStyle(
+                color: isPlayed ? const Color(0xFF8BE07F) : Colors.white54,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
       ),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 46,
-            child: SvgPicture.asset(
-              'assets/icons/ucl.svg',
-              width: 28,
-              height: 28,
-              fit: BoxFit.contain,
-            ),
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${AppStrings.championsLeague} · ${AppStrings.tournamentStageName(tournament.stage.title)}',
-                  style: const TextStyle(
-                    color: Color(0xFF8DB8FF),
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${isHome ? AppStrings.homeVenue : AppStrings.awayVenue}: $opponent',
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            result,
-            style: TextStyle(
-              color: isPlayed ? const Color(0xFF8BE07F) : Colors.white54,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    ));
+    );
   }
 
   Future<void> _playChampionsLeagueMatch({required bool interactive}) async {
@@ -1757,10 +1864,12 @@ class _SeasonScreenState extends State<SeasonScreen> {
             isHome: isHome,
             playerWillPlay: true,
             isKnockout: isFinal || !isFirstLeg,
-            homeAggregateGoalsBeforeMatch:
-                isFinal ? 0 : (tie.firstLegAwayGoals ?? 0),
-            awayAggregateGoalsBeforeMatch:
-                isFinal ? 0 : (tie.firstLegHomeGoals ?? 0),
+            homeAggregateGoalsBeforeMatch: isFinal
+                ? 0
+                : (tie.firstLegAwayGoals ?? 0),
+            awayAggregateGoalsBeforeMatch: isFinal
+                ? 0
+                : (tie.firstLegHomeGoals ?? 0),
           ),
         ),
       );
@@ -2007,10 +2116,12 @@ class _SeasonScreenState extends State<SeasonScreen> {
             isHome: isHome,
             playerWillPlay: true,
             isKnockout: isFinal || !isFirstLeg,
-            homeAggregateGoalsBeforeMatch:
-                isFinal ? 0 : (tie.firstLegAwayGoals ?? 0),
-            awayAggregateGoalsBeforeMatch:
-                isFinal ? 0 : (tie.firstLegHomeGoals ?? 0),
+            homeAggregateGoalsBeforeMatch: isFinal
+                ? 0
+                : (tie.firstLegAwayGoals ?? 0),
+            awayAggregateGoalsBeforeMatch: isFinal
+                ? 0
+                : (tie.firstLegHomeGoals ?? 0),
           ),
         ),
       );
@@ -2594,12 +2705,16 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     // Награды сезона формируются и сохраняются один раз после архивации статистики.
     if (!alreadyArchived &&
-        !completedCareer.seasonAwards.any((item) => item.season == career.season)) {
+        !completedCareer.seasonAwards.any(
+          (item) => item.season == career.season,
+        )) {
       final leagueAppearances = career.seasonMatches
-          .where((item) =>
-              item.isPlayed &&
-              item.result != null &&
-              item.result!.playerPlayed)
+          .where(
+            (item) =>
+                item.isPlayed &&
+                item.result != null &&
+                item.result!.playerPlayed,
+          )
           .toList();
       final leagueGoals = leagueAppearances.fold<int>(
         0,
@@ -2612,10 +2727,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
       final leagueRating = leagueAppearances.isEmpty
           ? null
           : leagueAppearances.fold<double>(
-                0,
-                (sum, item) => sum + item.result!.playerRating,
-              ) /
-              leagueAppearances.length;
+                  0,
+                  (sum, item) => sum + item.result!.playerRating,
+                ) /
+                leagueAppearances.length;
 
       final seasonAwards = SeasonAwardService.create(
         season: career.season,
@@ -2841,15 +2956,13 @@ class _SeasonScreenState extends State<SeasonScreen> {
         .length;
     final totalMatches = career.seasonMatches.length;
     final seasonStart = includeSeasonMilestones && playedBefore == 0;
-    final seasonEnd = includeSeasonMilestones &&
+    final seasonEnd =
+        includeSeasonMilestones &&
         totalMatches > 0 &&
         playedBefore >= totalMatches - 1;
 
     // Сезонные контрольные вопросы не должны блокироваться общей паузой.
-    if (!cooldownReady &&
-        !isTournamentDecider &&
-        !seasonStart &&
-        !seasonEnd) {
+    if (!cooldownReady && !isTournamentDecider && !seasonStart && !seasonEnd) {
       return updatedCareer;
     }
     final outstanding =
@@ -2959,8 +3072,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
               club.strength >= updatedCareer.player.overall - 10,
         )
         .toList();
-    final interestedClub = category == 'transferInterest' &&
-            interestedClubs.isNotEmpty
+    final interestedClub =
+        category == 'transferInterest' && interestedClubs.isNotEmpty
         ? interestedClubs[Random().nextInt(interestedClubs.length)].name
         : null;
     PressConferenceContentFactory.markConferenceShown();
@@ -3076,7 +3189,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Widget _buildNavigationDrawer() {
     return Drawer(
-      width: 304,
+      width: 300,
       elevation: 0,
       backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
@@ -3084,9 +3197,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         borderRadius: BorderRadius.horizontal(right: Radius.circular(30)),
       ),
       child: ClipRRect(
-        borderRadius: const BorderRadius.horizontal(
-          right: Radius.circular(30),
-        ),
+        borderRadius: const BorderRadius.horizontal(right: Radius.circular(30)),
         child: BackdropFilter(
           filter: ui.ImageFilter.blur(sigmaX: 30, sigmaY: 30),
           child: Container(
@@ -3107,12 +3218,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
                   color: Colors.white.withValues(alpha: 0.34),
                   width: 1.1,
                 ),
-                top: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.22),
-                ),
-                bottom: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.16),
-                ),
+                top: BorderSide(color: Colors.white.withValues(alpha: 0.22)),
+                bottom: BorderSide(color: Colors.white.withValues(alpha: 0.16)),
               ),
               boxShadow: [
                 BoxShadow(
@@ -3148,8 +3255,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
                     padding: const EdgeInsets.fromLTRB(10, 8, 10, 18),
                     children: [
                       Container(
-                        margin: const EdgeInsets.fromLTRB(4, 4, 4, 14),
-                        padding: const EdgeInsets.fromLTRB(18, 22, 18, 18),
+                        margin: const EdgeInsets.fromLTRB(4, 4, 4, 4),
+                        padding: const EdgeInsets.fromLTRB(18, 12, 18, 14),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(23),
                           gradient: LinearGradient(
@@ -3177,22 +3284,22 @@ class _SeasonScreenState extends State<SeasonScreen> {
                           children: [
                             SvgPicture.asset(
                               'assets/icons/player.svg',
-                              width: 36,
-                              height: 36,
+                              width: 30,
+                              height: 30,
                               fit: BoxFit.contain,
                               colorFilter: ColorFilter.mode(
                                 Colors.white.withValues(alpha: 0.92),
                                 BlendMode.srcIn,
                               ),
                             ),
-                            const SizedBox(height: 15),
+                            const SizedBox(height: 10),
                             Text(
                               career.player.name,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 19,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: -0.35,
                               ),
@@ -3204,7 +3311,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.72),
-                                fontSize: 12,
+                                fontSize: 11,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -3325,11 +3432,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                   BlendMode.srcIn,
                 ),
               )
-            : Icon(
-                icon,
-                color: Colors.white.withValues(alpha: 0.88),
-                size: 22,
-              ),
+            : Icon(icon, color: Colors.white.withValues(alpha: 0.88), size: 22),
         title: Text(
           title,
           style: TextStyle(
@@ -3345,9 +3448,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         tileColor: Colors.white.withValues(alpha: 0.045),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
-          side: BorderSide(
-            color: Colors.white.withValues(alpha: 0.075),
-          ),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.075)),
         ),
       ),
     );
@@ -3541,11 +3642,13 @@ class _SeasonScreenState extends State<SeasonScreen> {
                                 _buildNextCupMatchCard(nextCupMatch)
                               else if (!seasonFinished && nextMatch != null)
                                 _buildNextMatchCard(nextMatch),
-                              if (recentMonthlyAward != null && !worldCupBlocksSeason)
+                              if (recentMonthlyAward != null &&
+                                  !worldCupBlocksSeason)
                                 _buildRecentMonthlyAwardCard(),
                               const SizedBox(height: 10),
                               if (!worldCupBlocksSeason) _buildSeasonButton(),
-                              if (career.worldCup != null && !worldCupBlocksSeason)
+                              if (career.worldCup != null &&
+                                  !worldCupBlocksSeason)
                                 _buildWorldCupCalendarSection(
                                   blocksSeason: false,
                                 ),
@@ -4297,80 +4400,66 @@ class _SeasonScreenState extends State<SeasonScreen> {
       opponent: match.opponent,
       isHome: match.isHome,
     );
-    return _buildMatchGlassSurface(child: Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            playerColor.withValues(alpha: 0.72),
-            Color.lerp(playerColor, opponentColor, 0.45)!.withValues(alpha: 0.70),
-            const Color(0xFF102B17).withValues(alpha: 0.78),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+    return _buildMatchGlassSurface(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              playerColor.withValues(alpha: 0.72),
+              Color.lerp(
+                playerColor,
+                opponentColor,
+                0.45,
+              )!.withValues(alpha: 0.70),
+              const Color(0xFF102B17).withValues(alpha: 0.78),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          border: Border.all(color: opponentColor.withValues(alpha: 0.8)),
+          borderRadius: BorderRadius.circular(16),
         ),
-        border: Border.all(color: opponentColor.withValues(alpha: 0.8)),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppStrings.nextMatch,
-            style: TextStyle(
-              color: Color.fromARGB(255, 255, 255, 255),
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            match.isHome
-                ? '${career.player.club} — ${match.opponent}'
-                : '${match.opponent} — ${career.player.club}',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            '${AppStrings.round} ${match.number} • '
-            '${match.isHome ? AppStrings.home : AppStrings.away}',
-            style: const TextStyle(color: Colors.white, fontSize: 12),
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: isSaving || seasonFinishing
-                      ? null
-                      : () => _playMatch(match, interactive: false),
-                  label: const Text('Симуляция'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE8EDE8),
-                    foregroundColor: const Color(0xFF102B17),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppStrings.nextMatch,
+              style: TextStyle(
+                color: Color.fromARGB(255, 255, 255, 255),
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
               ),
-              if (interactiveAvailable) ...[
-                const SizedBox(width: 10),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              match.isHome
+                  ? '${career.player.club} — ${match.opponent}'
+                  : '${match.opponent} — ${career.player.club}',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              '${AppStrings.round} ${match.number} • '
+              '${match.isHome ? AppStrings.home : AppStrings.away}',
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+            ),
+            const SizedBox(height: 14),
+            Row(
+              children: [
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: isSaving || seasonFinishing
                         ? null
-                        : () => _playMatch(match, interactive: true),
-                    icon: const Icon(Icons.sports_soccer, size: 18),
-                    label: const Text('Играть'),
+                        : () => _playMatch(match, interactive: false),
+                    label: const Text('Симуляция'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF22C55E),
-                      foregroundColor: const Color(0xFF06210D),
+                      backgroundColor: const Color(0xFFE8EDE8),
+                      foregroundColor: const Color(0xFF102B17),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -4378,12 +4467,32 @@ class _SeasonScreenState extends State<SeasonScreen> {
                     ),
                   ),
                 ),
+                if (interactiveAvailable) ...[
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: isSaving || seasonFinishing
+                          ? null
+                          : () => _playMatch(match, interactive: true),
+                      icon: const Icon(Icons.sports_soccer, size: 18),
+                      label: const Text('Играть'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF22C55E),
+                        foregroundColor: const Color(0xFF06210D),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ],
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
-    ));
+    );
   }
 
   Widget _buildNextCupMatchCard(CupMatch match) {
@@ -4406,100 +4515,102 @@ class _SeasonScreenState extends State<SeasonScreen> {
       isHome: isHome,
     );
 
-    return _buildMatchGlassSurface(child: Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            playerColor,
-            Color.lerp(playerColor, opponentColor, 0.45)!,
-            const Color(0xFF102B17),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        border: Border.all(color: const Color(0xFF8BE07F)),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Row(
-            children: [
-              Image.asset(
-                'assets/icons/cup.png',
-                width: 28,
-                height: 28,
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '${AppStrings.nextMatchUpper} · ${AppStrings.nationalCup.toUpperCase()}',
-                style: TextStyle(
-                  color: Color.fromARGB(255, 243, 245, 243),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
-              ),
+    return _buildMatchGlassSurface(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              playerColor,
+              Color.lerp(playerColor, opponentColor, 0.45)!,
+              const Color(0xFF102B17),
             ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          const SizedBox(height: 8),
-          Text(
-            '$stage · ${isHome ? AppStrings.homeVenue : AppStrings.awayVenue}',
-            style: const TextStyle(color: Colors.white),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            isHome ? '$playerClub — $opponent' : '$opponent — $playerClub',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: isSaving || seasonFinishing
-                      ? null
-                      : () => _playCupMatch(match, interactive: false),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: const Text('Симуляция'),
+          border: Border.all(color: const Color(0xFF8BE07F)),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Row(
+              children: [
+                Image.asset(
+                  'assets/icons/cup.png',
+                  width: 28,
+                  height: 28,
+                  fit: BoxFit.contain,
                 ),
+                const SizedBox(width: 8),
+                Text(
+                  '${AppStrings.nextMatchUpper} · ${AppStrings.nationalCup.toUpperCase()}',
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 243, 245, 243),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '$stage · ${isHome ? AppStrings.homeVenue : AppStrings.awayVenue}',
+              style: const TextStyle(color: Colors.white),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              isHome ? '$playerClub — $opponent' : '$opponent — $playerClub',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
-              if (interactiveAvailable) ...[
-                const SizedBox(width: 10),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
                 Expanded(
                   child: ElevatedButton(
                     onPressed: isSaving || seasonFinishing
                         ? null
-                        : () => _playCupMatch(match, interactive: true),
+                        : () => _playCupMatch(match, interactive: false),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF22C55E),
-                      foregroundColor: const Color(0xFF06210D),
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: const Text('Играть'),
+                    child: const Text('Симуляция'),
                   ),
                 ),
+                if (interactiveAvailable) ...[
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: isSaving || seasonFinishing
+                          ? null
+                          : () => _playCupMatch(match, interactive: true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF22C55E),
+                        foregroundColor: const Color(0xFF06210D),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text('Играть'),
+                    ),
+                  ),
+                ],
               ],
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
-    ));
+    );
   }
 
   Widget _buildSeasonMatches() {
@@ -4661,134 +4772,141 @@ class _SeasonScreenState extends State<SeasonScreen> {
         ? AppStrings.firstLegLabel
         : AppStrings.secondLegLabel;
 
-    return _buildMatchGlassSurface(child: Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF5688D8)),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Stack(
-          children: [
-            // Фоновое фото с прозрачностью
-            Positioned.fill(
-              child: Opacity(
-                opacity: 0.5, // Меняй от 0.0 до 1.0
-                child: Image.asset('assets/images/uclcard2.png'),
+    return _buildMatchGlassSurface(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFF5688D8)),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            children: [
+              // Фоновое фото с прозрачностью
+              Positioned.fill(
+                child: Opacity(
+                  opacity: 0.5, // Меняй от 0.0 до 1.0
+                  child: Image.asset('assets/images/uclcard2.png'),
+                ),
               ),
-            ),
 
-            // Градиент поверх фото
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      const Color(0xFF142D52).withValues(alpha: 0.65),
-                      const Color.fromARGB(
-                        255,
-                        13,
-                        31,
-                        60,
-                      ).withValues(alpha: 0.65),
-                      const Color.fromARGB(
-                        255,
-                        16,
-                        19,
-                        43,
-                      ).withValues(alpha: 0.65),
-                    ],
+              // Градиент поверх фото
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color(0xFF142D52).withValues(alpha: 0.65),
+                        const Color.fromARGB(
+                          255,
+                          13,
+                          31,
+                          60,
+                        ).withValues(alpha: 0.65),
+                        const Color.fromARGB(
+                          255,
+                          16,
+                          19,
+                          43,
+                        ).withValues(alpha: 0.65),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            // Содержимое карточки
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      SvgPicture.asset(
-                        'assets/icons/ucl.svg',
-                        width: 28,
-                        height: 28,
-                        fit: BoxFit.contain,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          '${AppStrings.nextMatchUpper} · ${AppStrings.championsLeague.toUpperCase()}',
-                          style: TextStyle(
-                            color: Color(0xFF8DB8FF),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 10,
+              // Содержимое карточки
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        SvgPicture.asset(
+                          'assets/icons/ucl.svg',
+                          width: 28,
+                          height: 28,
+                          fit: BoxFit.contain,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '${AppStrings.nextMatchUpper} · ${AppStrings.championsLeague.toUpperCase()}',
+                            style: TextStyle(
+                              color: Color(0xFF8DB8FF),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${AppStrings.tournamentStageName(tournament.stage.title)} · $matchTitle',
-                    style: const TextStyle(color: Colors.white70, fontSize: 12),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    isHome ? '$club — $opponent' : '$opponent — $club',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: isSaving || seasonFinishing
-                              ? null
-                              : () => _playChampionsLeagueMatch(
-                                  interactive: false,
-                                ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF8DB8FF),
-                            foregroundColor: const Color(0xFF071526),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          child: const Text('Симуляция'),
-                        ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${AppStrings.tournamentStageName(tournament.stage.title)} · $matchTitle',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
                       ),
-                      if (interactiveAvailable) ...[
-                        const SizedBox(width: 10),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      isHome ? '$club — $opponent' : '$opponent — $club',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
                         Expanded(
                           child: ElevatedButton(
                             onPressed: isSaving || seasonFinishing
                                 ? null
                                 : () => _playChampionsLeagueMatch(
-                                    interactive: true,
+                                    interactive: false,
                                   ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF22C55E),
-                              foregroundColor: const Color(0xFF06210D),
+                              backgroundColor: const Color(0xFF8DB8FF),
+                              foregroundColor: const Color(0xFF071526),
                               padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
-                            child: const Text('Играть'),
+                            child: const Text('Симуляция'),
                           ),
                         ),
+                        if (interactiveAvailable) ...[
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: isSaving || seasonFinishing
+                                  ? null
+                                  : () => _playChampionsLeagueMatch(
+                                      interactive: true,
+                                    ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF22C55E),
+                                foregroundColor: const Color(0xFF06210D),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                              ),
+                              child: const Text('Играть'),
+                            ),
+                          ),
+                        ],
                       ],
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 
   Widget _buildNextEuropaLeagueMatchCard() {
@@ -4818,132 +4936,141 @@ class _SeasonScreenState extends State<SeasonScreen> {
         ? AppStrings.firstLegLabel
         : AppStrings.secondLegLabel;
 
-    return _buildMatchGlassSurface(child: Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFFFC857)),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Stack(
-          children: [
-            // Фоновое фото с прозрачностью
-            Positioned.fill(
-              child: Opacity(
-                opacity: 0.5, // Меняй от 0.0 до 1.0
-                child: Image.asset('assets/images/uelfon.png'),
+    return _buildMatchGlassSurface(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFFFC857)),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            children: [
+              // Фоновое фото с прозрачностью
+              Positioned.fill(
+                child: Opacity(
+                  opacity: 0.5, // Меняй от 0.0 до 1.0
+                  child: Image.asset('assets/images/uelfon.png'),
+                ),
               ),
-            ),
 
-            // Градиент поверх фото
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      const Color(0xFF493714).withValues(alpha: 0.65),
-                      const Color.fromARGB(
-                        255,
-                        13,
-                        31,
-                        60,
-                      ).withValues(alpha: 0.65),
-                      const Color.fromARGB(
-                        255,
-                        16,
-                        19,
-                        43,
-                      ).withValues(alpha: 0.65),
-                    ],
+              // Градиент поверх фото
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color(0xFF493714).withValues(alpha: 0.65),
+                        const Color.fromARGB(
+                          255,
+                          13,
+                          31,
+                          60,
+                        ).withValues(alpha: 0.65),
+                        const Color.fromARGB(
+                          255,
+                          16,
+                          19,
+                          43,
+                        ).withValues(alpha: 0.65),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            // Содержимое карточки
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      SvgPicture.asset(
-                        'assets/icons/europaleague.svg',
-                        width: 28,
-                        height: 28,
-                        fit: BoxFit.contain,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          '${AppStrings.nextMatchUpper} · ${AppStrings.europaLeague.toUpperCase()}',
-                          style: TextStyle(
-                            color: Color(0xFFFFC857),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 10,
+              // Содержимое карточки
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        SvgPicture.asset(
+                          'assets/icons/europaleague.svg',
+                          width: 28,
+                          height: 28,
+                          fit: BoxFit.contain,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '${AppStrings.nextMatchUpper} · ${AppStrings.europaLeague.toUpperCase()}',
+                            style: TextStyle(
+                              color: Color(0xFFFFC857),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${AppStrings.tournamentStageName(tournament.stage.title)} · $matchTitle',
-                    style: const TextStyle(color: Colors.white70, fontSize: 12),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    isHome ? '$club — $opponent' : '$opponent — $club',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: isSaving || seasonFinishing
-                              ? null
-                              : () =>
-                                    _playEuropaLeagueMatch(interactive: false),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFFC857),
-                            foregroundColor: const Color(0xFF1A1204),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          child: const Text('Симуляция'),
-                        ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${AppStrings.tournamentStageName(tournament.stage.title)} · $matchTitle',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
                       ),
-                      if (interactiveAvailable) ...[
-                        const SizedBox(width: 10),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      isHome ? '$club — $opponent' : '$opponent — $club',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
                         Expanded(
                           child: ElevatedButton(
                             onPressed: isSaving || seasonFinishing
                                 ? null
-                                : () =>
-                                      _playEuropaLeagueMatch(interactive: true),
+                                : () => _playEuropaLeagueMatch(
+                                    interactive: false,
+                                  ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF22C55E),
-                              foregroundColor: const Color(0xFF06210D),
+                              backgroundColor: const Color(0xFFFFC857),
+                              foregroundColor: const Color(0xFF1A1204),
                               padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
-                            child: const Text('Играть'),
+                            child: const Text('Симуляция'),
                           ),
                         ),
+                        if (interactiveAvailable) ...[
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: isSaving || seasonFinishing
+                                  ? null
+                                  : () => _playEuropaLeagueMatch(
+                                      interactive: true,
+                                    ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF22C55E),
+                                foregroundColor: const Color(0xFF06210D),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                              ),
+                              child: const Text('Играть'),
+                            ),
+                          ),
+                        ],
                       ],
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 
   Widget _buildCupMatchRow(CupMatch cupMatch) {
@@ -4977,68 +5104,70 @@ class _SeasonScreenState extends State<SeasonScreen> {
       }
     }
 
-    return _buildMatchGlassSurface(child: Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Color.lerp(
-          const Color(0xFF0A2110),
-          ClubColors.primary(opponent),
-          0.12,
-        )!.withValues(alpha: 0.68),
-        borderRadius: BorderRadius.circular(10),
-        border: Border(
-          left: BorderSide(color: const Color(0xFF8BE07F), width: 4),
+    return _buildMatchGlassSurface(
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Color.lerp(
+            const Color(0xFF0A2110),
+            ClubColors.primary(opponent),
+            0.12,
+          )!.withValues(alpha: 0.68),
+          borderRadius: BorderRadius.circular(10),
+          border: Border(
+            left: BorderSide(color: const Color(0xFF8BE07F), width: 4),
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 40,
-            child: Image.asset(
-              'assets/icons/cup.png',
-              width: 25,
-              height: 25,
-              fit: BoxFit.contain,
-              color: Colors.white,
-            ),
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${AppStrings.nationalCup} · $stage',
-                  style: const TextStyle(
-                    color: Color(0xFF8BE07F),
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${isHome ? AppStrings.home : AppStrings.away}: $opponent',
-                  style: const TextStyle(color: Colors.white, fontSize: 13),
-                ),
-              ],
-            ),
-          ),
-          if (resultText != null) const SizedBox(width: 8),
-          if (resultText != null)
-            Flexible(
-              child: Text(
-                resultText,
-                textAlign: TextAlign.end,
-                style: TextStyle(
-                  color: resultColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 40,
+              child: Image.asset(
+                'assets/icons/cup.png',
+                width: 25,
+                height: 25,
+                fit: BoxFit.contain,
+                color: Colors.white,
               ),
             ),
-        ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${AppStrings.nationalCup} · $stage',
+                    style: const TextStyle(
+                      color: Color(0xFF8BE07F),
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${isHome ? AppStrings.home : AppStrings.away}: $opponent',
+                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                  ),
+                ],
+              ),
+            ),
+            if (resultText != null) const SizedBox(width: 8),
+            if (resultText != null)
+              Flexible(
+                child: Text(
+                  resultText,
+                  textAlign: TextAlign.end,
+                  style: TextStyle(
+                    color: resultColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
-    ));
+    );
   }
 
   Widget _buildMatchRow(SeasonMatch match) {
@@ -5065,48 +5194,53 @@ class _SeasonScreenState extends State<SeasonScreen> {
       }
     }
 
-    return _buildMatchGlassSurface(child: Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Color.lerp(
-          const Color(0xFF0A2110),
-          ClubColors.primary(match.opponent),
-          0.12,
-        )!.withValues(alpha: 0.68),
-        borderRadius: BorderRadius.circular(10),
-        border: Border(
-          left: BorderSide(color: ClubColors.primary(match.opponent), width: 4),
+    return _buildMatchGlassSurface(
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Color.lerp(
+            const Color(0xFF0A2110),
+            ClubColors.primary(match.opponent),
+            0.12,
+          )!.withValues(alpha: 0.68),
+          borderRadius: BorderRadius.circular(10),
+          border: Border(
+            left: BorderSide(
+              color: ClubColors.primary(match.opponent),
+              width: 4,
+            ),
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 46,
-            child: Text(
-              '${match.number} ${AppStrings.round.toLowerCase()}',
-              style: const TextStyle(color: Colors.white54, fontSize: 11),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              '${match.isHome ? AppStrings.home : AppStrings.away}: '
-              '${match.opponent}',
-              style: const TextStyle(color: Colors.white, fontSize: 13),
-            ),
-          ),
-          if (resultText != null)
-            Text(
-              resultText,
-              style: TextStyle(
-                color: resultColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
+        child: Row(
+          children: [
+            SizedBox(
+              width: 46,
+              child: Text(
+                '${match.number} ${AppStrings.round.toLowerCase()}',
+                style: const TextStyle(color: Colors.white54, fontSize: 11),
               ),
             ),
-        ],
+            Expanded(
+              child: Text(
+                '${match.isHome ? AppStrings.home : AppStrings.away}: '
+                '${match.opponent}',
+                style: const TextStyle(color: Colors.white, fontSize: 13),
+              ),
+            ),
+            if (resultText != null)
+              Text(
+                resultText,
+                style: TextStyle(
+                  color: resultColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              ),
+          ],
+        ),
       ),
-    ));
+    );
   }
 
   Widget _buildSeasonButton() {

@@ -510,17 +510,17 @@ class _PlayerScreenState extends State<PlayerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildHeader(context),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 _buildPlayerCard(),
                 if (career.isInjured) ...[
                   const SizedBox(height: 10),
                   _buildInjuryCard(),
                 ],
-                const SizedBox(height: 10),
+                const SizedBox(height: 5),
                 _buildStatisticsCard(),
-                const SizedBox(height: 10),
+                const SizedBox(height: 5),
                 _buildClubCard(),
-                const SizedBox(height: 10),
+                const SizedBox(height: 5),
 
                 // const SizedBox(height: 10),
 
@@ -567,7 +567,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 10),
+                const SizedBox(height: 5),
 
                 // Сезон или итоги карьеры — ниже на всю ширину
                 SizedBox(
@@ -678,8 +678,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
             );
           },
           child: Container(
-            width: 38,
-            height: 38,
+            width: 30,
+            height: 30,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(11),
@@ -688,7 +688,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
             child: const Icon(
               Icons.chevron_left,
               color: Color(0xFF57A963),
-              size: 30,
+              size: 20,
             ),
           ),
         ),
@@ -698,29 +698,29 @@ class _PlayerScreenState extends State<PlayerScreen> {
             AppStrings.myPlayer,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 20,
+              fontSize: 16,
               fontWeight: FontWeight.w900,
             ),
           ),
         ),
-        const SizedBox(width: 6),
-        TextButton.icon(
-          onPressed: career.isCareerFinished ? _openCareerEnd : _openSeason,
-          style: TextButton.styleFrom(
-            foregroundColor: const Color(0xFF8BE07F),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            backgroundColor: const Color(0x1FFFFFFF),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: Color(0xFF3E9950)),
-            ),
-          ),
-          icon: const Icon(Icons.calendar_month, size: 17),
-          label: Text(
-            career.isCareerFinished ? 'ИТОГИ' : AppStrings.seasonButton,
-            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900),
-          ),
-        ),
+        // const SizedBox(width: 6),
+        // TextButton.icon(
+        //   onPressed: career.isCareerFinished ? _openCareerEnd : _openSeason,
+        //   style: TextButton.styleFrom(
+        //     foregroundColor: const Color(0xFF8BE07F),
+        //     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        //     backgroundColor: const Color(0x1FFFFFFF),
+        //     shape: RoundedRectangleBorder(
+        //       borderRadius: BorderRadius.circular(12),
+        //       side: const BorderSide(color: Color(0xFF3E9950)),
+        //     ),
+        //   ),
+        //   icon: const Icon(Icons.calendar_month, size: 17),
+        //   label: Text(
+        //     career.isCareerFinished ? 'ИТОГИ' : AppStrings.seasonButton,
+        //     style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900),
+        //   ),
+        // ),
       ],
     );
   }
@@ -754,7 +754,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
@@ -865,7 +865,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
             '${player.overall}',
             style: const TextStyle(
               color: Color.fromARGB(255, 182, 247, 4),
-              fontSize: 18,
+              fontSize: 15,
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -876,14 +876,54 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   Widget _buildStatRows() {
     final stats = [
-      _Stat(AppStrings.pace, player.skills.pace, Icons.bolt, const Color(0xFFC8E04A)),
-      _Stat(AppStrings.physical, player.skills.physical, Icons.fitness_center, const Color(0xFFFFC94A)),
-      _Stat(AppStrings.passing, player.skills.passing, Icons.adjust, const Color(0xFF5FD070)),
-      _Stat(AppStrings.shooting, player.skills.shooting, Icons.gps_fixed, const Color(0xFFFF6B4A)),
-      _Stat(AppStrings.defending, player.skills.defending, Icons.shield, const Color(0xFF7EA7FF)),
-      _Stat(AppStrings.dribbling, player.skills.dribbling, Icons.blur_circular, const Color(0xFF4AA8FF)),
-      _Stat(AppStrings.heading, player.skills.heading, Icons.sports_soccer, const Color(0xFFFF9F43)),
-      _Stat(AppStrings.vision, player.skills.vision, Icons.visibility, const Color(0xFFB78BFA)),
+      _Stat(
+        AppStrings.pace,
+        player.skills.pace,
+        Icons.bolt,
+        const Color(0xFFC8E04A),
+      ),
+      _Stat(
+        AppStrings.physical,
+        player.skills.physical,
+        Icons.fitness_center,
+        const Color(0xFFFFC94A),
+      ),
+      _Stat(
+        AppStrings.passing,
+        player.skills.passing,
+        Icons.adjust,
+        const Color(0xFF5FD070),
+      ),
+      _Stat(
+        AppStrings.shooting,
+        player.skills.shooting,
+        Icons.gps_fixed,
+        const Color(0xFFFF6B4A),
+      ),
+      _Stat(
+        AppStrings.defending,
+        player.skills.defending,
+        Icons.shield,
+        const Color(0xFF7EA7FF),
+      ),
+      _Stat(
+        AppStrings.dribbling,
+        player.skills.dribbling,
+        Icons.blur_circular,
+        const Color(0xFF4AA8FF),
+      ),
+      _Stat(
+        AppStrings.heading,
+        player.skills.heading,
+        Icons.sports_soccer,
+        const Color(0xFFFF9F43),
+      ),
+      _Stat(
+        AppStrings.vision,
+        player.skills.vision,
+        Icons.visibility,
+        const Color(0xFFB78BFA),
+      ),
     ];
 
     return GridView.builder(
@@ -892,9 +932,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
       itemCount: stats.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 14,
-        mainAxisSpacing: 12,
-        mainAxisExtent: 48,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 6,
+        mainAxisExtent: 33,
       ),
       itemBuilder: (context, index) => _CompactStatTile(stat: stats[index]),
     );
@@ -916,7 +956,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
             AppStrings.careerStats,
             style: const TextStyle(
               color: Color(0xFF8BE07F),
-              fontSize: 11,
+              fontSize: 10,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.2,
             ),
@@ -944,7 +984,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 5),
           Row(
             children: [
               Expanded(
@@ -986,16 +1026,16 @@ class _PlayerScreenState extends State<PlayerScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            AppStrings.careerAndFinances,
-            style: const TextStyle(
-              color: Color(0xFF8BE07F),
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.2,
-            ),
-          ),
-          const SizedBox(height: 10),
+          // Text(
+          //   AppStrings.careerAndFinances,
+          //   style: const TextStyle(
+          //     color: Color(0xFF8BE07F),
+          //     fontSize: 11,
+          //     fontWeight: FontWeight.w800,
+          //     letterSpacing: 1.2,
+          //   ),
+          // ),
+          // const SizedBox(height: 10),
           _InfoRow(title: AppStrings.club, value: player.club),
           _InfoRow(
             title: AppStrings.teamStatus,
@@ -1031,7 +1071,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
             value: '${career.contractYears} ${AppStrings.years}',
           ),
           const Padding(
-            padding: EdgeInsets.symmetric(vertical: 4),
+            padding: EdgeInsets.symmetric(vertical: 0),
             child: Divider(color: Color(0xFF24552C)),
           ),
           _InfoRow(
@@ -1093,7 +1133,7 @@ class _CareerStat extends StatelessWidget {
           value,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.w900,
           ),
         ),
@@ -1148,7 +1188,6 @@ class _InfoRow extends StatelessWidget {
     );
   }
 }
-
 
 class _CompactStatTile extends StatelessWidget {
   final _Stat stat;
@@ -1254,7 +1293,7 @@ class _StatBar extends StatelessWidget {
         return Container(
           height: 5,
           decoration: BoxDecoration(
-            color: const Color(0xFF123C1D),
+            color: const Color.fromARGB(255, 25, 82, 40),
             borderRadius: BorderRadius.circular(3),
           ),
           child: Align(
@@ -1296,7 +1335,7 @@ class _CareerHistoryStat extends StatelessWidget {
           value,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 20,
+            fontSize: 16,
             fontWeight: FontWeight.w900,
           ),
         ),
