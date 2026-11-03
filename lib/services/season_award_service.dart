@@ -18,6 +18,7 @@ class SeasonAwardService {
     required List<PositionRival> rivals,
     List<String> additionalTrophyWinningClubs = const [],
     Map<League, List<LeagueTableEntry>>? worldLeagueStandings,
+    SeasonStats? overallSeasonStats,
   }) {
     final sortedTable = [...leagueTable]
       ..sort((a, b) => b.points != a.points
@@ -275,7 +276,24 @@ class SeasonAwardService {
     // Золотой мяч: единая гонка между игроком карьеры и футболистами
     // из ростеров всех лиг. Статистика остальных игроков моделируется
     // детерминированно на сезон, поэтому результаты не меняются при перезагрузке.
-    final ballonCandidates = <_Candidate>[...candidates];
+    final ballonCandidates = candidates
+        .where((item) => !item.isCareerPlayer)
+        .toList();
+    final ballonStats = overallSeasonStats ?? seasonStats;
+    if (ballonStats.matches > 0) {
+      ballonCandidates.add(_Candidate(
+        name: player.name,
+        club: player.club,
+        position: player.position,
+        age: player.age,
+        matches: ballonStats.matches,
+        goals: ballonStats.goals,
+        assists: ballonStats.assists,
+        rating: ballonStats.averageRating ?? 0,
+        isCareerPlayer: true,
+        wonTrophy: trophyWinningClubs.contains(player.club),
+      ));
+    }
     final knownPlayers = ballonCandidates
         .map((item) => '${item.name}|${item.club}')
         .toSet();
