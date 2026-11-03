@@ -55,7 +55,9 @@ class SeasonAwardService {
 
     // Игрок карьеры участвует на тех же условиях, но его статистика берётся
     // из реальных матчей карьеры, а не из искусственно смоделированного состава.
-    if (seasonStats.matches >= 10 && (seasonStats.averageRating ?? 0) >= 6.0) {
+    if (seasonStats.matches > 0) {
+      // Игрок карьеры участвует в гонке бомбардиров даже при малом числе
+      // матчей; минимальный порог применяется отдельно к другим наградам.
       candidates.add(_Candidate(
         name: player.name,
         club: player.club,
@@ -153,7 +155,7 @@ class SeasonAwardService {
     }
 
     // Лидер ассистов определяется только количеством голевых передач.
-    final goalLeaders = eligible.where((item) => item.goals > 0).toList()
+    final goalLeaders = candidates.where((item) => item.goals > 0).toList()
       ..sort((a, b) {
         final compare = b.goals.compareTo(a.goals);
         if (compare != 0) return compare;
