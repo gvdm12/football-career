@@ -127,15 +127,15 @@ class _AgentScreenState extends State<AgentScreen> {
                     ),
                   ),
                   const SizedBox(height: 5),
-                  Text(
-                    AppStrings.agentDescription,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      height: 1.2,
-                      fontSize: 12,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
+                  // Text(
+                  //   AppStrings.agentDescription,
+                  //   style: const TextStyle(
+                  //     color: Colors.white70,
+                  //     height: 1.2,
+                  //     fontSize: 12,
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 8),
                   Text(
                     AppStrings.agentBonus((level - 1) * 2),
                     style: const TextStyle(
@@ -143,9 +143,10 @@ class _AgentScreenState extends State<AgentScreen> {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 5),
                   SizedBox(
                     width: double.infinity,
+                    height: 30,
                     child: ElevatedButton(
                       onPressed: isMax || career.agentCredits < upgradeCost
                           ? null
@@ -157,18 +158,19 @@ class _AgentScreenState extends State<AgentScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 5),
+                  // Text(
+                  //   AppStrings.currencyRewardsHint,
+                  //   style: const TextStyle(
+                  //     color: Colors.white54,
+                  //     fontSize: 11,
+                  //     height: 1.35,
+                  //   ),
+                  // ),
+                  // SizedBox(height: 2),
                   Text(
                     '${AppStrings.gameCurrency}: 🪙 ${_money(career.agentCredits)}',
                     style: const TextStyle(color: Colors.white54, fontSize: 12),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    AppStrings.currencyRewardsHint,
-                    style: const TextStyle(
-                      color: Colors.white54,
-                      fontSize: 11,
-                      height: 1.35,
-                    ),
                   ),
                 ],
               ),
@@ -176,7 +178,7 @@ class _AgentScreenState extends State<AgentScreen> {
             const SizedBox(height: 7),
             _panel(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
                     AppStrings.currentContract.toUpperCase(),
@@ -207,7 +209,7 @@ class _AgentScreenState extends State<AgentScreen> {
             const SizedBox(height: 7),
             _panel(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
                     AppStrings.interestedClubs.toUpperCase(),
@@ -225,11 +227,11 @@ class _AgentScreenState extends State<AgentScreen> {
                         : 'Предварительный интерес клубов с учётом ваших выступлений.',
                     style: const TextStyle(
                       color: Colors.white54,
-                      fontSize: 12,
+                      fontSize: 10,
                       height: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 7),
+                  const SizedBox(height: 4),
                   if (interests.isEmpty)
                     Text(
                       AppStrings.noInterestedClubs,
@@ -248,7 +250,7 @@ class _AgentScreenState extends State<AgentScreen> {
 
   Widget _offerCard(TransferOffer offer) {
     return Container(
-      margin: const EdgeInsets.only(top: 9),
+      margin: const EdgeInsets.only(top: 5),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.075),
@@ -266,7 +268,7 @@ class _AgentScreenState extends State<AgentScreen> {
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w900,
-                    fontSize: 14,
+                    fontSize: 13,
                   ),
                 ),
               ),
@@ -275,7 +277,7 @@ class _AgentScreenState extends State<AgentScreen> {
                 style: const TextStyle(
                   color: Color(0xFF8BE07F),
                   fontWeight: FontWeight.w800,
-                  fontSize: 12,
+                  fontSize: 11,
                 ),
               ),
             ],
@@ -285,7 +287,7 @@ class _AgentScreenState extends State<AgentScreen> {
             AppStrings.isEnglish
                 ? offer.club.league.displayName
                 : offer.club.league.countryName,
-            style: const TextStyle(color: Colors.white60, fontSize: 12),
+            style: const TextStyle(color: Colors.white60, fontSize: 11),
           ),
           const SizedBox(height: 5),
           _line(
