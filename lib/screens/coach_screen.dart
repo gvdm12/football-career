@@ -5,10 +5,52 @@ import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/player_status.dart';
 import 'package:flutter_football/services/app_strings.dart';
 
-class CoachScreen extends StatelessWidget {
+class CoachScreen extends StatefulWidget {
   final Career career;
 
   const CoachScreen({super.key, required this.career});
+
+  @override
+  State<CoachScreen> createState() => _CoachScreenState();
+}
+
+class _CoachScreenState extends State<CoachScreen> {
+  late Career career;
+
+  @override
+  void initState() {
+    super.initState();
+    career = widget.career;
+  }
+
+  bool get _canTalk => career.matches - career.lastConversationMatch >= 4;
+
+  Future<void> _talkToCoach() async {
+    if (!_canTalk) return;
+    final change = await showDialog<int>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFF14251B),
+        title: Text(career.coachName, style: const TextStyle(color: Colors.white)),
+        content: const Text(
+          'Тренер готов обсудить вашу роль в команде. Как вы хотите начать разговор?',
+          style: TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, 3), child: const Text('Попросить больше игрового времени')),
+          TextButton(onPressed: () => Navigator.pop(dialogContext, 1), child: const Text('Обсудить свою роль спокойно')),
+          TextButton(onPressed: () => Navigator.pop(dialogContext, -2), child: const Text('Потребовать место в основе')),
+        ],
+      ),
+    );
+    if (!mounted || change == null) return;
+    setState(() {
+      career = career.copyWith(
+        coachTrust: (career.coachTrust + change).clamp(0, 100).toInt(),
+        lastConversationMatch: career.matches,
+      );
+    });
+  }
 
   int get _reputation {
     final rating = career.averageRating ?? 6.0;
@@ -62,7 +104,12 @@ class CoachScreen extends StatelessWidget {
       averageRating: career.averageRating,
     );
 
-    return Scaffold(
+    return PopScope<Career>(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) Navigator.pop(context, career);
+      },
+      child: Scaffold(
       backgroundColor: const Color(0xFF07130F),
       appBar: AppBar(
         backgroundColor: const Color(0xAA18241F),
@@ -70,6 +117,10 @@ class CoachScreen extends StatelessWidget {
         title: Text(
           AppStrings.coachProfileTitle,
           style: TextStyle(fontSize: 16),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context, career),
         ),
       ),
       body: ListView(
@@ -136,6 +187,19 @@ class CoachScreen extends StatelessWidget {
                     fontSize: 12,
                   ),
                 ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: _canTalk ? _talkToCoach : null,
+                    icon: const Icon(Icons.forum_outlined, size: 17),
+                    label: Text(
+                      _canTalk
+                          ? 'Переговоры с тренером'
+                          : 'Новый разговор через ${(4 - (career.matches - career.lastConversationMatch)).clamp(0, 4)} матча',
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -200,6 +264,7 @@ class CoachScreen extends StatelessWidget {
           const SizedBox(height: 8),
 
         ],
+      ),
       ),
     );
   }
