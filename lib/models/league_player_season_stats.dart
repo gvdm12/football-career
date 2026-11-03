@@ -294,7 +294,7 @@ class LeaguePlayerStatsService {
       final random = Random(_seed(key));
       final month = totalRounds == 0
           ? 1
-          : (((fixture.round - 1) * 12) ~/ totalRounds) + 1;
+          : (((fixture.round * 12) - 1) ~/ totalRounds) + 1;
       _applyTeamMatch(
         players,
         club: fixture.homeTeam,
