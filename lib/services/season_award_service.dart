@@ -14,7 +14,16 @@ class SeasonAwardService {
     required List<LeaguePlayerSeasonStats> leaguePlayerStats,
     required List<LeagueTableEntry> leagueTable,
     required List<PositionRival> rivals,
+    List<String> additionalTrophyWinningClubs = const [],
   }) {
+    final sortedTable = [...leagueTable]
+      ..sort((a, b) => b.points != a.points
+          ? b.points.compareTo(a.points)
+          : b.goalDifference.compareTo(a.goalDifference));
+    final trophyWinningClubs = <String>{
+      ...additionalTrophyWinningClubs,
+      if (sortedTable.isNotEmpty) sortedTable.first.club,
+    };
     final candidates = <_Candidate>[];
 
     for (final item in leaguePlayerStats) {
@@ -34,6 +43,7 @@ class SeasonAwardService {
         assists: item.assists,
         rating: item.averageRating,
         isCareerPlayer: false,
+        wonTrophy: trophyWinningClubs.contains(item.club),
       ));
     }
 
@@ -51,6 +61,7 @@ class SeasonAwardService {
         assists: rival.assists,
         rating: rival.averageRating,
         isCareerPlayer: false,
+        wonTrophy: trophyWinningClubs.contains(player.club),
       ));
     }
 
@@ -69,6 +80,7 @@ class SeasonAwardService {
         assists: seasonStats.assists,
         rating: seasonStats.averageRating ?? 0,
         isCareerPlayer: true,
+        wonTrophy: trophyWinningClubs.contains(player.club),
       ));
     }
 
@@ -77,10 +89,6 @@ class SeasonAwardService {
         .toList();
     if (eligible.isEmpty) return [];
 
-    final sortedTable = [...leagueTable]
-      ..sort((a, b) => b.points != a.points
-          ? b.points.compareTo(a.points)
-          : b.goalDifference.compareTo(a.goalDifference));
     final positions = <String, int>{
       for (var i = 0; i < sortedTable.length; i++)
         sortedTable[i].club: i + 1,
@@ -123,6 +131,7 @@ class SeasonAwardService {
           averageRating: double.parse(item.rating.toStringAsFixed(2)),
           score: double.parse(score.toStringAsFixed(2)),
           isCareerPlayer: item.isCareerPlayer,
+          wonTrophy: item.wonTrophy,
         );
 
     final result = <SeasonAward>[];
@@ -131,9 +140,10 @@ class SeasonAwardService {
     // Условия совпадают с критериями достижения в архиве карьеры.
     final playerOfSeason = eligible
         .where((item) =>
-            item.matches >= 15 &&
-            item.rating >= 7.5 &&
-            item.goals + item.assists >= 15)
+            item.matches >= 20 &&
+            item.rating >= 7.8 &&
+            item.goals + item.assists >= 30 &&
+            item.wonTrophy)
         .toList()
       ..sort((a, b) {
         final scoreCompare = performanceScore(
@@ -192,7 +202,15 @@ class SeasonAwardService {
 
     // Не выдаём награду ассистента за несколько случайных передач.
     final assistLeaders = candidates
-        .where((item) => item.matches >= 10 && item.assists >= 10)
+        .where((item) {
+          if (item.matches < 20) return false;
+          final league = Clubs.leagueOf(item.club);
+          if (league == null) return false;
+          if (item.assists >= league.bestAssisterThreshold) return true;
+          final isTopLeague =
+              league == League.england || league == League.spain;
+          return isTopLeague && item.assists >= 18 && item.rating >= 8.0;
+        })
         .toList()
       ..sort((a, b) {
         final compare = b.assists.compareTo(a.assists);
@@ -255,6 +273,7 @@ class _Candidate {
   final int assists;
   final double rating;
   final bool isCareerPlayer;
+  final bool wonTrophy;
 
   const _Candidate({
     required this.name,
@@ -266,5 +285,6 @@ class _Candidate {
     required this.assists,
     required this.rating,
     required this.isCareerPlayer,
+    required this.wonTrophy,
   });
 }
