@@ -1413,43 +1413,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
   }
 
   Widget _buildMatchGlassSurface({required Widget child, double radius = 18}) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withValues(alpha: 0.13),
-                const Color(0xFF4ADE80).withValues(alpha: 0.08),
-                const Color(0xFF071B10).withValues(alpha: 0.24),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(radius),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.24),
-              width: 1.1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF4ADE80).withValues(alpha: 0.10),
-                blurRadius: 22,
-                offset: const Offset(0, 7),
-              ),
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.18),
-                blurRadius: 20,
-                offset: const Offset(0, 9),
-              ),
-            ],
-          ),
-          child: child,
-        ),
-      ),
-    );
+    // Карточки календаря остаются обычными плотными карточками без размытия.
+    return child;
   }
 
   Widget _buildLiquidGlassSurface({required Widget child, double radius = 24}) {
