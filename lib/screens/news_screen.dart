@@ -163,7 +163,7 @@ class NewsScreen extends StatelessWidget {
               children: [
                 Text(
                   _getCategory(news.type),
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: accent,
                     fontSize: 10,
                     fontWeight: FontWeight.w900,
