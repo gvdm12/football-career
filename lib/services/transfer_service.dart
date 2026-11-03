@@ -281,7 +281,7 @@ class TransferService {
 
     // Возвращение в бывший клуб — отдельный сценарий трансфера.
     // Такие клубы не исключаются только потому, что игрок недавно их покинул.
-    final formerClubs = candidates.where((club) =>
+    final formerClubs = allOtherClubs.where((club) =>
       career.history.any((stats) => stats.club == club.name) &&
       club.strength <= maxStrength
     ).toList();
