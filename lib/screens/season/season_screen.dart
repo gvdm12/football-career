@@ -2703,6 +2703,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 ) /
                 leagueAppearances.length;
 
+      final overallSeasonStats = completedCareer.history
+          .where((stats) => stats.season == career.season)
+          .toList();
       final seasonAwards = SeasonAwardService.create(
         season: career.season,
         player: career.player,
@@ -2722,6 +2725,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
         leagueTable: completedCareer.leagueTable,
         rivals: completedCareer.rivals,
         worldLeagueStandings: completedCareer.europeanLeagueStandings,
+        overallSeasonStats: overallSeasonStats.isEmpty
+            ? null
+            : overallSeasonStats.last,
         additionalTrophyWinningClubs: [
           if (completedCareer.domesticCup?.champion != null)
             completedCareer.domesticCup!.champion!,
