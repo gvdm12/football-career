@@ -11,30 +11,27 @@ class TransferService {
   static int _generateContractYears({
     required double rating,
     required int contributions,
+    required int maxYears,
   }) {
     final exceptional = rating >= 7.5 && contributions >= 18;
     final strong = rating >= 7.2 && contributions >= 12;
     final roll = _random.nextInt(100);
+    final contractLimit = maxYears.clamp(1, 3).toInt();
 
+    int years;
     if (exceptional) {
-      if (roll < 5) return 1;
-      if (roll < 15) return 2;
-      if (roll < 40) return 3;
-      return 4;
+      years = roll < 5 ? 1 : roll < 15 ? 2 : roll < 40 ? 3 : 4;
+    } else if (strong) {
+      years = roll < 10 ? 1 : roll < 30 ? 2 : roll < 60 ? 3 : 4;
+    } else {
+      years = roll < 25 ? 1 : roll < 60 ? 2 : roll < 85 ? 3 : 4;
     }
 
-    if (strong) {
-      if (roll < 10) return 1;
-      if (roll < 30) return 2;
-      if (roll < 60) return 3;
-      return 4;
-    }
-
-    if (roll < 25) return 1;
-    if (roll < 60) return 2;
-    if (roll < 85) return 3;
-    return 4;
+    return years.clamp(1, contractLimit).toInt();
   }
+
+  static int _maxContractYears(Career career) =>
+      (21 - career.season).clamp(1, 3).toInt();
 
   /// Определяет максимальную силу клуба,
   /// который может заинтересоваться игроком.
@@ -367,6 +364,7 @@ class TransferService {
       final contractYears = _generateContractYears(
         rating: rating,
         contributions: contributions,
+        maxYears: _maxContractYears(career),
       );
 
       final salary = _generateSalary(
@@ -450,6 +448,7 @@ class TransferService {
         contractYears: _generateContractYears(
           rating: rating,
           contributions: contributions,
+          maxYears: _maxContractYears(career),
         ),
         isAgentOffer: true,
       ));
@@ -515,6 +514,7 @@ class TransferService {
     final contractYears = _generateContractYears(
       rating: rating,
       contributions: contributions,
+      maxYears: _maxContractYears(career),
     );
 
     final salary = _generateSalary(
