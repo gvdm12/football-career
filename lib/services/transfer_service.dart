@@ -279,6 +279,16 @@ class TransferService {
       }
     }
 
+    // Возвращение в бывший клуб — отдельный сценарий трансфера.
+    // Такие клубы не исключаются только потому, что игрок недавно их покинул.
+    final formerClubs = candidates.where((club) =>
+      career.history.any((stats) => stats.club == club.name) &&
+      club.strength <= maxStrength
+    ).toList();
+    if (formerClubs.isNotEmpty && _random.nextDouble() < 0.38) {
+      addRandomFrom(formerClubs);
+    }
+
     if (career.season >= 16) {
       // Поздняя карьера:
       // все три предложения выбираются с весами.
