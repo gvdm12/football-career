@@ -18,7 +18,7 @@ class PreSeasonService {
   }) {
     final random = Random(_seed('$playerClub|$season'));
     final matchingClubs = Clubs.all.where((item) => item.name == playerClub).toList();
-    final club = matchingClubs.isEmpty ? null : matchingClubs.first;
+    final club = matchingClubs.isEmpty ? null : Clubs.getByName(playerClub);
     final candidates = Clubs.all
         .map((item) => Clubs.getByName(item.name))
         .where((item) {
