@@ -485,7 +485,7 @@ class RealClubSquads {
     'Strasbourg': {
       'defender': [RealClubPlayer('Andrew Omobamidele', 24, 81, 2), RealClubPlayer('Ben Chilwell', 29, 82, 3)],
       'midfielder': [RealClubPlayer('Giovanni Reyna', 23, 82, 10), RealClubPlayer('Dário Essugo', 21, 81, 14), RealClubPlayer('Maximilian Oyedele', 21, 80, 8)],
-      'forward': [RealClubPlayer('Joaquín Panichelli', 24, 82, 9), RealClubPlayer('Conrad Harder', 21, 82, 40), RealClubPlayer('Deivid Washington', 21, 80, 29), RealClubPlayer('Saidou Mara', 24, 79, 7)],
+      'forward': [RealClubPlayer('Joaquín Panichelli', 24, 82, 9), RealClubPlayer('Conrad Harder', 21, 82, 40), RealClubPlayer('Deivid Washington', 21, 80, 29), RealClubPlayer('Sekou Mara', 24, 79, 7)],
     },
     'Lyon': {
       'defender': [RealClubPlayer('Moussa Niakhaté', 30, 82, 19), RealClubPlayer('Nicolás Tagliafico', 34, 82, 3)],
