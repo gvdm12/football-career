@@ -325,7 +325,7 @@ class _ShopScreenState extends State<ShopScreen> {
             _sectionTitle('ЗДОРОВЬЕ И ВОССТАНОВЛЕНИЕ'),
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: _cardDecoration(),
+              decoration: _glassDecoration(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
