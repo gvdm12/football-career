@@ -5326,6 +5326,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
   }
 
   Future<void> _playFriendlyMatch(FriendlyMatch friendly) async {
+    if (worldCupBlocksSeason) {
+      await _openWorldCup();
+      return;
+    }
     if (isSaving || seasonFinishing || friendly.isPlayed || career.isInjured) {
       if (career.isInjured && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
