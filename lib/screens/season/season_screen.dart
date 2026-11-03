@@ -13,6 +13,8 @@ import 'package:flutter_football/models/league_player_season_stats.dart';
 import 'package:flutter_football/models/league_table.dart';
 import 'package:flutter_football/models/match.dart';
 import 'package:flutter_football/models/season_match.dart';
+import 'package:flutter_football/models/friendly_match.dart';
+import 'package:flutter_football/models/career_news.dart';
 import 'package:flutter_football/models/season_stats.dart';
 import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/models/player_of_month_award.dart';
@@ -4764,6 +4766,12 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     final List<MapEntry<double, Widget>> calendarItems = [];
 
+    for (final friendly in career.friendlyMatches) {
+      calendarItems.add(
+        MapEntry(-2.0 + friendly.number * 0.1, _buildFriendlyMatchRow(friendly)),
+      );
+    }
+
     for (final match in career.seasonMatches) {
       calendarItems.add(
         MapEntry(match.number.toDouble(), _buildMatchRow(match)),
@@ -5310,6 +5318,140 @@ class _SeasonScreenState extends State<SeasonScreen> {
               ),
           ],
         ),
+      ),
+    );
+  }
+
+  Future<void> _playFriendlyMatch(FriendlyMatch friendly) async {
+    if (isSaving || seasonFinishing || friendly.isPlayed || career.isInjured) {
+      if (career.isInjured && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Из-за травмы вы не можете сыграть товарищеский матч.')),
+        );
+      }
+      return;
+    }
+
+    final playedMatch = await Navigator.push<Match>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => InteractiveMatchScreen(
+          career: career.copyWith(player: career.playerForMatch),
+          opponent: friendly.opponent,
+          isHome: friendly.isHome,
+          playerWillPlay: true,
+        ),
+      ),
+    );
+    if (!mounted || playedMatch == null) return;
+
+    final expectedHome = friendly.isHome ? career.player.club : friendly.opponent;
+    final expectedAway = friendly.isHome ? friendly.opponent : career.player.club;
+    if (playedMatch.homeTeam != expectedHome || playedMatch.awayTeam != expectedAway) {
+      return;
+    }
+
+    final updatedFriendlies = career.friendlyMatches.map((item) =>
+      item.number == friendly.number ? item.copyWith(result: playedMatch) : item
+    ).toList();
+    final trustChange = playedMatch.playerRating >= 8.0
+        ? 2
+        : playedMatch.playerRating <= 5.8
+            ? -1
+            : 0;
+    final resultForPlayer = friendly.isHome
+        ? '${playedMatch.homeGoals} : ${playedMatch.awayGoals}'
+        : '${playedMatch.awayGoals} : ${playedMatch.homeGoals}';
+    final friendlyNews = CareerNews(
+      id: 'friendly_s${career.season}_${friendly.number}',
+      season: career.season,
+      matchNumber: -friendly.number,
+      title: 'Предсезонный матч завершён',
+      description: '${career.player.club} — ${friendly.opponent}: $resultForPlayer. Оценка игрока: ${playedMatch.playerRating.toStringAsFixed(1)}.',
+      type: CareerNewsType.match,
+    );
+
+    final updatedCareer = career.copyWith(
+      friendlyMatches: updatedFriendlies,
+      coachTrust: (career.coachTrust + trustChange).clamp(0, 100).toInt(),
+      news: [...career.news, friendlyNews],
+    );
+    setState(() => career = updatedCareer);
+    await _saveCareer(updatedCareer);
+  }
+
+  Widget _buildFriendlyMatchRow(FriendlyMatch friendly) {
+    final result = friendly.result;
+    final score = result == null
+        ? '— : —'
+        : friendly.isHome
+            ? '${result.homeGoals} : ${result.awayGoals}'
+            : '${result.awayGoals} : ${result.homeGoals}';
+    final resultColor = result == null
+        ? Colors.white54
+        : (friendly.isHome
+                ? result.homeGoals.compareTo(result.awayGoals)
+                : result.awayGoals.compareTo(result.homeGoals)) > 0
+            ? const Color(0xFF8BE07F)
+            : (friendly.isHome
+                    ? result.homeGoals.compareTo(result.awayGoals)
+                    : result.awayGoals.compareTo(result.homeGoals)) < 0
+                ? Colors.redAccent
+                : Colors.orangeAccent;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF13291D),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFF54745C)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'ПРЕДСЕЗОННАЯ ПОДГОТОВКА · ТОВАРИЩЕСКИЙ МАТЧ',
+            style: TextStyle(color: Color(0xFFB9C8BC), fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 0.6),
+          ),
+          const SizedBox(height: 7),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  '${friendly.isHome ? career.player.club : friendly.opponent} — ${friendly.isHome ? friendly.opponent : career.player.club}',
+                  style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700),
+                ),
+              ),
+              Text(score, style: TextStyle(color: resultColor, fontSize: 13, fontWeight: FontWeight.w900)),
+            ],
+          ),
+          if (result == null) ...[
+            const SizedBox(height: 9),
+            Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton.icon(
+                onPressed: isSaving || seasonFinishing
+                    ? null
+                    : () => _playFriendlyMatch(friendly),
+                icon: const Icon(Icons.sports_soccer, size: 15),
+                label: const Text('Сыграть'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF8BE07F),
+                  foregroundColor: const Color(0xFF082A12),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+            ),
+          ] else
+            Padding(
+              padding: const EdgeInsets.only(top: 5),
+              child: Text(
+                'Оценка игрока: ${result.playerRating.toStringAsFixed(1)} · В официальную статистику сезона не входит',
+                style: const TextStyle(color: Colors.white60, fontSize: 10),
+              ),
+            ),
+        ],
       ),
     );
   }
