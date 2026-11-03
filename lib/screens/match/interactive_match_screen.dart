@@ -330,12 +330,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
             s.vision * 0.22 +
             s.pace * 0.12;
       case 'twoOnOnePass':
-      case 'throughPass':
         return s.passing * 0.55 + s.vision * 0.35 + s.dribbling * 0.10;
       case 'twoOnOneShoot':
         return s.shooting * 0.65 + s.vision * 0.15 + s.dribbling * 0.20;
       case 'press':
-      case 'intercept':
         return s.defending * 0.40 + s.pace * 0.30 + s.vision * 0.20 + s.physical * 0.10;
       case 'recover':
         return s.pace * 0.40 + s.physical * 0.35 + s.defending * 0.25;
