@@ -324,7 +324,8 @@ class SeasonAwardService {
             PlayerPosition.forward =>
               ((realPlayer.overall - 65) * 0.25 + random.nextInt(8))
                   .round()
-                  .clamp(0, 25),
+                  .clamp(0, 25)
+                  .toInt(),
             PlayerPosition.midfielder =>
               ((realPlayer.overall - 65) * 0.43 + random.nextInt(9))
                   .round()
