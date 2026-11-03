@@ -51,7 +51,32 @@ class PlayerOfMonthAward {
     return PlayerOfMonthAward(
       season: (json['season'] as num?)?.toInt() ?? 1,
       month: (json['month'] as num?)?.toInt() ?? 1,
-      playerName: json['playerName'] as String? ?? 'Игрок',
+      playerName: (json['playerName'] as String? ?? 'Игрок').replaceFirst(RegExp(r'\s+\d{2}
+      club: json['club'] as String? ?? 'Неизвестный клуб',
+      position: PlayerPosition.values.firstWhere(
+        (item) => item.name == json['position'],
+        orElse: () => PlayerPosition.forward,
+      ),
+      overall: (json['overall'] as num?)?.toInt() ?? 60,
+      age: (json['age'] as num?)?.toInt() ?? 25,
+      matches: (json['matches'] as num?)?.toInt() ?? 0,
+      goals: (json['goals'] as num?)?.toInt() ?? 0,
+      assists: (json['assists'] as num?)?.toInt() ?? 0,
+      averageRating: (json['averageRating'] as num?)?.toDouble() ?? 6.0,
+      score: (json['score'] as num?)?.toDouble() ?? 0,
+      isCareerPlayer: json['isCareerPlayer'] as bool? ?? false,
+    );
+  }
+
+  String get monthName {
+    final index = month < 1 ? 0 : month > 12 ? 11 : month - 1;
+    return const [
+      'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь',
+    ][index];
+  }
+}
+), ''),
       club: json['club'] as String? ?? 'Неизвестный клуб',
       position: PlayerPosition.values.firstWhere(
         (item) => item.name == json['position'],
