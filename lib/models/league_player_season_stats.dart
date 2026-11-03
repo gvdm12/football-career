@@ -246,8 +246,26 @@ class LeaguePlayerStatsService {
     required List<String> processedMatchKeys,
     required List<LeagueMatch> fixtures,
   }) {
-    final players = List<LeaguePlayerSeasonStats>.from(current);
-    final processed = List<String>.from(processedMatchKeys);
+    final playedFixtureCount = fixtures.where((item) => item.isPlayed).length;
+    final storedMonthlyAppearances = current.fold<int>(
+      0,
+      (sum, player) => sum +
+          player.monthlyStats.values.fold<int>(
+            0,
+            (month, stats) => month + stats.matches,
+          ),
+    );
+    // Старые сохранения не содержат помесячной разбивки. Пересобираем
+    // детерминированную статистику из календаря, чтобы не смешивать месяцы.
+    final needsMonthlyRebuild = current.isNotEmpty &&
+        playedFixtureCount > 0 &&
+        storedMonthlyAppearances < playedFixtureCount * 22;
+    final players = needsMonthlyRebuild
+        ? <LeaguePlayerSeasonStats>[]
+        : List<LeaguePlayerSeasonStats>.from(current);
+    final processed = needsMonthlyRebuild
+        ? <String>[]
+        : List<String>.from(processedMatchKeys);
     final clubs = fixtures
         .expand((fixture) => [fixture.homeTeam, fixture.awayTeam])
         .toSet();
