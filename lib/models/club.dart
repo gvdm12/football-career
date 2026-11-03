@@ -132,6 +132,26 @@ extension LeagueInfo on League {
     }
   }
 
+  int get bestAssisterThreshold {
+    switch (this) {
+      case League.russia:
+      case League.belgium:
+      case League.turkey:
+      case League.mls:
+      case League.netherlands:
+      case League.saudiArabia:
+      case League.portugal:
+        return 16;
+      case League.italy:
+      case League.france:
+      case League.germany:
+        return 18;
+      case League.england:
+      case League.spain:
+        return 20;
+    }
+  }
+
   int get teamCount {
     switch (this) {
       case League.england:
