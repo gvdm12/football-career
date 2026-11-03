@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/player_status.dart';
@@ -61,9 +63,9 @@ class CoachScreen extends StatelessWidget {
     );
 
     return Scaffold(
-      backgroundColor: const Color(0xFF04160A),
+      backgroundColor: const Color(0xFF07130F),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0B3A1A),
+        backgroundColor: const Color(0xAA18241F),
         foregroundColor: Colors.white,
         title: Text(
           AppStrings.coachProfileTitle,
@@ -260,14 +262,39 @@ class CoachScreen extends StatelessWidget {
   }
 
   Widget _panel({required Widget child}) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0B2B14),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF24552C)),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withValues(alpha: 0.13),
+                Colors.white.withValues(alpha: 0.055),
+                const Color(0xFF101B16).withValues(alpha: 0.42),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.24),
+              width: 1.1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.16),
+                blurRadius: 22,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: child,
+        ),
       ),
-      child: child,
     );
   }
 }
