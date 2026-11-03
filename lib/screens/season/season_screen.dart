@@ -1096,96 +1096,101 @@ class _SeasonScreenState extends State<SeasonScreen> {
             ),
           ),
           Center(
-            child: _buildLiquidGlassSurface(
-              radius: 24,
-              child: AlertDialog(
-                backgroundColor: Colors.transparent,
-                surfaceTintColor: Colors.transparent,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  side: BorderSide.none,
-                ),
-                title: const Row(
-                  children: [
-                    Icon(
-                      Icons.emoji_events,
-                      color: Color(0xFFFFD54F),
-                      size: 28,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 430),
+                child: _buildLiquidGlassSurface(
+                  radius: 24,
+                  child: AlertDialog(
+                    backgroundColor: Colors.transparent,
+                    surfaceTintColor: Colors.transparent,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                      side: BorderSide.none,
                     ),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        'Игрок месяца',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      award.monthName,
-                      style: const TextStyle(
-                        color: Color(0xFF8BE07F),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      award.playerName,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    Text(
-                      award.club,
-                      style: const TextStyle(color: Colors.white70),
-                    ),
-
-                    const SizedBox(height: 14),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    title: const Row(
                       children: [
-                        _awardStat('МАТЧИ', award.matches.toString()),
-                        _awardStat('ГОЛЫ', award.goals.toString()),
-                        _awardStat('АССИСТЫ', award.assists.toString()),
-                        _awardStat(
-                          'ОЦЕНКА',
-                          award.averageRating.toStringAsFixed(1),
+                        Icon(
+                          Icons.emoji_events,
+                          color: Color(0xFFFFD54F),
+                          size: 28,
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Игрок месяца',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 14),
-                    Text(
-                      award.isCareerPlayer
-                          ? 'Поздравляем! Вы стали лучшим игроком месяца.'
-                          : 'В этом месяце награду получил другой футболист.',
-                      style: TextStyle(
-                        color: award.isCareerPlayer
-                            ? const Color(0xFF8BE07F)
-                            : Colors.white70,
-                        height: 1.35,
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          award.monthName,
+                          style: const TextStyle(
+                            color: Color(0xFF8BE07F),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          award.playerName,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        Text(
+                          award.club,
+                          style: const TextStyle(color: Colors.white70),
+                        ),
+                        const SizedBox(height: 14),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _awardStat('МАТЧИ', award.matches.toString()),
+                            _awardStat('ГОЛЫ', award.goals.toString()),
+                            _awardStat('АССИСТЫ', award.assists.toString()),
+                            _awardStat(
+                              'ОЦЕНКА',
+                              award.averageRating.toStringAsFixed(1),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          award.isCareerPlayer
+                              ? 'Поздравляем! Вы стали лучшим игроком месяца.'
+                              : 'В этом месяце награду получил другой футболист.',
+                          style: TextStyle(
+                            color: award.isCareerPlayer
+                                ? const Color(0xFF8BE07F)
+                                : Colors.white70,
+                            height: 1.35,
+                          ),
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(dialogContext),
+                        child: const Text(
+                          'Продолжить',
+                          style: TextStyle(color: Color(0xFF8BE07F)),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(dialogContext),
-                    child: const Text(
-                      'Продолжить',
-                      style: TextStyle(color: Color(0xFF8BE07F)),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -2825,39 +2830,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
       isSaving = false;
     });
 
-    final developmentResult = await Navigator.push<Career>(
-      context,
-      MaterialPageRoute(builder: (_) => DevelopmentScreen(career: career)),
-    );
-
-    if (!mounted) return;
-
-    if (developmentResult != null) {
-      setState(() {
-        career = developmentResult;
-      });
-
-      await _saveCareer(developmentResult);
-    }
-
-    if (!mounted) return;
-
-    // Старый контракт уменьшается перед трансферным окном.
-    // Новый контракт, подписанный в окне, сразу не уменьшается.
-    if (!alreadyArchived) {
-      final updatedContractCareer = career.copyWith(
-        contractYears: career.contractYears > 0 ? career.contractYears - 1 : 0,
-      );
-
-      setState(() {
-        career = updatedContractCareer;
-      });
-
-      await _saveCareer(updatedContractCareer);
-    }
-
-    if (!mounted) return;
-
     // После 20-го сезона карьера завершается.
     // Награды и статистика сезона к этому моменту уже сохранены.
     if (career.season >= 20) {
@@ -2890,6 +2862,39 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
       return;
     }
+
+    final developmentResult = await Navigator.push<Career>(
+      context,
+      MaterialPageRoute(builder: (_) => DevelopmentScreen(career: career)),
+    );
+
+    if (!mounted) return;
+
+    if (developmentResult != null) {
+      setState(() {
+        career = developmentResult;
+      });
+
+      await _saveCareer(developmentResult);
+    }
+
+    if (!mounted) return;
+
+    // Старый контракт уменьшается перед трансферным окном.
+    // Новый контракт, подписанный в окне, сразу не уменьшается.
+    if (!alreadyArchived) {
+      final updatedContractCareer = career.copyWith(
+        contractYears: career.contractYears > 0 ? career.contractYears - 1 : 0,
+      );
+
+      setState(() {
+        career = updatedContractCareer;
+      });
+
+      await _saveCareer(updatedContractCareer);
+    }
+
+    if (!mounted) return;
 
     await _openTransferWindowAndStartSeason();
   }
