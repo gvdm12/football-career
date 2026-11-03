@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/player.dart';
@@ -155,34 +157,35 @@ class _ShopScreenState extends State<ShopScreen> {
         if (!didPop) _closeShop();
       },
       child: Scaffold(
-      backgroundColor: const Color(0xFF061B0C),
+      backgroundColor: const Color(0xFF07130F),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0B3A1A),
+        elevation: 0,
+        centerTitle: true,
+        backgroundColor: const Color(0xAA18241F),
         foregroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: _closeShop,
         ),
-        title: const Text('Магазин'),
+        title: const Text('МАГАЗИН', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1.3)),
       ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF0B3A1A), Color(0xFF082A12), Color(0xFF04160A)],
+            colors: [Color(0xFF123522), Color(0xFF0A2117), Color(0xFF07130F)],
           ),
         ),
-        child: ListView(
-          padding: const EdgeInsets.all(18),
+        child: ClipRect(
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF102D18),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF3E9950)),
-              ),
+              decoration: _glassDecoration(),
               child: Row(
                 children: [
                   const Icon(
@@ -211,11 +214,11 @@ class _ShopScreenState extends State<ShopScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 10),
-            _sectionTitle('ТРЕНИРОВКИ'),
+            const SizedBox(height: 22),
+            _sectionTitle('УСИЛЕНИЕ ИГРЫ'),
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: _cardDecoration(),
+              decoration: _glassDecoration(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -293,8 +296,10 @@ class _ShopScreenState extends State<ShopScreen> {
                     ],
                   ),
                   const SizedBox(height: 6),
-                  SizedBox(
-                    width: double.infinity,
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: SizedBox(
+                    width: 205,
                     child: ElevatedButton(
                       onPressed: canTrain ? _buyTraining : null,
                       style: ElevatedButton.styleFrom(
@@ -311,15 +316,16 @@ class _ShopScreenState extends State<ShopScreen> {
                             : 'Купить бустер +5 на 3 матча',
                       ),
                     ),
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 10),
-            _sectionTitle('ВОССТАНОВЛЕНИЕ'),
+            const SizedBox(height: 18),
+            _sectionTitle('ЗДОРОВЬЕ И ВОССТАНОВЛЕНИЕ'),
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: _cardDecoration(),
+              decoration: _glassDecoration(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -365,8 +371,10 @@ class _ShopScreenState extends State<ShopScreen> {
                     ],
                   ),
                   const SizedBox(height: 6),
-                  SizedBox(
-                    width: double.infinity,
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: SizedBox(
+                    width: 205,
                     child: ElevatedButton(
                       onPressed:
                           career.isInjured &&
@@ -390,11 +398,13 @@ class _ShopScreenState extends State<ShopScreen> {
                             : 'Сократить травму на 2 матча',
                       ),
                     ),
+                    ),
                   ),
                 ],
               ),
             ),
           ],
+          ),
         ),
       ),
       ),
@@ -416,11 +426,26 @@ class _ShopScreenState extends State<ShopScreen> {
     );
   }
 
-  BoxDecoration _cardDecoration() {
+  BoxDecoration _glassDecoration() {
     return BoxDecoration(
-      color: const Color(0xFF0A2110),
-      borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: const Color(0xFF24552C)),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Colors.white.withValues(alpha: 0.13),
+          Colors.white.withValues(alpha: 0.055),
+          const Color(0xFF101B16).withValues(alpha: 0.42),
+        ],
+      ),
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: Colors.white.withValues(alpha: 0.22), width: 1.1),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.16),
+          blurRadius: 22,
+          offset: const Offset(0, 8),
+        ),
+      ],
     );
   }
 }
