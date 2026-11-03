@@ -257,9 +257,13 @@ class LeaguePlayerStatsService {
     );
     // Старые сохранения не содержат помесячной разбивки. Пересобираем
     // детерминированную статистику из календаря, чтобы не смешивать месяцы.
+    final hasLegacySeasonStats = current.any((player) => player.matches > 0);
+    final expectedProcessedAppearances = processedMatchKeys.length * 22;
     final needsMonthlyRebuild = current.isNotEmpty &&
         playedFixtureCount > 0 &&
-        storedMonthlyAppearances < playedFixtureCount * 22;
+        (processedMatchKeys.isNotEmpty
+            ? storedMonthlyAppearances < expectedProcessedAppearances
+            : hasLegacySeasonStats && storedMonthlyAppearances == 0);
     final players = needsMonthlyRebuild
         ? <LeaguePlayerSeasonStats>[]
         : List<LeaguePlayerSeasonStats>.from(current);
