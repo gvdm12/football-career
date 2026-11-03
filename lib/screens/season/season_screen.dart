@@ -37,6 +37,7 @@ import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/screens/press_conference_dialog.dart';
 import 'package:flutter_football/services/career_storage.dart';
 import 'package:flutter_football/screens/career_end_screen.dart';
+import 'package:flutter_football/widgets/liquid_glass.dart';
 import 'package:flutter_svg/svg.dart';
 
 class SeasonScreen extends StatefulWidget {
@@ -2758,40 +2759,40 @@ class _SeasonScreenState extends State<SeasonScreen> {
             award.playerName == career.player.name &&
             award.club == career.player.club,
       );
-      final updatedHistory =
-          (wonGoldenBoot || wonBestAssister)
-              ? completedCareer.history.map((stats) {
-                  if (stats.season != career.season) return stats;
-                  final achievements = [...stats.achievements];
-                  if (wonGoldenBoot) {
-                    if (!achievements.contains('Золотая бутса')) {
-                      achievements.add('Золотая бутса');
-                    }
-                    if (!achievements.contains('Бомбардир сезона')) {
-                      achievements.add('Бомбардир сезона');
-                    }
-                  }
-                  if (wonBestAssister &&
-                      !achievements.contains('Лучший ассистент')) {
-                    achievements.add('Лучший ассистент');
-                  }
-                  return SeasonStats(
-                    season: stats.season,
-                    club: stats.club,
-                    matches: stats.matches,
-                    goals: stats.goals,
-                    assists: stats.assists,
-                    yellowCards: stats.yellowCards,
-                    redCards: stats.redCards,
-                    averageRating: stats.averageRating,
-                    achievements: achievements,
-                  );
-                }).toList()
-              : completedCareer.history;
+      final updatedHistory = (wonGoldenBoot || wonBestAssister)
+          ? completedCareer.history.map((stats) {
+              if (stats.season != career.season) return stats;
+              final achievements = [...stats.achievements];
+              if (wonGoldenBoot) {
+                if (!achievements.contains('Золотая бутса')) {
+                  achievements.add('Золотая бутса');
+                }
+                if (!achievements.contains('Бомбардир сезона')) {
+                  achievements.add('Бомбардир сезона');
+                }
+              }
+              if (wonBestAssister &&
+                  !achievements.contains('Лучший ассистент')) {
+                achievements.add('Лучший ассистент');
+              }
+              return SeasonStats(
+                season: stats.season,
+                club: stats.club,
+                matches: stats.matches,
+                goals: stats.goals,
+                assists: stats.assists,
+                yellowCards: stats.yellowCards,
+                redCards: stats.redCards,
+                averageRating: stats.averageRating,
+                achievements: achievements,
+              );
+            }).toList()
+          : completedCareer.history;
       completedCareer = completedCareer.copyWith(
         seasonAwards: [...completedCareer.seasonAwards, ...seasonAwards],
         history: updatedHistory,
-        agentCredits: completedCareer.agentCredits +
+        agentCredits:
+            completedCareer.agentCredits +
             (wonGoldenBoot ? 10 : 0) +
             (wonBestAssister ? 10 : 0),
       );
@@ -4439,6 +4440,108 @@ class _SeasonScreenState extends State<SeasonScreen> {
   //   );
   // }
 
+  // Widget _buildNextMatchCard(SeasonMatch match) {
+  //   final playerColor = ClubColors.primary(career.player.club);
+  //   final opponentColor = ClubColors.primary(match.opponent);
+  //   final interactiveAvailable = _canPlayInteractiveMatch(
+  //     opponent: match.opponent,
+  //     isHome: match.isHome,
+  //   );
+  //   return _buildMatchGlassSurface(
+  //     child: Container(
+  //       padding: const EdgeInsets.all(16),
+  //       decoration: BoxDecoration(
+  //         gradient: LinearGradient(
+  //           colors: [
+  //             playerColor.withValues(alpha: 0.72),
+  //             Color.lerp(
+  //               playerColor,
+  //               opponentColor,
+  //               0.45,
+  //             )!.withValues(alpha: 0.70),
+  //             const Color(0xFF102B17).withValues(alpha: 0.78),
+  //           ],
+  //           begin: Alignment.topLeft,
+  //           end: Alignment.bottomRight,
+  //         ),
+  //         border: Border.all(color: opponentColor.withValues(alpha: 0.8)),
+  //         borderRadius: BorderRadius.circular(16),
+  //       ),
+  //       child: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Text(
+  //             AppStrings.nextMatch,
+  //             style: TextStyle(
+  //               color: Color.fromARGB(255, 255, 255, 255),
+  //               fontWeight: FontWeight.bold,
+  //               fontSize: 12,
+  //             ),
+  //           ),
+  //           const SizedBox(height: 8),
+  //           Text(
+  //             match.isHome
+  //                 ? '${career.player.club} — ${match.opponent}'
+  //                 : '${match.opponent} — ${career.player.club}',
+  //             style: const TextStyle(
+  //               color: Colors.white,
+  //               fontSize: 16,
+  //               fontWeight: FontWeight.bold,
+  //             ),
+  //           ),
+  //           const SizedBox(height: 6),
+  //           Text(
+  //             '${AppStrings.round} ${match.number} • '
+  //             '${match.isHome ? AppStrings.home : AppStrings.away}',
+  //             style: const TextStyle(color: Colors.white, fontSize: 12),
+  //           ),
+  //           const SizedBox(height: 14),
+  //           Row(
+  //             children: [
+  //               Expanded(
+  //                 child: ElevatedButton.icon(
+  //                   onPressed: isSaving || seasonFinishing
+  //                       ? null
+  //                       : () => _playMatch(match, interactive: false),
+  //                   label: const Text('Симуляция'),
+  //                   style: ElevatedButton.styleFrom(
+  //                     backgroundColor: const Color(0xFFE8EDE8),
+  //                     foregroundColor: const Color(0xFF102B17),
+  //                     padding: const EdgeInsets.symmetric(vertical: 12),
+  //                     shape: RoundedRectangleBorder(
+  //                       borderRadius: BorderRadius.circular(10),
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //               if (interactiveAvailable) ...[
+  //                 const SizedBox(width: 10),
+  //                 Expanded(
+  //                   child: ElevatedButton.icon(
+  //                     onPressed: isSaving || seasonFinishing
+  //                         ? null
+  //                         : () => _playMatch(match, interactive: true),
+  //                     icon: const Icon(Icons.sports_soccer, size: 18),
+  //                     label: const Text('Играть'),
+  //                     style: ElevatedButton.styleFrom(
+  //                       backgroundColor: const Color(0xFF22C55E),
+  //                       foregroundColor: const Color(0xFF06210D),
+  //                       padding: const EdgeInsets.symmetric(vertical: 12),
+  //                       shape: RoundedRectangleBorder(
+  //                         borderRadius: BorderRadius.circular(10),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ],
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
   Widget _buildNextMatchCard(SeasonMatch match) {
     final playerColor = ClubColors.primary(career.player.club);
     final opponentColor = ClubColors.primary(match.opponent);
@@ -4446,96 +4549,113 @@ class _SeasonScreenState extends State<SeasonScreen> {
       opponent: match.opponent,
       isHome: match.isHome,
     );
-    return _buildMatchGlassSurface(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              playerColor.withValues(alpha: 0.72),
-              Color.lerp(
-                playerColor,
-                opponentColor,
-                0.45,
-              )!.withValues(alpha: 0.70),
-              const Color(0xFF102B17).withValues(alpha: 0.78),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+    final busy = isSaving || seasonFinishing;
+
+    return LiquidGlass(
+      radius: 25,
+      tint: Color.lerp(playerColor, opponentColor, 0.5),
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppStrings.nextMatch,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.75),
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
+              letterSpacing: 0.4,
+            ),
           ),
-          border: Border.all(color: opponentColor.withValues(alpha: 0.8)),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              AppStrings.nextMatch,
-              style: TextStyle(
-                color: Color.fromARGB(255, 255, 255, 255),
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
+          const SizedBox(height: 8),
+          Text(
+            match.isHome
+                ? '${career.player.club} — ${match.opponent}'
+                : '${match.opponent} — ${career.player.club}',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 19,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.3,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '${AppStrings.round} ${match.number} • '
+            '${match.isHome ? AppStrings.home : AppStrings.away}',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.7),
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _glassButton(
+                  label: 'Симуляция',
+                  onPressed: busy
+                      ? null
+                      : () => _playMatch(match, interactive: false),
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              match.isHome
-                  ? '${career.player.club} — ${match.opponent}'
-                  : '${match.opponent} — ${career.player.club}',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              '${AppStrings.round} ${match.number} • '
-              '${match.isHome ? AppStrings.home : AppStrings.away}',
-              style: const TextStyle(color: Colors.white, fontSize: 12),
-            ),
-            const SizedBox(height: 14),
-            Row(
-              children: [
+              if (interactiveAvailable) ...[
+                const SizedBox(width: 10),
                 Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: isSaving || seasonFinishing
+                  child: _glassButton(
+                    label: 'Играть',
+                    accent: const Color(0xFF22C55E),
+                    icon: Icons.sports_soccer,
+                    onPressed: busy
                         ? null
-                        : () => _playMatch(match, interactive: false),
-                    label: const Text('Симуляция'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFE8EDE8),
-                      foregroundColor: const Color(0xFF102B17),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
+                        : () => _playMatch(match, interactive: true),
                   ),
                 ),
-                if (interactiveAvailable) ...[
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: isSaving || seasonFinishing
-                          ? null
-                          : () => _playMatch(match, interactive: true),
-                      icon: const Icon(Icons.sports_soccer, size: 18),
-                      label: const Text('Играть'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF22C55E),
-                        foregroundColor: const Color(0xFF06210D),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
-                  ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _glassButton({
+    required String label,
+    required VoidCallback? onPressed,
+    Color? accent,
+    IconData? icon,
+  }) {
+    final base = accent ?? Colors.white;
+    return Opacity(
+      opacity: onPressed == null ? 0.5 : 1,
+      child: Material(
+        color: base.withValues(alpha: accent == null ? 0.16 : 0.55),
+        shape: StadiumBorder(
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.35)),
+        ),
+        child: InkWell(
+          customBorder: const StadiumBorder(),
+          onTap: onPressed,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (icon != null) ...[
+                  Icon(icon, size: 17, color: Colors.white),
+                  const SizedBox(width: 6),
                 ],
+                Text(
+                  label,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );
