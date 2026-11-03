@@ -67,7 +67,27 @@ class PlayerOfMonthService {
         match.isPlayed).toList();
     if (monthFixtures.isEmpty) return null;
 
-    // Для остальных клубов берём помесячную статистику из той же модели,
+    // Конкуренты за позицию используют собственные помесячные показатели,
+    // которые одновременно суммируются в их сезонную статистику на экране команды.
+    for (final rival in rivals) {
+      final monthStats = rival.monthlyStats[month];
+      if (monthStats == null || monthStats.matches == 0) continue;
+      candidates.add(_candidate(
+        season: season,
+        month: month,
+        name: rival.name,
+        club: player.club,
+        age: rival.age,
+        position: rival.position,
+        overall: rival.overall,
+        matches: monthStats.matches,
+        goals: monthStats.goals,
+        assists: monthStats.assists,
+        averageRating: monthStats.averageRating,
+      ));
+    }
+
+    // Для остальных клубов берём помесячные показатели из той же модели,
     // которая накапливает сезонные голы, ассисты и оценки.
     for (final item in leaguePlayerStats) {
       if (item.matches == 0) continue;
