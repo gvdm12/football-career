@@ -82,7 +82,6 @@ class RealClubSquads {
         RealClubPlayer('Khvicha Kvaratskhelia', 25, 90, 7),
         RealClubPlayer('Désiré Doué', 21, 88, 14),
         RealClubPlayer('Ferran Torres', 26, 85, 9),
-        RealClubPlayer('Mika Godts', 21, 84, 22),
       ],
     },
     'Liverpool': {
@@ -424,522 +423,189 @@ class RealClubSquads {
 
     // Составы средних клубов сезона 2026/27. Общие рейтинги — игровые оценки.
     'Newcastle United': {
-      'defender': [
-        RealClubPlayer('Sven Botman', 26, 83, 4),
-        RealClubPlayer('Tino Livramento', 23, 82, 2),
-      ],
-      'midfielder': [
-        RealClubPlayer('Joelinton', 30, 82, 7),
-        RealClubPlayer('Jacob Ramsey', 25, 81, 41),
-      ],
-      'forward': [
-        RealClubPlayer('Yoane Wissa', 30, 83, 9),
-        RealClubPlayer('Anthony Elanga', 24, 82, 19),
-      ],
+      'defender': [RealClubPlayer('Sven Botman', 26, 83, 4), RealClubPlayer('Tino Livramento', 23, 82, 2)],
+      'midfielder': [RealClubPlayer('Joelinton', 30, 82, 7), RealClubPlayer('Jacob Ramsey', 25, 81, 41), RealClubPlayer('Lewis Miley', 20, 79, 67)],
+      'forward': [RealClubPlayer('Yoane Wissa', 30, 83, 9), RealClubPlayer('Anthony Elanga', 24, 82, 19), RealClubPlayer('Harvey Barnes', 28, 83, 11), RealClubPlayer('William Osula', 23, 79, 10)],
     },
     'Brighton': {
-      'defender': [
-        RealClubPlayer('Lewis Dunk', 34, 81, 5),
-        RealClubPlayer('Olivier Boscagli', 28, 82, 21),
-      ],
-      'midfielder': [
-        RealClubPlayer('Mats Wieffer', 26, 81, 27),
-        RealClubPlayer('Yasin Ayari', 23, 80, 26),
-      ],
-      'forward': [
-        RealClubPlayer('Kaoru Mitoma', 29, 84, 7),
-        RealClubPlayer('Georginio Rutter', 24, 82, 10),
-      ],
+      'defender': [RealClubPlayer('Lewis Dunk', 34, 81, 5), RealClubPlayer('Olivier Boscagli', 28, 82, 21)],
+      'midfielder': [RealClubPlayer('Mats Wieffer', 26, 81, 27), RealClubPlayer('Yasin Ayari', 23, 80, 26), RealClubPlayer("Matt O'Riley", 26, 82, 33)],
+      'forward': [RealClubPlayer('Kaoru Mitoma', 29, 84, 7), RealClubPlayer('Georginio Rutter', 24, 82, 10), RealClubPlayer('Yankuba Minteh', 22, 83, 11), RealClubPlayer('Evan Ferguson', 22, 81, 28)],
     },
     'Aston Villa': {
-      'defender': [
-        RealClubPlayer('Matty Cash', 29, 81, 2),
-        RealClubPlayer('Pau Torres', 29, 83, 14),
-      ],
-      'midfielder': [
-        RealClubPlayer('John McGinn', 31, 82, 7),
-        RealClubPlayer('Amadou Onana', 25, 83, 24),
-      ],
-      'forward': [
-        RealClubPlayer('Nicolas Jackson', 25, 84, 11),
-        RealClubPlayer('Alejandro Garnacho', 22, 83, 17),
-      ],
+      'defender': [RealClubPlayer('Matty Cash', 29, 81, 2), RealClubPlayer('Pau Torres', 29, 83, 14)],
+      'midfielder': [RealClubPlayer('John McGinn', 31, 82, 7), RealClubPlayer('Amadou Onana', 25, 83, 24), RealClubPlayer('Leon Goretzka', 31, 85, 27)],
+      'forward': [RealClubPlayer('Nicolas Jackson', 25, 84, 11), RealClubPlayer('Alejandro Garnacho', 22, 83, 17), RealClubPlayer('Tammy Abraham', 29, 82, 18), RealClubPlayer('Ibrahim Mbaye', 18, 78, 19)],
     },
     'Bayer Leverkusen': {
-      'defender': [
-        RealClubPlayer('Jarell Quansah', 23, 83, 4),
-        RealClubPlayer('Edmond Tapsoba', 27, 84, 12),
-      ],
-      'midfielder': [
-        RealClubPlayer('Malik Tillman', 24, 84, 10),
-        RealClubPlayer('Aleix García', 29, 82, 24),
-      ],
-      'forward': [
-        RealClubPlayer('Patrik Schick', 30, 85, 14),
-        RealClubPlayer('Victor Boniface', 25, 83, 22),
-      ],
+      'defender': [RealClubPlayer('Jarell Quansah', 23, 83, 4), RealClubPlayer('Edmond Tapsoba', 27, 84, 12)],
+      'midfielder': [RealClubPlayer('Malik Tillman', 24, 84, 10), RealClubPlayer('Aleix García', 29, 82, 24), RealClubPlayer('Ibrahim Maza', 20, 82, 30)],
+      'forward': [RealClubPlayer('Patrik Schick', 30, 85, 14), RealClubPlayer('Victor Boniface', 25, 83, 22), RealClubPlayer('Nathan Tella', 27, 82, 23), RealClubPlayer('Moussa Diaby', 27, 84, 19)],
     },
     'RB Leipzig': {
-      'defender': [
-        RealClubPlayer('Willi Orbán', 33, 83, 4),
-        RealClubPlayer('Maxime Estève', 24, 82, 3),
-      ],
-      'midfielder': [
-        RealClubPlayer('Nicolas Seiwald', 25, 82, 13),
-        RealClubPlayer('Assan Ouédraogo', 20, 82, 8),
-      ],
-      'forward': [
-        RealClubPlayer('Antonio Nusa', 21, 84, 7),
-        RealClubPlayer('Johan Bakayoko', 23, 84, 11),
-      ],
+      'defender': [RealClubPlayer('Willi Orbán', 33, 83, 4), RealClubPlayer('Maxime Estève', 24, 82, 3)],
+      'midfielder': [RealClubPlayer('Nicolas Seiwald', 25, 82, 13), RealClubPlayer('Assan Ouédraogo', 20, 82, 8), RealClubPlayer('Brajan Gruda', 22, 83, 10)],
+      'forward': [RealClubPlayer('Antonio Nusa', 21, 84, 7), RealClubPlayer('Johan Bakayoko', 23, 84, 11), RealClubPlayer('Marc Guiu', 20, 81, 9), RealClubPlayer('Christopher Nkunku', 28, 86, 28)],
     },
     'VfB Stuttgart': {
-      'defender': [
-        RealClubPlayer('Jeff Chabot', 28, 82, 24),
-        RealClubPlayer('Maximilian Mittelstädt', 29, 83, 7),
-      ],
-      'midfielder': [
-        RealClubPlayer('Angelo Stiller', 25, 85, 6),
-        RealClubPlayer('Bilal El Khannouss', 22, 83, 11),
-      ],
-      'forward': [
-        RealClubPlayer('Ermedin Demirović', 28, 84, 9),
-        RealClubPlayer('Deniz Undav', 30, 85, 26),
-      ],
+      'defender': [RealClubPlayer('Jeff Chabot', 28, 82, 24), RealClubPlayer('Maximilian Mittelstädt', 29, 83, 7)],
+      'midfielder': [RealClubPlayer('Angelo Stiller', 25, 85, 6), RealClubPlayer('Bilal El Khannouss', 22, 83, 11), RealClubPlayer('Chris Führich', 28, 83, 10)],
+      'forward': [RealClubPlayer('Ermedin Demirović', 28, 84, 9), RealClubPlayer('Deniz Undav', 30, 85, 26), RealClubPlayer('Tiago Tomás', 24, 81, 8), RealClubPlayer('Jamie Leweling', 25, 83, 18)],
     },
     'Lazio': {
-      'defender': [
-        RealClubPlayer('Diogo Leite', 27, 81, 2),
-        RealClubPlayer('Nuno Tavares', 26, 82, 17),
-      ],
-      'midfielder': [
-        RealClubPlayer('Nicolò Rovella', 24, 83, 6),
-        RealClubPlayer('Davide Frattesi', 26, 84, 16),
-      ],
-      'forward': [
-        RealClubPlayer('Mattia Zaccagni', 31, 83, 10),
-        RealClubPlayer('Andrea Pinamonti', 27, 82, 9),
-      ],
+      'defender': [RealClubPlayer('Diogo Leite', 27, 81, 2), RealClubPlayer('Nuno Tavares', 26, 82, 17)],
+      'midfielder': [RealClubPlayer('Nicolò Rovella', 24, 83, 6), RealClubPlayer('Davide Frattesi', 26, 84, 16), RealClubPlayer('Kenneth Taylor', 24, 83, 24)],
+      'forward': [RealClubPlayer('Mattia Zaccagni', 31, 83, 10), RealClubPlayer('Andrea Pinamonti', 27, 82, 9), RealClubPlayer('Boulaye Dia', 30, 82, 19), RealClubPlayer('Petar Ratkov', 23, 80, 20)],
     },
     'Atalanta': {
-      'defender': [
-        RealClubPlayer('Isak Hien', 27, 83, 4),
-        RealClubPlayer('Giorgio Scalvini', 22, 84, 42),
-      ],
-      'midfielder': [
-        RealClubPlayer('Éderson', 27, 85, 13),
-        RealClubPlayer('Mario Pašalić', 31, 83, 8),
-      ],
-      'forward': [
-        RealClubPlayer('Gianluca Scamacca', 27, 84, 9),
-        RealClubPlayer('Charles De Ketelaere', 25, 85, 17),
-      ],
+      'defender': [RealClubPlayer('Isak Hien', 27, 83, 4), RealClubPlayer('Giorgio Scalvini', 22, 84, 42)],
+      'midfielder': [RealClubPlayer('Éderson', 27, 85, 13), RealClubPlayer('Mario Pašalić', 31, 83, 8), RealClubPlayer('Lazar Samardžić', 24, 83, 10)],
+      'forward': [RealClubPlayer('Gianluca Scamacca', 27, 84, 9), RealClubPlayer('Charles De Ketelaere', 25, 85, 17), RealClubPlayer('Jonathan Rowe', 22, 82, 11), RealClubPlayer('Giacomo Raspadori', 26, 83, 18)],
     },
     'Fiorentina': {
-      'defender': [
-        RealClubPlayer('Dodô', 27, 82, 2),
-        RealClubPlayer('Marin Pongračić', 28, 81, 5),
-      ],
-      'midfielder': [
-        RealClubPlayer('Nicolò Fagioli', 25, 83, 44),
-        RealClubPlayer('Rolando Mandragora', 29, 81, 8),
-      ],
-      'forward': [
-        RealClubPlayer('Moise Kean', 26, 84, 9),
-        RealClubPlayer('Albert Gudmundsson', 29, 84, 11),
-      ],
+      'defender': [RealClubPlayer('Dodô', 27, 82, 2), RealClubPlayer('Marin Pongračić', 28, 81, 5)],
+      'midfielder': [RealClubPlayer('Nicolò Fagioli', 25, 83, 44), RealClubPlayer('Rolando Mandragora', 29, 81, 8), RealClubPlayer('Cher Ndour', 22, 81, 27)],
+      'forward': [RealClubPlayer('Moise Kean', 26, 84, 9), RealClubPlayer('Albert Gudmundsson', 29, 84, 11), RealClubPlayer('Alieu Njie', 21, 79, 25), RealClubPlayer('Wilfried Gnonto', 22, 83, 29)],
     },
     'Lille': {
-      'defender': [
-        RealClubPlayer('Nathan Ngoy', 23, 81, 3),
-        RealClubPlayer('Alexsandro', 27, 82, 4),
-      ],
-      'midfielder': [
-        RealClubPlayer('Nabil Bentaleb', 31, 81, 6),
-        RealClubPlayer('Hákon Haraldsson', 23, 82, 10),
-      ],
-      'forward': [
-        RealClubPlayer('Olivier Giroud', 40, 80, 9),
-        RealClubPlayer('Dilane Bakwa', 24, 82, 7),
-      ],
+      'defender': [RealClubPlayer('Nathan Ngoy', 23, 81, 3), RealClubPlayer('Alexsandro', 27, 82, 4)],
+      'midfielder': [RealClubPlayer('Nabil Bentaleb', 31, 81, 6), RealClubPlayer('Hákon Haraldsson', 23, 82, 10), RealClubPlayer('Osame Sahraoui', 25, 82, 11)],
+      'forward': [RealClubPlayer('Olivier Giroud', 40, 80, 9), RealClubPlayer('Dilane Bakwa', 24, 82, 7), RealClubPlayer('Ayase Ueda', 28, 82, 18), RealClubPlayer('Gaëtan Perrin', 30, 80, 28)],
     },
     'Marseille': {
-      'defender': [
-        RealClubPlayer('Leonardo Balerdi', 27, 83, 5),
-        RealClubPlayer('Nayef Aguerd', 30, 84, 21),
-      ],
-      'midfielder': [
-        RealClubPlayer('Pierre-Emile Højbjerg', 31, 84, 23),
-        RealClubPlayer('Angel Gomes', 26, 82, 7),
-      ],
-      'forward': [
-        RealClubPlayer('Amine Gouiri', 26, 84, 9),
-        RealClubPlayer('Igor Paixão', 26, 84, 14),
-      ],
+      'defender': [RealClubPlayer('Leonardo Balerdi', 27, 83, 5), RealClubPlayer('Nayef Aguerd', 30, 84, 21)],
+      'midfielder': [RealClubPlayer('Pierre-Emile Højbjerg', 31, 84, 23), RealClubPlayer('Angel Gomes', 26, 82, 7), RealClubPlayer('Tochukwu Nnadi', 23, 79, 6)],
+      'forward': [RealClubPlayer('Amine Gouiri', 26, 84, 9), RealClubPlayer('Igor Paixão', 26, 84, 14), RealClubPlayer('Neal Maupay', 30, 81, 11), RealClubPlayer('Faris Moumbagna', 26, 79, 29)],
     },
     'Monaco': {
-      'defender': [
-        RealClubPlayer('Vanderson', 25, 83, 2),
-        RealClubPlayer('Mohammed Salisu', 27, 82, 22),
-      ],
-      'midfielder': [
-        RealClubPlayer('Denis Zakaria', 29, 84, 6),
-        RealClubPlayer('Aleksandr Golovin', 30, 84, 10),
-      ],
-      'forward': [
-        RealClubPlayer('Folarin Balogun', 25, 83, 9),
-        RealClubPlayer('Mika Biereth', 23, 82, 14),
-      ],
+      'defender': [RealClubPlayer('Vanderson', 25, 83, 2), RealClubPlayer('Mohammed Salisu', 27, 82, 22)],
+      'midfielder': [RealClubPlayer('Denis Zakaria', 29, 84, 6), RealClubPlayer('Aleksandr Golovin', 30, 84, 10), RealClubPlayer('Lamine Camara', 22, 83, 8)],
+      'forward': [RealClubPlayer('Folarin Balogun', 25, 83, 9), RealClubPlayer('Mika Biereth', 23, 82, 14), RealClubPlayer('Matthis Abline', 23, 82, 11), RealClubPlayer('Ansu Fati', 24, 83, 31)],
     },
     'Strasbourg': {
-      'defender': [
-        RealClubPlayer('Andrew Omobamidele', 24, 81, 2),
-        RealClubPlayer('Ben Chilwell', 29, 82, 3),
-      ],
-      'midfielder': [
-        RealClubPlayer('Giovanni Reyna', 23, 82, 10),
-        RealClubPlayer('Dário Essugo', 21, 81, 14),
-      ],
-      'forward': [
-        RealClubPlayer('Joaquín Panichelli', 24, 82, 9),
-        RealClubPlayer('Conrad Harder', 21, 82, 40),
-      ],
+      'defender': [RealClubPlayer('Andrew Omobamidele', 24, 81, 2), RealClubPlayer('Ben Chilwell', 29, 82, 3)],
+      'midfielder': [RealClubPlayer('Giovanni Reyna', 23, 82, 10), RealClubPlayer('Dário Essugo', 21, 81, 14), RealClubPlayer('Maximilian Oyedele', 21, 80, 8)],
+      'forward': [RealClubPlayer('Joaquín Panichelli', 24, 82, 9), RealClubPlayer('Conrad Harder', 21, 82, 40), RealClubPlayer('Deivid Washington', 21, 80, 29), RealClubPlayer('Sekou Mara', 24, 79, 7)],
     },
     'Lyon': {
-      'defender': [
-        RealClubPlayer('Moussa Niakhaté', 30, 82, 19),
-        RealClubPlayer('Nicolás Tagliafico', 34, 82, 3),
-      ],
-      'midfielder': [
-        RealClubPlayer('Corentin Tolisso', 32, 83, 8),
-        RealClubPlayer('Tyler Morton', 23, 82, 23),
-      ],
-      'forward': [
-        RealClubPlayer('Ernest Nuamah', 22, 83, 7),
-        RealClubPlayer('Loïs Openda', 26, 85, 17),
-      ],
+      'defender': [RealClubPlayer('Moussa Niakhaté', 30, 82, 19), RealClubPlayer('Nicolás Tagliafico', 34, 82, 3)],
+      'midfielder': [RealClubPlayer('Corentin Tolisso', 32, 83, 8), RealClubPlayer('Tyler Morton', 23, 82, 23), RealClubPlayer('Pavel Šulc', 25, 83, 10)],
+      'forward': [RealClubPlayer('Ernest Nuamah', 22, 83, 7), RealClubPlayer('Loïs Openda', 26, 85, 17), RealClubPlayer('Kail Boudache', 20, 78, 26), RealClubPlayer('Rémi Himbert', 18, 77, 45)],
     },
     'Real Betis': {
-      'defender': [
-        RealClubPlayer('Natan', 25, 82, 4),
-        RealClubPlayer('Marc Bartra', 35, 81, 5),
-      ],
-      'midfielder': [
-        RealClubPlayer('Pablo Fornals', 30, 83, 8),
-        RealClubPlayer('Isco', 34, 82, 22),
-      ],
-      'forward': [
-        RealClubPlayer('Antony', 26, 84, 7),
-        RealClubPlayer('Cucho Hernández', 27, 83, 9),
-      ],
+      'defender': [RealClubPlayer('Natan', 25, 82, 4), RealClubPlayer('Marc Bartra', 35, 81, 5)],
+      'midfielder': [RealClubPlayer('Pablo Fornals', 30, 83, 8), RealClubPlayer('Isco', 34, 85, 22), RealClubPlayer('Giovani Lo Celso', 30, 84, 20)],
+      'forward': [RealClubPlayer('Antony', 26, 84, 7), RealClubPlayer('Cucho Hernández', 27, 83, 9), RealClubPlayer('Abde Ezzalzouli', 24, 83, 10), RealClubPlayer('Troy Parrott', 24, 81, 19)],
     },
     'Real Sociedad': {
-      'defender': [
-        RealClubPlayer('Igor Zubeldia', 29, 82, 5),
-        RealClubPlayer('Jon Aramburu', 24, 81, 2),
-      ],
-      'midfielder': [
-        RealClubPlayer('Beñat Turrientes', 24, 81, 8),
-        RealClubPlayer('Jon Gorrotxategi', 24, 80, 4),
-      ],
-      'forward': [
-        RealClubPlayer('Mikel Oyarzabal', 29, 85, 10),
-        RealClubPlayer('Orri Óskarsson', 21, 82, 9),
-      ],
+      'defender': [RealClubPlayer('Igor Zubeldia', 29, 82, 5), RealClubPlayer('Jon Aramburu', 24, 81, 2)],
+      'midfielder': [RealClubPlayer('Beñat Turrientes', 24, 81, 8), RealClubPlayer('Jon Gorrotxategi', 24, 80, 4), RealClubPlayer('Carlos Soler', 29, 83, 18)],
+      'forward': [RealClubPlayer('Mikel Oyarzabal', 29, 85, 10), RealClubPlayer('Orri Óskarsson', 21, 82, 9), RealClubPlayer('Takefusa Kubo', 25, 85, 14), RealClubPlayer('Gonçalo Guedes', 29, 82, 11)],
     },
     'Sevilla': {
-      'defender': [
-        RealClubPlayer('Juan Iglesias', 28, 80, 2),
-        RealClubPlayer('José Ángel Carmona', 24, 81, 22),
-      ],
-      'midfielder': [
-        RealClubPlayer('Lucien Agoumé', 24, 81, 6),
-        RealClubPlayer('Jon Guridi', 31, 80, 18),
-      ],
-      'forward': [
-        RealClubPlayer('Robbie Ure', 22, 78, 9),
-        RealClubPlayer('Peque Fernández', 23, 80, 10),
-      ],
+      'defender': [RealClubPlayer('Juan Iglesias', 28, 80, 2), RealClubPlayer('José Ángel Carmona', 24, 81, 22)],
+      'midfielder': [RealClubPlayer('Lucien Agoumé', 24, 81, 6), RealClubPlayer('Jon Guridi', 31, 80, 18), RealClubPlayer('Giorgi Kochorashvili', 27, 80, 8)],
+      'forward': [RealClubPlayer('Robbie Ure', 22, 78, 9), RealClubPlayer('Peque Fernández', 23, 80, 10), RealClubPlayer('Alfon González', 27, 80, 7), RealClubPlayer('Isaac Romero', 26, 82, 16)],
     },
     'Villarreal': {
-      'defender': [
-        RealClubPlayer('Pau Navarro', 21, 81, 26),
-        RealClubPlayer('Renato Veiga', 23, 83, 12),
-      ],
-      'midfielder': [
-        RealClubPlayer('Dani Parejo', 37, 82, 10),
-        RealClubPlayer('Santi Comesaña', 29, 81, 14),
-      ],
-      'forward': [
-        RealClubPlayer('Ayoze Pérez', 33, 83, 22),
-        RealClubPlayer('Gerard Moreno', 34, 84, 7),
-      ],
+      'defender': [RealClubPlayer('Pau Navarro', 21, 81, 26), RealClubPlayer('Renato Veiga', 23, 83, 12)],
+      'midfielder': [RealClubPlayer('Dani Parejo', 37, 82, 10), RealClubPlayer('Santi Comesaña', 29, 81, 14), RealClubPlayer('Alberto Moleiro', 23, 84, 10)],
+      'forward': [RealClubPlayer('Ayoze Pérez', 33, 83, 22), RealClubPlayer('Gerard Moreno', 34, 84, 7), RealClubPlayer('Georges Mikautadze', 26, 84, 9), RealClubPlayer('Ilias Akhomach', 22, 81, 11)],
     },
     'Athletic Bilbao': {
-      'defender': [
-        RealClubPlayer('Dani Vivian', 27, 84, 3),
-        RealClubPlayer('Aitor Paredes', 26, 82, 4),
-      ],
-      'midfielder': [
-        RealClubPlayer('Beñat Prados', 25, 82, 6),
-        RealClubPlayer('Oihan Sancet', 26, 84, 8),
-      ],
-      'forward': [
-        RealClubPlayer('Nico Williams', 24, 86, 10),
-        RealClubPlayer('Gorka Guruzeta', 29, 82, 12),
-      ],
+      'defender': [RealClubPlayer('Dani Vivian', 27, 84, 3), RealClubPlayer('Aitor Paredes', 26, 82, 4)],
+      'midfielder': [RealClubPlayer('Beñat Prados', 25, 82, 6), RealClubPlayer('Oihan Sancet', 26, 84, 8), RealClubPlayer('Peio Canales', 21, 79, 28)],
+      'forward': [RealClubPlayer('Nico Williams', 24, 86, 10), RealClubPlayer('Gorka Guruzeta', 29, 82, 12), RealClubPlayer('Iñaki Williams', 32, 85, 9), RealClubPlayer('Alex Berenguer', 31, 82, 7)],
     },
     'Zenit': {
-      'defender': [
-        RealClubPlayer('Nino', 29, 80, 33),
-        RealClubPlayer('Igor Diveev', 27, 79, 78),
-      ],
-      'midfielder': [
-        RealClubPlayer('Wendel', 29, 82, 8),
-        RealClubPlayer('Wilmar Barrios', 33, 81, 5),
-      ],
-      'forward': [
-        RealClubPlayer('Aleksandr Sobolev', 29, 77, 7),
-        RealClubPlayer('Felipe Augusto', 22, 81, 9),
-      ],
+      'defender': [RealClubPlayer('Nino', 29, 83, 33), RealClubPlayer('Igor Diveev', 27, 84, 78)],
+      'midfielder': [RealClubPlayer('Wendel', 29, 84, 8), RealClubPlayer('Wilmar Barrios', 33, 83, 5), RealClubPlayer('Luiz Henrique', 25, 84, 11)],
+      'forward': [RealClubPlayer('Aleksandr Sobolev', 29, 82, 7), RealClubPlayer('Felipe Augusto', 22, 81, 9), RealClubPlayer('Maksim Glushenkov', 27, 84, 10), RealClubPlayer('Pedro Henrique', 20, 80, 20)],
     },
     'CSKA Moscow': {
-      'defender': [
-        RealClubPlayer('Milan Gajić', 30, 80, 22),
-        RealClubPlayer('Matheus Reis', 31, 80, 2),
-      ],
-      'midfielder': [
-        RealClubPlayer('Matvey Kislyak', 21, 80, 31),
-        RealClubPlayer('Ivan Oblyakov', 28, 78, 10),
-      ],
-      'forward': [
-        RealClubPlayer('Luciano Gondou', 25, 81, 32),
-        RealClubPlayer('Tamerlan Musaev', 25, 80, 11),
-      ],
+      'defender': [RealClubPlayer('Milan Gajić', 30, 81, 22), RealClubPlayer('Matheus Reis', 31, 82, 2)],
+      'midfielder': [RealClubPlayer('Matvey Kislyak', 21, 83, 31), RealClubPlayer('Ivan Oblyakov', 28, 84, 10), RealClubPlayer('Danila Kozlov', 21, 81, 18)],
+      'forward': [RealClubPlayer('Luciano Gondou', 25, 83, 32), RealClubPlayer('Tamerlan Musaev', 25, 80, 11), RealClubPlayer('Maksim Voronov', 19, 78, 97), RealClubPlayer('Kirill Glebov', 20, 81, 17)],
     },
     'Spartak Moscow': {
-      'defender': [
-        RealClubPlayer('Christopher Wu', 25, 80, 3),
-        RealClubPlayer('Srdjan Babić', 30, 78, 6),
-      ],
-      'midfielder': [
-        RealClubPlayer('Esequiel Barco', 27, 83, 5),
-        RealClubPlayer('Nail Umyarov', 26, 78, 18),
-      ],
-      'forward': [
-        RealClubPlayer('Manfred Ugalde', 24, 82, 9),
-        RealClubPlayer('Marquinhos', 27, 81, 10),
-      ],
+      'defender': [RealClubPlayer('Christopher Wu', 25, 82, 3), RealClubPlayer('Srdjan Babić', 30, 82, 6)],
+      'midfielder': [RealClubPlayer('Esequiel Barco', 27, 85, 5), RealClubPlayer('Nail Umyarov', 26, 81, 18), RealClubPlayer('Roman Zobnin', 32, 81, 47)],
+      'forward': [RealClubPlayer('Manfred Ugalde', 24, 84, 9), RealClubPlayer('Marquinhos', 27, 82, 10), RealClubPlayer('Pablo Solari', 25, 82, 7), RealClubPlayer('Theo Bongonda', 30, 81, 77)],
     },
     'Krasnodar': {
-      'defender': [
-        RealClubPlayer('Vítor Tormena', 30, 80, 3),
-        RealClubPlayer('Jubal', 33, 78, 5),
-      ],
-      'midfielder': [
-        RealClubPlayer('Douglas Augusto', 29, 82, 8),
-        RealClubPlayer('Aleksandr Chernikov', 26, 76, 53),
-      ],
-      'forward': [
-        RealClubPlayer('Jhon Córdoba', 33, 83, 9),
-        RealClubPlayer('Dmitry Vorobyov', 28, 79, 10),
-      ],
+      'defender': [RealClubPlayer('Vítor Tormena', 30, 82, 3), RealClubPlayer('Jubal', 33, 81, 5)],
+      'midfielder': [RealClubPlayer('Douglas Augusto', 29, 82, 8), RealClubPlayer('Aleksandr Chernikov', 26, 81, 53), RealClubPlayer('Magomed Ozdoev', 33, 82, 21)],
+      'forward': [RealClubPlayer('Jhon Córdoba', 33, 85, 9), RealClubPlayer('Dmitry Vorobyov', 28, 81, 10), RealClubPlayer('Juan Boselli', 27, 80, 23), RealClubPlayer('Batxi', 28, 81, 11)],
     },
     'Lokomotiv Moscow': {
-      'defender': [
-        RealClubPlayer('Zherzino Nyamsi', 29, 80, 5),
-        RealClubPlayer('Lucas Fasson', 25, 80, 3),
-      ],
-      'midfielder': [
-        RealClubPlayer('Sergey Babkin', 24, 76, 6),
-        RealClubPlayer('Sergey Pinyaev', 21, 78, 9),
-      ],
-      'forward': [
-        RealClubPlayer('Nikolay Komlichenko', 31, 78, 27),
-        RealClubPlayer('Vadim Rakov', 21, 79, 11),
-      ],
+      'defender': [RealClubPlayer('Zherzino Nyamsi', 29, 81, 5), RealClubPlayer('Lucas Fasson', 25, 80, 3)],
+      'midfielder': [RealClubPlayer('Sergey Babkin', 24, 79, 6), RealClubPlayer('Sergey Pinyaev', 21, 83, 9), RealClubPlayer('Zelimkhan Bakaev', 30, 81, 7)],
+      'forward': [RealClubPlayer('Nikolay Komlichenko', 31, 81, 27), RealClubPlayer('Vadim Rakov', 21, 80, 11), RealClubPlayer('Aleksandr Rudenko', 27, 80, 19), RealClubPlayer('Ruslan Mialkovsky', 22, 78, 99)],
     },
     'Dynamo Makhachkala': {
-      'defender': [
-        RealClubPlayer('Idar Shumakhov', 27, 75, 4),
-        RealClubPlayer('Soslan Kagermazov', 29, 72, 13),
-      ],
-      'midfielder': [
-        RealClubPlayer('Marat Apshatsev', 25, 72, 6),
-        RealClubPlayer('Hussem Mrezig', 26, 78, 16),
-      ],
-      'forward': [
-        RealClubPlayer('Miro', 27, 78, 11),
-        RealClubPlayer('Gamid Agalarov', 26, 77, 25),
-      ],
+      'defender': [RealClubPlayer('Idar Shumakhov', 27, 78, 4), RealClubPlayer('Soslan Kagermazov', 29, 77, 13)],
+      'midfielder': [RealClubPlayer('Marat Apshatsev', 25, 78, 6), RealClubPlayer('Hussem Mrezig', 26, 78, 16), RealClubPlayer('Vladimir Khubulov', 25, 78, 8)],
+      'forward': [RealClubPlayer('Miro', 27, 78, 11), RealClubPlayer('Gamid Agalarov', 26, 79, 25), RealClubPlayer('Serder Serderov', 31, 77, 28), RealClubPlayer('Daniil Lesovoy', 28, 79, 88)],
     },
     'Dynamo Moscow': {
-      'defender': [
-        RealClubPlayer('Nicolas Marichal', 25, 82, 2),
-        RealClubPlayer('Maksim Osipenko', 32, 77, 55),
-      ],
-      'midfielder': [
-        RealClubPlayer('Bitello', 26, 81, 10),
-        RealClubPlayer('Daniil Fomin', 29, 78, 74),
-      ],
-      'forward': [
-        RealClubPlayer('Konstantin Tyukavin', 24, 80, 70),
-        RealClubPlayer('Ivan Sergeev', 31, 77, 33),
-      ],
+      'defender': [RealClubPlayer('Nicolas Marichal', 25, 82, 2), RealClubPlayer('Maksim Osipenko', 32, 83, 55)],
+      'midfielder': [RealClubPlayer('Bitello', 26, 84, 10), RealClubPlayer('Daniil Fomin', 29, 82, 74), RealClubPlayer('Anton Miranchuk', 31, 82, 21)],
+      'forward': [RealClubPlayer('Konstantin Tyukavin', 24, 85, 70), RealClubPlayer('Ivan Sergeev', 31, 81, 33), RealClubPlayer('Arthur Gomes', 28, 81, 11), RealClubPlayer('Josue Casimir', 25, 80, 77)],
     },
     'Ajax': {
-      'defender': [
-        RealClubPlayer('Youri Baas', 23, 82, 15),
-        RealClubPlayer('Ko Itakura', 29, 83, 4),
-      ],
-      'midfielder': [
-        RealClubPlayer('Julian Brandt', 30, 85, 8),
-        RealClubPlayer('Oscar Gloukh', 22, 84, 10),
-      ],
-      'forward': [
-        RealClubPlayer('Kasper Dolberg', 29, 83, 9),
-        RealClubPlayer('Mika Godts', 21, 84, 11),
-      ],
+      'defender': [RealClubPlayer('Youri Baas', 23, 82, 15), RealClubPlayer('Ko Itakura', 29, 83, 4)],
+      'midfielder': [RealClubPlayer('Julian Brandt', 30, 85, 8), RealClubPlayer('Oscar Gloukh', 22, 84, 10), RealClubPlayer('Davy Klaassen', 33, 82, 18)],
+      'forward': [RealClubPlayer('Kasper Dolberg', 29, 83, 9), RealClubPlayer('Mika Godts', 21, 84, 11), RealClubPlayer('Marcos Leonardo', 23, 84, 38), RealClubPlayer('Toluwalase Arokodare', 25, 81, 99)],
     },
     'PSV': {
-      'defender': [
-        RealClubPlayer('Lutsharel Geertruida', 26, 83, 2),
-        RealClubPlayer('Yarek Gasiorowski', 21, 82, 3),
-      ],
-      'midfielder': [
-        RealClubPlayer('Paul Wanner', 20, 83, 10),
-        RealClubPlayer('Guus Til', 28, 83, 20),
-      ],
-      'forward': [
-        RealClubPlayer('Ricardo Pepi', 23, 83, 9),
-        RealClubPlayer('Ivan Perišić', 37, 82, 5),
-      ],
+      'defender': [RealClubPlayer('Lutsharel Geertruida', 26, 83, 2), RealClubPlayer('Yarek Gasiorowski', 21, 82, 3)],
+      'midfielder': [RealClubPlayer('Paul Wanner', 20, 83, 10), RealClubPlayer('Guus Til', 28, 83, 20), RealClubPlayer('Sven Mijnans', 26, 82, 21)],
+      'forward': [RealClubPlayer('Ricardo Pepi', 23, 83, 9), RealClubPlayer('Ivan Perišić', 37, 82, 5), RealClubPlayer('Dennis Man', 28, 83, 27), RealClubPlayer('Ruben van Bommel', 22, 81, 7)],
     },
     'Feyenoord': {
-      'defender': [
-        RealClubPlayer('Tsuyoshi Watanabe', 29, 82, 4),
-        RealClubPlayer('Jordan Bos', 23, 81, 15),
-      ],
-      'midfielder': [
-        RealClubPlayer('Sem Steijn', 24, 84, 14),
-        RealClubPlayer('Luciano Valente', 23, 82, 10),
-      ],
-      'forward': [
-        RealClubPlayer('Anis Hadj Moussa', 24, 84, 23),
-        RealClubPlayer('Reiss Nelson', 26, 82, 17),
-      ],
+      'defender': [RealClubPlayer('Tsuyoshi Watanabe', 29, 82, 4), RealClubPlayer('Jordan Bos', 23, 81, 15)],
+      'midfielder': [RealClubPlayer('Sem Steijn', 24, 84, 14), RealClubPlayer('Luciano Valente', 23, 82, 10), RealClubPlayer('Jakub Moder', 27, 82, 7)],
+      'forward': [RealClubPlayer('Anis Hadj Moussa', 24, 84, 23), RealClubPlayer('Reiss Nelson', 26, 82, 17), RealClubPlayer('Gonçalo Borges', 27, 81, 11), RealClubPlayer('Gaoussou Diarra', 22, 78, 27)],
     },
     'Club Brugge': {
-      'defender': [
-        RealClubPlayer('Joel Ordóñez', 22, 83, 4),
-        RealClubPlayer('Brandon Mechele', 33, 82, 44),
-      ],
-      'midfielder': [
-        RealClubPlayer('Hans Vanaken', 34, 84, 20),
-        RealClubPlayer('Hugo Vetlesen', 26, 82, 10),
-      ],
-      'forward': [
-        RealClubPlayer('Nicolò Tresoldi', 22, 83, 7),
-        RealClubPlayer('Carlos Forbs', 22, 82, 9),
-      ],
+      'defender': [RealClubPlayer('Joel Ordóñez', 22, 83, 4), RealClubPlayer('Brandon Mechele', 33, 82, 44)],
+      'midfielder': [RealClubPlayer('Hans Vanaken', 34, 84, 20), RealClubPlayer('Hugo Vetlesen', 26, 82, 10), RealClubPlayer('Freddie Potts', 23, 80, 8)],
+      'forward': [RealClubPlayer('Nicolò Tresoldi', 22, 83, 7), RealClubPlayer('Carlos Forbs', 22, 82, 9), RealClubPlayer('Romeo Vermant', 22, 80, 17), RealClubPlayer('Jan Virgili', 21, 80, 11)],
     },
     'Union Saint-Gilloise': {
-      'defender': [
-        RealClubPlayer('Kevin Mac Allister', 28, 81, 5),
-        RealClubPlayer('Ross Sykes', 27, 80, 26),
-      ],
-      'midfielder': [
-        RealClubPlayer('Adem Zorgane', 26, 82, 8),
-        RealClubPlayer('Besfort Zeneli', 23, 80, 23),
-      ],
-      'forward': [
-        RealClubPlayer('Promise David', 25, 82, 12),
-        RealClubPlayer('Mohammed Fuseini', 24, 80, 7),
-      ],
+      'defender': [RealClubPlayer('Kevin Mac Allister', 28, 81, 5), RealClubPlayer('Ross Sykes', 27, 80, 26)],
+      'midfielder': [RealClubPlayer('Adem Zorgane', 26, 82, 8), RealClubPlayer('Besfort Zeneli', 23, 80, 23), RealClubPlayer('Rob Schoofs', 32, 81, 17)],
+      'forward': [RealClubPlayer('Promise David', 25, 82, 12), RealClubPlayer('Mohammed Fuseini', 24, 80, 7), RealClubPlayer('Kevin Rodríguez', 26, 81, 13), RealClubPlayer('Raúl Florucz', 25, 80, 30)],
     },
     'Benfica': {
-      'defender': [
-        RealClubPlayer('Clément Lenglet', 31, 83, 2),
-        RealClubPlayer('Alexander Bah', 28, 82, 6),
-      ],
-      'midfielder': [
-        RealClubPlayer('Fredrik Aursnes', 30, 84, 8),
-        RealClubPlayer('Georgiy Sudakov', 24, 85, 10),
-      ],
-      'forward': [
-        RealClubPlayer('Vangelis Pavlidis', 27, 83, 14),
-        RealClubPlayer('Dodi Lukébakio', 29, 84, 11),
-      ],
+      'defender': [RealClubPlayer('Clément Lenglet', 31, 83, 2), RealClubPlayer('Alexander Bah', 28, 82, 6)],
+      'midfielder': [RealClubPlayer('Fredrik Aursnes', 30, 84, 8), RealClubPlayer('Georgiy Sudakov', 24, 85, 10), RealClubPlayer('Leandro Barreiro', 27, 82, 18)],
+      'forward': [RealClubPlayer('Vangelis Pavlidis', 27, 85, 14), RealClubPlayer('Dodi Lukébakio', 29, 84, 11), RealClubPlayer('Franjo Ivanović', 22, 82, 9), RealClubPlayer('Andreas Schjelderup', 22, 82, 21)],
     },
     'Sporting CP': {
-      'defender': [
-        RealClubPlayer('Zeno Debast', 23, 83, 6),
-        RealClubPlayer('Gonçalo Inácio', 25, 85, 25),
-      ],
-      'midfielder': [
-        RealClubPlayer('Rodrigo Zalazar', 27, 83, 17),
-        RealClubPlayer('João Simões', 19, 81, 8),
-      ],
-      'forward': [
-        RealClubPlayer('Luis Suárez', 28, 85, 97),
-        RealClubPlayer('Fotis Ioannidis', 26, 83, 7),
-      ],
+      'defender': [RealClubPlayer('Zeno Debast', 23, 83, 6), RealClubPlayer('Gonçalo Inácio', 25, 85, 25)],
+      'midfielder': [RealClubPlayer('Rodrigo Zalazar', 27, 83, 17), RealClubPlayer('João Simões', 19, 81, 8), RealClubPlayer('Pedro Lima', 20, 79, 21)],
+      'forward': [RealClubPlayer('Luis Suárez', 28, 85, 97), RealClubPlayer('Fotis Ioannidis', 26, 83, 7), RealClubPlayer('Geny Catamo', 25, 82, 10), RealClubPlayer('Nuno Santos', 31, 81, 11)],
     },
     'Porto': {
-      'defender': [
-        RealClubPlayer('Jakub Kiwior', 26, 84, 4),
-        RealClubPlayer('Jan Bednarek', 30, 83, 5),
-      ],
-      'midfielder': [
-        RealClubPlayer('Victor Froholdt', 20, 82, 8),
-        RealClubPlayer('Alan Varela', 25, 82, 22),
-      ],
-      'forward': [
-        RealClubPlayer('Samu Aghehowa', 22, 83, 9),
-        RealClubPlayer('Santiago Giménez', 25, 83, 29),
-      ],
+      'defender': [RealClubPlayer('Jakub Kiwior', 26, 84, 4), RealClubPlayer('Jan Bednarek', 30, 83, 5)],
+      'midfielder': [RealClubPlayer('Victor Froholdt', 20, 82, 8), RealClubPlayer('Alan Varela', 25, 84, 22), RealClubPlayer('Seko Fofana', 31, 83, 42)],
+      'forward': [RealClubPlayer('Samu Aghehowa', 22, 85, 9), RealClubPlayer('Santiago Giménez', 25, 84, 29), RealClubPlayer('William Gomes', 20, 81, 7), RealClubPlayer('Pepê', 29, 83, 11)],
     },
     'Braga': {
-      'defender': [
-        RealClubPlayer('Sikou Niakaté', 27, 81, 4),
-        RealClubPlayer('Victor Gómez', 26, 80, 2),
-      ],
-      'midfielder': [
-        RealClubPlayer('João Moutinho', 40, 80, 8),
-        RealClubPlayer('Mahamadou Dorgeles', 22, 81, 20),
-      ],
-      'forward': [
-        RealClubPlayer('Ricardo Horta', 31, 83, 21),
-        RealClubPlayer('Fran Navarro', 28, 81, 9),
-      ],
+      'defender': [RealClubPlayer('Sikou Niakaté', 27, 81, 4), RealClubPlayer('Victor Gómez', 26, 80, 2)],
+      'midfielder': [RealClubPlayer('João Moutinho', 40, 80, 8), RealClubPlayer('Mahamadou Dorgeles', 22, 81, 20), RealClubPlayer('Denis Huseinbašić', 25, 81, 23)],
+      'forward': [RealClubPlayer('Ricardo Horta', 31, 85, 21), RealClubPlayer('Fran Navarro', 28, 81, 9), RealClubPlayer('Pau Víctor', 24, 82, 10), RealClubPlayer('Gabriel Silva', 24, 80, 11)],
     },
     'Fenerbahce': {
-      'defender': [
-        RealClubPlayer('Nathan Aké', 31, 85, 15),
-        RealClubPlayer('Milan Škriniar', 31, 84, 37),
-      ],
-      'midfielder': [
-        RealClubPlayer('Mattéo Guendouzi', 27, 84, 6),
-        RealClubPlayer('N’Golo Kanté', 35, 84, 91),
-      ],
-      'forward': [
-        RealClubPlayer('Mason Greenwood', 25, 85, 11),
-        RealClubPlayer('Romelu Lukaku', 33, 84, 9),
-      ],
+      'defender': [RealClubPlayer('Nathan Aké', 31, 85, 15), RealClubPlayer('Milan Škriniar', 31, 84, 37)],
+      'midfielder': [RealClubPlayer('Mattéo Guendouzi', 27, 85, 6), RealClubPlayer('N’Golo Kanté', 35, 84, 91), RealClubPlayer('İsmail Yüksek', 27, 82, 5)],
+      'forward': [RealClubPlayer('Mason Greenwood', 25, 85, 11), RealClubPlayer('Romelu Lukaku', 33, 84, 9), RealClubPlayer('Kerem Aktürkoğlu', 28, 83, 7), RealClubPlayer('Dorgeles Nene', 24, 81, 45)],
     },
     'Galatasaray': {
-      'defender': [
-        RealClubPlayer('Davinson Sánchez', 30, 84, 6),
-        RealClubPlayer('Wilfried Singo', 25, 83, 90),
-      ],
-      'midfielder': [
-        RealClubPlayer('Gabriel Sara', 27, 84, 8),
-        RealClubPlayer('Lucas Torreira', 30, 83, 34),
-      ],
-      'forward': [
-        RealClubPlayer('Victor Osimhen', 27, 88, 45),
-        RealClubPlayer('Leroy Sané', 30, 85, 10),
-      ],
+      'defender': [RealClubPlayer('Davinson Sánchez', 30, 84, 6), RealClubPlayer('Wilfried Singo', 25, 83, 90)],
+      'midfielder': [RealClubPlayer('Gabriel Sara', 27, 84, 8), RealClubPlayer('Lucas Torreira', 30, 83, 34), RealClubPlayer('İlkay Gündoğan', 36, 84, 20)],
+      'forward': [RealClubPlayer('Victor Osimhen', 27, 88, 45), RealClubPlayer('Leroy Sané', 30, 85, 10), RealClubPlayer('Rafael Leão', 27, 87, 27), RealClubPlayer('Yunus Akgün', 26, 82, 11)],
     },
   };
 }
