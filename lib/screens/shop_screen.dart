@@ -221,7 +221,7 @@ class _ShopScreenState extends State<ShopScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 22),
+                  const SizedBox(height: 10),
                   _sectionTitle('УСИЛЕНИЕ ИГРЫ'),
                   Container(
                     padding: const EdgeInsets.all(16),
@@ -326,6 +326,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                     : career.money < _trainingPrice
                                     ? 'Недостаточно денег'
                                     : 'Купить бустер +5 на 3 матча',
+                                style: TextStyle(fontSize: 12),
                               ),
                             ),
                           ),
@@ -333,7 +334,7 @@ class _ShopScreenState extends State<ShopScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 10),
                   _sectionTitle('ЗДОРОВЬЕ И ВОССТАНОВЛЕНИЕ'),
                   Container(
                     padding: const EdgeInsets.all(16),
@@ -415,6 +416,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                     : career.money < _recoveryPrice
                                     ? 'Недостаточно денег'
                                     : 'Сократить травму на 2 матча',
+                                style: TextStyle(fontSize: 12),
                               ),
                             ),
                           ),
