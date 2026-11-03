@@ -1039,10 +1039,6 @@ class Career {
     final achievements = <String>[];
 
     // Индивидуальные достижения игрока.
-    if (matches >= 5 && goals >= 25) {
-      achievements.add('Бомбардир сезона');
-    }
-
     if (matches >= 5 && assists >= 10) {
       achievements.add('Мастер передач');
     }
