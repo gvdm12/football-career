@@ -341,6 +341,13 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _momentReady = true;
       return;
     }
+    if (_phase == 'offBallRun') {
+      _momentTitle = 'Открывание под обратный пас';
+      _momentDescription =
+          'Вы уже перевели мяч на другой участок поля и ускорились без мяча. Можно рвануть за спину, ворваться в штрафную или предложить короткий пас.';
+      _momentReady = true;
+      return;
+    }
     if (_phase == 'keeperBeaten') {
       _momentTitle = 'Вратарь обыгран!';
       _momentDescription =
@@ -1430,7 +1437,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           _phase == 'aerialChance' ||
           _phase == 'finalThird' ||
           _phase == 'cutback' ||
-          _phase == 'keeperBeaten';
+          _phase == 'keeperBeaten' ||
+          _phase == 'offBallRun';
       _nextMomentMinute = min(
         88,
         _minute + (isFollowUp ? 1 : 6 + _random.nextInt(7)),
