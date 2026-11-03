@@ -7,7 +7,7 @@ import '../models/transfer_offer.dart';
 class TransferService {
   static final Random _random = Random();
 
-  /// Генерирует срок контракта от 1 до 4 лет.
+  /// Генерирует срок контракта с учётом оставшихся сезонов карьеры.
   static int _generateContractYears({
     required double rating,
     required int contributions,
@@ -16,7 +16,7 @@ class TransferService {
     final exceptional = rating >= 7.5 && contributions >= 18;
     final strong = rating >= 7.2 && contributions >= 12;
     final roll = _random.nextInt(100);
-    final contractLimit = maxYears.clamp(1, 3).toInt();
+    final contractLimit = maxYears.clamp(1, 4).toInt();
 
     int years;
     if (exceptional) {
@@ -31,7 +31,7 @@ class TransferService {
   }
 
   static int _maxContractYears(Career career) =>
-      (21 - career.season).clamp(1, 3).toInt();
+      (21 - career.season).clamp(1, 4).toInt();
 
   /// Определяет максимальную силу клуба,
   /// который может заинтересоваться игроком.
