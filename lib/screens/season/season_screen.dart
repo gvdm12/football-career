@@ -1415,8 +1415,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
   }
 
   Widget _buildMatchGlassSurface({required Widget child, double radius = 18}) {
-    // Карточки календаря остаются обычными плотными карточками без размытия.
-    return child;
+    // Оставляем только скругление: календарю больше не нужен blur/backdrop.
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: child,
+    );
   }
 
   Widget _buildLiquidGlassSurface({required Widget child, double radius = 24}) {
