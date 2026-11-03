@@ -209,7 +209,9 @@ class LeaguePlayerStatsService {
       PlayerPosition.goalkeeper: 2,
       PlayerPosition.defender: 6,
       PlayerPosition.midfielder: 6,
-      Pl    final clubStrength = _clubStrength(club);
+      PlayerPosition.forward: 5,
+    };
+    final clubStrength = _clubStrength(club);
     final usedNames = result.map((item) => item.playerName).toSet();
     final generatedNames = List<String>.from(_names)..shuffle(random);
 
@@ -231,8 +233,6 @@ class LeaguePlayerStatsService {
       }
     }
     return result;
-  }
-   return value.toString();
   }
 
   static int _clubStrength(String club) {
