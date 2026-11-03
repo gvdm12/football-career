@@ -2752,33 +2752,48 @@ class _SeasonScreenState extends State<SeasonScreen> {
             award.playerName == career.player.name &&
             award.club == career.player.club,
       );
-      final updatedHistory = wonGoldenBoot
-          ? completedCareer.history.map((stats) {
-              if (stats.season != career.season ||
-                  stats.achievements.contains('Золотая бутса')) {
-                return stats;
-              }
-              return SeasonStats(
-                season: stats.season,
-                club: stats.club,
-                matches: stats.matches,
-                goals: stats.goals,
-                assists: stats.assists,
-                yellowCards: stats.yellowCards,
-                redCards: stats.redCards,
-                averageRating: stats.averageRating,
-                achievements: [
-                  ...stats.achievements,
-                  'Золотая бутса',
-                  'Бомбардир сезона',
-                ],
-              );
-            }).toList()
-          : completedCareer.history;
+      final wonBestAssister = seasonAwards.any(
+        (award) =>
+            award.category == 'Лучший ассистент' &&
+            award.playerName == career.player.name &&
+            award.club == career.player.club,
+      );
+      final updatedHistory =
+          (wonGoldenBoot || wonBestAssister)
+              ? completedCareer.history.map((stats) {
+                  if (stats.season != career.season) return stats;
+                  final achievements = [...stats.achievements];
+                  if (wonGoldenBoot) {
+                    if (!achievements.contains('Золотая бутса')) {
+                      achievements.add('Золотая бутса');
+                    }
+                    if (!achievements.contains('Бомбардир сезона')) {
+                      achievements.add('Бомбардир сезона');
+                    }
+                  }
+                  if (wonBestAssister &&
+                      !achievements.contains('Лучший ассистент')) {
+                    achievements.add('Лучший ассистент');
+                  }
+                  return SeasonStats(
+                    season: stats.season,
+                    club: stats.club,
+                    matches: stats.matches,
+                    goals: stats.goals,
+                    assists: stats.assists,
+                    yellowCards: stats.yellowCards,
+                    redCards: stats.redCards,
+                    averageRating: stats.averageRating,
+                    achievements: achievements,
+                  );
+                }).toList()
+              : completedCareer.history;
       completedCareer = completedCareer.copyWith(
         seasonAwards: [...completedCareer.seasonAwards, ...seasonAwards],
         history: updatedHistory,
-        agentCredits: completedCareer.agentCredits + (wonGoldenBoot ? 10 : 0),
+        agentCredits: completedCareer.agentCredits +
+            (wonGoldenBoot ? 10 : 0) +
+            (wonBestAssister ? 10 : 0),
       );
     }
 
