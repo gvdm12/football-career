@@ -12,9 +12,9 @@ class TeamScreen extends StatelessWidget {
   const TeamScreen({super.key, required this.career});
 
   static const _background = Color(0xFF04160A);
-  static const _panel = Color(0xFF0B2A12);
+  static const _panel = Color(0x1FFFFFFF);
   static const _accent = Color(0xFF8BE07F);
-  static const _border = Color(0xFF286638);
+  static const _border = Color(0x55FFFFFF);
 
   String _positionName(PlayerPosition position) {
     switch (position) {
@@ -103,7 +103,7 @@ class TeamScreen extends StatelessWidget {
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF164A24),
+                          color: Colors.white.withValues(alpha: 0.10),
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(color: _border),
                         ),
@@ -265,7 +265,7 @@ class TeamScreen extends StatelessWidget {
                             width: 38,
                             height: 38,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF153D20),
+                              color: Colors.white.withValues(alpha: 0.09),
                               borderRadius: BorderRadius.circular(11),
                             ),
                             child: Center(
