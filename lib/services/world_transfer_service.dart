@@ -25,6 +25,9 @@ class WorldTransferService {
         for (final group in club.value.entries) {
           for (final player in group.value) {
             if (player.overall < 78 || player.age > 33) continue;
+            if (created.any((transfer) => transfer.playerName == player.name)) {
+              continue;
+            }
             candidates.add((club: club.key, position: group.key, player: player));
           }
         }
