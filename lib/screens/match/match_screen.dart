@@ -81,8 +81,7 @@ class MatchScreen extends StatelessWidget {
     // Интерес из профиля агента обсуждается не чаще одного раза за сезон.
     // Вопрос будет показан только при наличии реального списка клубов.
     if (career.agentInterestedClubs.isNotEmpty &&
-        career.lastTransferInterestConferenceSeason != career.season &&
-        Random().nextDouble() < 0.28) {
+        career.lastTransferInterestConferenceSeason != career.season) {
       return 'transferInterest';
     }
 
