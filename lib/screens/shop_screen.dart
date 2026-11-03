@@ -108,9 +108,6 @@ class _ShopScreenState extends State<ShopScreen> {
     });
 
     await CareerStorage.save(career);
-    _showMessage(
-      'Тренировка куплена: ${_skillName(selectedSkill)} +5 на 3 матча',
-    );
   }
 
   Future<void> _buyRecovery() async {
@@ -131,20 +128,6 @@ class _ShopScreenState extends State<ShopScreen> {
     });
 
     await CareerStorage.save(career);
-    _showMessage(
-      remaining == 0
-          ? 'Вы полностью восстановились!'
-          : 'Восстановление ускорено. Осталось матчей: $remaining',
-    );
-  }
-
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: const Color(0xFF14532D),
-      ),
-    );
   }
 
   @override
