@@ -329,6 +329,18 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
             s.physical * 0.24 +
             s.vision * 0.22 +
             s.pace * 0.12;
+      case 'twoOnOnePass':
+      case 'throughPass':
+        return s.passing * 0.55 + s.vision * 0.35 + s.dribbling * 0.10;
+      case 'twoOnOneShoot':
+        return s.shooting * 0.65 + s.vision * 0.15 + s.dribbling * 0.20;
+      case 'press':
+      case 'intercept':
+        return s.defending * 0.40 + s.pace * 0.30 + s.vision * 0.20 + s.physical * 0.10;
+      case 'recover':
+        return s.pace * 0.40 + s.physical * 0.35 + s.defending * 0.25;
+      case 'checkBack':
+        return s.vision * 0.45 + s.passing * 0.35 + s.physical * 0.20;
       case 'defend':
       case 'tackle':
       case 'contain':
@@ -1263,7 +1275,15 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         0.92,
       );
     }
-    final success = _random.nextDouble() < chance;
+    // Во второй половине матча усталость постепенно снижает точность.
+    // Высокая физическая подготовка помогает дольше сохранять качество действий.
+    final matchProgress = ((_minute - 45).clamp(0, 45) / 45).toDouble();
+    final fatiguePenalty =
+        matchProgress * (0.105 - _player.skills.physical * 0.00075)
+            .clamp(0.025, 0.075)
+            .toDouble();
+    final adjustedChance = (chance - fatiguePenalty).clamp(0.20, 0.98).toDouble();
+    final success = _random.nextDouble() < adjustedChance;
     if (success) _successfulActions++;
     String message;
 
