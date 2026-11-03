@@ -1807,6 +1807,33 @@ class Career {
       season: newSeason,
     );
 
+    // Пресса освещает не только клуб игрока, но и результаты других лиг.
+    final currentPlayerLeague = Clubs.leagueOf(newPlayer.club);
+    final otherLeagues = League.values
+        .where((league) => league != currentPlayerLeague)
+        .toList()
+      ..shuffle(Random(newSeason * 97 + newPlayer.overall));
+    final newsLeagues = <League>[
+      if (currentPlayerLeague != null) currentPlayerLeague,
+      ...otherLeagues.take(3),
+    ];
+    final leagueNews = newsLeagues.map((league) {
+      final table = [...(qualificationStandings[league] ?? const <LeagueTableEntry>[])]
+        ..sort((a, b) => b.points != a.points
+            ? b.points.compareTo(a.points)
+            : b.goalDifference.compareTo(a.goalDifference));
+      if (table.isEmpty) return null;
+      final champion = table.first.club;
+      return CareerNews(
+        id: 'league_result_s${newSeason}_${league.name}',
+        season: newSeason,
+        matchNumber: 0,
+        title: 'Итоги сезона в ${league.displayName}',
+        description: '$champion завершил предыдущий сезон на первом месте и стал чемпионом лиги.',
+        type: CareerNewsType.season,
+      );
+    }).whereType<CareerNews>().toList();
+
     final previousStats = previousSeasonStats.isNotEmpty
         ? previousSeasonStats.last
         : null;
@@ -1845,7 +1872,7 @@ class Career {
       history: newHistory,
       leagueTable: newLeagueTable,
       leagueMatches: newLeagueMatches,
-      news: [...news, ...worldTransferNews],
+      news: [...news, ...worldTransferNews, ...leagueNews],
       rivals: PositionRival.nextSeason(rivals, newSeason, player: newPlayer),
       coachTrust: coachTrust,
       agentLevel: agentLevel,
