@@ -95,7 +95,8 @@ class PlayerOfMonthService {
         // Для клуба игрока используем реальные данные его конкурентов.
         // Так цифры в награде совпадают с экраном команды.
         for (final rival in rivals) {
-          if (rival.matches == 0) continue;
+          final monthStats = rival.monthlyStats[month];
+          if (monthStats == null || monthStats.matches == 0) continue;
           candidates.add(_candidate(
             season: season,
             month: month,
@@ -104,10 +105,10 @@ class PlayerOfMonthService {
             age: rival.age,
             position: rival.position,
             overall: rival.overall,
-            matches: rival.matches,
-            goals: rival.goals,
-            assists: rival.assists,
-            averageRating: rival.averageRating,
+            matches: monthStats.matches,
+            goals: monthStats.goals,
+            assists: monthStats.assists,
+            averageRating: monthStats.averageRating,
           ));
         }
       }
