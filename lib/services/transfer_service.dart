@@ -223,6 +223,7 @@ class TransferService {
     final minStrength = max(60, currentStrength - 8);
 
     final allOtherClubs = Clubs.all
+        .map((club) => Clubs.getByName(club.name))
         .where((club) => club.name != player.club)
         .toList();
 
