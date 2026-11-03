@@ -17,13 +17,24 @@ class SeasonAwardService {
     required List<LeagueTableEntry> leagueTable,
     required List<PositionRival> rivals,
     List<String> additionalTrophyWinningClubs = const [],
+    Map<League, List<LeagueTableEntry>>? worldLeagueStandings,
   }) {
     final sortedTable = [...leagueTable]
       ..sort((a, b) => b.points != a.points
           ? b.points.compareTo(a.points)
           : b.goalDifference.compareTo(a.goalDifference));
+    final worldChampions = <String>{};
+    for (final entry in worldLeagueStandings?.entries ??
+        const <MapEntry<League, List<LeagueTableEntry>>>[]) {
+      final standings = [...entry.value]
+        ..sort((a, b) => b.points != a.points
+            ? b.points.compareTo(a.points)
+            : b.goalDifference.compareTo(a.goalDifference));
+      if (standings.isNotEmpty) worldChampions.add(standings.first.club);
+    }
     final trophyWinningClubs = <String>{
       ...additionalTrophyWinningClubs,
+      ...worldChampions,
       if (sortedTable.isNotEmpty) sortedTable.first.club,
     };
     final candidates = <_Candidate>[];
