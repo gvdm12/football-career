@@ -5,6 +5,69 @@ import 'package:flutter_football/models/league_match.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/real_club_squads.dart';
 
+class LeaguePlayerMonthStats {
+  final int matches;
+  final int goals;
+  final int assists;
+  final double ratingSum;
+
+  const LeaguePlayerMonthStats({
+    this.matches = 0,
+    this.goals = 0,
+    this.assists = 0,
+    this.ratingSum = 0,
+    this.monthlyStats = const {},
+  });
+
+  double get averageRating => matches == 0 ? 0 : ratingSum / matches;
+
+  LeaguePlayerMonthStats addMatch({
+    required int goals,
+    required int assists,
+    required double rating,
+  }) {
+    return LeaguePlayerMonthStats(
+      matches: matches + 1,
+      goals: this.goals + goals,
+      assists: this.assists + assists,
+      ratingSum: ratingSum + rating,
+      monthlyStats: updatedMonthlyStats,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'matches': matches,
+    'goals': goals,
+    'assists': assists,
+    'ratingSum': ratingSum,
+    'monthlyStats': {
+      for (final entry in monthlyStats.entries)
+        entry.key.toString(): entry.value.toJson(),
+    },
+  };
+
+  factory LeaguePlayerMonthStats.fromJson(Map<String, dynamic> json) {
+    return LeaguePlayerMonthStats(
+      matches: (json['matches'] as num?)?.toInt() ?? 0,
+      goals: (json['goals'] as num?)?.toInt() ?? 0,
+      assists: (json['assists'] as num?)?.toInt() ?? 0,
+      ratingSum: (json['ratingSum'] as num?)?.toDouble() ?? 0,
+      monthlyStats: (json['monthlyStats'] as Map?)?.entries.fold<Map<int, LeaguePlayerMonthStats>>(
+            {},
+            (result, entry) {
+              final month = int.tryParse(entry.key.toString());
+              if (month != null && entry.value is Map) {
+                result[month] = LeaguePlayerMonthStats.fromJson(
+                  Map<String, dynamic>.from(entry.value as Map),
+                );
+              }
+              return result;
+            },
+          ) ?? const {},
+    );
+  }
+}
+
 class LeaguePlayerSeasonStats {
   final String playerName;
   final String club;
@@ -15,6 +78,7 @@ class LeaguePlayerSeasonStats {
   final int goals;
   final int assists;
   final double ratingSum;
+  final Map<int, LeaguePlayerMonthStats> monthlyStats;
 
   const LeaguePlayerSeasonStats({
     required this.playerName,
@@ -34,7 +98,14 @@ class LeaguePlayerSeasonStats {
     required int goals,
     required int assists,
     required double rating,
+    int? month,
   }) {
+    final updatedMonthlyStats = Map<int, LeaguePlayerMonthStats>.from(monthlyStats);
+    if (month != null && month >= 1 && month <= 12) {
+      updatedMonthlyStats[month] =
+          (updatedMonthlyStats[month] ?? const LeaguePlayerMonthStats())
+              .addMatch(goals: goals, assists: assists, rating: rating);
+    }
     return LeaguePlayerSeasonStats(
       playerName: playerName,
       club: club,
@@ -187,16 +258,24 @@ class LeaguePlayerStatsService {
       }
     }
 
+    final totalRounds = fixtures.fold<int>(
+      0,
+      (maximum, fixture) => max(maximum, fixture.round),
+    );
     for (final fixture in fixtures.where((item) => item.isPlayed)) {
       final key = '$season:${fixture.id}';
       if (processed.contains(key)) continue;
       final random = Random(_seed(key));
+      final month = totalRounds == 0
+          ? 1
+          : (((fixture.round - 1) * 12) ~/ totalRounds) + 1;
       _applyTeamMatch(
         players,
         club: fixture.homeTeam,
         goalsFor: fixture.homeGoals!,
         goalsAgainst: fixture.awayGoals!,
         random: random,
+        month: month,
       );
       _applyTeamMatch(
         players,
@@ -204,6 +283,7 @@ class LeaguePlayerStatsService {
         goalsFor: fixture.awayGoals!,
         goalsAgainst: fixture.homeGoals!,
         random: random,
+        month: month,
       );
       processed.add(key);
     }
@@ -220,6 +300,7 @@ class LeaguePlayerStatsService {
     required int goalsFor,
     required int goalsAgainst,
     required Random random,
+    required int month,
   }) {
     final squad = players.where((item) => item.club == club).toList();
     final selected = <LeaguePlayerSeasonStats>[];
@@ -296,6 +377,7 @@ class LeaguePlayerStatsService {
           goals: playerGoals,
           assists: playerAssists,
           rating: rating,
+          month: month,
         );
       }
     }
