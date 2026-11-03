@@ -1,6 +1,9 @@
 import 'dart:math';
 import 'package:flutter_football/models/career_news.dart';
 import 'package:flutter_football/models/career_settings.dart';
+import 'package:flutter_football/models/career_world_transfer.dart';
+import 'package:flutter_football/models/real_club_squads.dart';
+import 'package:flutter_football/services/world_transfer_service.dart';
 import 'package:flutter_football/models/champions_league.dart';
 import 'package:flutter_football/models/europa_league.dart';
 import 'package:flutter_football/models/world_cup.dart';
@@ -25,6 +28,7 @@ import 'league_player_season_stats.dart';
 class Career {
   final Player player;
   final CareerSettings settings;
+  final List<CareerWorldTransfer> worldTransfers;
   final int season;
   final List<SeasonStats> history;
   final List<PlayerOfMonthAward> playerOfMonthAwards;
@@ -99,6 +103,7 @@ class Career {
   const Career({
     required this.player,
     this.settings = const CareerSettings(),
+    this.worldTransfers = const [],
     required this.season,
     required this.matches,
     required this.goals,
@@ -269,6 +274,7 @@ class Career {
     CareerSettings settings = const CareerSettings(),
   }) {
     Clubs.applyStrengthOverrides(const {});
+    RealClubSquads.applyCareerTransfers(const []);
     final leagueMatches = _createLeagueMatches(player.club);
 
     final seasonMatches = _createSeasonMatches(player.club, leagueMatches);
@@ -343,6 +349,7 @@ class Career {
     return {
       'player': player.toJson(),
       'settings': settings.toJson(),
+      'worldTransfers': worldTransfers.map((item) => item.toJson()).toList(),
       'season': season,
       'history': history.map((item) => item.toJson()).toList(),
       'playerOfMonthAwards': playerOfMonthAwards
@@ -415,6 +422,11 @@ class Career {
     }
 
     final loadedPlayer = Player.fromJson(Map<String, dynamic>.from(rawPlayer));
+    final restoredWorldTransfers = readList(
+      'worldTransfers',
+      CareerWorldTransfer.fromJson,
+    );
+    RealClubSquads.applyCareerTransfers(restoredWorldTransfers);
     final rawClubStrengths = json['clubStrengths'];
     final restoredClubStrengths = rawClubStrengths is Map
         ? rawClubStrengths.map(
@@ -612,6 +624,7 @@ class Career {
             ? Map<String, dynamic>.from(json['settings'] as Map)
             : null,
       ),
+      worldTransfers: restoredWorldTransfers,
       season: (json['season'] as num?)?.toInt() ?? 1,
       history: normalizedHistory,
       playerOfMonthAwards: readList(
@@ -698,6 +711,7 @@ class Career {
   Career copyWith({
     Player? player,
     CareerSettings? settings,
+    List<CareerWorldTransfer>? worldTransfers,
     int? season,
     int? matches,
     int? goals,
@@ -743,6 +757,7 @@ class Career {
     return Career(
       player: player ?? this.player,
       settings: settings ?? this.settings,
+      worldTransfers: worldTransfers ?? this.worldTransfers,
       season: season ?? this.season,
       matches: matches ?? this.matches,
       goals: goals ?? this.goals,
@@ -1668,6 +1683,21 @@ class Career {
     Clubs.applyStrengthOverrides(updatedClubStrengths);
 
     final newSeason = season + 1;
+    final newWorldTransfers = WorldTransferService.simulateSeason(
+      season: newSeason,
+      previousTransfers: worldTransfers,
+      realistic: settings.realisticTransfers,
+    );
+    final allWorldTransfers = [...worldTransfers, ...newWorldTransfers];
+    RealClubSquads.applyCareerTransfers(allWorldTransfers);
+    final worldTransferNews = newWorldTransfers.map((transfer) => CareerNews(
+      id: 'world_transfer_s${newSeason}_${transfer.playerName.hashCode}',
+      season: newSeason,
+      matchNumber: 0,
+      title: 'Трансфер: ${transfer.playerName}',
+      description: '${transfer.playerName} (${transfer.overall}) перешёл из ${transfer.fromClub} в ${transfer.toClub}.',
+      type: CareerNewsType.transfer,
+    )).toList();
 
     final newAge = player.age + 1;
 
@@ -1769,6 +1799,8 @@ class Career {
 
     return Career(
       player: newPlayer,
+      settings: settings,
+      worldTransfers: allWorldTransfers,
       season: newSeason,
       clubStrengths: updatedClubStrengths,
       matches: 0,
@@ -1786,7 +1818,7 @@ class Career {
       history: newHistory,
       leagueTable: newLeagueTable,
       leagueMatches: newLeagueMatches,
-      news: news,
+      news: [...news, ...worldTransferNews],
       rivals: PositionRival.nextSeason(rivals, newSeason, player: newPlayer),
       coachTrust: coachTrust,
       agentLevel: agentLevel,
