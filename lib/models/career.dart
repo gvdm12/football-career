@@ -47,6 +47,7 @@ class Career {
   final int money;
   final int agentCredits;
   final List<String> agentInterestedClubs;
+  final int lastTransferInterestConferenceSeason;
   final int monthlySalary; // Зарплата в месяц, евро
   final int contractYears;
   final int developmentPoints;
@@ -119,6 +120,7 @@ class Career {
     this.agentLevel = 1,
     this.agentCredits = 0,
     this.agentInterestedClubs = const [],
+    this.lastTransferInterestConferenceSeason = 0,
     this.coachName = 'Главный тренер',
     required this.monthlySalary,
     required this.isCareerFinished,
@@ -349,6 +351,7 @@ class Career {
       'money': money,
       'agentCredits': agentCredits,
       'agentInterestedClubs': agentInterestedClubs,
+      'lastTransferInterestConferenceSeason': lastTransferInterestConferenceSeason,
       'contractYears': contractYears,
       'developmentPoints': developmentPoints,
       'seasonMatches': seasonMatches.map((item) => item.toJson()).toList(),
@@ -539,6 +542,8 @@ class Career {
               ?.whereType<String>()
               .toList() ??
           const [],
+      lastTransferInterestConferenceSeason:
+          (json['lastTransferInterestConferenceSeason'] as num?)?.toInt() ?? 0,
       contractYears: (json['contractYears'] as num?)?.toInt() ?? 0,
       developmentPoints: (json['developmentPoints'] as num?)?.toInt() ?? 0,
       seasonMatches: seasonMatches,
@@ -602,6 +607,7 @@ class Career {
     int? money,
     int? agentCredits,
     List<String>? agentInterestedClubs,
+    int? lastTransferInterestConferenceSeason,
     int? contractYears,
     int? developmentPoints,
     List<SeasonMatch>? seasonMatches,
@@ -645,6 +651,9 @@ class Career {
       money: money ?? this.money,
       agentCredits: agentCredits ?? this.agentCredits,
       agentInterestedClubs: agentInterestedClubs ?? this.agentInterestedClubs,
+      lastTransferInterestConferenceSeason:
+          lastTransferInterestConferenceSeason ??
+          this.lastTransferInterestConferenceSeason,
       contractYears: contractYears ?? this.contractYears,
       developmentPoints: developmentPoints ?? this.developmentPoints,
       seasonMatches: seasonMatches ?? this.seasonMatches,
@@ -1154,10 +1163,6 @@ class Career {
     if (totalSeasonMatches >= 20 && seasonRating >= 7.2) {
       achievements.add('В сборной сезона');
     }
-    if (totalSeasonMatches >= 10 && totalSeasonAssists >= 15) {
-      achievements.add('Лучший ассистент');
-    }
-
     final seasonStats = SeasonStats(
       season: season,
       club: player.club,
