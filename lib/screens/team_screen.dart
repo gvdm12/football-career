@@ -71,8 +71,11 @@ class TeamScreen extends StatelessWidget {
             colors: [Color(0xFF0B3A1A), Color(0xFF082A12), _background],
           ),
         ),
-        child: ListView(
-          padding: const EdgeInsets.all(16),
+        child: ClipRect(
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+            child: ListView(
+              padding: const EdgeInsets.all(16),
           children: [
             Container(
               padding: const EdgeInsets.all(12),
@@ -373,7 +376,9 @@ class TeamScreen extends StatelessWidget {
                 ),
               ),
             ),
-          ],
+              ],
+            ),
+          ),
         ),
       ),
     );
