@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/club.dart';
@@ -48,9 +50,9 @@ class TeamScreen extends StatelessWidget {
       ..sort((a, b) => b.overall.compareTo(a.overall));
 
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: const Color(0xFF07130F),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0B3A1A),
+        backgroundColor: const Color(0xAA18241F),
         foregroundColor: Colors.white,
         title: const Text(
           'КОМАНДА',
@@ -75,9 +77,9 @@ class TeamScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: _panel,
+                color: Colors.white.withValues(alpha: 0.075),
                 borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: _border),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,7 +140,7 @@ class TeamScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF123A1D),
+                      color: Colors.white.withValues(alpha: 0.07),
                       borderRadius: BorderRadius.circular(13),
                       border: Border.all(color: _border),
                     ),
@@ -247,7 +249,9 @@ class TeamScreen extends StatelessWidget {
                     color: _panel,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: isStronger ? const Color(0xFF8A7040) : _border,
+                      color: isStronger
+                          ? const Color(0xFFFFD27A).withValues(alpha: 0.55)
+                          : Colors.white.withValues(alpha: 0.22),
                     ),
                   ),
                   child: Column(
@@ -356,9 +360,9 @@ class TeamScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF10251A),
+                color: Colors.white.withValues(alpha: 0.055),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF234B2D)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
               ),
               child: const Text(
                 'Игровое время зависит от рейтинга и репутации игрока, формы конкурентов и доверия тренера. Статус в команде может меняться по ходу сезона.',
