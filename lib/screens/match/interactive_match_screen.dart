@@ -918,11 +918,14 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       return;
     }
     if (action == 'turnAndRun' || action == 'receiveReturn') {
+      final teamAdvantage = widget.isHome
+          ? _homeStrength - _awayStrength
+          : _awayStrength - _homeStrength;
       final runChance = (0.64 +
               (_player.skills.pace - 60) * 0.0028 +
               (_player.skills.dribbling - 60) * 0.0022 +
-              (_player.skills.vision - 60) * 0.0012 -
-              (_awayStrength - _homeStrength).abs() * 0.0008)
+              (_player.skills.vision - 60) * 0.0012 +
+              teamAdvantage * 0.001)
           .clamp(0.40, 0.91);
       if (_random.nextDouble() < runChance) {
         _phase = 'chance';
@@ -936,10 +939,14 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       return;
     }
     if (action == 'attackNearPost' || action == 'attackFarPost') {
+      final teamAdvantage = widget.isHome
+          ? _homeStrength - _awayStrength
+          : _awayStrength - _homeStrength;
       final movementChance = (0.66 +
               (_player.skills.pace - 60) * 0.002 +
               (_player.skills.vision - 60) * 0.002 +
-              (_player.overall - 70) * 0.001)
+              (_player.overall - 70) * 0.001 +
+              teamAdvantage * 0.0008)
           .clamp(0.42, 0.90);
       if (_random.nextDouble() < movementChance) {
         _phase = 'aerialChance';
@@ -1072,6 +1079,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       'receiveReturn',
       'attackNearPost',
       'attackFarPost',
+      'checkBack',
       'dribble',
     ].contains(action);
     final advantage = widget.isHome
