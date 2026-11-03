@@ -919,7 +919,13 @@ class Career {
       );
     }
 
-    if (!playerParticipated || Random().nextDouble() >= 0.030) {
+    final difficultyInjuryMultiplier = switch (settings.difficulty) {
+      CareerDifficulty.easy => 0.85,
+      CareerDifficulty.normal => 1.0,
+      CareerDifficulty.hard => 1.15,
+    };
+    final injuryChance = 0.030 * settings.injuryFrequency * difficultyInjuryMultiplier;
+    if (!playerParticipated || Random().nextDouble() >= injuryChance) {
       return updatedCareer;
     }
     const injuries = [
@@ -1727,14 +1733,11 @@ class Career {
       newDomesticCup = null;
     }
 
+    final baseDevelopmentPoints = season < 5 ? 3 : season == 5 ? 5 : 6;
     final newDevelopmentPoints = alreadyArchived
         ? developmentPoints
         : developmentPoints +
-              (season < 5
-                  ? 3
-                  : season == 5
-                  ? 5
-                  : 6);
+              (baseDevelopmentPoints * settings.developmentSpeed).round();
 
     // Берём результаты чемпионатов текущего сезона.
     // Они используются для определения участников следующей ЛЧ.
