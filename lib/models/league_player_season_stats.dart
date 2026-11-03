@@ -16,7 +16,6 @@ class LeaguePlayerMonthStats {
     this.goals = 0,
     this.assists = 0,
     this.ratingSum = 0,
-    this.monthlyStats = const {},
   });
 
   double get averageRating => matches == 0 ? 0 : ratingSum / matches;
@@ -31,7 +30,6 @@ class LeaguePlayerMonthStats {
       goals: this.goals + goals,
       assists: this.assists + assists,
       ratingSum: ratingSum + rating,
-      monthlyStats: updatedMonthlyStats,
     );
   }
 
@@ -40,10 +38,6 @@ class LeaguePlayerMonthStats {
     'goals': goals,
     'assists': assists,
     'ratingSum': ratingSum,
-    'monthlyStats': {
-      for (final entry in monthlyStats.entries)
-        entry.key.toString(): entry.value.toJson(),
-    },
   };
 
   factory LeaguePlayerMonthStats.fromJson(Map<String, dynamic> json) {
@@ -52,18 +46,6 @@ class LeaguePlayerMonthStats {
       goals: (json['goals'] as num?)?.toInt() ?? 0,
       assists: (json['assists'] as num?)?.toInt() ?? 0,
       ratingSum: (json['ratingSum'] as num?)?.toDouble() ?? 0,
-      monthlyStats: (json['monthlyStats'] as Map?)?.entries.fold<Map<int, LeaguePlayerMonthStats>>(
-            {},
-            (result, entry) {
-              final month = int.tryParse(entry.key.toString());
-              if (month != null && entry.value is Map) {
-                result[month] = LeaguePlayerMonthStats.fromJson(
-                  Map<String, dynamic>.from(entry.value as Map),
-                );
-              }
-              return result;
-            },
-          ) ?? const {},
     );
   }
 }
@@ -90,6 +72,7 @@ class LeaguePlayerSeasonStats {
     this.goals = 0,
     this.assists = 0,
     this.ratingSum = 0,
+    this.monthlyStats = const {},
   });
 
   double get averageRating => matches == 0 ? 0 : ratingSum / matches;
@@ -100,7 +83,8 @@ class LeaguePlayerSeasonStats {
     required double rating,
     int? month,
   }) {
-    final updatedMonthlyStats = Map<int, LeaguePlayerMonthStats>.from(monthlyStats);
+    final updatedMonthlyStats =
+        Map<int, LeaguePlayerMonthStats>.from(monthlyStats);
     if (month != null && month >= 1 && month <= 12) {
       updatedMonthlyStats[month] =
           (updatedMonthlyStats[month] ?? const LeaguePlayerMonthStats())
@@ -116,6 +100,7 @@ class LeaguePlayerSeasonStats {
       goals: this.goals + goals,
       assists: this.assists + assists,
       ratingSum: ratingSum + rating,
+      monthlyStats: updatedMonthlyStats,
     );
   }
 
@@ -129,6 +114,10 @@ class LeaguePlayerSeasonStats {
     'goals': goals,
     'assists': assists,
     'ratingSum': ratingSum,
+    'monthlyStats': {
+      for (final entry in monthlyStats.entries)
+        entry.key.toString(): entry.value.toJson(),
+    },
   };
 
   factory LeaguePlayerSeasonStats.fromJson(Map<String, dynamic> json) {
@@ -145,6 +134,21 @@ class LeaguePlayerSeasonStats {
       goals: (json['goals'] as num?)?.toInt() ?? 0,
       assists: (json['assists'] as num?)?.toInt() ?? 0,
       ratingSum: (json['ratingSum'] as num?)?.toDouble() ?? 0,
+      monthlyStats:
+          (json['monthlyStats'] as Map?)?.entries
+              .fold<Map<int, LeaguePlayerMonthStats>>(
+                {},
+                (result, entry) {
+                  final month = int.tryParse(entry.key.toString());
+                  if (month != null && entry.value is Map) {
+                    result[month] = LeaguePlayerMonthStats.fromJson(
+                      Map<String, dynamic>.from(entry.value as Map),
+                    );
+                  }
+                  return result;
+                },
+              ) ??
+          const {},
     );
   }
 }
