@@ -46,7 +46,14 @@ class NewsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final sortedNews =
         career.news.where((item) => item.season == career.season).toList()
-          ..sort((a, b) => b.matchNumber.compareTo(a.matchNumber));
+          ..sort((a, b) {
+            final aSeasonEvent = a.matchNumber == 0 ? 1 : 0;
+            final bSeasonEvent = b.matchNumber == 0 ? 1 : 0;
+            if (aSeasonEvent != bSeasonEvent) {
+              return bSeasonEvent.compareTo(aSeasonEvent);
+            }
+            return b.matchNumber.compareTo(a.matchNumber);
+          });
 
     final visibleNews = sortedNews.take(15).toList();
 
