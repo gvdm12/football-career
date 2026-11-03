@@ -74,6 +74,70 @@ class _AgentScreenState extends State<AgentScreen> {
     });
   }
 
+  bool get _canTalk => career.matches - career.lastConversationMatch >= 4;
+
+  Future<void> _talkToAgent() async {
+    if (!_canTalk) return;
+    final choice = await showDialog<int>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFF14251B),
+        title: const Text('Переговоры с агентом', style: TextStyle(color: Colors.white)),
+        content: const Text(
+          'Обсудите следующий шаг в карьере. Агент может открыть новые варианты, но не гарантирует переход.',
+          style: TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, 0), child: const Text('Найти новые предложения')),
+          TextButton(onPressed: () => Navigator.pop(dialogContext, 1), child: const Text('Связаться с бывшим клубом')),
+          TextButton(onPressed: () => Navigator.pop(dialogContext, 2), child: const Text('Обсудить зарплату и контракт')),
+        ],
+      ),
+    );
+    if (!mounted || choice == null) return;
+
+    var updated = career;
+    if (choice == 0) {
+      final generated = TransferService.generateOffers(career)
+          .where((offer) => offer.club.name != career.player.club)
+          .take(2)
+          .map((offer) => offer.club.name)
+          .toList();
+      updated = career.copyWith(
+        agentInterestedClubs: {...career.agentInterestedClubs, ...generated}.toList(),
+      );
+    } else if (choice == 1) {
+      final former = career.history
+          .map((item) => item.club)
+          .where((club) => club != career.player.club && club != 'Без клуба')
+          .toSet()
+          .toList()
+        ..shuffle();
+      if (former.isNotEmpty) {
+        updated = career.copyWith(
+          agentInterestedClubs: {...career.agentInterestedClubs, former.first}.toList(),
+        );
+      }
+    } else {
+      final remainingCareer = (21 - career.season).clamp(1, 20).toInt();
+      final successChance = (0.35 + career.agentLevel * 0.045 +
+              (career.averageRating ?? 6.0) * 0.015)
+          .clamp(0.35, 0.85);
+      if (career.contractYears <= 1 && Random().nextDouble() < successChance) {
+        updated = career.copyWith(
+          monthlySalary: (career.monthlySalary * 1.08).round(),
+          contractYears: min(remainingCareer, 2),
+        );
+      }
+    }
+
+    updated = updated.copyWith(lastConversationMatch: career.matches);
+    setState(() {
+      career = updated;
+      interests = TransferService.generateAgentOffersFromInterest(career);
+    });
+  }
+
   String _money(int amount) {
     final digits = amount.toString();
     final output = StringBuffer();
@@ -172,6 +236,19 @@ class _AgentScreenState extends State<AgentScreen> {
                   Text(
                     '${AppStrings.gameCurrency}: 🪙 ${_money(career.agentCredits)}',
                     style: const TextStyle(color: Colors.white54, fontSize: 12),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: _canTalk ? _talkToAgent : null,
+                      icon: const Icon(Icons.handshake_outlined, size: 17),
+                      label: Text(
+                        _canTalk
+                            ? 'Переговоры с агентом'
+                            : 'Новый разговор через ${(4 - (career.matches - career.lastConversationMatch)).clamp(0, 4)} матча',
+                      ),
+                    ),
                   ),
                 ],
               ),
