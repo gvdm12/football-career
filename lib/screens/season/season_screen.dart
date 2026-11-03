@@ -2745,8 +2745,35 @@ class _SeasonScreenState extends State<SeasonScreen> {
         leagueTable: completedCareer.leagueTable,
         rivals: completedCareer.rivals,
       );
+      final wonGoldenBoot = seasonAwards.any(
+        (award) =>
+            award.category == 'Лучший бомбардир' &&
+            award.playerName == career.player.name &&
+            award.club == career.player.club,
+      );
+      final updatedHistory = wonGoldenBoot
+          ? completedCareer.history.map((stats) {
+              if (stats.season != career.season ||
+                  stats.achievements.contains('Золотая бутса')) {
+                return stats;
+              }
+              return SeasonStats(
+                season: stats.season,
+                club: stats.club,
+                matches: stats.matches,
+                goals: stats.goals,
+                assists: stats.assists,
+                yellowCards: stats.yellowCards,
+                redCards: stats.redCards,
+                averageRating: stats.averageRating,
+                achievements: [...stats.achievements, 'Золотая бутса'],
+              );
+            }).toList()
+          : completedCareer.history;
       completedCareer = completedCareer.copyWith(
         seasonAwards: [...completedCareer.seasonAwards, ...seasonAwards],
+        history: updatedHistory,
+        agentCredits: completedCareer.agentCredits + (wonGoldenBoot ? 10 : 0),
       );
     }
 
