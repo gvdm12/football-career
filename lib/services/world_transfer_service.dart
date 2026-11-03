@@ -38,7 +38,9 @@ class WorldTransferService {
       var moved = false;
       for (final candidate in candidates) {
         final source = Clubs.getByName(candidate.club);
-        final destinations = Clubs.all.where((club) {
+        final destinations = Clubs.all
+            .map((club) => Clubs.getByName(club.name))
+            .where((club) {
           if (club.name == candidate.club) return false;
           if (realistic && (club.strength - source.strength).abs() > 12) {
             return false;
