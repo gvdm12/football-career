@@ -171,7 +171,7 @@ class SeasonAwardService {
       ));
     }
 
-    final assistLeaders = eligible.where((item) => item.assists > 0).toList()
+    final assistLeaders = candidates.where((item) => item.assists > 0).toList()
       ..sort((a, b) {
         final compare = b.assists.compareTo(a.assists);
         if (compare != 0) return compare;
