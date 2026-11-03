@@ -530,15 +530,22 @@ class Career {
     final validSeasonAwards = savedSeasonAwards.where((award) {
       switch (award.category) {
         case 'Игрок сезона':
-          return award.matches >= 15 &&
-              award.averageRating >= 7.5 &&
-              award.goals + award.assists >= 15;
+          return award.wonTrophy &&
+              award.matches >= 20 &&
+              award.averageRating >= 7.8 &&
+              award.goals + award.assists >= 30;
         case 'Лучший бомбардир':
           final league = Clubs.leagueOf(award.club);
           final threshold = league?.goldenBootGoalThreshold ?? 21;
           return award.matches >= 10 && award.goals >= threshold;
         case 'Лучший ассистент':
-          return award.matches >= 10 && award.assists >= 10;
+          final league = Clubs.leagueOf(award.club);
+          if (league == null || award.matches < 20) return false;
+          if (award.assists >= league.bestAssisterThreshold) return true;
+          final isTopLeague =
+              league == League.england || league == League.spain;
+          return isTopLeague && award.assists >= 18 &&
+              award.averageRating >= 8.0;
         default:
           return true;
       }
@@ -554,6 +561,11 @@ class Career {
             award.isCareerPlayer && award.category == 'Лучший ассистент')
         .map((award) => award.season)
         .toSet();
+    final validPlayerOfSeasonSeasons = validSeasonAwards
+        .where((award) =>
+            award.isCareerPlayer && award.category == 'Игрок сезона')
+        .map((award) => award.season)
+        .toSet();
 
     final normalizedHistory = readList('history', SeasonStats.fromJson)
         .map((stats) {
@@ -566,9 +578,7 @@ class Career {
               return validAssisterSeasons.contains(stats.season);
             }
             if (achievement == 'Лучший игрок сезона') {
-              return stats.matches >= 15 &&
-                  (stats.averageRating ?? 0) >= 7.5 &&
-                  stats.goals + stats.assists >= 15;
+              return validPlayerOfSeasonSeasons.contains(stats.season);
             }
             return true;
           }).toList();
