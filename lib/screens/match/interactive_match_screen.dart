@@ -920,7 +920,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                           ? (_homeStrength - _awayStrength)
                           : (_awayStrength - _homeStrength)) *
                       0.0015)
-              .clamp(0.46, 0.95);
+              .clamp(0.46, 0.99);
       if (_random.nextDouble() < passChance) {
         _phase = 'offBallRun';
         _rating += 0.22;
@@ -1076,8 +1076,9 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       final pressChance =
           (0.48 +
                   (_player.skills.pace - 60) * 0.004 +
-                  (_player.skills.defending - 60) * 0.003)
-              .clamp(0.20, 0.82);
+                  (_player.skills.defending - 60) * 0.003 +
+                  _skillTierBonus(_skill('defend')) * 0.55)
+              .clamp(0.20, 0.94);
       if (action == 'press' && _random.nextDouble() < pressChance) {
         _phase = 'midfield';
         _rating += 0.20;
@@ -1226,6 +1227,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       chance =
           (0.71 +
                   (_player.skills.passing - 60) * 0.0045 +
+                  _skillTierBonus(skill) * 0.65 +
                   (_player.skills.vision - 60) * 0.002 +
                   advantage * 0.4 -
                   defensivePressure)
@@ -1234,6 +1236,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       chance =
           (0.76 +
                   (_player.skills.passing - 60) * 0.0038 +
+                  _skillTierBonus(skill) * 0.65 +
                   (_player.skills.vision - 60) * 0.0015 +
                   advantage * 0.35 -
                   defensivePressure * 0.9)
@@ -1241,7 +1244,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     } else if (action == 'keeper') {
       final opponentXg = widget.isHome ? _awayXgRemaining : _homeXgRemaining;
       final shotThreat = (opponentXg / 1.2).clamp(0.0, 1.0);
-      chance = (0.88 + (skill - 70) * 0.003 - shotThreat * 0.18).clamp(
+      chance = (0.88 + (skill - 70) * 0.003 + _skillTierBonus(skill) * 0.65 - shotThreat * 0.18).clamp(
         0.55,
         0.96,
       );
