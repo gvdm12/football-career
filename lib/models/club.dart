@@ -1,3 +1,5 @@
+import 'real_club_squads.dart';
+
 import 'package:flutter/material.dart';
 import 'club_colors.dart';
 
@@ -192,13 +194,20 @@ class Club {
   final String name;
   final League league;
   final int baseStrength;
-  int get strength => Clubs.strengthOverrides[name] ?? baseStrength;
+  final int? _resolvedStrength;
+  int get strength =>
+      _resolvedStrength ?? Clubs.strengthOverrides[name] ?? baseStrength;
   Color get primaryColor => ClubColors.primary(name);
 
   Color get secondaryColor => ClubColors.secondary(name);
 
-  const Club({required this.name, required this.league, required int strength})
-    : baseStrength = strength;
+  const Club({
+    required this.name,
+    required this.league,
+    required int strength,
+    int? resolvedStrength,
+  }) : baseStrength = strength,
+       _resolvedStrength = resolvedStrength;
 }
 
 class Clubs {
@@ -541,10 +550,16 @@ class Clubs {
       (club) => club.name == name,
       orElse: () => all.last,
     );
+    final baseStrength = strengthOverrides[club.name] ?? club.baseStrength;
+    final adjustedStrength = (baseStrength +
+            RealClubSquads.strengthAdjustment(club.name, baseStrength))
+        .clamp(35, 99)
+        .toInt();
     return Club(
       name: club.name,
       league: club.league,
-      strength: strengthOverrides[club.name] ?? club.baseStrength,
+      strength: baseStrength,
+      resolvedStrength: adjustedStrength,
     );
   }
 

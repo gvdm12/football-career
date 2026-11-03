@@ -80,6 +80,40 @@ class _ShopScreenState extends State<ShopScreen> {
 
   int get _recoveryPrice => 25000;
 
+  int get _psychologistPrice =>
+      (45000 * (1 + (career.skillTrainingPurchases['psychologist'] ?? 0) * 0.5)).round();
+
+  int get _personalTrainerPrice =>
+      (60000 * (1 + (career.skillTrainingPurchases['personalTrainer'] ?? 0) * 0.5)).round();
+
+  Future<void> _buyPsychologist() async {
+    if (career.money < _psychologistPrice) return;
+    final purchases = Map<String, int>.from(career.skillTrainingPurchases);
+    purchases['psychologist'] = (purchases['psychologist'] ?? 0) + 1;
+    setState(() {
+      career = career.copyWith(
+        money: career.money - _psychologistPrice,
+        coachTrust: (career.coachTrust + 8).clamp(0, 100).toInt(),
+        skillTrainingPurchases: purchases,
+      );
+    });
+    await CareerStorage.save(career);
+  }
+
+  Future<void> _buyPersonalTrainer() async {
+    if (career.money < _personalTrainerPrice) return;
+    final purchases = Map<String, int>.from(career.skillTrainingPurchases);
+    purchases['personalTrainer'] = (purchases['personalTrainer'] ?? 0) + 1;
+    setState(() {
+      career = career.copyWith(
+        money: career.money - _personalTrainerPrice,
+        developmentPoints: career.developmentPoints + 2,
+        skillTrainingPurchases: purchases,
+      );
+    });
+    await CareerStorage.save(career);
+  }
+
   void _closeShop() {
     if (_allowPop) return;
     setState(() => _allowPop = true);
@@ -407,11 +441,67 @@ class _ShopScreenState extends State<ShopScreen> {
                       ],
                     ),
                   ),
-                ],
+                  const SizedBox(height: 12),
+                _sectionTitle('КАРЬЕРНЫЙ ШТАБ'),
+                _purchaseCard(
+                  icon: Icons.psychology_alt,
+                  title: 'Спортивный психолог',
+                  description: 'Помогает восстановить контакт с тренером и повышает доверие на 8 пунктов.',
+                  price: _psychologistPrice,
+                  onPressed: career.money >= _psychologistPrice ? _buyPsychologist : null,
+                ),
+                const SizedBox(height: 8),
+                _purchaseCard(
+                  icon: Icons.sports,
+                  title: 'Персональный тренер',
+                  description: 'Индивидуальная программа подготовки. Даёт 2 дополнительных очка развития без прямого повышения характеристик.',
+                  price: _personalTrainerPrice,
+                  onPressed: career.money >= _personalTrainerPrice ? _buyPersonalTrainer : null,
+                ),
+              ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _purchaseCard({
+    required IconData icon,
+    required String title,
+    required String description,
+    required int price,
+    required VoidCallback? onPressed,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: _glassDecoration(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Icon(icon, color: const Color(0xFF8BE07F), size: 22),
+            const SizedBox(width: 9),
+            Expanded(child: Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800))),
+          ]),
+          const SizedBox(height: 7),
+          Text(description, style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.35)),
+          const SizedBox(height: 9),
+          Row(children: [
+            Expanded(child: Text('${price} €', style: const TextStyle(color: Color(0xFF8BE07F), fontWeight: FontWeight.w900))),
+            ElevatedButton(
+              onPressed: onPressed,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF8BE07F),
+                foregroundColor: const Color(0xFF082A12),
+                disabledBackgroundColor: Colors.white12,
+                disabledForegroundColor: Colors.white38,
+              ),
+              child: Text(onPressed == null ? 'Недостаточно денег' : 'Купить'),
+            ),
+          ]),
+        ],
       ),
     );
   }

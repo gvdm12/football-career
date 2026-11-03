@@ -5,6 +5,8 @@ import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/season_award.dart';
 import 'package:flutter_football/models/season_stats.dart';
 import 'package:flutter_football/models/position_rival.dart';
+import 'package:flutter_football/models/real_club_squads.dart';
+import 'dart:math';
 
 class SeasonAwardService {
   static List<SeasonAward> create({
@@ -15,13 +17,24 @@ class SeasonAwardService {
     required List<LeagueTableEntry> leagueTable,
     required List<PositionRival> rivals,
     List<String> additionalTrophyWinningClubs = const [],
+    Map<League, List<LeagueTableEntry>>? worldLeagueStandings,
   }) {
     final sortedTable = [...leagueTable]
       ..sort((a, b) => b.points != a.points
           ? b.points.compareTo(a.points)
           : b.goalDifference.compareTo(a.goalDifference));
+    final worldChampions = <String>{};
+    for (final entry in worldLeagueStandings?.entries ??
+        const <MapEntry<League, List<LeagueTableEntry>>>[]) {
+      final standings = [...entry.value]
+        ..sort((a, b) => b.points != a.points
+            ? b.points.compareTo(a.points)
+            : b.goalDifference.compareTo(a.goalDifference));
+      if (standings.isNotEmpty) worldChampions.add(standings.first.club);
+    }
     final trophyWinningClubs = <String>{
       ...additionalTrophyWinningClubs,
+      ...worldChampions,
       if (sortedTable.isNotEmpty) sortedTable.first.club,
     };
     final candidates = <_Candidate>[];
@@ -257,6 +270,102 @@ class SeasonAwardService {
       final key = '${item.name}|${item.club}';
       if (!selected.add(key)) continue;
       result.add(convert(item, 'Команда года', performanceScore(item)));
+    }
+
+    // Золотой мяч: единая гонка между игроком карьеры и футболистами
+    // из ростеров всех лиг. Статистика остальных игроков моделируется
+    // детерминированно на сезон, поэтому результаты не меняются при перезагрузке.
+    final ballonCandidates = <_Candidate>[...candidates];
+    final knownPlayers = ballonCandidates
+        .map((item) => '${item.name}|${item.club}')
+        .toSet();
+
+    int seedFor(String value) {
+      var seed = 17;
+      for (final unit in value.codeUnits) {
+        seed = (seed * 31 + unit) & 0x7fffffff;
+      }
+      return seed;
+    }
+
+    for (final clubEntry in RealClubSquads.squads.entries) {
+      for (final group in clubEntry.value.entries) {
+        final position = switch (group.key) {
+          'goalkeeper' => PlayerPosition.goalkeeper,
+          'defender' => PlayerPosition.defender,
+          'midfielder' => PlayerPosition.midfielder,
+          _ => PlayerPosition.forward,
+        };
+        for (final realPlayer in group.value) {
+          final key = '${realPlayer.name}|${clubEntry.key}';
+          if (!knownPlayers.add(key)) continue;
+          final random = Random(seedFor('$season|$key'));
+          final matches = 28 + random.nextInt(11);
+          final rating = (6.45 +
+                  (realPlayer.overall - 70) * 0.045 +
+                  random.nextDouble() * 0.34)
+              .clamp(6.2, 8.9)
+              .toDouble();
+          final goals = switch (position) {
+            PlayerPosition.forward =>
+              ((realPlayer.overall - 65) * 0.72 + random.nextInt(9))
+                  .round()
+                  .clamp(0, 45)
+                  .toInt(),
+            PlayerPosition.midfielder =>
+              ((realPlayer.overall - 65) * 0.27 + random.nextInt(6))
+                  .round()
+                  .clamp(0, 25)
+                  .toInt(),
+            PlayerPosition.defender => random.nextInt(5),
+            PlayerPosition.goalkeeper => 0,
+          };
+          final assists = switch (position) {
+            PlayerPosition.forward =>
+              ((realPlayer.overall - 65) * 0.25 + random.nextInt(8))
+                  .round()
+                  .clamp(0, 25)
+                  .toInt(),
+            PlayerPosition.midfielder =>
+              ((realPlayer.overall - 65) * 0.43 + random.nextInt(9))
+                  .round()
+                  .clamp(0, 30)
+                  .toInt(),
+            PlayerPosition.defender => random.nextInt(6),
+            PlayerPosition.goalkeeper => 0,
+          };
+          ballonCandidates.add(_Candidate(
+            name: realPlayer.name,
+            club: clubEntry.key,
+            position: position,
+            age: realPlayer.age,
+            matches: matches,
+            goals: goals,
+            assists: assists,
+            rating: rating,
+            isCareerPlayer: false,
+            wonTrophy: trophyWinningClubs.contains(clubEntry.key),
+          ));
+        }
+      }
+    }
+
+    final ballonEligible = ballonCandidates.where((item) =>
+        item.matches >= 25 &&
+        item.rating >= 7.65 &&
+        item.goals + item.assists >= 25 &&
+        (!item.isCareerPlayer || item.wonTrophy)).toList();
+
+    double ballonScore(_Candidate item) =>
+        item.rating * 12 +
+        item.goals * 0.72 +
+        item.assists * 0.48 +
+        (item.wonTrophy ? 4.0 : 0.0);
+
+    ballonEligible.sort((a, b) => ballonScore(b).compareTo(ballonScore(a)));
+    if (ballonEligible.isNotEmpty) {
+      final winner = ballonEligible.first;
+      result.add(convert(winner, 'Золотой мяч', ballonScore(winner)));
     }
 
     return result;

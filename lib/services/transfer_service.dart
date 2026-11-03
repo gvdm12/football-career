@@ -223,6 +223,7 @@ class TransferService {
     final minStrength = max(60, currentStrength - 8);
 
     final allOtherClubs = Clubs.all
+        .map((club) => Clubs.getByName(club.name))
         .where((club) => club.name != player.club)
         .toList();
 
@@ -277,6 +278,16 @@ class TransferService {
       if (available.isNotEmpty) {
         selected.add(available[_random.nextInt(available.length)]);
       }
+    }
+
+    // Возвращение в бывший клуб — отдельный сценарий трансфера.
+    // Такие клубы не исключаются только потому, что игрок недавно их покинул.
+    final formerClubs = allOtherClubs.where((club) =>
+      career.history.any((stats) => stats.club == club.name) &&
+      club.strength <= maxStrength + 5
+    ).toList();
+    if (formerClubs.isNotEmpty && _random.nextDouble() < 0.38) {
+      addRandomFrom(formerClubs);
     }
 
     if (career.season >= 16) {
