@@ -153,12 +153,29 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       playerTeamStrength: playerStrength,
       opponentStrength: opponentStrength,
     );
+    var homeExpectedGoals = expectedGoals.home;
+    var awayExpectedGoals = expectedGoals.away;
+    final difficultyShift = switch (widget.career.settings.difficulty.name) {
+      'easy' => 0.12,
+      'hard' => -0.12,
+      _ => 0.0,
+    };
+    if (widget.isHome) {
+      homeExpectedGoals += difficultyShift;
+      awayExpectedGoals -= difficultyShift * 0.55;
+    } else {
+      awayExpectedGoals += difficultyShift;
+      homeExpectedGoals -= difficultyShift * 0.55;
+    }
+    homeExpectedGoals = homeExpectedGoals.clamp(0.25, 3.0).toDouble();
+    awayExpectedGoals = awayExpectedGoals.clamp(0.25, 3.0).toDouble();
+
     final elapsedMinutes = _minute - 1;
     final remainingMinutes = 90 - elapsedMinutes;
-    _homeGoals = _samplePoisson(expectedGoals.home * elapsedMinutes / 90);
-    _awayGoals = _samplePoisson(expectedGoals.away * elapsedMinutes / 90);
-    _homeXgRemaining = expectedGoals.home * remainingMinutes / 90;
-    _awayXgRemaining = expectedGoals.away * remainingMinutes / 90;
+    _homeGoals = _samplePoisson(homeExpectedGoals * elapsedMinutes / 90);
+    _awayGoals = _samplePoisson(awayExpectedGoals * elapsedMinutes / 90);
+    _homeXgRemaining = homeExpectedGoals * remainingMinutes / 90;
+    _awayXgRemaining = awayExpectedGoals * remainingMinutes / 90;
     _nextMomentMinute = _minute + 6 + _random.nextInt(7);
     _clockTimer = Timer.periodic(
       const Duration(milliseconds: 400),
