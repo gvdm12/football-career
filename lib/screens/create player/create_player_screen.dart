@@ -32,6 +32,8 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
 
   bool _isCreating = false;
   bool _allowAnyClub = false;
+  bool _realisticTransfers = true;
+  CareerDifficulty _difficulty = CareerDifficulty.normal;
 
   List<Club> get _availableStartingClubs =>
       _allowAnyClub ? Clubs.all : startingClubs;
@@ -264,7 +266,13 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
 
     final career = Career.create(
       player.copyWith(jerseyNumber: jerseyNumber),
-      settings: CareerSettings(allowAnyStartingClub: _allowAnyClub),
+      settings: CareerSettings(
+        allowAnyStartingClub: _allowAnyClub,
+        realisticTransfers: _realisticTransfers,
+        difficulty: _difficulty,
+        injuryFrequency: _difficulty == CareerDifficulty.hard ? 1.2 : _difficulty == CareerDifficulty.easy ? 0.8 : 1.0,
+        developmentSpeed: _difficulty == CareerDifficulty.easy ? 1.15 : _difficulty == CareerDifficulty.hard ? 0.85 : 1.0,
+      ),
     );
 
     try {
@@ -410,6 +418,43 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                       });
                     },
                   ),
+                ),
+
+                DropdownButtonFormField<CareerDifficulty>(
+                  value: _difficulty,
+                  dropdownColor: const Color(0xFF0B3A1A),
+                  decoration: InputDecoration(
+                    labelText: AppStrings.isEnglish ? 'Difficulty' : 'Сложность карьеры',
+                    labelStyle: const TextStyle(color: Colors.white70),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF24552C)),
+                    ),
+                  ),
+                  style: const TextStyle(color: Colors.white),
+                  items: [
+                    DropdownMenuItem(value: CareerDifficulty.easy, child: Text(AppStrings.isEnglish ? 'Easy' : 'Лёгкая')),
+                    DropdownMenuItem(value: CareerDifficulty.normal, child: Text(AppStrings.isEnglish ? 'Normal' : 'Обычная')),
+                    DropdownMenuItem(value: CareerDifficulty.hard, child: Text(AppStrings.isEnglish ? 'Hard' : 'Сложная')),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) setState(() => _difficulty = value);
+                  },
+                ),
+
+                SwitchListTile.adaptive(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                  value: _realisticTransfers,
+                  activeColor: green,
+                  title: Text(
+                    AppStrings.isEnglish ? 'Realistic transfers' : 'Реалистичные трансферы',
+                    style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700),
+                  ),
+                  subtitle: Text(
+                    AppStrings.isEnglish ? 'Clubs sign players with a similar level.' : 'Клубы подписывают футболистов с подходящим уровнем.',
+                    style: const TextStyle(color: Colors.white60, fontSize: 11),
+                  ),
+                  onChanged: (value) => setState(() => _realisticTransfers = value),
                 ),
 
                 Text(
