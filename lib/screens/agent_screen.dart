@@ -251,9 +251,9 @@ class _AgentScreenState extends State<AgentScreen> {
       margin: const EdgeInsets.only(top: 9),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF12371C),
+        color: Colors.white.withValues(alpha: 0.075),
         borderRadius: BorderRadius.circular(13),
-        border: Border.all(color: const Color(0xFF285D32)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.19)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
