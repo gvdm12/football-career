@@ -2767,7 +2767,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 yellowCards: stats.yellowCards,
                 redCards: stats.redCards,
                 averageRating: stats.averageRating,
-                achievements: [...stats.achievements, 'Золотая бутса'],
+                achievements: [
+                  ...stats.achievements,
+                  'Золотая бутса',
+                  'Бомбардир сезона',
+                ],
               );
             }).toList()
           : completedCareer.history;
