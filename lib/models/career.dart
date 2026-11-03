@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter_football/models/career_news.dart';
+import 'package:flutter_football/models/career_settings.dart';
 import 'package:flutter_football/models/champions_league.dart';
 import 'package:flutter_football/models/europa_league.dart';
 import 'package:flutter_football/models/world_cup.dart';
@@ -23,6 +24,7 @@ import 'league_player_season_stats.dart';
 
 class Career {
   final Player player;
+  final CareerSettings settings;
   final int season;
   final List<SeasonStats> history;
   final List<PlayerOfMonthAward> playerOfMonthAwards;
@@ -96,6 +98,7 @@ class Career {
 
   const Career({
     required this.player,
+    this.settings = const CareerSettings(),
     required this.season,
     required this.matches,
     required this.goals,
@@ -261,7 +264,10 @@ class Career {
     return names[Random().nextInt(names.length)];
   }
 
-  factory Career.create(Player player) {
+  factory Career.create(
+    Player player, {
+    CareerSettings settings = const CareerSettings(),
+  }) {
     Clubs.applyStrengthOverrides(const {});
     final leagueMatches = _createLeagueMatches(player.club);
 
@@ -303,6 +309,7 @@ class Career {
 
     return Career(
       player: player,
+      settings: settings,
       season: 1,
       rivals: PositionRival.generate(player: player, season: 1),
       coachName: _generateCoachName(),
@@ -335,6 +342,7 @@ class Career {
   Map<String, dynamic> toJson() {
     return {
       'player': player.toJson(),
+      'settings': settings.toJson(),
       'season': season,
       'history': history.map((item) => item.toJson()).toList(),
       'playerOfMonthAwards': playerOfMonthAwards
@@ -599,6 +607,11 @@ class Career {
 
     return Career(
       player: loadedPlayer,
+      settings: CareerSettings.fromJson(
+        json['settings'] is Map
+            ? Map<String, dynamic>.from(json['settings'] as Map)
+            : null,
+      ),
       season: (json['season'] as num?)?.toInt() ?? 1,
       history: normalizedHistory,
       playerOfMonthAwards: readList(
@@ -684,6 +697,7 @@ class Career {
 
   Career copyWith({
     Player? player,
+    CareerSettings? settings,
     int? season,
     int? matches,
     int? goals,
@@ -728,6 +742,7 @@ class Career {
   }) {
     return Career(
       player: player ?? this.player,
+      settings: settings ?? this.settings,
       season: season ?? this.season,
       matches: matches ?? this.matches,
       goals: goals ?? this.goals,
