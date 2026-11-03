@@ -825,7 +825,15 @@ class Career {
 
   Career afterMatch(Match match) {
     // Конкуренты получают игровую практику даже тогда, когда игрок пропустил матч.
-    final matchCareer = copyWith(rivals: PositionRival.advanceMatch(rivals));
+    // Месячная статистика хранится отдельно, чтобы награда не использовала
+    // накопленные за весь сезон показатели конкурента.
+    final rivalRound = seasonMatches.where((item) => item.isPlayed).length + 1;
+    final rivalMonth = seasonMatches.isEmpty
+        ? 1
+        : (((rivalRound - 1) * 12) ~/ seasonMatches.length) + 1;
+    final matchCareer = copyWith(
+      rivals: PositionRival.advanceMatch(rivals, month: rivalMonth),
+    );
     final trustChange = !match.playerPlayed
         ? 0
         : match.playerRating >= 8.0
