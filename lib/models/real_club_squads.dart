@@ -519,8 +519,8 @@ class RealClubSquads {
     },
     'Zenit': {
       'defender': [RealClubPlayer('Nino', 29, 83, 33), RealClubPlayer('Igor Diveev', 27, 84, 78)],
-      'midfielder': [RealClubPlayer('Wendel', 29, 84, 8), RealClubPlayer('Luiz Henrique', 25, 84, 11)],
-      'forward': [RealClubPlayer('Maksim Glushenkov', 27, 84, 10), RealClubPlayer('Aleksandr Sobolev', 29, 82, 7)],
+      'midfielder': [RealClubPlayer('Wendel', 29, 84, 8), RealClubPlayer('Wilmar Barrios', 33, 83, 5)],
+      'forward': [RealClubPlayer('Aleksandr Sobolev', 29, 82, 7), RealClubPlayer('Felipe Augusto', 22, 81, 9)],
     },
     'CSKA Moscow': {
       'defender': [RealClubPlayer('Milan Gajić', 30, 81, 22), RealClubPlayer('Matheus Reis', 31, 82, 2)],
@@ -528,24 +528,24 @@ class RealClubSquads {
       'forward': [RealClubPlayer('Luciano Gondou', 25, 83, 32), RealClubPlayer('Tamerlan Musaev', 25, 80, 11)],
     },
     'Spartak Moscow': {
-      'defender': [RealClubPlayer('Ruslan Litvinov', 25, 81, 68), RealClubPlayer('Srdjan Babić', 30, 82, 6)],
+      'defender': [RealClubPlayer('Christopher Wu', 25, 82, 3), RealClubPlayer('Srdjan Babić', 30, 82, 6)],
       'midfielder': [RealClubPlayer('Esequiel Barco', 27, 85, 5), RealClubPlayer('Nail Umyarov', 26, 81, 18)],
-      'forward': [RealClubPlayer('Manfred Ugalde', 24, 84, 9), RealClubPlayer('Pablo Solari', 25, 82, 7)],
+      'forward': [RealClubPlayer('Manfred Ugalde', 24, 84, 9), RealClubPlayer('Marquinhos', 27, 82, 10)],
     },
     'Krasnodar': {
-      'defender': [RealClubPlayer('Vítor Tormena', 30, 82, 3), RealClubPlayer('Júnior Alonso', 33, 81, 6)],
-      'midfielder': [RealClubPlayer('Eduard Spertsyan', 26, 86, 10), RealClubPlayer('Aleksandr Chernikov', 26, 81, 53)],
-      'forward': [RealClubPlayer('Jhon Córdoba', 33, 85, 9), RealClubPlayer('Moses Cobnan', 24, 80, 90)],
+      'defender': [RealClubPlayer('Vítor Tormena', 30, 82, 3), RealClubPlayer('Jubal', 33, 81, 5)],
+      'midfielder': [RealClubPlayer('Douglas Augusto', 29, 82, 8), RealClubPlayer('Aleksandr Chernikov', 26, 81, 53)],
+      'forward': [RealClubPlayer('Jhon Córdoba', 33, 85, 9), RealClubPlayer('Dmitry Vorobyov', 28, 81, 10)],
     },
     'Lokomotiv Moscow': {
-      'defender': [RealClubPlayer('César Montes', 29, 82, 23), RealClubPlayer('Lucas Fasson', 25, 80, 3)],
-      'midfielder': [RealClubPlayer('Dmitry Barinov', 30, 83, 6), RealClubPlayer('Sergey Pinyaev', 21, 83, 9)],
-      'forward': [RealClubPlayer('Nikolay Komlichenko', 30, 81, 27), RealClubPlayer('Aleksandr Rudenko', 27, 80, 19)],
+      'defender': [RealClubPlayer('Zherzino Nyamsi', 29, 81, 5), RealClubPlayer('Lucas Fasson', 25, 80, 3)],
+      'midfielder': [RealClubPlayer('Sergey Babkin', 24, 79, 6), RealClubPlayer('Sergey Pinyaev', 21, 83, 9)],
+      'forward': [RealClubPlayer('Nikolay Komlichenko', 31, 81, 27), RealClubPlayer('Vadim Rakov', 21, 80, 11)],
     },
     'Dynamo Makhachkala': {
-      'defender': [RealClubPlayer('Jemal Tabidze', 30, 78, 5), RealClubPlayer('Mouhamed Toure', 24, 77, 4)],
-      'midfielder': [RealClubPlayer('Daniil Glebov', 27, 79, 15), RealClubPlayer('Nikola Čumić', 27, 78, 17)],
-      'forward': [RealClubPlayer('Dmitry Glebov', 25, 77, 11), RealClubPlayer('Abakar Gadzhiev', 22, 78, 9)],
+      'defender': [RealClubPlayer('Idar Shumakhov', 27, 78, 4), RealClubPlayer('Soslan Kagermazov', 29, 77, 13)],
+      'midfielder': [RealClubPlayer('Marat Apshatsev', 25, 78, 6), RealClubPlayer('Hussem Mrezig', 26, 78, 16)],
+      'forward': [RealClubPlayer('Miro', 27, 78, 11), RealClubPlayer('Gamid Agalarov', 26, 79, 25)],
     },
     'Dynamo Moscow': {
       'defender': [RealClubPlayer('Nicolas Marichal', 25, 82, 2), RealClubPlayer('Maksim Osipenko', 32, 83, 55)],
