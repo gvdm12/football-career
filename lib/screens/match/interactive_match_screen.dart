@@ -1280,7 +1280,13 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         matchProgress * (0.105 - _player.skills.physical * 0.00075)
             .clamp(0.025, 0.075)
             .toDouble();
-    final adjustedChance = (chance - fatiguePenalty).clamp(0.20, 0.98).toDouble();
+    final difficultyAdjustment = switch (widget.career.settings.difficulty.name) {
+      'easy' => 0.035,
+      'hard' => -0.035,
+      _ => 0.0,
+    };
+    final adjustedChance =
+        (chance - fatiguePenalty + difficultyAdjustment).clamp(0.20, 0.98).toDouble();
     final success = _random.nextDouble() < adjustedChance;
     if (success) _successfulActions++;
     String message;
