@@ -12,7 +12,9 @@ class PreSeasonService {
   }) {
     final matchingClubs = Clubs.all.where((item) => item.name == playerClub).toList();
     final club = matchingClubs.isEmpty ? null : matchingClubs.first;
-    final candidates = Clubs.all.where((item) {
+    final candidates = Clubs.all
+        .map((item) => Clubs.getByName(item.name))
+        .where((item) {
       if (item.name == playerClub) return false;
       if (club == null) return true;
       return (item.strength - club.strength).abs() <= 12;
