@@ -339,6 +339,7 @@ class Career {
       contractYears: 3,
       developmentPoints: 0,
       seasonMatches: seasonMatches,
+      friendlyMatches: friendlyMatches,
       history: const [],
       leagueTable: leagueTable,
       leagueMatches: leagueMatches,
