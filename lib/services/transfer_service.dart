@@ -283,7 +283,7 @@ class TransferService {
     // Такие клубы не исключаются только потому, что игрок недавно их покинул.
     final formerClubs = allOtherClubs.where((club) =>
       career.history.any((stats) => stats.club == club.name) &&
-      club.strength <= maxStrength
+      club.strength <= maxStrength + 5
     ).toList();
     if (formerClubs.isNotEmpty && _random.nextDouble() < 0.38) {
       addRandomFrom(formerClubs);
