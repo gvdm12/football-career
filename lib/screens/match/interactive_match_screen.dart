@@ -1440,7 +1440,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           _phase == 'keeperBeaten' ||
           _phase == 'offBallRun';
       _nextMomentMinute = min(
-        88,
+        89,
         _minute + (isFollowUp ? 1 : 6 + _random.nextInt(7)),
       );
     }
