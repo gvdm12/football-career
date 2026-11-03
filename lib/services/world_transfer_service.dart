@@ -24,6 +24,7 @@ class WorldTransferService {
       for (final club in RealClubSquads.squads.entries) {
         for (final group in club.value.entries) {
           for (final player in group.value) {
+            if (group.value.length <= 1) continue;
             if (player.overall < 78 || player.age > 33) continue;
             if (created.any((transfer) => transfer.playerName == player.name)) {
               continue;
@@ -42,6 +43,14 @@ class WorldTransferService {
             .map((club) => Clubs.getByName(club.name))
             .where((club) {
           if (club.name == candidate.club) return false;
+          final destinationRoster = RealClubSquads.squads[club.name];
+          final positionCount = destinationRoster?[candidate.position]?.length ?? 0;
+          final positionLimit = candidate.position == 'goalkeeper'
+              ? 2
+              : candidate.position == 'forward'
+                  ? 4
+                  : 5;
+          if (positionCount >= positionLimit) return false;
           if (realistic && (club.strength - source.strength).abs() > 12) {
             return false;
           }
