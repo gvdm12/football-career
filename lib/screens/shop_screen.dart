@@ -371,8 +371,10 @@ class _ShopScreenState extends State<ShopScreen> {
                     ],
                   ),
                   const SizedBox(height: 6),
-                  SizedBox(
-                    width: double.infinity,
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: SizedBox(
+                    width: 205,
                     child: ElevatedButton(
                       onPressed:
                           career.isInjured &&
@@ -395,6 +397,7 @@ class _ShopScreenState extends State<ShopScreen> {
                             ? 'Недостаточно денег'
                             : 'Сократить травму на 2 матча',
                       ),
+                    ),
                     ),
                   ),
                 ],
