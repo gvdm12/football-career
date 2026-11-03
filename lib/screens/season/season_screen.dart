@@ -2741,9 +2741,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
             award.playerName == career.player.name &&
             award.club == career.player.club,
       );
-      final ballonDorAward = seasonAwards.where(
-        (award) => award.category == 'Золотой мяч',
-      ).firstOrNull;
+      final ballonDorAwards = seasonAwards
+          .where((award) => award.category == 'Золотой мяч')
+          .toList();
+      final ballonDorAward =
+          ballonDorAwards.isEmpty ? null : ballonDorAwards.first;
       final wonBallonDor = ballonDorAward != null &&
           ballonDorAward.isCareerPlayer &&
           ballonDorAward.playerName == career.player.name &&
