@@ -1714,10 +1714,6 @@ class Career {
     );
     final allWorldTransfers = [...worldTransfers, ...newWorldTransfers];
     RealClubSquads.applyCareerTransfers(allWorldTransfers);
-    final newFriendlyMatches = PreSeasonService.create(
-      playerClub: player.club,
-      season: newSeason,
-    );
     final worldTransferNews = newWorldTransfers.map((transfer) => CareerNews(
       id: 'world_transfer_s${newSeason}_${transfer.playerName.hashCode}',
       season: newSeason,
@@ -1731,6 +1727,10 @@ class Career {
 
     final agedPlayer = _applyAgeDecline(player, newAge, newSeason);
     final newPlayer = agedPlayer.copyWith(season: newSeason);
+    final newFriendlyMatches = PreSeasonService.create(
+      playerClub: newPlayer.club,
+      season: newSeason,
+    );
     // Клуб берётся после трансферного окна.
     final newLeagueMatches = _createLeagueMatches(newPlayer.club);
 
