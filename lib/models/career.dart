@@ -1703,6 +1703,8 @@ class Career {
       coachTrust: coachTrust,
       agentLevel: agentLevel,
       agentInterestedClubs: const [],
+      // В новом сезоне разрешаем снова показать интерес клубов на пресс-конференции.
+      lastTransferInterestConferenceSeason: 0,
       coachName: coachName,
       monthlySalary: monthlySalary,
       isCareerFinished: false,
