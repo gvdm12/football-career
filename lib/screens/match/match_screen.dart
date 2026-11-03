@@ -78,6 +78,14 @@ class MatchScreen extends StatelessWidget {
     if (seasonEnd) return 'seasonEnd';
     if (seasonMiddle && Random().nextDouble() < 0.15) return 'seasonMiddle';
 
+    // Интерес из профиля агента обсуждается не чаще одного раза за сезон.
+    // Вопрос будет показан только при наличии реального списка клубов.
+    if (career.agentInterestedClubs.isNotEmpty &&
+        career.lastTransferInterestConferenceSeason != career.season &&
+        Random().nextDouble() < 0.28) {
+      return 'transferInterest';
+    }
+
     final outstanding =
         match.playerRating >= 8.8 ||
         match.playerGoals >= 3 ||
@@ -97,10 +105,23 @@ class MatchScreen extends StatelessWidget {
 
     if (category != null) {
       PressConferenceContentFactory.markConferenceShown();
+      final interestedClubs = career.agentInterestedClubs
+          .where((club) => club.trim().isNotEmpty)
+          .toList();
+      final interestedClub = category == 'transferInterest' &&
+              interestedClubs.isNotEmpty
+          ? interestedClubs[Random().nextInt(interestedClubs.length)]
+          : null;
       final content = PressConferenceContentFactory.create(
         category: category,
         english: AppStrings.isEnglish,
+        interestedClub: interestedClub,
       );
+      if (category == 'transferInterest') {
+        updatedCareer = updatedCareer.copyWith(
+          lastTransferInterestConferenceSeason: career.season,
+        );
+      }
       final trustChange = await PressConferenceDialog.show(
         context: context,
         content: content,
