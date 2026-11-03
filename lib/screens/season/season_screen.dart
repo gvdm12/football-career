@@ -1672,8 +1672,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
     PlayerOfMonthAward? monthlyWinner;
     final totalRounds = updatedSeasonMatches.length;
     if (totalRounds > 0) {
-      final month = (((seasonMatch.number - 1) * 12) ~/ totalRounds) + 1;
-      final monthEndRound = (month * totalRounds / 12).ceil();
+      final month = (((seasonMatch.number * 12) - 1) ~/ totalRounds) + 1;
+      final monthEndRound = (month * totalRounds) ~/ 12;
       if (seasonMatch.number == monthEndRound) {
         monthlyWinner = PlayerOfMonthService.create(
           season: updatedCareer.season,
