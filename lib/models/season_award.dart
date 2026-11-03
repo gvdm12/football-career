@@ -54,7 +54,22 @@ class SeasonAward {
   factory SeasonAward.fromJson(Map<String, dynamic> json) => SeasonAward(
     season: (json['season'] as num?)?.toInt() ?? 1,
     category: json['category'] as String? ?? 'Награда сезона',
-    playerName: json['playerName'] as String? ?? 'Игрок',
+    playerName: (json['playerName'] as String? ?? 'Игрок').replaceFirst(RegExp(r'\s+\d{2}
+    club: json['club'] as String? ?? 'Без клуба',
+    position: PlayerPosition.values.firstWhere(
+      (value) => value.name == json['position'],
+      orElse: () => PlayerPosition.forward,
+    ),
+    age: (json['age'] as num?)?.toInt() ?? 25,
+    matches: (json['matches'] as num?)?.toInt() ?? 0,
+    goals: (json['goals'] as num?)?.toInt() ?? 0,
+    assists: (json['assists'] as num?)?.toInt() ?? 0,
+    averageRating: (json['averageRating'] as num?)?.toDouble() ?? 0,
+    score: (json['score'] as num?)?.toDouble() ?? 0,
+    isCareerPlayer: json['isCareerPlayer'] as bool? ?? false,
+  );
+}
+), ''),
     club: json['club'] as String? ?? 'Без клуба',
     position: PlayerPosition.values.firstWhere(
       (value) => value.name == json['position'],
