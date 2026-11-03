@@ -2718,6 +2718,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         leaguePlayerStats: completedCareer.leaguePlayerStats,
         leagueTable: completedCareer.leagueTable,
         rivals: completedCareer.rivals,
+        worldLeagueStandings: completedCareer.europeanLeagueStandings,
         additionalTrophyWinningClubs: [
           if (completedCareer.domesticCup?.champion != null)
             completedCareer.domesticCup!.champion!,
