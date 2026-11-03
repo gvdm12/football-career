@@ -1,38 +1,18 @@
-import 'dart:math';
-
 import 'package:flutter_football/models/league_match.dart';
 import 'package:flutter_football/models/player.dart';
-import 'package:flutter_football/models/real_club_squads.dart';
 import 'package:flutter_football/models/player_of_month_award.dart';
 import 'package:flutter_football/models/season_match.dart';
 import 'package:flutter_football/models/position_rival.dart';
+import 'package:flutter_football/models/league_player_season_stats.dart';
 
 class PlayerOfMonthService {
-  static const _names = [
-    'James Wilson', 'Oliver Bennett', 'Lucas Mitchell',
-    'Ethan Parker', 'Daniel Foster', 'Alexander Brooks',
-    'Noah Carter', 'Leo Anderson', 'Mateo Rivera',
-    'Gabriel Santos', 'Ryan Cooper', 'Thomas Reed',
-    'William Turner', 'Nathan Collins', 'Adrian Morris',
-    'Samuel Hayes', 'Jack Robinson', 'David Morgan',
-    'Benjamin Scott', 'Oscar Hughes', 'Felix Wagner',
-    'Marco Romano', 'Hugo Laurent', 'Victor Almeida',
-  ];
-
-  static int _seed(String value) {
-    var result = 23;
-    for (final code in value.codeUnits) {
-      result = (result * 37 + code) & 0x7fffffff;
-    }
-    return result;
-  }
-
   static PlayerOfMonthAward? create({
     required int season,
     required int month,
     required Player player,
     required List<SeasonMatch> playerMatches,
     required List<LeagueMatch> leagueMatches,
+    required List<LeaguePlayerSeasonStats> leaguePlayerStats,
     required List<PlayerOfMonthAward> previousAwards,
     required List<PositionRival> rivals,
   }) {
@@ -85,87 +65,31 @@ class PlayerOfMonthService {
         match.round >= firstRound &&
         match.round <= lastRound &&
         match.isPlayed).toList();
-    final clubs = <String>{
-      for (final fixture in monthFixtures) fixture.homeTeam,
-      for (final fixture in monthFixtures) fixture.awayTeam,
-    };
+    if (monthFixtures.isEmpty) return null;
 
-    for (final clubName in clubs) {
-      if (clubName == player.club) {
-        // Для клуба игрока используем реальные данные его конкурентов.
-        // Так цифры в награде совпадают с экраном команды.
-        for (final rival in rivals) {
-          final monthStats = rival.monthlyStats[month];
-          if (monthStats == null || monthStats.matches == 0) continue;
-          candidates.add(_candidate(
-            season: season,
-            month: month,
-            name: rival.name,
-            club: player.club,
-            age: rival.age,
-            position: rival.position,
-            overall: rival.overall,
-            matches: monthStats.matches,
-            goals: monthStats.goals,
-            assists: monthStats.assists,
-            averageRating: monthStats.averageRating,
-          ));
-        }
+    // Для остальных клубов берём помесячную статистику из той же модели,
+    // которая накапливает сезонные голы, ассисты и оценки.
+    for (final item in leaguePlayerStats) {
+      if (item.matches == 0) continue;
+      if (item.club == player.club &&
+          (item.playerName == player.name ||
+              rivals.any((rival) => rival.name == item.playerName))) {
+        continue;
       }
-
-      final fixtures = monthFixtures.where((match) =>
-          match.homeTeam == clubName || match.awayTeam == clubName).toList();
-      if (fixtures.isEmpty) continue;
-
-      final scored = fixtures.fold<int>(0, (sum, match) =>
-          sum + (match.homeTeam == clubName ? match.homeGoals! : match.awayGoals!));
-      final conceded = fixtures.fold<int>(0, (sum, match) =>
-          sum + (match.homeTeam == clubName ? match.awayGoals! : match.homeGoals!));
-      final points = fixtures.fold<int>(0, (sum, match) {
-        final home = match.homeTeam == clubName;
-        final own = home ? match.homeGoals! : match.awayGoals!;
-        final other = home ? match.awayGoals! : match.homeGoals!;
-        return sum + (own > other ? 3 : own == other ? 1 : 0);
-      });
-
-      final random = Random(_seed('$season|$month|$clubName'));
-      final position = scored >= fixtures.length * 1.5
-          ? PlayerPosition.forward
-          : points >= fixtures.length * 2
-              ? PlayerPosition.midfielder
-              : PlayerPosition.defender;
-      final realPlayers = RealClubSquads.squads[clubName]?[position.name];
-      final availableRealPlayers = (realPlayers ?? const <RealClubPlayer>[])
-          .where((item) =>
-              clubName != player.club ||
-              !rivals.any((rival) => rival.name == item.name))
-          .toList();
-      final realPlayer = availableRealPlayers.isEmpty
-          ? null
-          : availableRealPlayers[random.nextInt(availableRealPlayers.length)];
-      final overall = realPlayer?.overall ??
-          (68 + random.nextInt(22)).clamp(60, 90).toInt();
-      final age = realPlayer?.age ?? 18 + random.nextInt(18);
-      final goals = scored == 0 ? 0 : min(scored, (scored * (0.35 + random.nextDouble() * 0.3)).round()).toInt();
-      final assists = max(0, min(scored - goals, (scored * 0.22).round())).toInt();
-      final rating = (6.15 +
-          (points / (fixtures.length * 3)) * 1.1 +
-          (goals + assists) * 0.12 -
-          (conceded / max(1, fixtures.length)) * 0.06)
-          .clamp(5.8, 9.4).toDouble();
-
+      final monthStats = item.monthlyStats[month];
+      if (monthStats == null || monthStats.matches == 0) continue;
       candidates.add(_candidate(
         season: season,
         month: month,
-        name: realPlayer?.name ?? _names[random.nextInt(_names.length)],
-        club: clubName,
-        age: age,
-        position: position,
-        overall: overall,
-        matches: fixtures.length,
-        goals: goals,
-        assists: assists,
-        averageRating: rating,
+        name: item.playerName,
+        club: item.club,
+        age: item.age,
+        position: item.position,
+        overall: item.overall,
+        matches: monthStats.matches,
+        goals: monthStats.goals,
+        assists: monthStats.assists,
+        averageRating: monthStats.averageRating,
       ));
     }
 
