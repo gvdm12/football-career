@@ -4,12 +4,19 @@ import '../models/club.dart';
 import '../models/friendly_match.dart';
 
 class PreSeasonService {
-  static final Random _random = Random();
+  static int _seed(String value) {
+    var result = 23;
+    for (final unit in value.codeUnits) {
+      result = (result * 31 + unit) & 0x7fffffff;
+    }
+    return result;
+  }
 
   static List<FriendlyMatch> create({
     required String playerClub,
     required int season,
   }) {
+    final random = Random(_seed('$playerClub|$season'));
     final matchingClubs = Clubs.all.where((item) => item.name == playerClub).toList();
     final club = matchingClubs.isEmpty ? null : matchingClubs.first;
     final candidates = Clubs.all
@@ -19,13 +26,13 @@ class PreSeasonService {
       if (club == null) return true;
       return (item.strength - club.strength).abs() <= 12;
     }).toList()
-      ..shuffle(_random);
+      ..shuffle(random);
 
-    final selected = candidates.take(2 + _random.nextInt(3)).toList();
+    final selected = candidates.take(2 + random.nextInt(3)).toList();
     return List.generate(selected.length, (index) => FriendlyMatch(
       number: index + 1,
       opponent: selected[index].name,
-      isHome: _random.nextBool(),
+      isHome: random.nextBool(),
     ));
   }
 }
