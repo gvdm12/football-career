@@ -2751,6 +2751,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
         leaguePlayerStats: completedCareer.leaguePlayerStats,
         leagueTable: completedCareer.leagueTable,
         rivals: completedCareer.rivals,
+        additionalTrophyWinningClubs: [
+          if (completedCareer.domesticCup?.champion != null)
+            completedCareer.domesticCup!.champion!,
+          if (completedCareer.championsLeague?.champion != null)
+            completedCareer.championsLeague!.champion!,
+          if (completedCareer.europaLeague?.champion != null)
+            completedCareer.europaLeague!.champion!,
+        ],
       );
       final wonGoldenBoot = seasonAwards.any(
         (award) =>
