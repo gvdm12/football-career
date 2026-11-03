@@ -350,11 +350,17 @@ class SeasonAwardService {
       }
     }
 
-    final ballonEligible = ballonCandidates.where((item) =>
-        item.matches >= 25 &&
-        item.rating >= 7.65 &&
-        item.goals + item.assists >= 25 &&
-        (!item.isCareerPlayer || item.wonTrophy)).toList();
+    final ballonEligible = ballonCandidates.where((item) {
+      final contributions = item.goals + item.assists;
+      if (item.matches < 25 || item.rating < 7.7 || contributions < 28) {
+        return false;
+      }
+      // Игрок карьеры должен провести по-настоящему элитный сезон и выиграть трофей.
+      if (item.isCareerPlayer) {
+        return item.wonTrophy && item.rating >= 7.9 && contributions >= 35;
+      }
+      return true;
+    }).toList();
 
     double ballonScore(_Candidate item) =>
         item.rating * 12 +
