@@ -59,17 +59,18 @@ class _AgentScreenState extends State<AgentScreen> {
       return;
     }
 
+    final upgradedCareer = career.copyWith(
+      agentCredits: career.agentCredits - cost,
+      agentLevel: career.agentLevel + 1,
+    );
+    // Повышение уровня улучшает условия предложений, но не меняет клубы,
+    // которые агент уже нашёл для игрока.
+    final updatedInterests =
+        TransferService.generateAgentOffersFromInterest(upgradedCareer);
+
     setState(() {
-      career = career.copyWith(
-        agentCredits: career.agentCredits - cost,
-        agentLevel: career.agentLevel + 1,
-      );
-      interests = TransferService.generateOffers(career);
-      career = career.copyWith(
-        agentInterestedClubs: interests
-            .map((offer) => offer.club.name)
-            .toList(),
-      );
+      career = upgradedCareer;
+      interests = updatedInterests;
     });
   }
 
