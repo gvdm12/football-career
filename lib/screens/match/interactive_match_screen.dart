@@ -1495,7 +1495,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           _phase == 'keeperBeaten' ||
           _phase == 'offBallRun';
       _nextMomentMinute = min(
-        89,
+        88,
         _minute + (isFollowUp ? 1 : 6 + _random.nextInt(7)),
       );
     }
@@ -1828,7 +1828,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                                 if (_chronicle.isNotEmpty) ...[
                                   const SizedBox(height: 9),
                                   ..._chronicle
-                                      .take(3)
+                                      .take(2)
                                       .map(
                                         (entry) => Padding(
                                           padding: const EdgeInsets.only(
