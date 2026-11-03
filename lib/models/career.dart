@@ -32,6 +32,7 @@ class Career {
   final CareerSettings settings;
   final List<CareerWorldTransfer> worldTransfers;
   final List<FriendlyMatch> friendlyMatches;
+  final int lastConversationMatch;
   final int season;
   final List<SeasonStats> history;
   final List<PlayerOfMonthAward> playerOfMonthAwards;
@@ -108,6 +109,7 @@ class Career {
     this.settings = const CareerSettings(),
     this.worldTransfers = const [],
     this.friendlyMatches = const [],
+    this.lastConversationMatch = -4,
     required this.season,
     required this.matches,
     required this.goals,
@@ -359,6 +361,7 @@ class Career {
       'settings': settings.toJson(),
       'worldTransfers': worldTransfers.map((item) => item.toJson()).toList(),
       'friendlyMatches': friendlyMatches.map((item) => item.toJson()).toList(),
+      'lastConversationMatch': lastConversationMatch,
       'season': season,
       'history': history.map((item) => item.toJson()).toList(),
       'playerOfMonthAwards': playerOfMonthAwards
@@ -635,6 +638,7 @@ class Career {
       ),
       worldTransfers: restoredWorldTransfers,
       friendlyMatches: readList('friendlyMatches', FriendlyMatch.fromJson),
+      lastConversationMatch: (json['lastConversationMatch'] as num?)?.toInt() ?? -4,
       season: (json['season'] as num?)?.toInt() ?? 1,
       history: normalizedHistory,
       playerOfMonthAwards: readList(
@@ -723,6 +727,7 @@ class Career {
     CareerSettings? settings,
     List<CareerWorldTransfer>? worldTransfers,
     List<FriendlyMatch>? friendlyMatches,
+    int? lastConversationMatch,
     int? season,
     int? matches,
     int? goals,
@@ -770,6 +775,7 @@ class Career {
       settings: settings ?? this.settings,
       worldTransfers: worldTransfers ?? this.worldTransfers,
       friendlyMatches: friendlyMatches ?? this.friendlyMatches,
+      lastConversationMatch: lastConversationMatch ?? this.lastConversationMatch,
       season: season ?? this.season,
       matches: matches ?? this.matches,
       goals: goals ?? this.goals,
@@ -1821,6 +1827,7 @@ class Career {
       settings: settings,
       worldTransfers: allWorldTransfers,
       friendlyMatches: newFriendlyMatches,
+      lastConversationMatch: -4,
       season: newSeason,
       clubStrengths: updatedClubStrengths,
       matches: 0,
