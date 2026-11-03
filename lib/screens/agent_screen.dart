@@ -127,7 +127,7 @@ class _AgentScreenState extends State<AgentScreen> {
       if (career.contractYears <= 1 && Random().nextDouble() < successChance) {
         updated = career.copyWith(
           monthlySalary: (career.monthlySalary * 1.08).round(),
-          contractYears: min(remainingCareer, 2),
+          contractYears: remainingCareer < 2 ? remainingCareer : 2,
         );
       }
     }
