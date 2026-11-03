@@ -24,7 +24,7 @@ class PlayerOfMonthService {
     final totalRounds = playerMatches.length;
     if (totalRounds == 0) return null;
     final firstRound = (((month - 1) * totalRounds) ~/ 12) + 1;
-    final lastRound = (month * totalRounds / 12).ceil();
+    final lastRound = (month * totalRounds) ~/ 12;
     if (lastRound < firstRound) return null;
 
     final monthPlayerMatches = playerMatches.where((item) =>
