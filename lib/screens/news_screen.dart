@@ -46,9 +46,16 @@ class NewsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final sortedNews =
         career.news.where((item) => item.season == career.season).toList()
-          ..sort((a, b) => b.matchNumber.compareTo(a.matchNumber));
+          ..sort((a, b) {
+            final aSeasonEvent = a.matchNumber == 0 ? 1 : 0;
+            final bSeasonEvent = b.matchNumber == 0 ? 1 : 0;
+            if (aSeasonEvent != bSeasonEvent) {
+              return bSeasonEvent.compareTo(aSeasonEvent);
+            }
+            return b.matchNumber.compareTo(a.matchNumber);
+          });
 
-    final visibleNews = sortedNews.take(6).toList();
+    final visibleNews = sortedNews.take(15).toList();
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -71,7 +78,12 @@ class NewsScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               children: [
                 _buildHeader(visibleNews.length),
-                const SizedBox(height: 18),
+                const SizedBox(height: 12),
+                const Text(
+                  'ТРАНСФЕРЫ · ЛИГИ · ЕВРОПА · ВАША КАРЬЕРА',
+                  style: TextStyle(color: Colors.white54, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.1),
+                ),
+                const SizedBox(height: 14),
                 ...visibleNews.map(_buildNewsCard),
               ],
             ),
@@ -118,13 +130,19 @@ class NewsScreen extends StatelessWidget {
   }
 
   Widget _buildNewsCard(CareerNews news) {
+    final accent = news.type == CareerNewsType.transfer
+        ? const Color(0xFFFFC857)
+        : accentColor;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+        border: Border.all(color: accent.withValues(alpha: 0.22)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: 0.14), blurRadius: 14, offset: const Offset(0, 5)),
+        ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,10 +151,10 @@ class NewsScreen extends StatelessWidget {
             width: 46,
             height: 46,
             decoration: BoxDecoration(
-              color: accentColor.withValues(alpha: 0.12),
+              color: accent.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(13),
             ),
-            child: Icon(_getIcon(news.type), color: accentColor, size: 24),
+            child: Icon(_getIcon(news.type), color: accent, size: 24),
           ),
           const SizedBox(width: 13),
           Expanded(
@@ -145,8 +163,8 @@ class NewsScreen extends StatelessWidget {
               children: [
                 Text(
                   _getCategory(news.type),
-                  style: const TextStyle(
-                    color: accentColor,
+                  style: TextStyle(
+                    color: accent,
                     fontSize: 10,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 1,
@@ -172,7 +190,15 @@ class NewsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  AppStrings.newsSeasonAndMatch(news.season, news.matchNumber),
+                  news.matchNumber == 0 && news.type == CareerNewsType.transfer
+                      ? 'ТРАНСФЕРНОЕ ОКНО · СЕЗОН ${news.season}'
+                      : news.matchNumber == 0 && news.type == CareerNewsType.season
+                          ? 'ИТОГИ ДРУГИХ ЛИГ · СЕЗОН ${news.season}'
+                          : news.matchNumber == 0 && news.type == CareerNewsType.achievement
+                              ? 'ЗОЛОТОЙ МЯЧ · СЕЗОН ${news.season}'
+                              : news.matchNumber < 0
+                              ? 'ПРЕДСЕЗОННАЯ ПОДГОТОВКА · СЕЗОН ${news.season}'
+                              : AppStrings.newsSeasonAndMatch(news.season, news.matchNumber),
                   style: const TextStyle(color: Colors.white38, fontSize: 11),
                 ),
               ],

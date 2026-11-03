@@ -153,12 +153,29 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       playerTeamStrength: playerStrength,
       opponentStrength: opponentStrength,
     );
+    var homeExpectedGoals = expectedGoals.home;
+    var awayExpectedGoals = expectedGoals.away;
+    final difficultyShift = switch (widget.career.settings.difficulty.name) {
+      'easy' => 0.12,
+      'hard' => -0.12,
+      _ => 0.0,
+    };
+    if (widget.isHome) {
+      homeExpectedGoals += difficultyShift;
+      awayExpectedGoals -= difficultyShift * 0.55;
+    } else {
+      awayExpectedGoals += difficultyShift;
+      homeExpectedGoals -= difficultyShift * 0.55;
+    }
+    homeExpectedGoals = homeExpectedGoals.clamp(0.25, 3.0).toDouble();
+    awayExpectedGoals = awayExpectedGoals.clamp(0.25, 3.0).toDouble();
+
     final elapsedMinutes = _minute - 1;
     final remainingMinutes = 90 - elapsedMinutes;
-    _homeGoals = _samplePoisson(expectedGoals.home * elapsedMinutes / 90);
-    _awayGoals = _samplePoisson(expectedGoals.away * elapsedMinutes / 90);
-    _homeXgRemaining = expectedGoals.home * remainingMinutes / 90;
-    _awayXgRemaining = expectedGoals.away * remainingMinutes / 90;
+    _homeGoals = _samplePoisson(homeExpectedGoals * elapsedMinutes / 90);
+    _awayGoals = _samplePoisson(awayExpectedGoals * elapsedMinutes / 90);
+    _homeXgRemaining = homeExpectedGoals * remainingMinutes / 90;
+    _awayXgRemaining = awayExpectedGoals * remainingMinutes / 90;
     _nextMomentMinute = _minute + 6 + _random.nextInt(7);
     _clockTimer = Timer.periodic(
       const Duration(milliseconds: 400),
@@ -329,6 +346,16 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
             s.physical * 0.24 +
             s.vision * 0.22 +
             s.pace * 0.12;
+      case 'twoOnOnePass':
+        return s.passing * 0.55 + s.vision * 0.35 + s.dribbling * 0.10;
+      case 'twoOnOneShoot':
+        return s.shooting * 0.65 + s.vision * 0.15 + s.dribbling * 0.20;
+      case 'press':
+        return s.defending * 0.40 + s.pace * 0.30 + s.vision * 0.20 + s.physical * 0.10;
+      case 'recover':
+        return s.pace * 0.40 + s.physical * 0.35 + s.defending * 0.25;
+      case 'checkBack':
+        return s.vision * 0.45 + s.passing * 0.35 + s.physical * 0.20;
       case 'defend':
       case 'tackle':
       case 'contain':
@@ -1263,7 +1290,21 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         0.92,
       );
     }
-    final success = _random.nextDouble() < chance;
+    // Во второй половине матча усталость постепенно снижает точность.
+    // Высокая физическая подготовка помогает дольше сохранять качество действий.
+    final matchProgress = ((_minute - 45).clamp(0, 45) / 45).toDouble();
+    final fatiguePenalty =
+        matchProgress * (0.105 - _player.skills.physical * 0.00075)
+            .clamp(0.025, 0.075)
+            .toDouble();
+    final difficultyAdjustment = switch (widget.career.settings.difficulty.name) {
+      'easy' => 0.035,
+      'hard' => -0.035,
+      _ => 0.0,
+    };
+    final adjustedChance =
+        (chance - fatiguePenalty + difficultyAdjustment).clamp(0.20, 0.98).toDouble();
+    final success = _random.nextDouble() < adjustedChance;
     if (success) _successfulActions++;
     String message;
 

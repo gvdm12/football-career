@@ -1,3 +1,5 @@
+import 'career_world_transfer.dart';
+
 class RealClubPlayer {
   final String name;
   final int age;
@@ -10,8 +12,8 @@ class RealClubPlayer {
 class RealClubSquads {
   const RealClubSquads._();
 
-  // Составы топ-клубов сезона 2026/27. Рейтинги адаптированы под игру.
-  static const Map<String, Map<String, List<RealClubPlayer>>> squads = {
+  // Базовые составы неизменны: сохранённые трансферы накладываются поверх них.
+  static const Map<String, Map<String, List<RealClubPlayer>>> _baseSquads = {
     'Real Madrid': {
       'goalkeeper': [
         RealClubPlayer('Thibaut Courtois', 34, 90, 1),
@@ -1052,4 +1054,58 @@ class RealClubSquads {
       ],
     },
   };
+
+  static final Map<String, Map<String, List<RealClubPlayer>>> squads =
+      _copyBaseSquads();
+
+  static Map<String, Map<String, List<RealClubPlayer>>> _copyBaseSquads() => {
+    for (final club in _baseSquads.entries)
+      club.key: {
+        for (final position in club.value.entries)
+          position.key: List<RealClubPlayer>.from(position.value),
+      },
+  };
+
+  static double? _averageOverall(Map<String, List<RealClubPlayer>>? squad) {
+    if (squad == null) return null;
+    final players = squad.values.expand((items) => items).toList();
+    if (players.isEmpty) return null;
+    return players.fold<int>(0, (sum, player) => sum + player.overall) /
+        players.length;
+  }
+
+  /// Небольшая поправка к силе клуба из-за пришедших и ушедших реальных игроков.
+  static int strengthAdjustment(String clubName, int fallbackStrength) {
+    final currentAverage = _averageOverall(squads[clubName]);
+    if (currentAverage == null) return 0;
+    final baseAverage = _averageOverall(_baseSquads[clubName]);
+    final difference = baseAverage == null
+        ? (currentAverage - fallbackStrength) * 0.12
+        : (currentAverage - baseAverage) * 0.65;
+    return difference.round().clamp(-4, 4).toInt();
+  }
+
+  /// Восстанавливает базовые составы и применяет трансферы текущей карьеры.
+  static void applyCareerTransfers(Iterable<CareerWorldTransfer> transfers) {
+    squads
+      ..clear()
+      ..addAll(_copyBaseSquads());
+
+    for (final transfer in transfers) {
+      final position = transfer.position as String;
+      final source = squads[transfer.fromClub]?[position];
+      if (source == null) continue;
+      final index = source.indexWhere(
+        (player) => player.name == transfer.playerName,
+      );
+      if (index < 0) continue;
+
+      final player = source.removeAt(index);
+      final destination = squads.putIfAbsent(
+        transfer.toClub,
+        () => <String, List<RealClubPlayer>>{},
+      );
+      destination.putIfAbsent(position, () => <RealClubPlayer>[]).add(player);
+    }
+  }
 }

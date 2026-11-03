@@ -321,8 +321,24 @@ class Match {
       isHome: isHome,
       playerPlayed: playerPlayed,
     );
-    final homeExpectedGoals = expectedGoals.home;
-    final awayExpectedGoals = expectedGoals.away;
+    var homeExpectedGoals = expectedGoals.home;
+    var awayExpectedGoals = expectedGoals.away;
+
+    // Настройка сложности влияет и на обычную симуляцию, и на результативность соперника.
+    final difficultyShift = switch (career?.settings.difficulty.name) {
+      'easy' => 0.12,
+      'hard' => -0.12,
+      _ => 0.0,
+    };
+    if (isHome) {
+      homeExpectedGoals += difficultyShift;
+      awayExpectedGoals -= difficultyShift * 0.55;
+    } else {
+      awayExpectedGoals += difficultyShift;
+      homeExpectedGoals -= difficultyShift * 0.55;
+    }
+    homeExpectedGoals = homeExpectedGoals.clamp(0.25, 3.0).toDouble();
+    awayExpectedGoals = awayExpectedGoals.clamp(0.25, 3.0).toDouble();
 
     // Генерируем окончательный счёт.
     final homeGoals = _generateGoals(random, homeExpectedGoals);

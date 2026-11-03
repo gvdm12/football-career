@@ -1,5 +1,11 @@
 import 'dart:math';
 import 'package:flutter_football/models/career_news.dart';
+import 'package:flutter_football/models/career_settings.dart';
+import 'package:flutter_football/models/career_world_transfer.dart';
+import 'package:flutter_football/models/real_club_squads.dart';
+import 'package:flutter_football/models/friendly_match.dart';
+import 'package:flutter_football/services/pre_season_service.dart';
+import 'package:flutter_football/services/world_transfer_service.dart';
 import 'package:flutter_football/models/champions_league.dart';
 import 'package:flutter_football/models/europa_league.dart';
 import 'package:flutter_football/models/world_cup.dart';
@@ -23,6 +29,10 @@ import 'league_player_season_stats.dart';
 
 class Career {
   final Player player;
+  final CareerSettings settings;
+  final List<CareerWorldTransfer> worldTransfers;
+  final List<FriendlyMatch> friendlyMatches;
+  final int lastConversationMatch;
   final int season;
   final List<SeasonStats> history;
   final List<PlayerOfMonthAward> playerOfMonthAwards;
@@ -96,6 +106,10 @@ class Career {
 
   const Career({
     required this.player,
+    this.settings = const CareerSettings(),
+    this.worldTransfers = const [],
+    this.friendlyMatches = const [],
+    this.lastConversationMatch = -4,
     required this.season,
     required this.matches,
     required this.goals,
@@ -261,11 +275,19 @@ class Career {
     return names[Random().nextInt(names.length)];
   }
 
-  factory Career.create(Player player) {
+  factory Career.create(
+    Player player, {
+    CareerSettings settings = const CareerSettings(),
+  }) {
     Clubs.applyStrengthOverrides(const {});
+    RealClubSquads.applyCareerTransfers(const []);
     final leagueMatches = _createLeagueMatches(player.club);
 
     final seasonMatches = _createSeasonMatches(player.club, leagueMatches);
+    final friendlyMatches = PreSeasonService.create(
+      playerClub: player.club,
+      season: 1,
+    );
 
     final leagueTable = _createLeagueTable(player.club, seasonMatches);
     final startingSalary = _startingClubSalary(player.club);
@@ -303,6 +325,7 @@ class Career {
 
     return Career(
       player: player,
+      settings: settings,
       season: 1,
       rivals: PositionRival.generate(player: player, season: 1),
       coachName: _generateCoachName(),
@@ -316,6 +339,7 @@ class Career {
       contractYears: 3,
       developmentPoints: 0,
       seasonMatches: seasonMatches,
+      friendlyMatches: friendlyMatches,
       history: const [],
       leagueTable: leagueTable,
       leagueMatches: leagueMatches,
@@ -335,6 +359,10 @@ class Career {
   Map<String, dynamic> toJson() {
     return {
       'player': player.toJson(),
+      'settings': settings.toJson(),
+      'worldTransfers': worldTransfers.map((item) => item.toJson()).toList(),
+      'friendlyMatches': friendlyMatches.map((item) => item.toJson()).toList(),
+      'lastConversationMatch': lastConversationMatch,
       'season': season,
       'history': history.map((item) => item.toJson()).toList(),
       'playerOfMonthAwards': playerOfMonthAwards
@@ -407,6 +435,11 @@ class Career {
     }
 
     final loadedPlayer = Player.fromJson(Map<String, dynamic>.from(rawPlayer));
+    final restoredWorldTransfers = readList(
+      'worldTransfers',
+      CareerWorldTransfer.fromJson,
+    );
+    RealClubSquads.applyCareerTransfers(restoredWorldTransfers);
     final rawClubStrengths = json['clubStrengths'];
     final restoredClubStrengths = rawClubStrengths is Map
         ? rawClubStrengths.map(
@@ -605,6 +638,14 @@ class Career {
 
     return Career(
       player: loadedPlayer,
+      settings: CareerSettings.fromJson(
+        json['settings'] is Map
+            ? Map<String, dynamic>.from(json['settings'] as Map)
+            : null,
+      ),
+      worldTransfers: restoredWorldTransfers,
+      friendlyMatches: readList('friendlyMatches', FriendlyMatch.fromJson),
+      lastConversationMatch: (json['lastConversationMatch'] as num?)?.toInt() ?? -4,
       season: (json['season'] as num?)?.toInt() ?? 1,
       history: normalizedHistory,
       playerOfMonthAwards: readList(
@@ -690,6 +731,10 @@ class Career {
 
   Career copyWith({
     Player? player,
+    CareerSettings? settings,
+    List<CareerWorldTransfer>? worldTransfers,
+    List<FriendlyMatch>? friendlyMatches,
+    int? lastConversationMatch,
     int? season,
     int? matches,
     int? goals,
@@ -734,6 +779,10 @@ class Career {
   }) {
     return Career(
       player: player ?? this.player,
+      settings: settings ?? this.settings,
+      worldTransfers: worldTransfers ?? this.worldTransfers,
+      friendlyMatches: friendlyMatches ?? this.friendlyMatches,
+      lastConversationMatch: lastConversationMatch ?? this.lastConversationMatch,
       season: season ?? this.season,
       matches: matches ?? this.matches,
       goals: goals ?? this.goals,
@@ -895,7 +944,13 @@ class Career {
       );
     }
 
-    if (!playerParticipated || Random().nextDouble() >= 0.030) {
+    final difficultyInjuryMultiplier = switch (settings.difficulty) {
+      CareerDifficulty.easy => 0.85,
+      CareerDifficulty.normal => 1.0,
+      CareerDifficulty.hard => 1.15,
+    };
+    final injuryChance = 0.030 * settings.injuryFrequency * difficultyInjuryMultiplier;
+    if (!playerParticipated || Random().nextDouble() >= injuryChance) {
       return updatedCareer;
     }
     const injuries = [
@@ -1659,11 +1714,30 @@ class Career {
     Clubs.applyStrengthOverrides(updatedClubStrengths);
 
     final newSeason = season + 1;
+    final newWorldTransfers = WorldTransferService.simulateSeason(
+      season: newSeason,
+      previousTransfers: worldTransfers,
+      realistic: settings.realisticTransfers,
+    );
+    final allWorldTransfers = [...worldTransfers, ...newWorldTransfers];
+    RealClubSquads.applyCareerTransfers(allWorldTransfers);
+    final worldTransferNews = newWorldTransfers.map((transfer) => CareerNews(
+      id: 'world_transfer_s${newSeason}_${transfer.playerName.hashCode}',
+      season: newSeason,
+      matchNumber: 0,
+      title: 'Трансфер: ${transfer.playerName}',
+      description: '${transfer.playerName} (${transfer.overall}) перешёл из ${transfer.fromClub} в ${transfer.toClub}.',
+      type: CareerNewsType.transfer,
+    )).toList();
 
     final newAge = player.age + 1;
 
     final agedPlayer = _applyAgeDecline(player, newAge, newSeason);
     final newPlayer = agedPlayer.copyWith(season: newSeason);
+    final newFriendlyMatches = PreSeasonService.create(
+      playerClub: newPlayer.club,
+      season: newSeason,
+    );
     // Клуб берётся после трансферного окна.
     final newLeagueMatches = _createLeagueMatches(newPlayer.club);
 
@@ -1688,14 +1762,11 @@ class Career {
       newDomesticCup = null;
     }
 
+    final baseDevelopmentPoints = season < 5 ? 3 : season == 5 ? 5 : 6;
     final newDevelopmentPoints = alreadyArchived
         ? developmentPoints
         : developmentPoints +
-              (season < 5
-                  ? 3
-                  : season == 5
-                  ? 5
-                  : 6);
+              (baseDevelopmentPoints * settings.developmentSpeed).round();
 
     // Берём результаты чемпионатов текущего сезона.
     // Они используются для определения участников следующей ЛЧ.
@@ -1743,6 +1814,33 @@ class Career {
       season: newSeason,
     );
 
+    // Пресса освещает не только клуб игрока, но и результаты других лиг.
+    final currentPlayerLeague = Clubs.leagueOf(newPlayer.club);
+    final otherLeagues = League.values
+        .where((league) => league != currentPlayerLeague)
+        .toList()
+      ..shuffle(Random(newSeason * 97 + newPlayer.overall));
+    final newsLeagues = <League>[
+      if (currentPlayerLeague != null) currentPlayerLeague,
+      ...otherLeagues.take(3),
+    ];
+    final leagueNews = newsLeagues.map((league) {
+      final table = [...(qualificationStandings[league] ?? const <LeagueTableEntry>[])]
+        ..sort((a, b) => b.points != a.points
+            ? b.points.compareTo(a.points)
+            : b.goalDifference.compareTo(a.goalDifference));
+      if (table.isEmpty) return null;
+      final champion = table.first.club;
+      return CareerNews(
+        id: 'league_result_s${newSeason}_${league.name}',
+        season: newSeason,
+        matchNumber: 0,
+        title: 'Итоги сезона в ${league.displayName}',
+        description: '$champion завершил предыдущий сезон на первом месте и стал чемпионом лиги.',
+        type: CareerNewsType.season,
+      );
+    }).whereType<CareerNews>().toList();
+
     final previousStats = previousSeasonStats.isNotEmpty
         ? previousSeasonStats.last
         : null;
@@ -1760,6 +1858,10 @@ class Career {
 
     return Career(
       player: newPlayer,
+      settings: settings,
+      worldTransfers: allWorldTransfers,
+      friendlyMatches: newFriendlyMatches,
+      lastConversationMatch: -4,
       season: newSeason,
       clubStrengths: updatedClubStrengths,
       matches: 0,
@@ -1777,7 +1879,7 @@ class Career {
       history: newHistory,
       leagueTable: newLeagueTable,
       leagueMatches: newLeagueMatches,
-      news: news,
+      news: [...news, ...worldTransferNews, ...leagueNews],
       rivals: PositionRival.nextSeason(rivals, newSeason, player: newPlayer),
       coachTrust: coachTrust,
       agentLevel: agentLevel,
