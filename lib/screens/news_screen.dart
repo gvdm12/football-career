@@ -185,9 +185,11 @@ class NewsScreen extends StatelessWidget {
                 Text(
                   news.matchNumber == 0 && news.type == CareerNewsType.transfer
                       ? 'ТРАНСФЕРНОЕ ОКНО · СЕЗОН ${news.season}'
-                      : news.matchNumber < 0
-                          ? 'ПРЕДСЕЗОННАЯ ПОДГОТОВКА · СЕЗОН ${news.season}'
-                          : AppStrings.newsSeasonAndMatch(news.season, news.matchNumber),
+                      : news.matchNumber == 0 && news.type == CareerNewsType.season
+                          ? 'ИТОГИ ДРУГИХ ЛИГ · СЕЗОН ${news.season}'
+                          : news.matchNumber < 0
+                              ? 'ПРЕДСЕЗОННАЯ ПОДГОТОВКА · СЕЗОН ${news.season}'
+                              : AppStrings.newsSeasonAndMatch(news.season, news.matchNumber),
                   style: const TextStyle(color: Colors.white38, fontSize: 11),
                 ),
               ],
