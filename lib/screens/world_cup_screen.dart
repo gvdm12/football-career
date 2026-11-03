@@ -263,8 +263,11 @@ class _WorldCupScreenState extends State<WorldCupScreen> {
   }
 
   Widget _buildWorldCupMatchGlass({required Widget child}) {
-    // В календаре ЧМ используем обычные карточки без liquid glass.
-    return child;
+    // Сохраняем скругление карточки, но убираем размытие и стеклянный фон.
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(14),
+      child: child,
+    );
   }
 
   Widget _playerStat(String label, String value) {
