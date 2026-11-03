@@ -1066,6 +1066,25 @@ class RealClubSquads {
       },
   };
 
+  static double? _averageOverall(Map<String, List<RealClubPlayer>>? squad) {
+    if (squad == null) return null;
+    final players = squad.values.expand((items) => items).toList();
+    if (players.isEmpty) return null;
+    return players.fold<int>(0, (sum, player) => sum + player.overall) /
+        players.length;
+  }
+
+  /// Небольшая поправка к силе клуба из-за пришедших и ушедших реальных игроков.
+  static int strengthAdjustment(String clubName, int fallbackStrength) {
+    final currentAverage = _averageOverall(squads[clubName]);
+    if (currentAverage == null) return 0;
+    final baseAverage = _averageOverall(_baseSquads[clubName]);
+    final difference = baseAverage == null
+        ? (currentAverage - fallbackStrength) * 0.12
+        : (currentAverage - baseAverage) * 0.65;
+    return difference.round().clamp(-4, 4).toInt();
+  }
+
   /// Восстанавливает базовые составы и применяет трансферы текущей карьеры.
   static void applyCareerTransfers(Iterable<CareerWorldTransfer> transfers) {
     squads
