@@ -168,7 +168,7 @@ class SeasonAwardService {
 
     // «Золотая бутса» появляется только при достижении порога конкретной лиги.
     final league = Clubs.leagueOf(player.club);
-    final goldenBootThreshold = league?.goldenBootGoalThreshold ?? 0;
+    final goldenBootThreshold = league?.goldenBootGoalThreshold ?? 21;
     final goalLeaders = candidates
         .where((item) =>
             item.matches >= 10 &&
