@@ -10,7 +10,8 @@ class PreSeasonService {
     required String playerClub,
     required int season,
   }) {
-    final club = Clubs.all.where((item) => item.name == playerClub).firstOrNull;
+    final matchingClubs = Clubs.all.where((item) => item.name == playerClub).toList();
+    final club = matchingClubs.isEmpty ? null : matchingClubs.first;
     final candidates = Clubs.all.where((item) {
       if (item.name == playerClub) return false;
       if (club == null) return true;
