@@ -3,6 +3,51 @@ import 'dart:math';
 import 'player.dart';
 import 'real_club_squads.dart';
 
+class RivalMonthStats {
+  final int matches;
+  final int goals;
+  final int assists;
+  final double ratingSum;
+
+  const RivalMonthStats({
+    this.matches = 0,
+    this.goals = 0,
+    this.assists = 0,
+    this.ratingSum = 0,
+  });
+
+  double get averageRating => matches == 0 ? 0 : ratingSum / matches;
+
+  RivalMonthStats addMatch({
+    required int goals,
+    required int assists,
+    required double rating,
+  }) {
+    return RivalMonthStats(
+      matches: matches + 1,
+      goals: this.goals + goals,
+      assists: this.assists + assists,
+      ratingSum: ratingSum + rating,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'matches': matches,
+    'goals': goals,
+    'assists': assists,
+    'ratingSum': ratingSum,
+  };
+
+  factory RivalMonthStats.fromJson(Map<String, dynamic> json) {
+    return RivalMonthStats(
+      matches: (json['matches'] as num?)?.toInt() ?? 0,
+      goals: (json['goals'] as num?)?.toInt() ?? 0,
+      assists: (json['assists'] as num?)?.toInt() ?? 0,
+      ratingSum: (json['ratingSum'] as num?)?.toDouble() ?? 0,
+    );
+  }
+}
+
 class PositionRival {
   final String id;
   final String name;
@@ -18,6 +63,7 @@ class PositionRival {
   final int assists;
   final double averageRating;
   final int form;
+  final Map<int, RivalMonthStats> monthlyStats;
 
   const PositionRival({
     required this.id,
@@ -34,6 +80,7 @@ class PositionRival {
     this.assists = 0,
     this.averageRating = 6.5,
     this.form = 0,
+    this.monthlyStats = const {},
   });
 
   PositionRival copyWith({
@@ -48,6 +95,7 @@ class PositionRival {
     int? assists,
     double? averageRating,
     int? form,
+    Map<int, RivalMonthStats>? monthlyStats,
   }) {
     return PositionRival(
       id: id,
@@ -65,6 +113,7 @@ class PositionRival {
       assists: assists ?? this.assists,
       averageRating: averageRating ?? this.averageRating,
       form: form ?? this.form,
+      monthlyStats: monthlyStats ?? this.monthlyStats,
     );
   }
 
@@ -91,6 +140,10 @@ class PositionRival {
     'assists': assists,
     'averageRating': averageRating,
     'form': form,
+    'monthlyStats': {
+      for (final entry in monthlyStats.entries)
+        entry.key.toString(): entry.value.toJson(),
+    },
   };
 
   factory PositionRival.fromJson(Map<String, dynamic> json) {
@@ -118,6 +171,18 @@ class PositionRival {
       assists: (json['assists'] as num?)?.toInt() ?? 0,
       averageRating: (json['averageRating'] as num?)?.toDouble() ?? 6.5,
       form: (json['form'] as num?)?.toInt() ?? 0,
+      monthlyStats: (json['monthlyStats'] as Map?)?.entries.fold<Map<int, RivalMonthStats>>(
+            {},
+            (result, entry) {
+              final month = int.tryParse(entry.key.toString());
+              if (month != null && entry.value is Map) {
+                result[month] = RivalMonthStats.fromJson(
+                  Map<String, dynamic>.from(entry.value as Map),
+                );
+              }
+              return result;
+            },
+          ) ?? const {},
     );
   }
 
@@ -281,6 +346,7 @@ class PositionRival {
             assists: old.assists,
             averageRating: old.averageRating,
             form: old.form,
+            monthlyStats: old.monthlyStats,
           );
         }
       }
@@ -288,7 +354,10 @@ class PositionRival {
     }).toList();
   }
 
-  static List<PositionRival> advanceMatch(List<PositionRival> rivals) {
+  static List<PositionRival> advanceMatch(
+    List<PositionRival> rivals, {
+    int? month,
+  }) {
     final random = Random();
     return rivals.map((rival) {
       // Без игровой практики форма постепенно возвращается к нейтральной.
@@ -354,6 +423,12 @@ class PositionRival {
           .clamp(-5, 5)
           .toInt();
 
+      final monthlyStats = Map<int, RivalMonthStats>.from(rival.monthlyStats);
+      if (month != null && month >= 1 && month <= 12) {
+        monthlyStats[month] = (monthlyStats[month] ?? const RivalMonthStats())
+            .addMatch(goals: goals, assists: assists, rating: rating);
+      }
+
       return rival.copyWith(
         matches: matches,
         starts: starts,
@@ -363,6 +438,7 @@ class PositionRival {
         assists: rival.assists + assists,
         averageRating: double.parse(average.toStringAsFixed(2)),
         form: form,
+        monthlyStats: monthlyStats,
       );
     }).toList();
   }
