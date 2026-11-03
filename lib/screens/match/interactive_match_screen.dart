@@ -184,12 +184,12 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   }
 
   void _addGoal({required bool home}) {
+    // xG задаёт ожидаемую результативность, но не ограничивает число голов.
+    // Забитый мяч не должен обнулять оставшуюся вероятность следующих голов.
     if (home) {
       _homeGoals++;
-      _homeXgRemaining = (_homeXgRemaining - 1).clamp(0.0, 2.8).toDouble();
     } else {
       _awayGoals++;
-      _awayXgRemaining = (_awayXgRemaining - 1).clamp(0.0, 2.8).toDouble();
     }
   }
 
@@ -336,6 +336,15 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       default:
         return _player.overall.toDouble();
     }
+  }
+
+  // Бонусы за высокий профильный навык растут ступенчато после 80, 85, 90 и 95.
+  double _skillTierBonus(double skill) {
+    if (skill < 80) return 0;
+    if (skill < 85) return 0.04 + (skill - 80) * 0.01;
+    if (skill < 90) return 0.09 + (skill - 85) * 0.012;
+    if (skill < 95) return 0.15 + (skill - 90) * 0.014;
+    return 0.22 + (skill - 95) * 0.015;
   }
 
   void _createMoment() {
@@ -906,6 +915,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                   (_player.skills.passing - 60) * 0.0042 +
                   (_player.skills.vision - 60) * 0.0022 +
                   (_player.skills.dribbling - 60) * 0.001 +
+                  _skillTierBonus(_skill(action)) * 0.55 +
                   (widget.isHome
                           ? (_homeStrength - _awayStrength)
                           : (_awayStrength - _homeStrength)) *
@@ -938,8 +948,9 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           (0.73 +
                   (_player.skills.passing - 60) * 0.0035 +
                   (_player.skills.dribbling - 60) * 0.0025 +
-                  (_player.skills.vision - 60) * 0.0015)
-              .clamp(0.45, 0.95);
+                  (_player.skills.vision - 60) * 0.0015 +
+                  _skillTierBonus(_skill(action)) * 0.55)
+              .clamp(0.45, 0.98);
       if (_random.nextDouble() < wallChance) {
         _phase = 'chance';
         _rating += 0.30;
@@ -964,8 +975,9 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                   (_player.skills.pace - 60) * 0.0028 +
                   (_player.skills.dribbling - 60) * 0.0022 +
                   (_player.skills.vision - 60) * 0.0012 +
-                  teamAdvantage * 0.001)
-              .clamp(0.40, 0.91);
+                  teamAdvantage * 0.001 +
+                  _skillTierBonus(_skill(action)) * 0.55)
+              .clamp(0.40, 0.97);
       if (_random.nextDouble() < runChance) {
         _phase = 'chance';
         _rating += 0.28;
@@ -990,8 +1002,9 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                   (_player.skills.pace - 60) * 0.002 +
                   (_player.skills.vision - 60) * 0.002 +
                   (_player.overall - 70) * 0.001 +
-                  teamAdvantage * 0.0008)
-              .clamp(0.42, 0.90);
+                  teamAdvantage * 0.0008 +
+                  _skillTierBonus(_skill(action)) * 0.45)
+              .clamp(0.42, 0.96);
       if (_random.nextDouble() < movementChance) {
         _phase = 'aerialChance';
         _rating += 0.18;
@@ -1020,14 +1033,17 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       final passChance =
           (0.76 +
                   (_player.skills.passing - 60) * 0.005 +
-                  (_player.skills.vision - 60) * 0.002)
-              .clamp(0.48, 0.96);
+                  (_player.skills.vision - 60) * 0.002 +
+                  _skillTierBonus(_skill(action)) * 0.65)
+              .clamp(0.48, 0.99);
       if (_random.nextDouble() < passChance) {
         _rating += 0.32;
         final attackXg = widget.isHome ? _homeXgRemaining : _awayXgRemaining;
-        final partnerScoreChance = attackXg <= 0.02
-            ? 0.0
-            : (0.18 * (attackXg / 1.1).clamp(0.15, 1.0)).clamp(0.0, 0.22);
+        final partnerScoreChance =
+            (0.20 +
+                    _skillTierBonus(_skill('pass')) * 0.45 +
+                    (attackXg / 1.1).clamp(0.0, 1.0) * 0.12)
+                .clamp(0.12, 0.42);
         final partnerScores = _random.nextDouble() < partnerScoreChance;
         _phase = 'buildUp';
         if (partnerScores) {
@@ -1085,8 +1101,9 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       final penaltyChance =
           (0.76 +
                   (_player.skills.shooting - 70) * 0.0035 +
-                  (_player.skills.vision - 70) * 0.001)
-              .clamp(0.62, 0.91);
+                  (_player.skills.vision - 70) * 0.001 +
+                  _skillTierBonus(_skill('shoot')) * 0.45)
+              .clamp(0.62, 0.97);
       final scored = _random.nextDouble() < penaltyChance;
       String penaltyMessage;
       if (scored) {
@@ -1147,6 +1164,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       chance =
           (0.74 +
                   (_player.skills.shooting - 60) * 0.0045 +
+                  _skillTierBonus(skill) +
                   advantage * 0.7 -
                   defensivePressure * 0.45 +
                   (_phase == 'oneOnOne' ? 0.08 : 0.0))
@@ -1155,6 +1173,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       chance =
           (0.52 +
                   (_player.skills.shooting - 60) * 0.0038 +
+                  _skillTierBonus(skill) +
                   advantage * 0.5 -
                   defensivePressure * 0.35)
               .clamp(0.30, 0.84);
@@ -1162,6 +1181,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       chance =
           (0.74 +
                   (_player.skills.heading - 60) * 0.005 +
+                  _skillTierBonus(skill) +
                   (_player.skills.physical - 60) * 0.0015 +
                   advantage * 0.6 -
                   defensivePressure * 0.35)
@@ -1170,6 +1190,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       chance =
           (0.66 +
                   (_player.skills.shooting - 60) * 0.0035 +
+                  _skillTierBonus(skill) +
                   (_player.skills.heading - 60) * 0.0015 +
                   advantage * 0.5 -
                   defensivePressure * 0.35)
@@ -1178,6 +1199,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       chance =
           (0.91 +
                   (_player.skills.passing - 60) * 0.0025 +
+                  _skillTierBonus(skill) * 0.5 +
                   (_player.skills.vision - 60) * 0.001 +
                   advantage * 0.2 -
                   defensivePressure * 0.2)
@@ -1186,6 +1208,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       chance =
           (0.80 +
                   (_player.skills.passing - 60) * 0.0045 +
+                  _skillTierBonus(skill) * 0.65 +
                   (_player.skills.vision - 60) * 0.0015 +
                   advantage * 0.4 -
                   defensivePressure)
@@ -1194,6 +1217,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       chance =
           (0.67 +
                   (_player.skills.passing - 60) * 0.0048 +
+                  _skillTierBonus(skill) * 0.65 +
                   (_player.skills.vision - 60) * 0.002 +
                   advantage * 0.3 -
                   defensivePressure * 0.8)
@@ -1225,12 +1249,13 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       chance =
           (0.70 +
                   (_player.skills.dribbling - 60) * 0.0045 +
+                  _skillTierBonus(skill) * 0.65 +
                   (_player.skills.pace - 60) * 0.0015 +
                   advantage * 0.4 -
                   defensivePressure)
               .clamp(0.42, 0.94);
     } else {
-      chance = (0.66 + (skill - 60) * 0.0045 + advantage * 0.4).clamp(
+      chance = (0.66 + (skill - 60) * 0.0045 + _skillTierBonus(skill) + advantage * 0.4).clamp(
         0.38,
         0.92,
       );
@@ -1281,19 +1306,16 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         skillFinishingBonus = (_player.skills.shooting - 70) * 0.0026667;
       }
 
-      final attackingXg = widget.isHome ? _homeXgRemaining : _awayXgRemaining;
-
-      final xgBudgetFactor = attackingXg <= 0.02
-          ? 0.0
-          : (attackingXg / 1.1).clamp(0.12, 1.0);
-
+      final finishingSkill = action == 'header'
+          ? _player.skills.heading.toDouble()
+          : _player.skills.shooting.toDouble();
       final finishingChance =
-          ((baseFinishingChance +
-                      skillFinishingBonus +
-                      overallBonus +
-                      advantage * 0.35) *
-                  xgBudgetFactor)
-              .clamp(0.0, 0.70);
+          (baseFinishingChance +
+                  skillFinishingBonus +
+                  overallBonus +
+                  advantage * 0.35 +
+                  _skillTierBonus(finishingSkill) * 0.45)
+              .clamp(0.05, 0.85);
 
       if (success && _random.nextDouble() < finishingChance) {
         if (widget.isHome) {
