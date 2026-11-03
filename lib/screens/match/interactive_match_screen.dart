@@ -233,13 +233,20 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       final attackingTeam = homePressing ? _homeTeam : _awayTeam;
       final defendingTeam = homePressing ? _awayTeam : _homeTeam;
       _event = switch (_random.nextInt(7)) {
-        0 => '$attackingTeam разыгрывает мяч короткими передачами и пытается пройти первую линию прессинга.',
-        1 => '$attackingTeam переводит атаку на фланг, крайний защитник подключается вперёд.',
-        2 => '$defendingTeam перехватывает передачу и начинает быструю контратаку.',
-        3 => '$attackingTeam играет в стенку у штрафной, но защитник успевает накрыть продолжение.',
-        4 => '$attackingTeam выходит из-под давления через короткий пас в центр.',
-        5 => '$defendingTeam выигрывает подбор после выноса и пытается развить атаку.',
-        _ => '$attackingTeam наносит удар издали, но мяч проходит рядом со штангой.',
+        0 =>
+          '$attackingTeam разыгрывает мяч короткими передачами и пытается пройти первую линию прессинга.',
+        1 =>
+          '$attackingTeam переводит атаку на фланг, крайний защитник подключается вперёд.',
+        2 =>
+          '$defendingTeam перехватывает передачу и начинает быструю контратаку.',
+        3 =>
+          '$attackingTeam играет в стенку у штрафной, но защитник успевает накрыть продолжение.',
+        4 =>
+          '$attackingTeam выходит из-под давления через короткий пас в центр.',
+        5 =>
+          '$defendingTeam выигрывает подбор после выноса и пытается развить атаку.',
+        _ =>
+          '$attackingTeam наносит удар издали, но мяч проходит рядом со штангой.',
       };
       _recordEvent(_event);
     }
@@ -648,7 +655,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     }
     if (_phase == 'wideCombination') {
       return [
-        _actionButton('Сыграть в центр и открыться под обратный пас', 'playCenter'),
+        _actionButton(
+          'Сыграть в центр и открыться под обратный пас',
+          'playCenter',
+        ),
         _actionButton('Перевести мяч на правый фланг', 'playRight'),
         _actionButton('Перевести мяч на левый фланг', 'playLeft'),
         _actionButton('Сыграть в стенку', 'wallPass'),
@@ -665,7 +675,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     }
     if (_phase == 'offBallRun') {
       return [
-        _actionButton('Открыться за спину и принять обратный пас', 'receiveReturn'),
+        _actionButton(
+          'Открыться за спину и принять обратный пас',
+          'receiveReturn',
+        ),
         _actionButton('Рвануть в штрафную под передачу', 'attackNearPost'),
         _actionButton('Сместиться на дальнюю штангу', 'attackFarPost'),
         _actionButton('Остановиться и сохранить позицию', 'checkBack'),
@@ -882,45 +895,63 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       setState(() {});
       return;
     }
-    if (['playCenter', 'playRight', 'playLeft', 'switchPlay'].contains(action)) {
-      final passChance = (0.72 +
-              (_player.skills.passing - 60) * 0.0042 +
-              (_player.skills.vision - 60) * 0.0022 +
-              (_player.skills.dribbling - 60) * 0.001 +
-              (widget.isHome ? (_homeStrength - _awayStrength) : (_awayStrength - _homeStrength)) * 0.0015)
-          .clamp(0.46, 0.95);
+    if ([
+      'playCenter',
+      'playRight',
+      'playLeft',
+      'switchPlay',
+    ].contains(action)) {
+      final passChance =
+          (0.72 +
+                  (_player.skills.passing - 60) * 0.0042 +
+                  (_player.skills.vision - 60) * 0.0022 +
+                  (_player.skills.dribbling - 60) * 0.001 +
+                  (widget.isHome
+                          ? (_homeStrength - _awayStrength)
+                          : (_awayStrength - _homeStrength)) *
+                      0.0015)
+              .clamp(0.46, 0.95);
       if (_random.nextDouble() < passChance) {
         _phase = 'offBallRun';
         _rating += 0.22;
         final direction = action == 'playCenter'
             ? 'в центр'
             : action == 'playRight'
-                ? 'на правый фланг'
-                : action == 'playLeft'
-                    ? 'на левый фланг'
-                    : 'на противоположный фланг';
-        _advanceClock('Вы перевели мяч $direction и сразу сделали рывок в свободную зону. Партнёры ищут обратную передачу.');
+            ? 'на правый фланг'
+            : action == 'playLeft'
+            ? 'на левый фланг'
+            : 'на противоположный фланг';
+        _advanceClock(
+          'Вы перевели мяч $direction и сразу сделали рывок в свободную зону. Партнёры ищут обратную передачу.',
+        );
       } else {
         _phase = 'defend';
         _rating -= 0.12;
-        _advanceClock('Соперник прочитал направление перевода и накрыл адресата. Команда вынуждена отойти назад.');
+        _advanceClock(
+          'Соперник прочитал направление перевода и накрыл адресата. Команда вынуждена отойти назад.',
+        );
       }
       return;
     }
     if (action == 'wallPass') {
-      final wallChance = (0.73 +
-              (_player.skills.passing - 60) * 0.0035 +
-              (_player.skills.dribbling - 60) * 0.0025 +
-              (_player.skills.vision - 60) * 0.0015)
-          .clamp(0.45, 0.95);
+      final wallChance =
+          (0.73 +
+                  (_player.skills.passing - 60) * 0.0035 +
+                  (_player.skills.dribbling - 60) * 0.0025 +
+                  (_player.skills.vision - 60) * 0.0015)
+              .clamp(0.45, 0.95);
       if (_random.nextDouble() < wallChance) {
         _phase = 'chance';
         _rating += 0.30;
-        _advanceClock('Игра в стенку прошла! Вы отдали пас, ускорились между защитниками и получили мяч обратно у штрафной.');
+        _advanceClock(
+          'Игра в стенку прошла! Вы отдали пас, ускорились между защитниками и получили мяч обратно у штрафной.',
+        );
       } else {
         _phase = 'midfield';
         _rating -= 0.10;
-        _advanceClock('Защитник успел перекрыть обратную передачу. Партнёр сохранил мяч, но темп атаки сбит.');
+        _advanceClock(
+          'Защитник успел перекрыть обратную передачу. Партнёр сохранил мяч, но темп атаки сбит.',
+        );
       }
       return;
     }
@@ -928,20 +959,25 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       final teamAdvantage = widget.isHome
           ? _homeStrength - _awayStrength
           : _awayStrength - _homeStrength;
-      final runChance = (0.64 +
-              (_player.skills.pace - 60) * 0.0028 +
-              (_player.skills.dribbling - 60) * 0.0022 +
-              (_player.skills.vision - 60) * 0.0012 +
-              teamAdvantage * 0.001)
-          .clamp(0.40, 0.91);
+      final runChance =
+          (0.64 +
+                  (_player.skills.pace - 60) * 0.0028 +
+                  (_player.skills.dribbling - 60) * 0.0022 +
+                  (_player.skills.vision - 60) * 0.0012 +
+                  teamAdvantage * 0.001)
+              .clamp(0.40, 0.91);
       if (_random.nextDouble() < runChance) {
         _phase = 'chance';
         _rating += 0.28;
-        _advanceClock('Вы вовремя ускорились, избавились от опеки и получили передачу на ход. Появилась возможность создать голевой момент.');
+        _advanceClock(
+          'Вы вовремя ускорились, избавились от опеки и получили передачу на ход. Появилась возможность создать голевой момент.',
+        );
       } else {
         _phase = 'midfield';
         _rating -= 0.08;
-        _advanceClock('Защитник прочитал рывок и не дал принять мяч на скорости. Команда продолжает владеть мячом.');
+        _advanceClock(
+          'Защитник прочитал рывок и не дал принять мяч на скорости. Команда продолжает владеть мячом.',
+        );
       }
       return;
     }
@@ -949,28 +985,35 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       final teamAdvantage = widget.isHome
           ? _homeStrength - _awayStrength
           : _awayStrength - _homeStrength;
-      final movementChance = (0.66 +
-              (_player.skills.pace - 60) * 0.002 +
-              (_player.skills.vision - 60) * 0.002 +
-              (_player.overall - 70) * 0.001 +
-              teamAdvantage * 0.0008)
-          .clamp(0.42, 0.90);
+      final movementChance =
+          (0.66 +
+                  (_player.skills.pace - 60) * 0.002 +
+                  (_player.skills.vision - 60) * 0.002 +
+                  (_player.overall - 70) * 0.001 +
+                  teamAdvantage * 0.0008)
+              .clamp(0.42, 0.90);
       if (_random.nextDouble() < movementChance) {
         _phase = 'aerialChance';
         _rating += 0.18;
-        _advanceClock(action == 'attackNearPost'
-            ? 'Вы опередили защитника на ближней штанге. Партнёр готовит прострел или навес.'
-            : 'Вы ушли от опеки и заняли позицию у дальней штанги. Подача может найти вас.');
+        _advanceClock(
+          action == 'attackNearPost'
+              ? 'Вы опередили защитника на ближней штанге. Партнёр готовит прострел или навес.'
+              : 'Вы ушли от опеки и заняли позицию у дальней штанги. Подача может найти вас.',
+        );
       } else {
         _phase = 'finalThird';
-        _advanceClock('Защитник удержал позицию и не позволил вам открыться. Атака продолжается перед штрафной.');
+        _advanceClock(
+          'Защитник удержал позицию и не позволил вам открыться. Атака продолжается перед штрафной.',
+        );
       }
       return;
     }
     if (action == 'checkBack') {
       _phase = 'midfield';
       _rating += 0.10;
-      _advanceClock('Вы показали короткий вариант и помогли команде сохранить владение.');
+      _advanceClock(
+        'Вы показали короткий вариант и помогли команде сохранить владение.',
+      );
       return;
     }
     if (action == 'twoOnOnePass') {
@@ -1104,61 +1147,72 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       chance =
           (0.74 +
                   (_player.skills.shooting - 60) * 0.0045 +
-                  advantage * 0.7 - defensivePressure * 0.45 +
+                  advantage * 0.7 -
+                  defensivePressure * 0.45 +
                   (_phase == 'oneOnOne' ? 0.08 : 0.0))
               .clamp(0.48, 0.96);
     } else if (action == 'longShot') {
       chance =
-          (0.52 + (_player.skills.shooting - 60) * 0.0038 + advantage * 0.5 - defensivePressure * 0.35)
+          (0.52 +
+                  (_player.skills.shooting - 60) * 0.0038 +
+                  advantage * 0.5 -
+                  defensivePressure * 0.35)
               .clamp(0.30, 0.84);
     } else if (action == 'header') {
       chance =
           (0.74 +
                   (_player.skills.heading - 60) * 0.005 +
                   (_player.skills.physical - 60) * 0.0015 +
-                  advantage * 0.6 - defensivePressure * 0.35)
+                  advantage * 0.6 -
+                  defensivePressure * 0.35)
               .clamp(0.46, 0.95);
     } else if (action == 'volley') {
       chance =
           (0.66 +
                   (_player.skills.shooting - 60) * 0.0035 +
                   (_player.skills.heading - 60) * 0.0015 +
-                  advantage * 0.5 - defensivePressure * 0.35)
+                  advantage * 0.5 -
+                  defensivePressure * 0.35)
               .clamp(0.38, 0.91);
     } else if (action == 'backPass') {
       chance =
           (0.91 +
                   (_player.skills.passing - 60) * 0.0025 +
                   (_player.skills.vision - 60) * 0.001 +
-                  advantage * 0.2 - defensivePressure * 0.2)
+                  advantage * 0.2 -
+                  defensivePressure * 0.2)
               .clamp(0.72, 0.99);
     } else if (action == 'pass') {
       chance =
           (0.80 +
                   (_player.skills.passing - 60) * 0.0045 +
                   (_player.skills.vision - 60) * 0.0015 +
-                  advantage * 0.4 - defensivePressure)
+                  advantage * 0.4 -
+                  defensivePressure)
               .clamp(0.54, 0.97);
     } else if (action == 'longPass') {
       chance =
           (0.67 +
                   (_player.skills.passing - 60) * 0.0048 +
                   (_player.skills.vision - 60) * 0.002 +
-                  advantage * 0.3 - defensivePressure * 0.8)
+                  advantage * 0.3 -
+                  defensivePressure * 0.8)
               .clamp(0.40, 0.94);
     } else if (action == 'throughPass') {
       chance =
           (0.71 +
                   (_player.skills.passing - 60) * 0.0045 +
                   (_player.skills.vision - 60) * 0.002 +
-                  advantage * 0.4 - defensivePressure)
+                  advantage * 0.4 -
+                  defensivePressure)
               .clamp(0.43, 0.94);
     } else if (action == 'cross') {
       chance =
           (0.76 +
                   (_player.skills.passing - 60) * 0.0038 +
                   (_player.skills.vision - 60) * 0.0015 +
-                  advantage * 0.35 - defensivePressure * 0.9)
+                  advantage * 0.35 -
+                  defensivePressure * 0.9)
               .clamp(0.46, 0.95);
     } else if (action == 'keeper') {
       final opponentXg = widget.isHome ? _awayXgRemaining : _homeXgRemaining;
@@ -1172,7 +1226,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           (0.70 +
                   (_player.skills.dribbling - 60) * 0.0045 +
                   (_player.skills.pace - 60) * 0.0015 +
-                  advantage * 0.4 - defensivePressure)
+                  advantage * 0.4 -
+                  defensivePressure)
               .clamp(0.42, 0.94);
     } else {
       chance = (0.66 + (skill - 60) * 0.0045 + advantage * 0.4).clamp(
@@ -1440,7 +1495,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           _phase == 'keeperBeaten' ||
           _phase == 'offBallRun';
       _nextMomentMinute = min(
-        89,
+        88,
         _minute + (isFollowUp ? 1 : 6 + _random.nextInt(7)),
       );
     }
@@ -1595,8 +1650,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                               ),
                             ),
                             child: Text(
-                              'ОЦЕНКА ' +
-                                  _rating.clamp(4.0, 10.0).toStringAsFixed(1),
+                              'ОЦЕНКА ${_rating.clamp(4.0, 10.0).toStringAsFixed(1)}',
                               style: const TextStyle(
                                 color: Color(0xFFBBF7D0),
                                 fontSize: 10,
@@ -1773,21 +1827,25 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                                 ),
                                 if (_chronicle.isNotEmpty) ...[
                                   const SizedBox(height: 9),
-                                  ..._chronicle.take(3).map(
-                                    (entry) => Padding(
-                                      padding: const EdgeInsets.only(top: 3),
-                                      child: Text(
-                                        entry,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          color: Colors.white54,
-                                          fontSize: 10,
-                                          height: 1.2,
+                                  ..._chronicle
+                                      .take(3)
+                                      .map(
+                                        (entry) => Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 3,
+                                          ),
+                                          child: Text(
+                                            entry,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              color: Colors.white54,
+                                              fontSize: 10,
+                                              height: 1.2,
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ),
                                 ],
                               ],
                             ),

@@ -337,9 +337,13 @@ class Career {
       'player': player.toJson(),
       'season': season,
       'history': history.map((item) => item.toJson()).toList(),
-      'playerOfMonthAwards': playerOfMonthAwards.map((item) => item.toJson()).toList(),
+      'playerOfMonthAwards': playerOfMonthAwards
+          .map((item) => item.toJson())
+          .toList(),
       'seasonAwards': seasonAwards.map((item) => item.toJson()).toList(),
-      'leaguePlayerStats': leaguePlayerStats.map((item) => item.toJson()).toList(),
+      'leaguePlayerStats': leaguePlayerStats
+          .map((item) => item.toJson())
+          .toList(),
       'leagueStatsProcessedMatchKeys': leagueStatsProcessedMatchKeys,
       'matches': matches,
       'goals': goals,
@@ -351,7 +355,8 @@ class Career {
       'money': money,
       'agentCredits': agentCredits,
       'agentInterestedClubs': agentInterestedClubs,
-      'lastTransferInterestConferenceSeason': lastTransferInterestConferenceSeason,
+      'lastTransferInterestConferenceSeason':
+          lastTransferInterestConferenceSeason,
       'contractYears': contractYears,
       'developmentPoints': developmentPoints,
       'seasonMatches': seasonMatches.map((item) => item.toJson()).toList(),
@@ -523,11 +528,20 @@ class Career {
       player: loadedPlayer,
       season: (json['season'] as num?)?.toInt() ?? 1,
       history: readList('history', SeasonStats.fromJson),
-      playerOfMonthAwards: readList('playerOfMonthAwards', PlayerOfMonthAward.fromJson),
+      playerOfMonthAwards: readList(
+        'playerOfMonthAwards',
+        PlayerOfMonthAward.fromJson,
+      ),
       seasonAwards: readList('seasonAwards', SeasonAward.fromJson),
-      leaguePlayerStats: readList('leaguePlayerStats', LeaguePlayerSeasonStats.fromJson),
+      leaguePlayerStats: readList(
+        'leaguePlayerStats',
+        LeaguePlayerSeasonStats.fromJson,
+      ),
       leagueStatsProcessedMatchKeys:
-          (json['leagueStatsProcessedMatchKeys'] as List?)?.whereType<String>().toList() ?? const [],
+          (json['leagueStatsProcessedMatchKeys'] as List?)
+              ?.whereType<String>()
+              .toList() ??
+          const [],
       matches: (json['matches'] as num?)?.toInt() ?? 0,
       goals: (json['goals'] as num?)?.toInt() ?? 0,
       assists: (json['assists'] as num?)?.toInt() ?? 0,
@@ -802,8 +816,9 @@ class Career {
       );
     }
 
-    if (!playerParticipated || Random().nextDouble() >= 0.030)
+    if (!playerParticipated || Random().nextDouble() >= 0.030) {
       return updatedCareer;
+    }
     const injuries = [
       'Растяжение мышц',
       'Ушиб',
@@ -901,7 +916,9 @@ class Career {
             id: 's${season}_squad_role_${competitionRound}_${newRole.name}',
             season: season,
             matchNumber: competitionRound,
-            title: improved ? 'Новый статус в команде' : 'Изменение роли в составе',
+            title: improved
+                ? 'Новый статус в команде'
+                : 'Изменение роли в составе',
             description: improved
                 ? 'Благодаря выступлениям и доверию тренера ваша роль изменилась: ${newRole.displayName.toLowerCase()}.'
                 : 'Конкуренция за позицию усилилась. Теперь ваша роль: ${newRole.displayName.toLowerCase()}.',
@@ -933,14 +950,12 @@ class Career {
             id: 's${season}_bench_${competitionRound}_$rivalId',
             season: season,
             matchNumber: competitionRound,
-            title: rivalIsAhead
-                ? 'Борьба за игровое время'
-                : 'Ротация состава',
+            title: rivalIsAhead ? 'Борьба за игровое время' : 'Ротация состава',
             description: rivalIsAhead
                 ? '$rivalName сейчас опережает вас в борьбе за позицию. '
-                    'Тренировки и сильные выступления помогут вернуть место в составе.'
+                      'Тренировки и сильные выступления помогут вернуть место в составе.'
                 : 'Тренер провёл ротацию состава. Следующие матчи — возможность '
-                    'укрепить своё положение в команде.',
+                      'укрепить своё положение в команде.',
             type: CareerNewsType.match,
           ),
         );
@@ -996,7 +1011,9 @@ class Career {
             id: 's${season}_squad_role_${competitionRound}_${newRole.name}',
             season: season,
             matchNumber: competitionRound,
-            title: improved ? 'Новый статус в команде' : 'Изменение роли в составе',
+            title: improved
+                ? 'Новый статус в команде'
+                : 'Изменение роли в составе',
             description: improved
                 ? 'Благодаря выступлениям и доверию тренера ваша роль изменилась: ${newRole.displayName.toLowerCase()}.'
                 : 'Конкуренция за позицию усилилась. Теперь ваша роль: ${newRole.displayName.toLowerCase()}.',
@@ -1549,8 +1566,9 @@ class Career {
         ? null
         : Clubs.leagueOf(previousClub.club);
     if (previousLeague != null && leagueTable.isNotEmpty) {
-      performanceStandings[previousLeague] =
-          List<LeagueTableEntry>.from(leagueTable);
+      performanceStandings[previousLeague] = List<LeagueTableEntry>.from(
+        leagueTable,
+      );
     }
     final updatedClubStrengths = ClubStrengthService.update(
       currentStrengths: clubStrengths,
