@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/player.dart';
@@ -114,9 +116,8 @@ class _ShopScreenState extends State<ShopScreen> {
   Future<void> _buyRecovery() async {
     if (!career.isInjured ||
         career.injuryRecoveryUsed ||
-        career.money < _recoveryPrice) {
+        career.money < _recoveryPrice)
       return;
-    }
 
     final remaining = (career.injuryMatchesRemaining - 2).clamp(0, 10).toInt();
 
@@ -156,256 +157,256 @@ class _ShopScreenState extends State<ShopScreen> {
         if (!didPop) _closeShop();
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF061B0C),
-        appBar: AppBar(
-          backgroundColor: const Color(0xFF0B3A1A),
-          foregroundColor: Colors.white,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: _closeShop,
-          ),
-          title: const Text('Магазин'),
+      backgroundColor: const Color(0xFF07130F),
+      appBar: AppBar(
+        elevation: 0,
+        centerTitle: true,
+        backgroundColor: const Color(0xAA18241F),
+        foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: _closeShop,
         ),
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFF0B3A1A), Color(0xFF082A12), Color(0xFF04160A)],
-            ),
+        title: const Text('МАГАЗИН', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1.3)),
+      ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF123522), Color(0xFF0A2117), Color(0xFF07130F)],
           ),
+        ),
+        child: ClipRect(
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
           child: ListView(
-            padding: const EdgeInsets.all(18),
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF102D18),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFF3E9950)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.account_balance_wallet,
-                      color: Color(0xFF8BE07F),
-                      size: 22,
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: _glassDecoration(),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.account_balance_wallet,
+                    color: Color(0xFF8BE07F),
+                    size: 22,
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Text(
+                      'Деньги игрока',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    const SizedBox(width: 12),
-                    const Expanded(
-                      child: Text(
-                        'Деньги игрока',
-                        style: TextStyle(
-                          color: Colors.white,
+                  ),
+                  Text(
+                    '${career.money} €',
+                    style: const TextStyle(
+                      color: Color(0xFF8BE07F),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 22),
+            _sectionTitle('УСИЛЕНИЕ ИГРЫ'),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: _glassDecoration(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(
+                        Icons.fitness_center,
+                        color: Color(0xFF8BE07F),
+                        size: 22,
+                      ),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'Индивидуальная тренировка',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Повышает выбранную характеристику на +5 на следующие 3 матча. Пока бустер активен, повторная покупка недоступна. После окончания можно купить снова, но цена вырастет на 50% за каждую предыдущую покупку этого навыка.',
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                  const SizedBox(height: 14),
+                  DropdownButtonFormField<SkillName>(
+                    value: selectedSkill,
+                    dropdownColor: const Color(0xFF12351B),
+                    decoration: InputDecoration(
+                      labelText: 'Характеристика',
+                      labelStyle: const TextStyle(color: Colors.white70),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: Color(0xFF3E9950)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: Color(0xFF8BE07F)),
+                      ),
+                    ),
+                    style: const TextStyle(color: Colors.white),
+                    items: SkillName.values.map((skill) {
+                      return DropdownMenuItem(
+                        value: skill,
+                        child: Text(
+                          '${_skillName(skill)} · ${_skillValue(career.player.skills, skill)}/99'
+                          '${(career.temporarySkillBoostMatches[skill.name] ?? 0) > 0 ? '  (+5 · ${career.temporarySkillBoostMatches[skill.name]} мат.)' : ''}',
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      if (value != null) setState(() => selectedSkill = value);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Стоимость · покупка №${_trainingPurchaseCount + 1}',
+                          style: const TextStyle(color: Colors.white70),
+                        ),
+                      ),
+                      Text(
+                        '$_trainingPrice €',
+                        style: const TextStyle(
+                          color: Color(0xFF8BE07F),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                    Text(
-                      '${career.money} €',
-                      style: const TextStyle(
-                        color: Color(0xFF8BE07F),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w900,
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: SizedBox(
+                    width: 205,
+                    child: ElevatedButton(
+                      onPressed: canTrain ? _buyTraining : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF8BE07F),
+                        foregroundColor: const Color(0xFF082A12),
+                        disabledBackgroundColor: Colors.white12,
+                        disabledForegroundColor: Colors.white38,
+                      ),
+                      child: Text(
+                        _trainingActive
+                            ? 'Бустер уже активен'
+                            : career.money < _trainingPrice
+                            ? 'Недостаточно денег'
+                            : 'Купить бустер +5 на 3 матча',
                       ),
                     ),
-                  ],
-                ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 10),
-              _sectionTitle('ТРЕНИРОВКИ'),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: _cardDecoration(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Row(
-                      children: [
-                        Icon(
-                          Icons.fitness_center,
-                          color: Color(0xFF8BE07F),
-                          size: 22,
-                        ),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            'Индивидуальная тренировка',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Повышает выбранную характеристику на +5 на следующие 3 матча. Пока бустер активен, повторная покупка недоступна. После окончания можно купить снова, но цена вырастет на 50% за каждую предыдущую покупку этого навыка.',
-                      style: TextStyle(color: Colors.white70, fontSize: 12),
-                    ),
-                    const SizedBox(height: 14),
-                    DropdownButtonFormField<SkillName>(
-                      initialValue: selectedSkill,
-                      dropdownColor: const Color(0xFF12351B),
-                      decoration: InputDecoration(
-                        labelText: 'Характеристика',
-                        labelStyle: const TextStyle(color: Colors.white70),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF3E9950),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF8BE07F),
-                          ),
-                        ),
-                      ),
-                      style: const TextStyle(color: Colors.white),
-                      items: SkillName.values.map((skill) {
-                        return DropdownMenuItem(
-                          value: skill,
-                          child: Text(
-                            '${_skillName(skill)} · ${_skillValue(career.player.skills, skill)}/99'
-                            '${(career.temporarySkillBoostMatches[skill.name] ?? 0) > 0 ? '  (+5 · ${career.temporarySkillBoostMatches[skill.name]} мат.)' : ''}',
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        if (value != null)
-                          setState(() => selectedSkill = value);
-                      },
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Стоимость · покупка №${_trainingPurchaseCount + 1}',
-                            style: const TextStyle(color: Colors.white70),
-                          ),
-                        ),
-                        Text(
-                          '$_trainingPrice €',
-                          style: const TextStyle(
-                            color: Color(0xFF8BE07F),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: canTrain ? _buyTraining : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF8BE07F),
-                          foregroundColor: const Color(0xFF082A12),
-                          disabledBackgroundColor: Colors.white12,
-                          disabledForegroundColor: Colors.white38,
-                        ),
+            ),
+            const SizedBox(height: 18),
+            _sectionTitle('ЗДОРОВЬЕ И ВОССТАНОВЛЕНИЕ'),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: _glassDecoration(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.healing, color: Color(0xFFFF9999), size: 22),
+                      SizedBox(width: 10),
+                      Expanded(
                         child: Text(
-                          _trainingActive
-                              ? 'Бустер уже активен'
-                              : career.money < _trainingPrice
-                              ? 'Недостаточно денег'
-                              : 'Купить бустер +5 на 3 матча',
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 10),
-              _sectionTitle('ВОССТАНОВЛЕНИЕ'),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: _cardDecoration(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Row(
-                      children: [
-                        Icon(Icons.healing, color: Color(0xFFFF9999), size: 22),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            'Ускоренное лечение',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      career.isInjured
-                          ? 'Травма: ${career.injuryName ?? 'повреждение'}. Осталось пропустить матчей: ${career.injuryMatchesRemaining}. ${career.injuryRecoveryUsed ? 'Лечение уже использовано для этой травмы.' : 'Можно воспользоваться лечением один раз.'}'
-                          : 'Сейчас вы здоровы. Лечение станет доступно при получении травмы.',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        const Expanded(
-                          child: Text(
-                            'Стоимость лечения',
-                            style: TextStyle(color: Colors.white70),
-                          ),
-                        ),
-                        Text(
-                          '$_recoveryPrice €',
+                          'Ускоренное лечение',
                           style: TextStyle(
-                            color: Color(0xFF8BE07F),
+                            color: Colors.white,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed:
-                            career.isInjured &&
-                                !career.injuryRecoveryUsed &&
-                                career.money >= _recoveryPrice
-                            ? _buyRecovery
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF8BE07F),
-                          foregroundColor: const Color(0xFF082A12),
-                          disabledBackgroundColor: Colors.white12,
-                          disabledForegroundColor: Colors.white38,
-                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    career.isInjured
+                        ? 'Травма: ${career.injuryName ?? 'повреждение'}. Осталось пропустить матчей: ${career.injuryMatchesRemaining}. ${career.injuryRecoveryUsed ? 'Лечение уже использовано для этой травмы.' : 'Можно воспользоваться лечением один раз.'}'
+                        : 'Сейчас вы здоровы. Лечение станет доступно при получении травмы.',
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Expanded(
                         child: Text(
-                          !career.isInjured
-                              ? 'Лечение не требуется'
-                              : career.injuryRecoveryUsed
-                              ? 'Уже использовано для этой травмы'
-                              : career.money < _recoveryPrice
-                              ? 'Недостаточно денег'
-                              : 'Сократить травму на 2 матча',
+                          'Стоимость лечения',
+                          style: TextStyle(color: Colors.white70),
                         ),
                       ),
+                      Text(
+                        '$_recoveryPrice €',
+                        style: TextStyle(
+                          color: Color(0xFF8BE07F),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: SizedBox(
+                    width: 205,
+                    child: ElevatedButton(
+                      onPressed:
+                          career.isInjured &&
+                              !career.injuryRecoveryUsed &&
+                              career.money >= _recoveryPrice
+                          ? _buyRecovery
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF8BE07F),
+                        foregroundColor: const Color(0xFF082A12),
+                        disabledBackgroundColor: Colors.white12,
+                        disabledForegroundColor: Colors.white38,
+                      ),
+                      child: Text(
+                        !career.isInjured
+                            ? 'Лечение не требуется'
+                            : career.injuryRecoveryUsed
+                            ? 'Уже использовано для этой травмы'
+                            : career.money < _recoveryPrice
+                            ? 'Недостаточно денег'
+                            : 'Сократить травму на 2 матча',
+                      ),
                     ),
-                  ],
-                ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
+          ],
           ),
         ),
+      ),
       ),
     );
   }
@@ -425,11 +426,26 @@ class _ShopScreenState extends State<ShopScreen> {
     );
   }
 
-  BoxDecoration _cardDecoration() {
+  BoxDecoration _glassDecoration() {
     return BoxDecoration(
-      color: const Color(0xFF0A2110),
-      borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: const Color(0xFF24552C)),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Colors.white.withValues(alpha: 0.13),
+          Colors.white.withValues(alpha: 0.055),
+          const Color(0xFF101B16).withValues(alpha: 0.42),
+        ],
+      ),
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: Colors.white.withValues(alpha: 0.22), width: 1.1),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.16),
+          blurRadius: 22,
+          offset: const Offset(0, 8),
+        ),
+      ],
     );
   }
 }
