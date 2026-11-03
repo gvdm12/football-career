@@ -67,6 +67,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   String? _injuryName;
   int _injuryMatchesRemaining = 0;
   String _event = 'Матч начинается! Ваша команда разыгрывает мяч.';
+  final List<String> _chronicle = [];
   String _phase = 'buildUp';
 
   late final bool _playerPlayed;
@@ -218,26 +219,29 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     if (homeScored) {
       _addGoal(home: true);
       _event = 'ГОЛ! $_homeTeam забивает после атаки.';
+      _recordEvent(_event);
     }
     if (awayScored) {
       _addGoal(home: false);
       _event = 'ГОЛ! $_awayTeam забивает после быстрой атаки.';
+      _recordEvent(_event);
     }
-    if (!homeScored && !awayScored && _random.nextDouble() < 0.085) {
+    if (!homeScored && !awayScored && _random.nextDouble() < 0.17) {
       final homePressing =
           _random.nextDouble() <
           (_homeXgRemaining / max(0.1, _homeXgRemaining + _awayXgRemaining));
       final attackingTeam = homePressing ? _homeTeam : _awayTeam;
       final defendingTeam = homePressing ? _awayTeam : _homeTeam;
-      _event = switch (_random.nextInt(4)) {
-        0 =>
-          '$attackingTeam развивает позиционную атаку, но $defendingTeam сохраняет компактность.',
-        1 => '$attackingTeam переводит мяч на фланг и готовит подачу.',
-        2 =>
-          '$defendingTeam перехватывает передачу и начинает быструю контратаку.',
-        _ =>
-          '$attackingTeam наносит удар издали, но мяч проходит рядом со штангой.',
+      _event = switch (_random.nextInt(7)) {
+        0 => '$attackingTeam разыгрывает мяч короткими передачами и пытается пройти первую линию прессинга.',
+        1 => '$attackingTeam переводит атаку на фланг, крайний защитник подключается вперёд.',
+        2 => '$defendingTeam перехватывает передачу и начинает быструю контратаку.',
+        3 => '$attackingTeam играет в стенку у штрафной, но защитник успевает накрыть продолжение.',
+        4 => '$attackingTeam выходит из-под давления через короткий пас в центр.',
+        5 => '$defendingTeam выигрывает подбор после выноса и пытается развить атаку.',
+        _ => '$attackingTeam наносит удар издали, но мяч проходит рядом со штангой.',
       };
+      _recordEvent(_event);
     }
 
     if (_minute >= 90) {
@@ -272,11 +276,20 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   double _skill(String action) {
     final s = _player.skills;
     switch (action) {
+      case 'turnAndRun':
+      case 'receiveReturn':
+      case 'attackNearPost':
+      case 'attackFarPost':
       case 'dribble':
         return s.dribbling * 0.48 +
             s.pace * 0.30 +
             s.physical * 0.12 +
             s.vision * 0.10;
+      case 'playCenter':
+      case 'playRight':
+      case 'playLeft':
+      case 'switchPlay':
+      case 'wallPass':
       case 'pass':
       case 'backPass':
       case 'throughPass':
@@ -471,6 +484,27 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
 
     if ((position == PlayerPosition.forward ||
             position == PlayerPosition.midfielder) &&
+        roll >= 0.37 &&
+        roll < 0.47) {
+      _phase = 'wideCombination';
+      _momentTitle = 'Комбинация через фланг';
+      _momentDescription =
+          'Вы получили мяч в полуфланге. Можно перевести атаку в центр или на любой фланг, а затем открыться под обратную передачу.';
+      _event = '$_minute-я минута. Вы начинаете комбинацию через фланг.';
+      _momentReady = true;
+      return;
+    }
+    if (position == PlayerPosition.midfielder && roll >= 0.47 && roll < 0.55) {
+      _phase = 'receiveBetweenLines';
+      _momentTitle = 'Получение между линиями';
+      _momentDescription =
+          'Вы нашли свободное пространство за полузащитой соперника. Можно развернуться, сыграть в стенку или вывести партнёра передачей.';
+      _event = '$_minute-я минута. Передача проходит между линиями.';
+      _momentReady = true;
+      return;
+    }
+    if ((position == PlayerPosition.forward ||
+            position == PlayerPosition.midfielder) &&
         roll >= 0.29 &&
         roll < 0.37) {
       _phase = 'pressingTrap';
@@ -604,6 +638,31 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     }
     if (_phase == 'penalty') {
       return [_actionButton('Пробить пенальти', 'penaltyShoot')];
+    }
+    if (_phase == 'wideCombination') {
+      return [
+        _actionButton('Сыграть в центр и открыться под обратный пас', 'playCenter'),
+        _actionButton('Перевести мяч на правый фланг', 'playRight'),
+        _actionButton('Перевести мяч на левый фланг', 'playLeft'),
+        _actionButton('Сыграть в стенку', 'wallPass'),
+        _actionButton('Продолжить атаку самому', 'dribble'),
+      ];
+    }
+    if (_phase == 'receiveBetweenLines') {
+      return [
+        _actionButton('Развернуться и ворваться вперёд', 'turnAndRun'),
+        _actionButton('Отдать разрезающую передачу', 'throughPass'),
+        _actionButton('Сыграть в стенку и открыться', 'wallPass'),
+        _actionButton('Перевести атаку на фланг', 'switchPlay'),
+      ];
+    }
+    if (_phase == 'offBallRun') {
+      return [
+        _actionButton('Открыться за спину и принять обратный пас', 'receiveReturn'),
+        _actionButton('Рвануть в штрафную под передачу', 'attackNearPost'),
+        _actionButton('Сместиться на дальнюю штангу', 'attackFarPost'),
+        _actionButton('Остановиться и сохранить позицию', 'checkBack'),
+      ];
     }
     if (_phase == 'twoOnOne') {
       return [
@@ -816,6 +875,90 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       setState(() {});
       return;
     }
+    if (['playCenter', 'playRight', 'playLeft', 'switchPlay'].contains(action)) {
+      final passChance = (0.72 +
+              (_player.skills.passing - 60) * 0.0042 +
+              (_player.skills.vision - 60) * 0.0022 +
+              (_player.skills.dribbling - 60) * 0.001 +
+              (widget.isHome ? (_homeStrength - _awayStrength) : (_awayStrength - _homeStrength)) * 0.0015)
+          .clamp(0.46, 0.95);
+      if (_random.nextDouble() < passChance) {
+        _phase = 'offBallRun';
+        _rating += 0.22;
+        final direction = action == 'playCenter'
+            ? 'в центр'
+            : action == 'playRight'
+                ? 'на правый фланг'
+                : action == 'playLeft'
+                    ? 'на левый фланг'
+                    : 'на противоположный фланг';
+        _advanceClock('Вы перевели мяч $direction и сразу сделали рывок в свободную зону. Партнёры ищут обратную передачу.');
+      } else {
+        _phase = 'defend';
+        _rating -= 0.12;
+        _advanceClock('Соперник прочитал направление перевода и накрыл адресата. Команда вынуждена отойти назад.');
+      }
+      return;
+    }
+    if (action == 'wallPass') {
+      final wallChance = (0.73 +
+              (_player.skills.passing - 60) * 0.0035 +
+              (_player.skills.dribbling - 60) * 0.0025 +
+              (_player.skills.vision - 60) * 0.0015)
+          .clamp(0.45, 0.95);
+      if (_random.nextDouble() < wallChance) {
+        _phase = 'chance';
+        _rating += 0.30;
+        _advanceClock('Игра в стенку прошла! Вы отдали пас, ускорились между защитниками и получили мяч обратно у штрафной.');
+      } else {
+        _phase = 'midfield';
+        _rating -= 0.10;
+        _advanceClock('Защитник успел перекрыть обратную передачу. Партнёр сохранил мяч, но темп атаки сбит.');
+      }
+      return;
+    }
+    if (action == 'turnAndRun' || action == 'receiveReturn') {
+      final runChance = (0.64 +
+              (_player.skills.pace - 60) * 0.0028 +
+              (_player.skills.dribbling - 60) * 0.0022 +
+              (_player.skills.vision - 60) * 0.0012 -
+              (_awayStrength - _homeStrength).abs() * 0.0008)
+          .clamp(0.40, 0.91);
+      if (_random.nextDouble() < runChance) {
+        _phase = 'chance';
+        _rating += 0.28;
+        _advanceClock('Вы вовремя ускорились, избавились от опеки и получили передачу на ход. Появилась возможность создать голевой момент.');
+      } else {
+        _phase = 'midfield';
+        _rating -= 0.08;
+        _advanceClock('Защитник прочитал рывок и не дал принять мяч на скорости. Команда продолжает владеть мячом.');
+      }
+      return;
+    }
+    if (action == 'attackNearPost' || action == 'attackFarPost') {
+      final movementChance = (0.66 +
+              (_player.skills.pace - 60) * 0.002 +
+              (_player.skills.vision - 60) * 0.002 +
+              (_player.overall - 70) * 0.001)
+          .clamp(0.42, 0.90);
+      if (_random.nextDouble() < movementChance) {
+        _phase = 'aerialChance';
+        _rating += 0.18;
+        _advanceClock(action == 'attackNearPost'
+            ? 'Вы опередили защитника на ближней штанге. Партнёр готовит прострел или навес.'
+            : 'Вы ушли от опеки и заняли позицию у дальней штанги. Подача может найти вас.');
+      } else {
+        _phase = 'finalThird';
+        _advanceClock('Защитник удержал позицию и не позволил вам открыться. Атака продолжается перед штрафной.');
+      }
+      return;
+    }
+    if (action == 'checkBack') {
+      _phase = 'midfield';
+      _rating += 0.10;
+      _advanceClock('Вы показали короткий вариант и помогли команде сохранить владение.');
+      return;
+    }
     if (action == 'twoOnOnePass') {
       final passChance =
           (0.76 +
@@ -920,6 +1063,15 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       'throughPass',
       'longPass',
       'cross',
+      'playCenter',
+      'playRight',
+      'playLeft',
+      'switchPlay',
+      'wallPass',
+      'turnAndRun',
+      'receiveReturn',
+      'attackNearPost',
+      'attackFarPost',
       'dribble',
     ].contains(action);
     final advantage = widget.isHome
@@ -1246,8 +1398,16 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     _advanceClock(message);
   }
 
+  void _recordEvent(String message) {
+    final entry = "$_minute' · $message";
+    if (_chronicle.isNotEmpty && _chronicle.first == entry) return;
+    _chronicle.insert(0, entry);
+    if (_chronicle.length > 6) _chronicle.removeLast();
+  }
+
   void _advanceClock(String message) {
     _event = message;
+    _recordEvent(message);
     _momentReady = false;
     if (_playerUnavailable) {
       _createMoment();
@@ -1590,6 +1750,24 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                                     height: 1.2,
                                   ),
                                 ),
+                                if (_chronicle.isNotEmpty) ...[
+                                  const SizedBox(height: 9),
+                                  ..._chronicle.take(3).map(
+                                    (entry) => Padding(
+                                      padding: const EdgeInsets.only(top: 3),
+                                      child: Text(
+                                        entry,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: Colors.white54,
+                                          fontSize: 10,
+                                          height: 1.2,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                           ),
