@@ -1085,6 +1085,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     final advantage = widget.isHome
         ? (_homeStrength - _awayStrength) * 0.003
         : (_awayStrength - _homeStrength) * 0.003;
+    final opponentDefence = widget.isHome ? _awayStrength : _homeStrength;
+    // Сила обороны соперника — доступный в текущей модели командный proxy:
+    // сильная команда лучше закрывает линии передач и пространство для дриблинга.
+    final defensivePressure = (opponentDefence - 70) * 0.0018;
 
     // Для каждого действия используется профильный навык.
     // Удар головой зависит прежде всего от heading, а не от shooting.
@@ -1093,61 +1097,61 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       chance =
           (0.74 +
                   (_player.skills.shooting - 60) * 0.0045 +
-                  advantage * 0.7 +
+                  advantage * 0.7 - defensivePressure * 0.45 +
                   (_phase == 'oneOnOne' ? 0.08 : 0.0))
               .clamp(0.48, 0.96);
     } else if (action == 'longShot') {
       chance =
-          (0.52 + (_player.skills.shooting - 60) * 0.0038 + advantage * 0.5)
+          (0.52 + (_player.skills.shooting - 60) * 0.0038 + advantage * 0.5 - defensivePressure * 0.35)
               .clamp(0.30, 0.84);
     } else if (action == 'header') {
       chance =
           (0.74 +
                   (_player.skills.heading - 60) * 0.005 +
                   (_player.skills.physical - 60) * 0.0015 +
-                  advantage * 0.6)
+                  advantage * 0.6 - defensivePressure * 0.35)
               .clamp(0.46, 0.95);
     } else if (action == 'volley') {
       chance =
           (0.66 +
                   (_player.skills.shooting - 60) * 0.0035 +
                   (_player.skills.heading - 60) * 0.0015 +
-                  advantage * 0.5)
+                  advantage * 0.5 - defensivePressure * 0.35)
               .clamp(0.38, 0.91);
     } else if (action == 'backPass') {
       chance =
           (0.91 +
                   (_player.skills.passing - 60) * 0.0025 +
                   (_player.skills.vision - 60) * 0.001 +
-                  advantage * 0.2)
+                  advantage * 0.2 - defensivePressure * 0.2)
               .clamp(0.72, 0.99);
     } else if (action == 'pass') {
       chance =
           (0.80 +
                   (_player.skills.passing - 60) * 0.0045 +
                   (_player.skills.vision - 60) * 0.0015 +
-                  advantage * 0.4)
+                  advantage * 0.4 - defensivePressure)
               .clamp(0.54, 0.97);
     } else if (action == 'longPass') {
       chance =
           (0.67 +
                   (_player.skills.passing - 60) * 0.0048 +
                   (_player.skills.vision - 60) * 0.002 +
-                  advantage * 0.3)
+                  advantage * 0.3 - defensivePressure * 0.8)
               .clamp(0.40, 0.94);
     } else if (action == 'throughPass') {
       chance =
           (0.71 +
                   (_player.skills.passing - 60) * 0.0045 +
                   (_player.skills.vision - 60) * 0.002 +
-                  advantage * 0.4)
+                  advantage * 0.4 - defensivePressure)
               .clamp(0.43, 0.94);
     } else if (action == 'cross') {
       chance =
           (0.76 +
                   (_player.skills.passing - 60) * 0.0038 +
                   (_player.skills.vision - 60) * 0.0015 +
-                  advantage * 0.35)
+                  advantage * 0.35 - defensivePressure * 0.9)
               .clamp(0.46, 0.95);
     } else if (action == 'keeper') {
       final opponentXg = widget.isHome ? _awayXgRemaining : _homeXgRemaining;
@@ -1161,7 +1165,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           (0.70 +
                   (_player.skills.dribbling - 60) * 0.0045 +
                   (_player.skills.pace - 60) * 0.0015 +
-                  advantage * 0.4)
+                  advantage * 0.4 - defensivePressure)
               .clamp(0.42, 0.94);
     } else {
       chance = (0.66 + (skill - 60) * 0.0045 + advantage * 0.4).clamp(
@@ -1190,11 +1194,12 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
 
       if (action == 'header') {
         // Удар головой: основной бонус зависит от heading.
-        baseFinishingChance = isAerial ? 0.22 : 0.20;
+        baseFinishingChance = isAerial ? 0.27 : 0.22;
 
         skillFinishingBonus =
-            (_player.skills.heading - 70) * 0.004 +
-            (_player.skills.shooting - 70) * 0.001;
+            (_player.skills.heading - 70) * 0.006 +
+            (_player.skills.shooting - 70) * 0.0015 -
+            defensivePressure * 0.35;
       } else if (action == 'longShot') {
         // Дальний удар.
         baseFinishingChance = 0.20;
