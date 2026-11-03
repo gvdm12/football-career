@@ -13,6 +13,7 @@ class SeasonAward {
   final double averageRating;
   final double score;
   final bool isCareerPlayer;
+  final bool wonTrophy;
 
   const SeasonAward({
     required this.season,
@@ -27,6 +28,7 @@ class SeasonAward {
     required this.averageRating,
     required this.score,
     this.isCareerPlayer = false,
+    this.wonTrophy = false,
   });
 
   String get positionLabel => switch (position) {
@@ -49,6 +51,7 @@ class SeasonAward {
     'averageRating': averageRating,
     'score': score,
     'isCareerPlayer': isCareerPlayer,
+    'wonTrophy': wonTrophy,
   };
 
   factory SeasonAward.fromJson(Map<String, dynamic> json) => SeasonAward(
@@ -67,6 +70,7 @@ class SeasonAward {
     averageRating: (json['averageRating'] as num?)?.toDouble() ?? 0,
     score: (json['score'] as num?)?.toDouble() ?? 0,
     isCareerPlayer: json['isCareerPlayer'] as bool? ?? false,
+    wonTrophy: json['wonTrophy'] as bool? ?? false,
   );
 }
 
