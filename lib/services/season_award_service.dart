@@ -301,9 +301,9 @@ class SeasonAwardService {
           if (!knownPlayers.add(key)) continue;
           final random = Random(seedFor('$season|$key'));
           final matches = 28 + random.nextInt(11);
-          final rating = (6.45 +
-                  (realPlayer.overall - 70) * 0.045 +
-                  random.nextDouble() * 0.34)
+          final rating = (6.55 +
+                  (realPlayer.overall - 70) * 0.05 +
+                  random.nextDouble() * 0.35)
               .clamp(6.2, 8.9)
               .toDouble();
           final goals = switch (position) {
