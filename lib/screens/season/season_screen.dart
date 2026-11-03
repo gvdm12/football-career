@@ -15,7 +15,6 @@ import 'package:flutter_football/models/league_table.dart';
 import 'package:flutter_football/models/match.dart';
 import 'package:flutter_football/models/season_match.dart';
 import 'package:flutter_football/models/friendly_match.dart';
-import 'package:flutter_football/models/career_news.dart';
 import 'package:flutter_football/models/season_stats.dart';
 import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/models/player_of_month_award.dart';
