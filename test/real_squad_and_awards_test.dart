@@ -45,6 +45,55 @@ void main() {
       }
     });
 
+    test('keeps monthly history for real rosters smaller than eleven players', () {
+      final firstRealPlayer = RealClubSquads.squads['Real Madrid']!
+          .values
+          .expand((players) => players)
+          .first;
+      final update = LeaguePlayerStatsService.update(
+        season: 1,
+        current: [
+          LeaguePlayerSeasonStats(
+            playerName: firstRealPlayer.name,
+            club: 'Real Madrid',
+            position: PlayerPosition.forward,
+            age: firstRealPlayer.age,
+            overall: firstRealPlayer.overall,
+            matches: 1,
+            goals: 1,
+            ratingSum: 7.5,
+            monthlyStats: const {
+              1: LeaguePlayerMonthStats(
+                matches: 1,
+                goals: 1,
+                ratingSum: 7.5,
+              ),
+            },
+          ),
+        ],
+        processedMatchKeys: const ['1:1'],
+        fixtures: const [
+          LeagueMatch(
+            id: 1,
+            round: 1,
+            homeTeam: 'Real Madrid',
+            awayTeam: 'Barcelona',
+            homeGoals: 1,
+            awayGoals: 0,
+          ),
+        ],
+      );
+
+      final restoredPlayer = update.players.firstWhere(
+        (player) =>
+            player.club == 'Real Madrid' &&
+            player.playerName == firstRealPlayer.name,
+      );
+      expect(restoredPlayer.matches, 1);
+      expect(restoredPlayer.goals, 1);
+      expect(restoredPlayer.monthlyStats[1]?.matches, 1);
+    });
+
     test('removes generated players from old saved rosters', () {
       final update = LeaguePlayerStatsService.update(
         season: 2,
