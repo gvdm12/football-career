@@ -129,7 +129,7 @@ void main() {
 
 
   group('Season leader awards', () {
-    test('shows the top scorer and assist leader below former thresholds', () {
+    test('awards scorer and assist prizes only after league thresholds', () {
       final player = Player.create(
         name: 'Career Player',
         nationality: 'Россия',
@@ -157,7 +157,7 @@ void main() {
             age: 26,
             overall: 86,
             matches: 30,
-            goals: 15,
+            goals: 35,
             assists: 2,
             ratingSum: 210,
           ),
@@ -169,7 +169,7 @@ void main() {
             overall: 85,
             matches: 30,
             goals: 3,
-            assists: 12,
+            assists: 20,
             ratingSum: 210,
           ),
         ],
@@ -193,6 +193,48 @@ void main() {
               award.playerName == 'Top Assister',
         ),
         isTrue,
+      );
+    });
+
+    test('does not award the Premier League Golden Boot for 16 goals', () {
+      final player = Player.create(
+        name: 'Career Player',
+        nationality: 'Россия',
+        position: PlayerPosition.forward,
+        club: 'Real Madrid',
+      );
+      final awards = SeasonAwardService.create(
+        season: 2,
+        player: player,
+        seasonStats: const SeasonStats(
+          season: 2,
+          club: 'Real Madrid',
+          matches: 30,
+          goals: 16,
+          assists: 4,
+          yellowCards: 0,
+          redCards: 0,
+          averageRating: 8.0,
+        ),
+        leaguePlayerStats: const [],
+        leagueTable: const <LeagueTableEntry>[
+          LeagueTableEntry(
+            club: 'Real Madrid',
+            played: 38,
+            wins: 20,
+            draws: 8,
+            losses: 10,
+            goalsFor: 60,
+            goalsAgainst: 40,
+          ),
+        ],
+        rivals: const <PositionRival>[],
+        worldLeagueStandings: const <League, List<LeagueTableEntry>>{},
+      );
+
+      expect(
+        awards.any((award) => award.category == 'Лучший бомбардир'),
+        isFalse,
       );
     });
   });

@@ -21,6 +21,11 @@ class SeasonAwardService {
     required Map<League, List<LeagueTableEntry>> worldLeagueStandings,
     SeasonStats? overallSeasonStats,
   }) {
+    final playerLeague = Clubs.leagueOf(player.club);
+    final goldenBootThreshold =
+        playerLeague?.goldenBootGoalThreshold ?? 0;
+    final bestAssisterThreshold =
+        playerLeague?.bestAssisterThreshold ?? 0;
     final sortedTable = [...leagueTable]
       ..sort(
         (a, b) => b.points != a.points
@@ -211,50 +216,57 @@ class SeasonAwardService {
       );
     }
 
-    // Лидеры по голам и передачам показываются независимо от порога награды.
-    final goalLeaders =
-        candidates
-            .where(
-              (item) =>
-                  item.matches >= 10 && item.goals > 0,
-            )
-            .toList()
-          ..sort((a, b) {
-            final compare = b.goals.compareTo(a.goals);
-            if (compare != 0) return compare;
-            final ratingCompare = b.rating.compareTo(a.rating);
-            if (ratingCompare != 0) return ratingCompare;
-            return b.assists.compareTo(a.assists);
-          });
+    // Награды бомбардиру и ассистенту выдаются только при выполнении
+    // порога конкретной лиги. Лидер с 16 голами не получает приз,
+    // если для его чемпионата требуется 21/23/27/35 голов.
+    final goalLeaders = candidates
+        .where(
+          (item) =>
+              goldenBootThreshold > 0 &&
+              item.matches >= 10 &&
+              item.goals >= goldenBootThreshold,
+        )
+        .toList()
+      ..sort((a, b) {
+        final compare = b.goals.compareTo(a.goals);
+        if (compare != 0) return compare;
+        final ratingCompare = b.rating.compareTo(a.rating);
+        if (ratingCompare != 0) return ratingCompare;
+        return b.assists.compareTo(a.assists);
+      });
     if (goalLeaders.isNotEmpty) {
-      result.add(
-        convert(
-          goalLeaders.first,
-          'Лучший бомбардир',
-          goalLeaders.first.goals.toDouble(),
-        ),
-      );
+      final topGoals = goalLeaders.first.goals;
+      for (final winner in goalLeaders.where((item) => item.goals == topGoals)) {
+        result.add(
+          convert(winner, 'Лучший бомбардир', winner.goals.toDouble()),
+        );
+      }
     }
 
-    // Показываем лидера по передачам даже тогда, когда старый порог
-    // конкретной лиги не был достигнут.
     final assistLeaders = candidates
-        .where((item) => item.matches >= 10 && item.assists > 0)
-        .toList()..sort((a, b) {
-          final compare = b.assists.compareTo(a.assists);
-          if (compare != 0) return compare;
-          final ratingCompare = b.rating.compareTo(a.rating);
-          if (ratingCompare != 0) return ratingCompare;
-          return b.goals.compareTo(a.goals);
-        });
+        .where(
+          (item) =>
+              bestAssisterThreshold > 0 &&
+              item.matches >= 10 &&
+              item.assists >= bestAssisterThreshold,
+        )
+        .toList()
+      ..sort((a, b) {
+        final compare = b.assists.compareTo(a.assists);
+        if (compare != 0) return compare;
+        final ratingCompare = b.rating.compareTo(a.rating);
+        if (ratingCompare != 0) return ratingCompare;
+        return b.goals.compareTo(a.goals);
+      });
     if (assistLeaders.isNotEmpty) {
-      result.add(
-        convert(
-          assistLeaders.first,
-          'Лучший ассистент',
-          assistLeaders.first.assists.toDouble(),
-        ),
-      );
+      final topAssists = assistLeaders.first.assists;
+      for (final winner in assistLeaders.where(
+        (item) => item.assists == topAssists,
+      )) {
+        result.add(
+          convert(winner, 'Лучший ассистент', winner.assists.toDouble()),
+        );
+      }
     }
 
     // Сборная сезона: 1 вратарь, 4 защитника, 3 полузащитника, 3 нападающих.
@@ -290,9 +302,9 @@ class SeasonAwardService {
       result.add(convert(item, 'Команда года', performanceScore(item)));
     }
 
-    // Золотой мяч: единая гонка между игроком карьеры и футболистами
-    // из ростеров всех лиг. Статистика остальных игроков моделируется
-    // детерминированно на сезон, поэтому результаты не меняются при перезагрузке.
+    // «Золотой мяч» — общая мировая гонка. У каждого кандидата
+    // одинаковые критерии: игровое время, средняя оценка и вклад в голы.
+    // Победы команды дают бонус, но не являются обязательным условием.
     final ballonStats = overallSeasonStats ?? seasonStats;
     final ballonCandidates = <_Candidate>[
       ...candidates.where((item) => !item.isCareerPlayer),
@@ -313,7 +325,21 @@ class SeasonAwardService {
         ),
       );
     }
-    final knownPlayers = candidates
+
+    final ballonTeamPositions = <String, int>{...positions};
+    for (final entry in worldLeagueStandings.entries) {
+      final standings = [...entry.value]
+        ..sort(
+          (a, b) => b.points != a.points
+              ? b.points.compareTo(a.points)
+              : b.goalDifference.compareTo(a.goalDifference),
+        );
+      for (var index = 0; index < standings.length; index++) {
+        ballonTeamPositions[standings[index].club] = index + 1;
+      }
+    }
+
+    final knownPlayers = ballonCandidates
         .map((item) => '${item.name}|${item.club}')
         .toSet();
 
@@ -326,6 +352,8 @@ class SeasonAwardService {
     }
 
     for (final clubEntry in RealClubSquads.squads.entries) {
+      final clubLeague = Clubs.leagueOf(clubEntry.key);
+      final seasonMatches = clubLeague?.matchesPerSeason ?? 34;
       for (final group in clubEntry.value.entries) {
         final position = switch (group.key) {
           'goalkeeper' => PlayerPosition.goalkeeper,
@@ -336,42 +364,46 @@ class SeasonAwardService {
         for (final realPlayer in group.value) {
           final key = '${realPlayer.name}|${clubEntry.key}';
           if (!knownPlayers.add(key)) continue;
+
           final random = Random(seedFor('$season|$key'));
-          final matches = 28 + random.nextInt(11);
-          final rating =
-              (6.45 +
-                      (realPlayer.overall - 70) * 0.045 +
-                      random.nextDouble() * 0.34)
-                  .clamp(6.2, 8.9)
-                  .toDouble();
+          final matches = (seasonMatches - random.nextInt(12))
+              .clamp(20, seasonMatches)
+              .toInt();
+          final rating = (6.4 +
+                  (realPlayer.overall - 70) * 0.06 +
+                  random.nextDouble() * 0.45)
+              .clamp(6.2, 8.95)
+              .toDouble();
+
           final goals = switch (position) {
             PlayerPosition.forward =>
-              ((realPlayer.overall - 65) * 0.72 + random.nextInt(9))
+              ((realPlayer.overall - 65) * 0.75 + random.nextInt(12))
                   .round()
                   .clamp(0, 45)
                   .toInt(),
             PlayerPosition.midfielder =>
-              ((realPlayer.overall - 65) * 0.27 + random.nextInt(6))
+              ((realPlayer.overall - 65) * 0.34 + random.nextInt(8))
                   .round()
-                  .clamp(0, 25)
-                  .toInt(),
-            PlayerPosition.defender => random.nextInt(5),
-            PlayerPosition.goalkeeper => 0,
-          };
-          final assists = switch (position) {
-            PlayerPosition.forward =>
-              ((realPlayer.overall - 65) * 0.25 + random.nextInt(8))
-                  .round()
-                  .clamp(0, 25)
-                  .toInt(),
-            PlayerPosition.midfielder =>
-              ((realPlayer.overall - 65) * 0.43 + random.nextInt(9))
-                  .round()
-                  .clamp(0, 30)
+                  .clamp(0, 28)
                   .toInt(),
             PlayerPosition.defender => random.nextInt(6),
             PlayerPosition.goalkeeper => 0,
           };
+          final assists = switch (position) {
+            PlayerPosition.forward =>
+              ((realPlayer.overall - 65) * 0.30 + random.nextInt(10))
+                  .round()
+                  .clamp(0, 25)
+                  .toInt(),
+            PlayerPosition.midfielder =>
+              ((realPlayer.overall - 65) * 0.60 + random.nextInt(12))
+                  .round()
+                  .clamp(0, 32)
+                  .toInt(),
+            PlayerPosition.defender => random.nextInt(10),
+            PlayerPosition.goalkeeper => 0,
+          };
+
           ballonCandidates.add(
             _Candidate(
               name: realPlayer.name,
@@ -394,20 +426,25 @@ class SeasonAwardService {
         .where(
           (item) =>
               item.matches >= 25 &&
-              item.rating >= 7.65 &&
-              item.goals + item.assists >= 25 &&
-              (!item.isCareerPlayer ||
-                  (item.wonTrophy &&
-                      item.rating >= 7.9 &&
-                      item.goals + item.assists >= 40)),
+              item.rating >= 7.4 &&
+              item.goals + item.assists >= 22,
         )
         .toList();
 
-    double ballonScore(_Candidate item) =>
-        item.rating * 12 +
-        item.goals * 0.72 +
-        item.assists * 0.48 +
-        (item.wonTrophy ? 4.0 : 0.0);
+    double ballonScore(_Candidate item) {
+      final teamPosition = ballonTeamPositions[item.club];
+      final teamBonus = item.wonTrophy
+          ? 4.0
+          : teamPosition == 1
+          ? 3.0
+          : teamPosition != null && teamPosition <= 4
+          ? 1.5
+          : 0.0;
+      return item.rating * 12 +
+          item.goals * 0.8 +
+          item.assists * 0.65 +
+          teamBonus;
+    }
 
     ballonEligible.sort((a, b) {
       final scoreCompare = ballonScore(b).compareTo(ballonScore(a));
