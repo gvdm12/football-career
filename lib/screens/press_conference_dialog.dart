@@ -390,8 +390,8 @@ class PressConferenceContentFactory {
             'I want more playing time',
           ),
           detail: choose('Прямое заявление', 'Direct statement'),
-          trustChange: 0,
-          reputationChange: -3,
+          trustChange: -3,
+          reputationChange: 0,
           icon: Icons.timer_outlined,
         ),
         PressConferenceOption(
