@@ -1819,7 +1819,8 @@ class Career {
             matchNumber: 0,
             title: 'Managerial change: ${transfer.coachName}',
             description:
-                '${transfer.coachName} moved from ${transfer.fromClub} to ${transfer.toClub}.',
+                '${transfer.coachName} moved from ${transfer.fromClub} to ${transfer.toClub}. '
+                '${transfer.replacementCoachName} moved to ${transfer.fromClub}.',
             type: CareerNewsType.season,
           ),
         )
