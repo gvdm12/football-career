@@ -105,6 +105,7 @@ class SeasonAwardService {
     final knownCandidateKeys = candidates
         .map((item) => '${item.name}|${item.club}')
         .toSet();
+    final globalCandidateKeys = <String>{};
     for (final clubEntry in RealClubSquads.squads.entries) {
       final clubLeague = Clubs.leagueOf(clubEntry.key);
       final seasonMatches = clubLeague?.matchesPerSeason ?? 34;
@@ -147,6 +148,7 @@ class SeasonAwardService {
             PlayerPosition.defender => random.nextInt(10),
             PlayerPosition.goalkeeper => 0,
           };
+          globalCandidateKeys.add(key);
           candidates.add(
             _Candidate(
               name: realPlayer.name,
@@ -307,7 +309,8 @@ class SeasonAwardService {
         .where(
           (item) =>
               goldenBootThreshold > 0 &&
-              Clubs.leagueOf(item.club) == playerLeague &&
+              (!globalCandidateKeys.contains('${item.name}|${item.club}') ||
+                  Clubs.leagueOf(item.club) == playerLeague) &&
               item.matches >= 10 &&
               item.goals >= goldenBootThreshold,
         )
@@ -332,7 +335,8 @@ class SeasonAwardService {
         .where(
           (item) =>
               bestAssisterThreshold > 0 &&
-              Clubs.leagueOf(item.club) == playerLeague &&
+              (!globalCandidateKeys.contains('${item.name}|${item.club}') ||
+                  Clubs.leagueOf(item.club) == playerLeague) &&
               item.matches >= 10 &&
               item.assists >= bestAssisterThreshold,
         )
