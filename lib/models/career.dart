@@ -615,6 +615,16 @@ class Career {
           final assistThreshold =
               Clubs.leagueOf(award.club)?.bestAssisterThreshold ?? 999;
           return award.matches >= 10 && award.assists >= assistThreshold;
+        case 'Лучший молодой игрок':
+          return award.age <= 21 &&
+              award.matches >= 15 &&
+              award.averageRating >= 7.0;
+        case 'Команда года':
+          return award.matches >= 10 && award.averageRating >= 6.0;
+        case 'Золотой мяч':
+          return award.matches >= 25 &&
+              award.averageRating >= 7.4 &&
+              award.goals + award.assists >= 22;
         default:
           return true;
       }
