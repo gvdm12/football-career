@@ -5363,7 +5363,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
       await _openWorldCup();
       return;
     }
-    if (isSaving || seasonFinishing || friendly.isPlayed || career.isInjured) {
+    if (isSaving || seasonFinishing || friendly.isResolved || career.isInjured) {
       if (career.isInjured && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Из-за травмы вы не можете сыграть товарищеский матч.')),
