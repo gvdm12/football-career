@@ -2910,10 +2910,21 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Future<void> _openTransferWindowAndStartSeason() async {
     final previousClub = career.player.club;
-    final transferResult = await Navigator.push<Career>(
-      context,
-      MaterialPageRoute(builder: (_) => TransferScreen(career: career)),
-    );
+    Career? transferResult;
+
+    // В режиме пятилетнего ограничения не открываем трансферное окно,
+    // пока не наступил разрешённый сезон смены клуба.
+    if (career.canChangeClub) {
+      transferResult = await Navigator.push<Career>(
+        context,
+        MaterialPageRoute(builder: (_) => TransferScreen(career: career)),
+      );
+    } else if (career.settings.limitTransfersToFiveYears &&
+        career.contractYears <= 0) {
+      // Пока переход запрещён, автоматически продлеваем контракт
+      // в текущем клубе, чтобы игрок не остался без команды.
+      career = career.copyWith(contractYears: 1);
+    }
 
     if (!mounted) return;
 
