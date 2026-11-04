@@ -3773,16 +3773,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            AppStrings.yourClub,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.4,
-            ),
-          ),
-          const SizedBox(height: 8),
           Row(
             children: [
               Container(
@@ -3811,66 +3801,30 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      career.player.club,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    if (league != null) ...[
-                      const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 103, 116, 108),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: const Color.fromARGB(255, 30, 74, 42),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.asset(
-                              league.logoAsset,
-                              width: 26,
-                              height: 26,
-                              fit: BoxFit.contain,
-                            ),
-                            const SizedBox(width: 3),
-                            Flexible(
-                              child: Text(
-                                league.displayName,
-                                style: const TextStyle(
-                                  color: Color.fromARGB(255, 253, 254, 253),
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.5,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ],
+                child: Text(
+                  career.player.club,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
+              if (league != null) ...[
+                const SizedBox(width: 10),
+                Image.asset(
+                  league.logoAsset,
+                  width: 40,
+                  height: 40,
+                  fit: BoxFit.contain,
+                ),
+              ],
             ],
           ),
-
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           Row(
             children: [
               Expanded(
