@@ -23,7 +23,8 @@ class _CoachScreenState extends State<CoachScreen> {
     career = widget.career;
   }
 
-  bool get _canTalk => career.matches - career.lastConversationMatch >= 4;
+  bool get _canTalk =>
+      career.teamMatches - career.lastCoachNegotiationTeamMatch >= 7;
 
   Future<void> _talkToCoach() async {
     if (!_canTalk) return;
@@ -48,6 +49,7 @@ class _CoachScreenState extends State<CoachScreen> {
       career = career.copyWith(
         coachTrust: (career.coachTrust + change).clamp(0, 100).toInt(),
         lastConversationMatch: career.matches,
+        lastCoachNegotiationTeamMatch: career.teamMatches,
       );
     });
   }
@@ -196,7 +198,7 @@ class _CoachScreenState extends State<CoachScreen> {
                     label: Text(
                       _canTalk
                           ? 'Переговоры с тренером'
-                          : 'Новый разговор через ${(4 - (career.matches - career.lastConversationMatch)).clamp(0, 4)} матча',
+                          : 'Новый разговор через ${(7 - (career.teamMatches - career.lastCoachNegotiationTeamMatch)).clamp(0, 7)} матчей команды',
                     ),
                   ),
                 ),
