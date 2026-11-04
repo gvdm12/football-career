@@ -49,8 +49,8 @@ class CareerSettings {
 }
 
 
-/// Единые коэффициенты сложности. Скорость развития игрока намеренно
-/// не зависит от сложности и остаётся отдельной настройкой карьеры.
+/// Единые коэффициенты игровых эффектов сложности.
+/// Коэффициенты не переопределяют настройку скорости развития карьеры.
 extension CareerDifficultyEffects on CareerDifficulty {
   double get matchExpectedGoalsShift => switch (this) {
     CareerDifficulty.easy => 0.15,
