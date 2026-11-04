@@ -110,7 +110,11 @@ class Match {
         .clamp(0.05, 0.99)
         .toDouble();
 
-    playChance = (chanceBeforeAgeDecline - ageRelatedPenalty)
+    final difficultyAdjustment =
+        career?.settings.difficulty.selectionChanceAdjustment ?? 0.0;
+    playChance = (chanceBeforeAgeDecline -
+            ageRelatedPenalty +
+            difficultyAdjustment)
         .clamp(0.05, 0.99)
         .toDouble();
 
@@ -325,11 +329,8 @@ class Match {
     var awayExpectedGoals = expectedGoals.away;
 
     // Настройка сложности влияет и на обычную симуляцию, и на результативность соперника.
-    final difficultyShift = switch (career?.settings.difficulty.name) {
-      'easy' => 0.12,
-      'hard' => -0.12,
-      _ => 0.0,
-    };
+    final difficultyShift =
+        career?.settings.difficulty.matchExpectedGoalsShift ?? 0.0;
     if (isHome) {
       homeExpectedGoals += difficultyShift;
       awayExpectedGoals -= difficultyShift * 0.55;
