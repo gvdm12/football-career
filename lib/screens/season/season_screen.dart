@@ -2919,6 +2919,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
         context,
         MaterialPageRoute(builder: (_) => TransferScreen(career: career)),
       );
+    } else if (career.settings.limitTransfersToFiveYears &&
+        career.contractYears <= 0) {
+      // Пока переход запрещён, автоматически продлеваем контракт
+      // в текущем клубе, чтобы игрок не остался без команды.
+      career = career.copyWith(contractYears: 1);
     }
 
     if (!mounted) return;
