@@ -171,11 +171,11 @@ void main() {
         season: 4,
         club: 'Real Madrid',
         matches: 32,
-        goals: 25,
-        assists: 15,
+        goals: 50,
+        assists: 20,
         yellowCards: 1,
         redCards: 0,
-        averageRating: 8.1,
+        averageRating: 9.0,
       );
 
       final awards = SeasonAwardService.create(
@@ -195,7 +195,7 @@ void main() {
       expect(ballonDor.playerName, 'Career Star');
       expect(ballonDor.isCareerPlayer, isTrue);
       expect(ballonDor.matches, 32);
-      expect(ballonDor.goals + ballonDor.assists, 40);
+      expect(ballonDor.goals + ballonDor.assists, 70);
     });
 
     test('does not award the Ballon d\'Or to a career player below 35 contributions', () {
