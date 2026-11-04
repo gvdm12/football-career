@@ -983,7 +983,7 @@ class Career {
           nextDurations[skillName] = remaining;
         }
       }
-      updatedCareer = copyWith(
+      updatedCareer = updatedCareer.copyWith(
         temporarySkillBoosts: nextBoosts,
         temporarySkillBoostMatches: nextDurations,
       );
