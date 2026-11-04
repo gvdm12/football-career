@@ -329,11 +329,19 @@ class LeaguePlayerStatsService {
     // Старые сохранения не содержат помесячной разбивки. Пересобираем
     // детерминированную статистику из календаря, чтобы не смешивать месяцы.
     final hasLegacySeasonStats = current.any((player) => player.matches > 0);
-    final expectedProcessedAppearances = processedMatchKeys.length * 22;
+    final storedSeasonAppearances = current.fold<int>(
+      0,
+      (sum, player) => sum + player.matches,
+    );
+    // Сверяем помесячную статистику с фактическими появлениями игроков,
+    // а не с фиксированными 22 участниками матча: реальные ростеры могут
+    // быть неполными и не должны дополняться случайными футболистами.
+    final hasIncompleteMonthlyStats =
+        storedMonthlyAppearances < storedSeasonAppearances;
     final needsMonthlyRebuild = current.isNotEmpty &&
         playedFixtureCount > 0 &&
         (processedMatchKeys.isNotEmpty
-            ? storedMonthlyAppearances < expectedProcessedAppearances
+            ? hasIncompleteMonthlyStats
             : hasLegacySeasonStats && storedMonthlyAppearances == 0);
     final players = needsMonthlyRebuild
         ? <LeaguePlayerSeasonStats>[]
