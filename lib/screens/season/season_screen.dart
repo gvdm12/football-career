@@ -2761,12 +2761,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
       final wonGoldenBoot = seasonAwards.any(
         (award) =>
             award.category == 'Лучший бомбардир' &&
+            award.isCareerPlayer &&
             award.playerName == career.player.name &&
             award.club == career.player.club,
       );
       final wonBestAssister = seasonAwards.any(
         (award) =>
             award.category == 'Лучший ассистент' &&
+            award.isCareerPlayer &&
             award.playerName == career.player.name &&
             award.club == career.player.club,
       );
