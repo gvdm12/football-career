@@ -258,39 +258,6 @@ class SeasonAwardService {
 
     final result = <SeasonAward>[];
 
-    // Награда «Игрок сезона» выдаётся только при действительно сильном сезоне.
-    // Условия совпадают с критериями достижения в архиве карьеры.
-    final playerOfSeason =
-        eligible
-            .where(
-              (item) =>
-                  item.matches >= 20 &&
-                  item.rating >= 7.8 &&
-                  item.goals + item.assists >= 40 &&
-                  item.wonTrophy,
-            )
-            .toList()
-          ..sort((a, b) {
-            final scoreCompare = performanceScore(
-              b,
-              includeTeamSuccess: true,
-            ).compareTo(performanceScore(a, includeTeamSuccess: true));
-            if (scoreCompare != 0) return scoreCompare;
-            final ratingCompare = b.rating.compareTo(a.rating);
-            if (ratingCompare != 0) return ratingCompare;
-            return (b.goals + b.assists).compareTo(a.goals + a.assists);
-          });
-    if (playerOfSeason.isNotEmpty) {
-      final seasonWinner = playerOfSeason.first;
-      result.add(
-        convert(
-          seasonWinner,
-          'Игрок сезона',
-          performanceScore(seasonWinner, includeTeamSuccess: true),
-        ),
-      );
-    }
-
     final youngPlayers =
         eligible
             .where(

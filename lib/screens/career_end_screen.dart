@@ -62,7 +62,6 @@ class CareerEndScreen extends StatelessWidget {
 
   int get goldenBoots => _achievementCount('Золотая бутса');
   int get goldenBalls => _achievementCount('Золотой мяч');
-  int get playerOfSeasonAwards => _achievementCount('Лучший игрок сезона');
   int get youngPlayerAwards => _achievementCount('Лучший молодой игрок сезона');
   int get bestAssisterAwards => _achievementCount('Лучший ассистент');
   int get teamOfSeasonSelections => _achievementCount('В сборной сезона');
@@ -205,10 +204,6 @@ class CareerEndScreen extends StatelessWidget {
                   _stat(
                     AppStrings.isEnglish ? 'Ballon d’Or' : 'Золотой мяч',
                     goldenBalls.toString(),
-                  ),
-                  _stat(
-                    AppStrings.isEnglish ? 'Player of the Season' : 'Игрок сезона',
-                    playerOfSeasonAwards.toString(),
                   ),
                   _stat(
                     AppStrings.isEnglish ? 'Best Young Player' : 'Лучший молодой игрок',

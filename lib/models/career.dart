@@ -746,10 +746,7 @@ class Career {
     final validSeasonAwards = savedSeasonAwards.where((award) {
       switch (award.category) {
         case 'Игрок сезона':
-          return award.wonTrophy &&
-              award.matches >= 20 &&
-              award.averageRating >= 7.8 &&
-              award.goals + award.assists >= 40;
+          return false;
         case 'Лучший бомбардир':
           final goalThreshold =
               Clubs.leagueOf(award.club)?.goldenBootGoalThreshold ?? 999;
@@ -765,9 +762,9 @@ class Career {
         case 'Команда года':
           return award.matches >= 10 && award.averageRating >= 6.0;
         case 'Золотой мяч':
-          return award.matches >= 25 &&
-              award.averageRating >= 7.4 &&
-              award.goals + award.assists >= 22;
+          // Поддерживаем и резервного победителя из fallback-гонки:
+          // регулярные выходы на поле и нормальная оценка уже достаточны.
+          return award.matches >= 10 && award.averageRating >= 6.0;
         default:
           return true;
       }
@@ -1602,11 +1599,6 @@ class Career {
               totalSeasonMatches;
 
     final seasonRating = totalSeasonRating ?? 0;
-    if (totalSeasonMatches >= 15 &&
-        seasonRating >= 7.5 &&
-        totalSeasonGoals + totalSeasonAssists >= 15) {
-      achievements.add('Лучший игрок сезона');
-    }
     if (player.age <= 21 && totalSeasonMatches >= 15 && seasonRating >= 7.0) {
       achievements.add('Лучший молодой игрок сезона');
     }
@@ -1636,7 +1628,6 @@ class Career {
     final awardNews = achievements
         .where(
           (item) =>
-              item == 'Лучший игрок сезона' ||
               item == 'Лучший молодой игрок сезона' ||
               item == 'В сборной сезона' ||
               item == 'Лучший ассистент' ||

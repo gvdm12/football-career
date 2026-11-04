@@ -647,7 +647,6 @@ class AppStrings {
       'Бомбардир сезона': 'Top Scorer of the Season',
       'Лучший бомбардир': 'Top Scorer',
       'Лучший ассистент': 'Top Assister',
-      'Лучший игрок сезона': 'Player of the Season',
       'Лучший молодой игрок сезона': 'Best Young Player',
       'В сборной сезона': 'Team of the Season',
     };
