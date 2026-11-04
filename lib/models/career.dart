@@ -84,14 +84,22 @@ class Career {
   bool get isInjured =>
       !settings.playWithoutInjuries && injuryMatchesRemaining > 0;
 
-  bool get canChangeClub =>
-      !settings.limitTransfersToFiveYears ||
-      lastClubChangeSeason == 0 ||
-      season - lastClubChangeSeason >= 5;
+  // Стартовый клуб считается первым клубом карьеры: при включённом
+  // ограничении первая смена клуба доступна только в 5-м сезоне.
+  // После каждого реального перехода отсчёт пяти сезонов начинается заново.
+  bool get canChangeClub {
+    if (!settings.limitTransfersToFiveYears) return true;
+    if (lastClubChangeSeason <= 0) return season >= 5;
+    return season - lastClubChangeSeason >= 5;
+  }
 
-  int get seasonsUntilClubChange => canChangeClub
-      ? 0
-      : (5 - (season - lastClubChangeSeason)).clamp(0, 5).toInt();
+  int get seasonsUntilClubChange {
+    if (canChangeClub) return 0;
+    final seasonsPassed = lastClubChangeSeason <= 0
+        ? season
+        : season - lastClubChangeSeason;
+    return (5 - seasonsPassed).clamp(0, 5).toInt();
+  }
 
   Player get playerForMatch {
     var skills = player.skills;
