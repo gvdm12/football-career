@@ -23,7 +23,7 @@ class CareerObjective {
     this.completed = false,
   });
 
-  double get progressRatio => target <= 0 ? 0 : (progress / target).clamp(0.0, 1.0);
+  double get progressRatio => target <= 0 ? 0 : (progress / target).clamp(0.0, 1.0).toDouble();
 
   CareerObjective updateProgress(int value) {
     final nextProgress = value.clamp(0, target).toInt();
@@ -63,9 +63,9 @@ class CareerObjective {
       ),
       title: json['title'] as String? ?? '',
       description: json['description'] as String? ?? '',
-      target: ((json['target'] as num?)?.toInt() ?? 1).clamp(1, 999),
-      progress: ((json['progress'] as num?)?.toInt() ?? 0).clamp(0, 999),
-      reward: ((json['reward'] as num?)?.toInt() ?? 0).clamp(0, 10000000),
+      target: ((json['target'] as num?)?.toInt() ?? 1).clamp(1, 999).toInt(),
+      progress: ((json['progress'] as num?)?.toInt() ?? 0).clamp(0, 999).toInt(),
+      reward: ((json['reward'] as num?)?.toInt() ?? 0).clamp(0, 10000000).toInt(),
       completed: json['completed'] as bool? ?? false,
     );
   }
