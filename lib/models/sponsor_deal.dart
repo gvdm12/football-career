@@ -26,7 +26,7 @@ class SponsorOffer {
     brand: json['brand'] as String? ?? 'Sponsor',
     paymentPerSeason: (json['paymentPerSeason'] as num?)?.toInt() ?? 0,
     signingBonus: (json['signingBonus'] as num?)?.toInt() ?? 0,
-    contractYears: ((json['contractYears'] as num?)?.toInt() ?? 1).clamp(1, 3),
+    contractYears: ((json['contractYears'] as num?)?.toInt() ?? 1).clamp(1, 3).toInt(),
   );
 }
 
@@ -51,7 +51,7 @@ class SponsorContract {
   );
 
   int payoutForSeason(int goals) =>
-      paymentPerSeason + (goals.clamp(0, 25) * goalBonus);
+      paymentPerSeason + (goals.clamp(0, 25).toInt() * goalBonus);
 
   Map<String, dynamic> toJson() => {
     'brand': brand,
@@ -63,7 +63,7 @@ class SponsorContract {
   factory SponsorContract.fromJson(Map<String, dynamic> json) => SponsorContract(
     brand: json['brand'] as String? ?? 'Sponsor',
     paymentPerSeason: (json['paymentPerSeason'] as num?)?.toInt() ?? 0,
-    seasonsRemaining: ((json['seasonsRemaining'] as num?)?.toInt() ?? 1).clamp(0, 3),
+    seasonsRemaining: ((json['seasonsRemaining'] as num?)?.toInt() ?? 1).clamp(0, 3).toInt(),
     goalBonus: (json['goalBonus'] as num?)?.toInt() ?? 0,
   );
 }
