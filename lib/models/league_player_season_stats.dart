@@ -217,34 +217,89 @@ class LeaguePlayerStatsService {
       }
     }
 
-    const targetCounts = <PlayerPosition, int>{
-      PlayerPosition.goalkeeper: 2,
-      PlayerPosition.defender: 6,
-      PlayerPosition.midfielder: 6,
-      PlayerPosition.forward: 5,
-    };
-    final clubStrength = _clubStrength(club);
-    final usedNames = result.map((item) => item.playerName).toSet();
-    final generatedNames = List<String>.from(_names)..shuffle(random);
+    // Если для клуба уже задан реальный состав, не добавляем к нему
+    // вымышленных футболистов. Генерация применяется только к клубам
+    // без базы реальных игроков.
+    if (real == null || real.values.every((players) => players.isEmpty)) {
+      const targetCounts = <PlayerPosition, int>{
+        PlayerPosition.goalkeeper: 2,
+        PlayerPosition.defender: 6,
+        PlayerPosition.midfielder: 6,
+        PlayerPosition.forward: 5,
+      };
+      final clubStrength = _clubStrength(club);
+      final usedNames = result.map((item) => item.playerName).toSet();
+      final generatedNames = List<String>.from(_names)..shuffle(random);
 
-    for (final entry in targetCounts.entries) {
-      final existing = result.where((item) => item.position == entry.key).length;
-      for (var index = existing; index < entry.value; index++) {
-        final name = generatedNames.firstWhere(
-          (candidate) => !usedNames.contains(candidate),
-        );
-        usedNames.add(name);
-        final delta = random.nextInt(15) - 7;
-        result.add(LeaguePlayerSeasonStats(
-          playerName: name,
-          club: club,
-          position: entry.key,
-          age: 18 + random.nextInt(17),
-          overall: (clubStrength + delta).clamp(48, 92).toInt(),
-        ));
+      for (final entry in targetCounts.entries) {
+        final existing =
+            result.where((item) => item.position == entry.key).length;
+        for (var index = existing; index < entry.value; index++) {
+          final name = generatedNames.firstWhere(
+            (candidate) => !usedNames.contains(candidate),
+          );
+          usedNames.add(name);
+          final delta = random.nextInt(15) - 7;
+          result.add(LeaguePlayerSeasonStats(
+            playerName: name,
+            club: club,
+            position: entry.key,
+            age: 18 + random.nextInt(17),
+            overall: (clubStrength + delta).clamp(48, 92).toInt(),
+          ));
+        }
       }
     }
     return result;
+  }
+
+  /// Синхронизирует сохранённый список со всеми реальными игроками клуба.
+  /// Также очищает случайных футболистов из старых сохранений.
+  static void _syncRealRosters(
+    List<LeaguePlayerSeasonStats> players,
+    Iterable<String> clubs,
+  ) {
+    for (final club in clubs) {
+      final realSquad = RealClubSquads.squads[club];
+      if (realSquad == null ||
+          realSquad.values.every((items) => items.isEmpty)) {
+        continue;
+      }
+
+      final realPlayers = <String, ({RealClubPlayer player, PlayerPosition position})>{};
+      for (final group in realSquad.entries) {
+        final position = PlayerPosition.values.firstWhere(
+          (value) => value.name == group.key,
+          orElse: () => PlayerPosition.forward,
+        );
+        for (final realPlayer in group.value) {
+          realPlayers['${realPlayer.name}|$club'] =
+              (player: realPlayer, position: position);
+        }
+      }
+
+      players.removeWhere(
+        (item) =>
+            item.club == club &&
+            !realPlayers.containsKey('${item.playerName}|$club'),
+      );
+
+      for (final entry in realPlayers.entries) {
+        final key = entry.key;
+        final data = entry.value;
+        final exists = players.any(
+          (item) => '${item.playerName}|${item.club}' == key,
+        );
+        if (exists) continue;
+        players.add(LeaguePlayerSeasonStats(
+          playerName: data.player.name,
+          club: club,
+          position: data.position,
+          age: data.player.age,
+          overall: data.player.overall,
+        ));
+      }
+    }
   }
 
   static int _clubStrength(String club) {
@@ -295,6 +350,10 @@ class LeaguePlayerStatsService {
         players.addAll(_createRoster(club, season));
       }
     }
+
+    // Обновляем реальные составы даже в уже существующих сохранениях:
+    // старые случайно сгенерированные имена удаляются, реальные добавляются.
+    _syncRealRosters(players, clubs);
 
     final totalRounds = fixtures.fold<int>(
       0,
