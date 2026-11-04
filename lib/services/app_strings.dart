@@ -643,6 +643,8 @@ class AppStrings {
       'Лига Европы': 'Europa League',
       'Лига чемпионов': 'Champions League',
       'Золотая бутса': 'Golden Boot',
+      'Золотой мяч': 'Ballon d’Or',
+      'Бомбардир сезона': 'Top Scorer of the Season',
       'Лучший бомбардир': 'Top Scorer',
       'Лучший ассистент': 'Top Assister',
       'Лучший игрок сезона': 'Player of the Season',
