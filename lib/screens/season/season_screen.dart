@@ -1097,7 +1097,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
           backgroundColor: Colors.transparent,
           surfaceTintColor: Colors.transparent,
           elevation: 0,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 24,
+          ),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 340, maxHeight: 390),
@@ -1112,10 +1115,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
                         width: 48,
                         height: 48,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFD54F).withValues(alpha: 0.13),
+                          color: const Color(
+                            0xFFFFD54F,
+                          ).withValues(alpha: 0.13),
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: const Color(0xFFFFD54F).withValues(alpha: 0.45),
+                            color: const Color(
+                              0xFFFFD54F,
+                            ).withValues(alpha: 0.45),
                           ),
                         ),
                         child: const Icon(
@@ -1164,7 +1171,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
                         textAlign: TextAlign.center,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: Colors.white70, fontSize: 11),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 11,
+                        ),
                       ),
                       const SizedBox(height: 14),
                       Wrap(
@@ -1172,10 +1182,22 @@ class _SeasonScreenState extends State<SeasonScreen> {
                         spacing: 8,
                         runSpacing: 8,
                         children: [
-                          _awardStat(isEnglish ? 'MATCHES' : 'МАТЧИ', award.matches.toString()),
-                          _awardStat(isEnglish ? 'GOALS' : 'ГОЛЫ', award.goals.toString()),
-                          _awardStat(isEnglish ? 'ASSISTS' : 'АССИСТЫ', award.assists.toString()),
-                          _awardStat(isEnglish ? 'RATING' : 'ОЦЕНКА', award.averageRating.toStringAsFixed(1)),
+                          _awardStat(
+                            isEnglish ? 'MATCHES' : 'МАТЧИ',
+                            award.matches.toString(),
+                          ),
+                          _awardStat(
+                            isEnglish ? 'GOALS' : 'ГОЛЫ',
+                            award.goals.toString(),
+                          ),
+                          _awardStat(
+                            isEnglish ? 'ASSISTS' : 'АССИСТЫ',
+                            award.assists.toString(),
+                          ),
+                          _awardStat(
+                            isEnglish ? 'RATING' : 'ОЦЕНКА',
+                            award.averageRating.toStringAsFixed(1),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 14),
@@ -1193,7 +1215,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
                           ),
                           child: Text(
                             isEnglish ? 'Continue' : 'Продолжить',
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ),
@@ -1206,7 +1231,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
         );
       },
       transitionBuilder: (context, animation, secondaryAnimation, child) {
-        final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+        final curved = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+        );
         return FadeTransition(
           opacity: curved,
           child: ScaleTransition(
@@ -1433,10 +1461,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Widget _buildMatchGlassSurface({required Widget child, double radius = 18}) {
     // Оставляем только скругление: календарю больше не нужен blur/backdrop.
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
-      child: child,
-    );
+    return ClipRRect(borderRadius: BorderRadius.circular(radius), child: child);
   }
 
   Widget _buildLiquidGlassSurface({required Widget child, double radius = 24}) {
@@ -2775,9 +2800,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
       final ballonDorAwards = seasonAwards
           .where((award) => award.category == 'Золотой мяч')
           .toList();
-      final ballonDorAward =
-          ballonDorAwards.isEmpty ? null : ballonDorAwards.first;
-      final wonBallonDor = ballonDorAward != null &&
+      final ballonDorAward = ballonDorAwards.isEmpty
+          ? null
+          : ballonDorAwards.first;
+      final wonBallonDor =
+          ballonDorAward != null &&
           ballonDorAward.isCareerPlayer &&
           ballonDorAward.playerName == career.player.name &&
           ballonDorAward.club == career.player.club;
@@ -2795,7 +2822,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
             season: career.season,
             matchNumber: 0,
             title: 'Золотой мяч: ${ballonDorAward.playerName}',
-            description: '${ballonDorAward.club} · голы: ${ballonDorAward.goals}, ассисты: ${ballonDorAward.assists}, средняя оценка: ${ballonDorAward.averageRating.toStringAsFixed(2)}.',
+            description:
+                '${ballonDorAward.club} · голы: ${ballonDorAward.goals}, ассисты: ${ballonDorAward.assists}, средняя оценка: ${ballonDorAward.averageRating.toStringAsFixed(2)}.',
             type: CareerNewsType.achievement,
           ),
         for (final award in careerAwards.where(
@@ -2806,7 +2834,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
             season: career.season,
             matchNumber: 0,
             title: '${award.category}: ${career.player.name}',
-            description: '${award.club} · матчи: ${award.matches}, голы: ${award.goals}, ассисты: ${award.assists}, средняя оценка: ${award.averageRating.toStringAsFixed(2)}.',
+            description:
+                '${award.club} · матчи: ${award.matches}, голы: ${award.goals}, ассисты: ${award.assists}, средняя оценка: ${award.averageRating.toStringAsFixed(2)}.',
             type: CareerNewsType.achievement,
           ),
       ];
@@ -3687,7 +3716,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
                             padding: const EdgeInsets.all(16),
                             children: [
                               _buildProgressCard(),
-                              if (career.friendlyMatches.any((item) => !item.isResolved)) ...[
+                              if (career.friendlyMatches.any(
+                                (item) => !item.isResolved,
+                              )) ...[
                                 const SizedBox(height: 10),
                                 _buildFriendlyMatchesSection(),
                               ],
@@ -3817,14 +3848,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 const SizedBox(width: 10),
                 Image.asset(
                   league.logoAsset,
-                  width: 40,
-                  height: 40,
+                  width: 35,
+                  height: 35,
                   fit: BoxFit.contain,
                 ),
               ],
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
@@ -5336,10 +5367,17 @@ class _SeasonScreenState extends State<SeasonScreen> {
       await _openWorldCup();
       return;
     }
-    if (isSaving || seasonFinishing || friendly.isResolved || career.isInjured) {
+    if (isSaving ||
+        seasonFinishing ||
+        friendly.isResolved ||
+        career.isInjured) {
       if (career.isInjured && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Из-за травмы вы не можете сыграть товарищеский матч.')),
+          const SnackBar(
+            content: Text(
+              'Из-за травмы вы не можете сыграть товарищеский матч.',
+            ),
+          ),
         );
       }
       return;
@@ -5358,20 +5396,29 @@ class _SeasonScreenState extends State<SeasonScreen> {
     );
     if (!mounted || playedMatch == null) return;
 
-    final expectedHome = friendly.isHome ? career.player.club : friendly.opponent;
-    final expectedAway = friendly.isHome ? friendly.opponent : career.player.club;
-    if (playedMatch.homeTeam != expectedHome || playedMatch.awayTeam != expectedAway) {
+    final expectedHome = friendly.isHome
+        ? career.player.club
+        : friendly.opponent;
+    final expectedAway = friendly.isHome
+        ? friendly.opponent
+        : career.player.club;
+    if (playedMatch.homeTeam != expectedHome ||
+        playedMatch.awayTeam != expectedAway) {
       return;
     }
 
-    final updatedFriendlies = career.friendlyMatches.map((item) =>
-      item.number == friendly.number ? item.copyWith(result: playedMatch) : item
-    ).toList();
+    final updatedFriendlies = career.friendlyMatches
+        .map(
+          (item) => item.number == friendly.number
+              ? item.copyWith(result: playedMatch)
+              : item,
+        )
+        .toList();
     final trustChange = playedMatch.playerRating >= 8.0
         ? 2
         : playedMatch.playerRating <= 5.8
-            ? -1
-            : 0;
+        ? -1
+        : 0;
     final resultForPlayer = friendly.isHome
         ? '${playedMatch.homeGoals} : ${playedMatch.awayGoals}'
         : '${playedMatch.awayGoals} : ${playedMatch.homeGoals}';
@@ -5380,7 +5427,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
       season: career.season,
       matchNumber: -friendly.number,
       title: 'Предсезонный матч завершён',
-      description: '${career.player.club} — ${friendly.opponent}: $resultForPlayer. Оценка игрока: ${playedMatch.playerRating.toStringAsFixed(1)}.',
+      description:
+          '${career.player.club} — ${friendly.opponent}: $resultForPlayer. Оценка игрока: ${playedMatch.playerRating.toStringAsFixed(1)}.',
       type: CareerNewsType.match,
     );
 
@@ -5416,19 +5464,21 @@ class _SeasonScreenState extends State<SeasonScreen> {
     final score = result == null
         ? '— : —'
         : friendly.isHome
-            ? '${result.homeGoals} : ${result.awayGoals}'
-            : '${result.awayGoals} : ${result.homeGoals}';
+        ? '${result.homeGoals} : ${result.awayGoals}'
+        : '${result.awayGoals} : ${result.homeGoals}';
     final resultColor = result == null
         ? Colors.white54
         : (friendly.isHome
-                ? result.homeGoals.compareTo(result.awayGoals)
-                : result.awayGoals.compareTo(result.homeGoals)) > 0
-            ? const Color(0xFF8BE07F)
-            : (friendly.isHome
-                    ? result.homeGoals.compareTo(result.awayGoals)
-                    : result.awayGoals.compareTo(result.homeGoals)) < 0
-                ? Colors.redAccent
-                : Colors.orangeAccent;
+                  ? result.homeGoals.compareTo(result.awayGoals)
+                  : result.awayGoals.compareTo(result.homeGoals)) >
+              0
+        ? const Color(0xFF8BE07F)
+        : (friendly.isHome
+                  ? result.homeGoals.compareTo(result.awayGoals)
+                  : result.awayGoals.compareTo(result.homeGoals)) <
+              0
+        ? Colors.redAccent
+        : Colors.orangeAccent;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
