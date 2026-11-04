@@ -3667,8 +3667,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                             padding: const EdgeInsets.all(16),
                             children: [
                               _buildProgressCard(),
-                              if (!worldCupBlocksSeason &&
-                                  career.friendlyMatches.any((item) => !item.isResolved)) ...[
+                              if (career.friendlyMatches.any((item) => !item.isResolved)) ...[
                                 const SizedBox(height: 10),
                                 _buildFriendlyMatchesSection(),
                               ],

@@ -84,8 +84,7 @@ class Career {
   bool get canChangeClub =>
       !settings.limitTransfersToFiveYears ||
       lastClubChangeSeason == 0 ||
-      season - lastClubChangeSeason >= 5 ||
-      contractYears <= 0;
+      season - lastClubChangeSeason >= 5;
 
   int get seasonsUntilClubChange => canChangeClub
       ? 0
@@ -984,7 +983,7 @@ class Career {
           nextDurations[skillName] = remaining;
         }
       }
-      updatedCareer = copyWith(
+      updatedCareer = updatedCareer.copyWith(
         temporarySkillBoosts: nextBoosts,
         temporarySkillBoostMatches: nextDurations,
       );

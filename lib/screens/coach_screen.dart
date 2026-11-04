@@ -197,8 +197,12 @@ class _CoachScreenState extends State<CoachScreen> {
                     icon: const Icon(Icons.forum_outlined, size: 17),
                     label: Text(
                       _canTalk
-                          ? 'Переговоры с тренером'
-                          : 'Новый разговор через ${(7 - (career.teamMatches - career.lastCoachNegotiationTeamMatch)).clamp(0, 7)} матчей команды',
+                          ? (AppStrings.isEnglish
+                              ? 'Talk to coach'
+                              : 'Переговоры с тренером')
+                          : (AppStrings.isEnglish
+                              ? 'Next talk in ${(7 - (career.teamMatches - career.lastCoachNegotiationTeamMatch)).clamp(0, 7)} team matches'
+                              : 'Новый разговор через ${(7 - (career.teamMatches - career.lastCoachNegotiationTeamMatch)).clamp(0, 7)} матчей команды'),
                     ),
                   ),
                 ),

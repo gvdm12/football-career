@@ -85,6 +85,7 @@ void main() {
 
       expect(career.canChangeClub, isFalse);
       expect(career.seasonsUntilClubChange, 2);
+      expect(career.copyWith(contractYears: 0).canChangeClub, isFalse);
       expect(career.copyWith(season: 6).canChangeClub, isTrue);
     });
 
