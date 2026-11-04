@@ -696,6 +696,40 @@ class Career {
       season: currentSeason,
       existing: normalizedRivals,
     );
+    final restoredObjectives = readList('objectives', CareerObjective.fromJson);
+    final restoredSponsorOffers = readList('sponsorOffers', SponsorOffer.fromJson);
+    final rawSponsorContract = json['sponsorContract'];
+    final restoredSponsorContract = rawSponsorContract is Map
+        ? SponsorContract.fromJson(Map<String, dynamic>.from(rawSponsorContract))
+        : null;
+    final restoredAgentInterests = (json['agentInterestedClubs'] as List?)
+        ?.whereType<String>().toList() ?? const <String>[];
+    final restoredNews = readList('news', CareerNews.fromJson);
+    final migratedSponsorOffers = restoredSponsorOffers.isEmpty && restoredSponsorContract == null
+        ? _createSponsorOffers(loadedPlayer, currentSeason)
+        : restoredSponsorOffers;
+    final migrationNews = <CareerNews>[
+      if (restoredSponsorOffers.isEmpty && restoredSponsorContract == null)
+        for (final offer in migratedSponsorOffers)
+          CareerNews(
+            id: 'sponsor_offer_${offer.id}',
+            season: currentSeason,
+            matchNumber: -1,
+            title: 'Новое предложение от ${offer.brand}',
+            description: '${offer.brand} предлагает €${offer.paymentPerSeason} за сезон, бонус €${offer.signingBonus} и контракт на ${offer.contractYears} сезона. Обсудите предложение с агентом.',
+            type: CareerNewsType.sponsor,
+          ),
+      for (final club in restoredAgentInterests.take(2))
+        if (!restoredNews.any((item) => item.id == 'rumor_s${currentSeason}_${club.hashCode}'))
+          CareerNews(
+            id: 'rumor_s${currentSeason}_${club.hashCode}',
+            season: currentSeason,
+            matchNumber: -1,
+            title: 'Трансферные слухи: интерес со стороны ${club}',
+            description: 'Скауты клуба следят за вашими последними выступлениями. Официального предложения пока нет.',
+            type: CareerNewsType.rumor,
+          ),
+    ];
 
     // Миграция старых сохранений: удаляем индивидуальные награды,
     // которые ранее могли выдаваться без реальных сезонных показателей.
@@ -815,25 +849,21 @@ class Career {
       leagueTable: leagueTable,
       money: (json['money'] as num?)?.toInt() ?? 0,
       agentCredits: (json['agentCredits'] as num?)?.toInt() ?? 0,
-      agentInterestedClubs:
-          (json['agentInterestedClubs'] as List?)
-              ?.whereType<String>()
-              .toList() ??
-          const [],
+      agentInterestedClubs: restoredAgentInterests,
       lastTransferInterestConferenceSeason:
           (json['lastTransferInterestConferenceSeason'] as num?)?.toInt() ?? 0,
       contractYears: (json['contractYears'] as num?)?.toInt() ?? 0,
       developmentPoints: (json['developmentPoints'] as num?)?.toInt() ?? 0,
       seasonMatches: seasonMatches,
       leagueMatches: leagueMatches,
-      news: readList('news', CareerNews.fromJson),
-      objectives: readList('objectives', CareerObjective.fromJson),
+      news: [...restoredNews, ...migrationNews],
+      objectives: restoredObjectives.isNotEmpty
+          ? restoredObjectives
+          : _createSeasonObjectives(loadedPlayer, currentSeason),
       recentMatchRatings: ((json['recentMatchRatings'] as List?) ?? const [])
           .whereType<num>().map((value) => value.toDouble()).toList().take(5).toList(),
-      sponsorOffers: readList('sponsorOffers', SponsorOffer.fromJson),
-      sponsorContract: json['sponsorContract'] is Map
-          ? SponsorContract.fromJson(Map<String, dynamic>.from(json['sponsorContract'] as Map))
-          : null,
+      sponsorOffers: migratedSponsorOffers,
+      sponsorContract: restoredSponsorContract,
       rivals: restoredRivals,
       coachTrust: ((json['coachTrust'] as num?)?.toInt() ?? 65)
           .clamp(0, 100)
