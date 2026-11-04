@@ -92,6 +92,71 @@ class SeasonAwardService {
       );
     }
 
+    // Игроки всех реальных составов участвуют во всех сезонных наградах,
+    // а не только в гонке за «Золотой мяч».
+    final knownCandidateKeys = candidates
+        .map((item) => '${item.name}|${item.club}')
+        .toSet();
+    for (final clubEntry in RealClubSquads.squads.entries) {
+      final clubLeague = Clubs.leagueOf(clubEntry.key);
+      final seasonMatches = clubLeague?.matchesPerSeason ?? 34;
+      for (final group in clubEntry.value.entries) {
+        final position = switch (group.key) {
+          'goalkeeper' => PlayerPosition.goalkeeper,
+          'defender' => PlayerPosition.defender,
+          'midfielder' => PlayerPosition.midfielder,
+          _ => PlayerPosition.forward,
+        };
+        for (final realPlayer in group.value) {
+          final key = '${realPlayer.name}|${clubEntry.key}';
+          if (!knownCandidateKeys.add(key)) continue;
+          final random = Random(seedFor('$season|$key'));
+          final matches = (seasonMatches - random.nextInt(12))
+              .clamp(20, seasonMatches)
+              .toInt();
+          final rating = (6.4 +
+                  (realPlayer.overall - 70) * 0.06 +
+                  random.nextDouble() * 0.45)
+              .clamp(6.2, 8.95)
+              .toDouble();
+          final goals = switch (position) {
+            PlayerPosition.forward =>
+              ((realPlayer.overall - 65) * 0.75 + random.nextInt(12))
+                  .round().clamp(0, 45).toInt(),
+            PlayerPosition.midfielder =>
+              ((realPlayer.overall - 65) * 0.34 + random.nextInt(8))
+                  .round().clamp(0, 28).toInt(),
+            PlayerPosition.defender => random.nextInt(6),
+            PlayerPosition.goalkeeper => 0,
+          };
+          final assists = switch (position) {
+            PlayerPosition.forward =>
+              ((realPlayer.overall - 65) * 0.30 + random.nextInt(10))
+                  .round().clamp(0, 25).toInt(),
+            PlayerPosition.midfielder =>
+              ((realPlayer.overall - 65) * 0.60 + random.nextInt(12))
+                  .round().clamp(0, 32).toInt(),
+            PlayerPosition.defender => random.nextInt(10),
+            PlayerPosition.goalkeeper => 0,
+          };
+          candidates.add(
+            _Candidate(
+              name: realPlayer.name,
+              club: clubEntry.key,
+              position: position,
+              age: realPlayer.age,
+              matches: matches,
+              goals: goals,
+              assists: assists,
+              rating: rating,
+              isCareerPlayer: false,
+              wonTrophy: trophyWinningClubs.contains(clubEntry.key),
+            ),
+          );
+        }
+      }
+    }
+
     // Игрок карьеры участвует на тех же условиях, но его статистика берётся
     // из реальных матчей карьеры, а не из искусственно смоделированного состава.
     if (seasonStats.matches > 0) {
@@ -120,6 +185,17 @@ class SeasonAwardService {
     final positions = <String, int>{
       for (var i = 0; i < sortedTable.length; i++) sortedTable[i].club: i + 1,
     };
+    for (final entry in worldLeagueStandings.entries) {
+      final standings = [...entry.value]
+        ..sort(
+          (a, b) => b.points != a.points
+              ? b.points.compareTo(a.points)
+              : b.goalDifference.compareTo(a.goalDifference),
+        );
+      for (var index = 0; index < standings.length; index++) {
+        positions[standings[index].club] = index + 1;
+      }
+    }
 
     // Индивидуальная результативность и оценка имеют основной вес.
     // Позиция клуба даёт небольшой контекстный бонус, как в реальных премиях.
@@ -223,6 +299,7 @@ class SeasonAwardService {
         .where(
           (item) =>
               goldenBootThreshold > 0 &&
+              Clubs.leagueOf(item.club) == playerLeague &&
               item.matches >= 10 &&
               item.goals >= goldenBootThreshold,
         )
@@ -247,6 +324,7 @@ class SeasonAwardService {
         .where(
           (item) =>
               bestAssisterThreshold > 0 &&
+              Clubs.leagueOf(item.club) == playerLeague &&
               item.matches >= 10 &&
               item.assists >= bestAssisterThreshold,
         )
