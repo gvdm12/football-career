@@ -608,9 +608,13 @@ class Career {
               award.averageRating >= 7.8 &&
               award.goals + award.assists >= 40;
         case 'Лучший бомбардир':
-          return award.matches >= 10 && award.goals > 0;
+          final goalThreshold =
+              Clubs.leagueOf(award.club)?.goldenBootGoalThreshold ?? 999;
+          return award.matches >= 10 && award.goals >= goalThreshold;
         case 'Лучший ассистент':
-          return award.matches >= 10 && award.assists > 0;
+          final assistThreshold =
+              Clubs.leagueOf(award.club)?.bestAssisterThreshold ?? 999;
+          return award.matches >= 10 && award.assists >= assistThreshold;
         default:
           return true;
       }
