@@ -155,11 +155,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     );
     var homeExpectedGoals = expectedGoals.home;
     var awayExpectedGoals = expectedGoals.away;
-    final difficultyShift = switch (widget.career.settings.difficulty.name) {
-      'easy' => 0.12,
-      'hard' => -0.12,
-      _ => 0.0,
-    };
+    final difficultyShift =
+        widget.career.settings.difficulty.matchExpectedGoalsShift;
     if (widget.isHome) {
       homeExpectedGoals += difficultyShift;
       awayExpectedGoals -= difficultyShift * 0.55;
@@ -1130,7 +1127,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           (0.76 +
                   (_player.skills.shooting - 70) * 0.0035 +
                   (_player.skills.vision - 70) * 0.001 +
-                  _skillTierBonus(_skill('shoot')) * 0.45)
+                  _skillTierBonus(_skill('shoot')) * 0.45 +
+                  widget.career.settings.difficulty.interactiveActionAdjustment)
               .clamp(0.62, 0.97);
       final scored = _random.nextDouble() < penaltyChance;
       String penaltyMessage;
@@ -1183,7 +1181,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     final opponentDefence = widget.isHome ? _awayStrength : _homeStrength;
     // Сила обороны соперника — доступный в текущей модели командный proxy:
     // сильная команда лучше закрывает линии передач и пространство для дриблинга.
-    final defensivePressure = (opponentDefence - 70) * 0.0018;
+    final defensivePressure =
+        (opponentDefence - 70) *
+        0.0018 *
+        widget.career.settings.difficulty.opponentPressureMultiplier;
 
     // Для каждого действия используется профильный навык.
     // Удар головой зависит прежде всего от heading, а не от shooting.
@@ -1297,11 +1298,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         matchProgress * (0.105 - _player.skills.physical * 0.00075)
             .clamp(0.025, 0.075)
             .toDouble();
-    final difficultyAdjustment = switch (widget.career.settings.difficulty.name) {
-      'easy' => 0.035,
-      'hard' => -0.035,
-      _ => 0.0,
-    };
+    final difficultyAdjustment =
+        widget.career.settings.difficulty.interactiveActionAdjustment;
     final adjustedChance =
         (chance - fatiguePenalty + difficultyAdjustment).clamp(0.20, 0.98).toDouble();
     final success = _random.nextDouble() < adjustedChance;
