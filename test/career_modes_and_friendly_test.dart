@@ -2,6 +2,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/career_settings.dart';
 import 'package:flutter_football/models/friendly_match.dart';
+import 'package:flutter_football/models/league_player_season_stats.dart';
+import 'package:flutter_football/models/league_table.dart';
+import 'package:flutter_football/models/position_rival.dart';
+import 'package:flutter_football/models/season_stats.dart';
+import 'package:flutter_football/services/season_award_service.dart';
+import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/match.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/services/pre_season_service.dart';
@@ -114,6 +120,75 @@ void main() {
       expect(restored.difficulty, CareerDifficulty.hard);
       expect(restored.limitTransfersToFiveYears, isTrue);
       expect(restored.playWithoutInjuries, isTrue);
+    });
+  });
+
+
+  group('Season leader awards', () {
+    test('shows the top scorer and assist leader below former thresholds', () {
+      final player = Player.create(
+        name: 'Career Player',
+        nationality: 'Россия',
+        position: PlayerPosition.forward,
+        club: 'Real Madrid',
+      );
+      final awards = SeasonAwardService.create(
+        season: 1,
+        player: player,
+        seasonStats: const SeasonStats(
+          season: 1,
+          club: 'Real Madrid',
+          matches: 0,
+          goals: 0,
+          assists: 0,
+          yellowCards: 0,
+          redCards: 0,
+        ),
+        leaguePlayerStats: const [
+          LeaguePlayerSeasonStats(
+            playerName: 'Top Scorer',
+            club: 'Real Madrid',
+            position: PlayerPosition.forward,
+            age: 26,
+            overall: 86,
+            matches: 30,
+            goals: 15,
+            assists: 2,
+            ratingSum: 210,
+          ),
+          LeaguePlayerSeasonStats(
+            playerName: 'Top Assister',
+            club: 'Barcelona',
+            position: PlayerPosition.midfielder,
+            age: 25,
+            overall: 85,
+            matches: 30,
+            goals: 3,
+            assists: 12,
+            ratingSum: 210,
+          ),
+        ],
+        leagueTable: const <LeagueTableEntry>[],
+        rivals: const <PositionRival>[],
+        worldLeagueStandings: const <League, List<LeagueTableEntry>>{},
+      );
+
+      expect(
+        awards.any(
+          (award) =>
+              award.category == 'Лучший бомбардир' &&
+              award.playerName == 'Top Scorer',
+        ),
+        isTrue,
+      );
+      expect(
+        awards.any(
+          (award) =>
+              award.category == 'Лучший ассистент' &&
+              award.playerName == 'Top Assister',
+        ),
+        isTrue,
+      );
     });
   });
 
