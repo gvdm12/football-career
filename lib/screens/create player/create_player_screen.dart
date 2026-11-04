@@ -270,16 +270,10 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
         difficulty: _difficulty,
         limitTransfersToFiveYears: _limitTransfersToFiveYears,
         playWithoutInjuries: _playWithoutInjuries,
-        injuryFrequency: _difficulty == CareerDifficulty.hard
-            ? 1.2
-            : _difficulty == CareerDifficulty.easy
-            ? 0.8
-            : 1.0,
-        developmentSpeed: _difficulty == CareerDifficulty.easy
-            ? 1.15
-            : _difficulty == CareerDifficulty.hard
-            ? 0.85
-            : 1.0,
+        // Сложность не меняет прокачку и отдельную настройку частоты травм.
+        // Разница в травматизме задаётся единым коэффициентом сложности.
+        injuryFrequency: 1.0,
+        developmentSpeed: 1.0,
       ),
     );
 
