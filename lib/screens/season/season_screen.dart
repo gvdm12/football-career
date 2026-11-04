@@ -2989,16 +2989,17 @@ class _SeasonScreenState extends State<SeasonScreen> {
         english: AppStrings.isEnglish,
         clubName: career.player.club,
       );
-      final trustChange = await PressConferenceDialog.show(
+      final conferenceResult = await PressConferenceDialog.show(
         context: context,
         content: transferConference,
         title: AppStrings.pressConferenceTitle,
         skipLabel: AppStrings.skipPressConference,
       );
       if (!mounted) return;
-      if (trustChange != null && trustChange != 0) {
+      if (conferenceResult != null) {
         career = career.copyWith(
-          coachTrust: (career.coachTrust + trustChange).clamp(0, 100).toInt(),
+          coachTrust: (career.coachTrust + conferenceResult.trustChange).clamp(0, 100).toInt(),
+          reputationModifier: career.reputationModifier + conferenceResult.reputationChange,
         );
       }
     }
@@ -3131,13 +3132,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
         lossesInLastFive >= 4 &&
         (previousFive.length < 5 || lossesInPreviousFive < 4);
     final poorSeasonCheckpoint = max(6, (totalMatches * 0.65).round());
+    final poorSeasonProgress = playedBefore + 1;
+    // Окно в несколько матчей защищает событие от перехвата другими вопросами.
     final poorSeason =
-        playedBefore + 1 == poorSeasonCheckpoint &&
+        poorSeasonProgress >= poorSeasonCheckpoint &&
+        poorSeasonProgress <= poorSeasonCheckpoint + 3 &&
         ((updatedCareer.averageRating ?? 6.5) < 6.2 ||
             completedResults
-                    .where(
-                      (item) => item.isPlayerLoss(updatedCareer.player.club),
-                    )
+                    .where((item) => item.isPlayerLoss(updatedCareer.player.club))
                     .length >=
                 (completedResults.length * 0.55).ceil());
 
@@ -3199,19 +3201,16 @@ class _SeasonScreenState extends State<SeasonScreen> {
       english: AppStrings.isEnglish,
       interestedClub: interestedClub,
     );
-    final trustChange = await PressConferenceDialog.show(
+    final conferenceResult = await PressConferenceDialog.show(
       context: context,
       content: content,
       title: AppStrings.pressConferenceTitle,
       skipLabel: AppStrings.skipPressConference,
     );
-
-    if (trustChange == null || trustChange == 0) return updatedCareer;
-
+    if (conferenceResult == null) return updatedCareer;
     return updatedCareer.copyWith(
-      coachTrust: (updatedCareer.coachTrust + trustChange)
-          .clamp(0, 100)
-          .toInt(),
+      coachTrust: (updatedCareer.coachTrust + conferenceResult.trustChange).clamp(0, 100).toInt(),
+      reputationModifier: updatedCareer.reputationModifier + conferenceResult.reputationChange,
     );
   }
 
@@ -3223,15 +3222,16 @@ class _SeasonScreenState extends State<SeasonScreen> {
       category: 'tournament',
       english: AppStrings.isEnglish,
     );
-    final trustChange = await PressConferenceDialog.show(
+    final conferenceResult = await PressConferenceDialog.show(
       context: context,
       content: content,
       title: AppStrings.pressConferenceTitle,
       skipLabel: AppStrings.skipPressConference,
     );
-    if (!mounted || trustChange == null || trustChange == 0) return;
+    if (!mounted || conferenceResult == null) return;
     final updated = career.copyWith(
-      coachTrust: (career.coachTrust + trustChange).clamp(0, 100).toInt(),
+      coachTrust: (career.coachTrust + conferenceResult.trustChange).clamp(0, 100).toInt(),
+      reputationModifier: career.reputationModifier + conferenceResult.reputationChange,
     );
     setState(() => career = updated);
     await _saveCareer(updated);
