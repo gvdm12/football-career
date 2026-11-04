@@ -2053,9 +2053,9 @@ class Career {
         .toList();
 
     final newAge = player.age + 1;
-    final nextSponsorContract = sponsorContract == null
-        ? null
-        : sponsorContract.copyWith(seasonsRemaining: sponsorContract.seasonsRemaining - 1);
+    final nextSponsorContract = sponsorContract?.copyWith(
+      seasonsRemaining: sponsorContract!.seasonsRemaining - 1,
+    );
     final activeSponsor = nextSponsorContract != null && nextSponsorContract.seasonsRemaining > 0
         ? nextSponsorContract
         : null;
