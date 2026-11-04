@@ -2770,6 +2770,27 @@ class _SeasonScreenState extends State<SeasonScreen> {
             award.playerName == career.player.name &&
             award.club == career.player.club,
       );
+      final wonPlayerOfSeason = seasonAwards.any(
+        (award) =>
+            award.category == 'Игрок сезона' &&
+            award.isCareerPlayer &&
+            award.playerName == career.player.name &&
+            award.club == career.player.club,
+      );
+      final wonYoungPlayer = seasonAwards.any(
+        (award) =>
+            award.category == 'Лучший молодой игрок' &&
+            award.isCareerPlayer &&
+            award.playerName == career.player.name &&
+            award.club == career.player.club,
+      );
+      final wonTeamOfSeason = seasonAwards.any(
+        (award) =>
+            award.category == 'Команда года' &&
+            award.isCareerPlayer &&
+            award.playerName == career.player.name &&
+            award.club == career.player.club,
+      );
       final ballonDorAwards = seasonAwards
           .where((award) => award.category == 'Золотой мяч')
           .toList();
@@ -2779,7 +2800,12 @@ class _SeasonScreenState extends State<SeasonScreen> {
           ballonDorAward.isCareerPlayer &&
           ballonDorAward.playerName == career.player.name &&
           ballonDorAward.club == career.player.club;
-      final updatedHistory = (wonGoldenBoot || wonBestAssister || wonBallonDor)
+      final updatedHistory = (wonGoldenBoot ||
+              wonBestAssister ||
+              wonPlayerOfSeason ||
+              wonYoungPlayer ||
+              wonTeamOfSeason ||
+              wonBallonDor)
           ? completedCareer.history.map((stats) {
               if (stats.season != career.season) return stats;
               final achievements = [...stats.achievements];
@@ -2794,6 +2820,18 @@ class _SeasonScreenState extends State<SeasonScreen> {
               if (wonBestAssister &&
                   !achievements.contains('Лучший ассистент')) {
                 achievements.add('Лучший ассистент');
+              }
+              if (wonPlayerOfSeason &&
+                  !achievements.contains('Лучший игрок сезона')) {
+                achievements.add('Лучший игрок сезона');
+              }
+              if (wonYoungPlayer &&
+                  !achievements.contains('Лучший молодой игрок сезона')) {
+                achievements.add('Лучший молодой игрок сезона');
+              }
+              if (wonTeamOfSeason &&
+                  !achievements.contains('В сборной сезона')) {
+                achievements.add('В сборной сезона');
               }
               if (wonBallonDor && !achievements.contains('Золотой мяч')) {
                 achievements.add('Золотой мяч');
@@ -2811,19 +2849,35 @@ class _SeasonScreenState extends State<SeasonScreen> {
               );
             }).toList()
           : completedCareer.history;
-      final awardNews = ballonDorAward == null
-          ? completedCareer.news
-          : [
-              ...completedCareer.news,
-              CareerNews(
-                id: 'ballon_dor_s${career.season}',
-                season: career.season,
-                matchNumber: 0,
-                title: 'Золотой мяч: ${ballonDorAward.playerName}',
-                description: '${ballonDorAward.club} · голы: ${ballonDorAward.goals}, ассисты: ${ballonDorAward.assists}, средняя оценка: ${ballonDorAward.averageRating.toStringAsFixed(2)}.',
-                type: CareerNewsType.achievement,
-              ),
-            ];
+      final careerAwards = seasonAwards.where(
+        (award) =>
+            award.isCareerPlayer &&
+            award.playerName == career.player.name &&
+            award.club == career.player.club,
+      );
+      final awardNews = [
+        ...completedCareer.news,
+        if (ballonDorAward != null)
+          CareerNews(
+            id: 'ballon_dor_s${career.season}',
+            season: career.season,
+            matchNumber: 0,
+            title: 'Золотой мяч: ${ballonDorAward.playerName}',
+            description: '${ballonDorAward.club} · голы: ${ballonDorAward.goals}, ассисты: ${ballonDorAward.assists}, средняя оценка: ${ballonDorAward.averageRating.toStringAsFixed(2)}.',
+            type: CareerNewsType.achievement,
+          ),
+        for (final award in careerAwards.where(
+          (item) => item.category != 'Золотой мяч',
+        ))
+          CareerNews(
+            id: 'season_award_${award.category.replaceAll(' ', '_')}_s${career.season}',
+            season: career.season,
+            matchNumber: 0,
+            title: '${award.category}: ${career.player.name}',
+            description: '${award.club} · матчи: ${award.matches}, голы: ${award.goals}, ассисты: ${award.assists}, средняя оценка: ${award.averageRating.toStringAsFixed(2)}.',
+            type: CareerNewsType.achievement,
+          ),
+      ];
       completedCareer = completedCareer.copyWith(
         seasonAwards: [...completedCareer.seasonAwards, ...seasonAwards],
         history: updatedHistory,
