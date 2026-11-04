@@ -1055,6 +1055,11 @@ class RealClubSquads {
     },
   };
 
+  /// Показывает, что для клуба существует база реального состава.
+  /// Проверка не зависит от того, остались ли игроки после трансферов.
+  static bool hasRealSquad(String clubName) =>
+      _baseSquads.containsKey(clubName);
+
   static final Map<String, Map<String, List<RealClubPlayer>>> squads =
       _copyBaseSquads();
 
