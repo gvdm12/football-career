@@ -1182,10 +1182,11 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     final opponentDefence = widget.isHome ? _awayStrength : _homeStrength;
     // Сила обороны соперника — доступный в текущей модели командный proxy:
     // сильная команда лучше закрывает линии передач и пространство для дриблинга.
-    final defensivePressure =
-        (opponentDefence - 70) *
-        0.0018 *
-        widget.career.settings.difficulty.opponentPressureMultiplier;
+    final baseDefensivePressure = (opponentDefence - 70) * 0.0018;
+    final defensivePressure = baseDefensivePressure >= 0
+        ? baseDefensivePressure *
+              widget.career.settings.difficulty.opponentPressureMultiplier
+        : baseDefensivePressure;
 
     // Для каждого действия используется профильный навык.
     // Удар головой зависит прежде всего от heading, а не от shooting.
