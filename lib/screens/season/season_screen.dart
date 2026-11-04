@@ -2772,27 +2772,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
             award.playerName == career.player.name &&
             award.club == career.player.club,
       );
-      final wonPlayerOfSeason = seasonAwards.any(
-        (award) =>
-            award.category == 'Игрок сезона' &&
-            award.isCareerPlayer &&
-            award.playerName == career.player.name &&
-            award.club == career.player.club,
-      );
-      final wonYoungPlayer = seasonAwards.any(
-        (award) =>
-            award.category == 'Лучший молодой игрок' &&
-            award.isCareerPlayer &&
-            award.playerName == career.player.name &&
-            award.club == career.player.club,
-      );
-      final wonTeamOfSeason = seasonAwards.any(
-        (award) =>
-            award.category == 'Команда года' &&
-            award.isCareerPlayer &&
-            award.playerName == career.player.name &&
-            award.club == career.player.club,
-      );
       final ballonDorAwards = seasonAwards
           .where((award) => award.category == 'Золотой мяч')
           .toList();
@@ -2802,55 +2781,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
           ballonDorAward.isCareerPlayer &&
           ballonDorAward.playerName == career.player.name &&
           ballonDorAward.club == career.player.club;
-      final updatedHistory = (wonGoldenBoot ||
-              wonBestAssister ||
-              wonPlayerOfSeason ||
-              wonYoungPlayer ||
-              wonTeamOfSeason ||
-              wonBallonDor)
-          ? completedCareer.history.map((stats) {
-              if (stats.season != career.season) return stats;
-              final achievements = [...stats.achievements];
-              if (wonGoldenBoot) {
-                if (!achievements.contains('Золотая бутса')) {
-                  achievements.add('Золотая бутса');
-                }
-                if (!achievements.contains('Бомбардир сезона')) {
-                  achievements.add('Бомбардир сезона');
-                }
-              }
-              if (wonBestAssister &&
-                  !achievements.contains('Лучший ассистент')) {
-                achievements.add('Лучший ассистент');
-              }
-              if (wonPlayerOfSeason &&
-                  !achievements.contains('Лучший игрок сезона')) {
-                achievements.add('Лучший игрок сезона');
-              }
-              if (wonYoungPlayer &&
-                  !achievements.contains('Лучший молодой игрок сезона')) {
-                achievements.add('Лучший молодой игрок сезона');
-              }
-              if (wonTeamOfSeason &&
-                  !achievements.contains('В сборной сезона')) {
-                achievements.add('В сборной сезона');
-              }
-              if (wonBallonDor && !achievements.contains('Золотой мяч')) {
-                achievements.add('Золотой мяч');
-              }
-              return SeasonStats(
-                season: stats.season,
-                club: stats.club,
-                matches: stats.matches,
-                goals: stats.goals,
-                assists: stats.assists,
-                yellowCards: stats.yellowCards,
-                redCards: stats.redCards,
-                averageRating: stats.averageRating,
-                achievements: achievements,
-              );
-            }).toList()
-          : completedCareer.history;
       final careerAwards = seasonAwards.where(
         (award) =>
             award.isCareerPlayer &&
@@ -2882,7 +2812,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
       ];
       completedCareer = completedCareer.copyWith(
         seasonAwards: [...completedCareer.seasonAwards, ...seasonAwards],
-        history: updatedHistory,
         news: awardNews,
         agentCredits:
             completedCareer.agentCredits +
