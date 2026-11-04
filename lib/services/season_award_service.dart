@@ -49,6 +49,14 @@ class SeasonAwardService {
     };
     final candidates = <_Candidate>[];
 
+    int seedFor(String value) {
+      var seed = 17;
+      for (final unit in value.codeUnits) {
+        seed = (seed * 31 + unit) & 0x7fffffff;
+      }
+      return seed;
+    }
+
     for (final item in leaguePlayerStats) {
       if (item.matches == 0) continue;
       if (item.club == player.club &&
@@ -420,14 +428,6 @@ class SeasonAwardService {
     final knownPlayers = ballonCandidates
         .map((item) => '${item.name}|${item.club}')
         .toSet();
-
-    int seedFor(String value) {
-      var seed = 17;
-      for (final unit in value.codeUnits) {
-        seed = (seed * 31 + unit) & 0x7fffffff;
-      }
-      return seed;
-    }
 
     for (final clubEntry in RealClubSquads.squads.entries) {
       final clubLeague = Clubs.leagueOf(clubEntry.key);
