@@ -234,7 +234,7 @@ void main() {
       expect(ballonDor.goals + ballonDor.assists, 70);
     });
 
-    test('does not award the Ballon d\'Or to a career player with 34 contributions and no team trophy', () {
+    test('allows a career player with 34 contributions to win without a team trophy', () {
       const skills = PlayerSkills(
         pace: 90,
         physical: 90,
