@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/league_player_season_stats.dart';
 import 'package:flutter_football/models/league_table.dart';
@@ -6,8 +8,6 @@ import 'package:flutter_football/models/season_award.dart';
 import 'package:flutter_football/models/season_stats.dart';
 import 'package:flutter_football/models/position_rival.dart';
 import 'package:flutter_football/models/real_club_squads.dart';
-import 'dart:math';
-
 class SeasonAwardService {
   static List<SeasonAward> create({
     required int season,
@@ -25,8 +25,7 @@ class SeasonAwardService {
           ? b.points.compareTo(a.points)
           : b.goalDifference.compareTo(a.goalDifference));
     final worldChampions = <String>{};
-    for (final entry in worldLeagueStandings?.entries ??
-        const <MapEntry<League, List<LeagueTableEntry>>>[]) {
+    for (final entry in worldLeagueStandings.entries) {
       final standings = [...entry.value]
         ..sort((a, b) => b.points != a.points
             ? b.points.compareTo(a.points)
