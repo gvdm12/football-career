@@ -22,10 +22,6 @@ class SeasonAwardService {
     SeasonStats? overallSeasonStats,
   }) {
     final playerLeague = Clubs.leagueOf(player.club);
-    final goldenBootThreshold =
-        playerLeague?.goldenBootGoalThreshold ?? 0;
-    final bestAssisterThreshold =
-        playerLeague?.bestAssisterThreshold ?? 0;
     final sortedTable = [...leagueTable]
       ..sort(
         (a, b) => b.points != a.points
@@ -151,20 +147,26 @@ class SeasonAwardService {
             PlayerPosition.defender => random.nextInt(10),
             PlayerPosition.goalkeeper => 0,
           };
-          candidates.add(
-            _Candidate(
-              name: realPlayer.name,
-              club: clubEntry.key,
-              position: position,
-              age: realPlayer.age,
-              matches: matches,
-              goals: goals,
-              assists: assists,
-              rating: rating,
-              isCareerPlayer: false,
-              wonTrophy: trophyWinningClubs.contains(clubEntry.key),
-            ),
+          final realCandidate = _Candidate(
+            name: realPlayer.name,
+            club: clubEntry.key,
+            position: position,
+            age: realPlayer.age,
+            matches: matches,
+            goals: goals,
+            assists: assists,
+            rating: rating,
+            isCareerPlayer: false,
+            wonTrophy: trophyWinningClubs.contains(clubEntry.key),
           );
+          candidates.add(realCandidate);
+
+          // Для «Золотой бутсы» и лучшего ассистента используем только
+          // игроков чемпионата клуба карьеры. Раньше этот пул копировался
+          // до добавления реальных составов, поэтому награды часто исчезали.
+          if (playerLeague != null && clubLeague == playerLeague) {
+            leagueCandidates.add(realCandidate);
+          }
         }
       }
     }
@@ -304,16 +306,10 @@ class SeasonAwardService {
       );
     }
 
-    // Награды бомбардиру и ассистенту выдаются только при выполнении
-    // порога конкретной лиги. Лидер с 16 голами не получает приз,
-    // если для его чемпионата требуется 21/23/27/35 голов.
+    // «Золотая бутса» всегда получает лучший бомбардир чемпионата.
+    // Порог достижений не должен отменять саму сезонную награду.
     final goalLeaders = leagueCandidates
-        .where(
-          (item) =>
-              goldenBootThreshold > 0 &&
-              item.matches >= 10 &&
-              item.goals >= goldenBootThreshold,
-        )
+        .where((item) => item.matches >= 10 && item.goals > 0)
         .toList()
       ..sort((a, b) {
         final compare = b.goals.compareTo(a.goals);
@@ -331,13 +327,10 @@ class SeasonAwardService {
       }
     }
 
+    // Лучший ассистент также определяется по фактическому первому месту,
+    // без минимального порога достижений.
     final assistLeaders = leagueCandidates
-        .where(
-          (item) =>
-              bestAssisterThreshold > 0 &&
-              item.matches >= 10 &&
-              item.assists >= bestAssisterThreshold,
-        )
+        .where((item) => item.matches >= 10 && item.assists > 0)
         .toList()
       ..sort((a, b) {
         final compare = b.assists.compareTo(a.assists);
@@ -502,7 +495,10 @@ class SeasonAwardService {
       }
     }
 
-    final ballonEligible = ballonCandidates
+    // У «Золотого мяча» всегда должен быть победитель. Сначала выбираем
+    // из игроков с сильным сезоном; если никто не прошёл высокий порог,
+    // используем лучшего из тех, кто регулярно выходил на поле.
+    final qualifiedBallonCandidates = ballonCandidates
         .where(
           (item) =>
               item.matches >= 25 &&
@@ -510,6 +506,11 @@ class SeasonAwardService {
               item.goals + item.assists >= 22,
         )
         .toList();
+    final ballonEligible = qualifiedBallonCandidates.isNotEmpty
+        ? qualifiedBallonCandidates
+        : ballonCandidates
+              .where((item) => item.matches >= 10 && item.rating >= 6.0)
+              .toList();
 
     double ballonScore(_Candidate item) {
       final teamPosition = ballonTeamPositions[item.club];
