@@ -955,13 +955,6 @@ class Career {
   /// Продвигает восстановление после любого матча игрока — клубного или сборной.
   /// Новая травма появляется только после матча, в котором игрок участвовал.
   Career advanceAfterCompetitionMatch({required bool playerParticipated}) {
-    if (settings.playWithoutInjuries) {
-      return copyWith(
-        injuryMatchesRemaining: 0,
-        injuryRecoveryUsed: false,
-        clearInjury: true,
-      );
-    }
     if (isInjured) {
       final remaining = (injuryMatchesRemaining - 1).clamp(0, 10).toInt();
       return copyWith(
@@ -970,10 +963,18 @@ class Career {
       );
     }
 
-    var updatedCareer = this;
+    var updatedCareer = settings.playWithoutInjuries &&
+            (injuryMatchesRemaining > 0 || injuryName != null)
+        ? copyWith(
+            injuryMatchesRemaining: 0,
+            injuryRecoveryUsed: false,
+            clearInjury: true,
+          )
+        : this;
     if (playerParticipated) {
-      final nextBoosts = Map<String, int>.from(temporarySkillBoosts);
-      final nextDurations = Map<String, int>.from(temporarySkillBoostMatches);
+      final nextBoosts = Map<String, int>.from(updatedCareer.temporarySkillBoosts);
+      final nextDurations =
+          Map<String, int>.from(updatedCareer.temporarySkillBoostMatches);
       for (final skillName in nextDurations.keys.toList()) {
         final remaining = (nextDurations[skillName] ?? 0) - 1;
         if (remaining <= 0) {
@@ -996,7 +997,9 @@ class Career {
     };
     final injuryChance =
         0.030 * settings.injuryFrequency * difficultyInjuryMultiplier;
-    if (!playerParticipated || Random().nextDouble() >= injuryChance) {
+    if (settings.playWithoutInjuries ||
+        !playerParticipated ||
+        Random().nextDouble() >= injuryChance) {
       return updatedCareer;
     }
     const injuries = [
