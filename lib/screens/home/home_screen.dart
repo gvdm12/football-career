@@ -129,7 +129,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         child: SafeArea(
-          child: Padding(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final compact = constraints.maxHeight < 640;
+              final logoSize = compact ? 100.0 : 120.0;
+              return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 10),
             child: Column(
               children: [
@@ -150,8 +154,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Spacer(),
 
                 Container(
-                  width: 120,
-                  height: 120,
+                  width: logoSize,
+                  height: logoSize,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: green.withValues(alpha: 0.10),
@@ -168,19 +172,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: ClipOval(
                     child: Image.asset(
                       'assets/images/iconic.png',
-                      width: 120,
-                      height: 120,
+                      width: logoSize,
+                      height: logoSize,
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 28),
+                SizedBox(height: compact ? 16 : 28),
 
                 const Text(
                   'FOOTBALL',
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: compact ? 28 : 32,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 4,
                     color: Color.fromARGB(255, 28, 255, 111),
@@ -313,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 60),
+                SizedBox(height: compact ? 20 : 60),
 
                 Text(
                   'Football Journey • 1.0',
@@ -323,9 +327,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 12),
+                SizedBox(height: compact ? 8 : 12),
               ],
             ),
+              );
+            },
           ),
         ),
       ),
