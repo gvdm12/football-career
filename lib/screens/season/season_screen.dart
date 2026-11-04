@@ -2716,11 +2716,25 @@ class _SeasonScreenState extends State<SeasonScreen> {
       leagueStatsProcessedMatchKeys: finalLeagueStats.processedMatchKeys,
     );
 
-    // Награды сезона формируются и сохраняются один раз после архивации статистики.
-    if (!alreadyArchived &&
-        !completedCareer.seasonAwards.any(
-          (item) => item.season == career.season,
-        )) {
+    // Проверяем полноту индивидуальных наград. Это также чинит сохранения,
+    // где сезон уже был архивирован старой версией игры с неполным списком.
+    final existingSeasonAwards = completedCareer.seasonAwards
+        .where((item) => item.season == career.season)
+        .toList();
+    const requiredAwardCategories = [
+      'Лучший бомбардир',
+      'Лучший ассистент',
+      'Золотой мяч',
+    ];
+    final hasAllMajorAwards = requiredAwardCategories.every(
+      (category) => existingSeasonAwards.any(
+        (award) => award.category == category,
+      ),
+    );
+    var awardsUpdated = false;
+
+    if (!alreadyArchived || !hasAllMajorAwards) {
+      awardsUpdated = true;
       final leagueAppearances = career.seasonMatches
           .where(
             (item) =>
@@ -2814,8 +2828,13 @@ class _SeasonScreenState extends State<SeasonScreen> {
             award.playerName == career.player.name &&
             award.club == career.player.club,
       );
+      final preservedNews = completedCareer.news.where((item) {
+        if (item.id == 'ballon_dor_s${career.season}') return false;
+        return !(item.id.startsWith('season_award_') &&
+            item.id.endsWith('_s${career.season}'));
+      }).toList();
       final awardNews = [
-        ...completedCareer.news,
+        ...preservedNews,
         if (ballonDorAward != null)
           CareerNews(
             id: 'ballon_dor_s${career.season}',
@@ -2840,13 +2859,39 @@ class _SeasonScreenState extends State<SeasonScreen> {
           ),
       ];
       completedCareer = completedCareer.copyWith(
-        seasonAwards: [...completedCareer.seasonAwards, ...seasonAwards],
+        seasonAwards: [
+          ...completedCareer.seasonAwards.where(
+            (item) => item.season != career.season,
+          ),
+          ...seasonAwards,
+        ],
         news: awardNews,
         agentCredits:
             completedCareer.agentCredits +
-            (wonGoldenBoot ? 10 : 0) +
-            (wonBestAssister ? 10 : 0) +
-            (wonBallonDor ? 30 : 0),
+            (wonGoldenBoot &&
+                    !existingSeasonAwards.any(
+                      (item) =>
+                          item.category == 'Лучший бомбардир' &&
+                          item.isCareerPlayer,
+                    )
+                ? 10
+                : 0) +
+            (wonBestAssister &&
+                    !existingSeasonAwards.any(
+                      (item) =>
+                          item.category == 'Лучший ассистент' &&
+                          item.isCareerPlayer,
+                    )
+                ? 10
+                : 0) +
+            (wonBallonDor &&
+                    !existingSeasonAwards.any(
+                      (item) =>
+                          item.category == 'Золотой мяч' &&
+                          item.isCareerPlayer,
+                    )
+                ? 30
+                : 0),
       );
     }
 
@@ -2877,7 +2922,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     if (!mounted) return;
 
-    if (!alreadyArchived) {
+    if (!alreadyArchived || awardsUpdated) {
       final awards = completedCareer.seasonAwards
           .where((item) => item.season == completedCareer.season)
           .toList();
