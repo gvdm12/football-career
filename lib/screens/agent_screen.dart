@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/transfer_offer.dart';
+import 'package:flutter_football/models/sponsor_deal.dart';
+import 'package:flutter_football/models/career_news.dart';
 import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/services/transfer_service.dart';
 
@@ -48,6 +50,45 @@ class _AgentScreenState extends State<AgentScreen> {
     925,
     1150,
   ];
+
+  void _acceptSponsorOffer(SponsorOffer offer) {
+    final contract = SponsorContract(
+      brand: offer.brand,
+      paymentPerSeason: offer.paymentPerSeason,
+      seasonsRemaining: offer.contractYears,
+      goalBonus: 500,
+    );
+    final updated = career.copyWith(
+      sponsorContract: contract,
+      sponsorOffers: career.sponsorOffers.where((item) => item.id != offer.id).toList(),
+      money: career.money + offer.signingBonus,
+      news: [
+        ...career.news,
+        CareerNews(
+          id: 'sponsor_signed_${offer.id}',
+          season: career.season,
+          matchNumber: -1,
+          title: 'Подписан спонсорский контракт',
+          description: 'Вы заключили соглашение с ${offer.brand} на ${offer.contractYears} сезона. Бонус за подписание: €${offer.signingBonus}.',
+          type: CareerNewsType.sponsor,
+        ),
+      ],
+    );
+    setState(() {
+      career = updated;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppStrings.isEnglish ? 'Sponsorship deal signed' : 'Спонсорский контракт подписан')),
+    );
+  }
+
+  void _declineSponsorOffer(SponsorOffer offer) {
+    setState(() {
+      career = career.copyWith(
+        sponsorOffers: career.sponsorOffers.where((item) => item.id != offer.id).toList(),
+      );
+    });
+  }
 
   void _upgradeAgent() {
     if (career.agentLevel >= 10) return;
@@ -296,6 +337,26 @@ class _AgentScreenState extends State<AgentScreen> {
             const SizedBox(height: 7),
             _panel(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(AppStrings.isEnglish ? 'SPONSORSHIP' : 'СПОНСОРСКИЕ КОНТРАКТЫ',
+                    style: const TextStyle(color: Color(0xFF8BE07F), fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1)),
+                  const SizedBox(height: 7),
+                  if (career.sponsorContract != null) ...[
+                    _line(AppStrings.isEnglish ? 'Active brand' : 'Действующий бренд', career.sponsorContract!.brand),
+                    _line(AppStrings.isEnglish ? 'Payment per season' : 'Выплата за сезон', '€${_money(career.sponsorContract!.paymentPerSeason)}'),
+                    _line(AppStrings.isEnglish ? 'Seasons remaining' : 'Осталось сезонов', '${career.sponsorContract!.seasonsRemaining}'),
+                  ] else if (career.sponsorOffers.isEmpty)
+                    Text(AppStrings.isEnglish ? 'No sponsorship offers at the moment.' : 'Сейчас нет предложений от спонсоров.',
+                      style: const TextStyle(color: Colors.white60, fontSize: 11))
+                  else
+                    ...career.sponsorOffers.map((offer) => _sponsorOfferCard(offer)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 7),
+            _panel(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
@@ -332,6 +393,37 @@ class _AgentScreenState extends State<AgentScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _sponsorOfferCard(SponsorOffer offer) {
+    return Container(
+      margin: const EdgeInsets.only(top: 7),
+      padding: const EdgeInsets.all(11),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(13),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(offer.brand, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13)),
+        const SizedBox(height: 5),
+        _line(AppStrings.isEnglish ? 'Season payment' : 'Выплата за сезон', '€${_money(offer.paymentPerSeason)}'),
+        _line(AppStrings.isEnglish ? 'Signing bonus' : 'Бонус за подписание', '€${_money(offer.signingBonus)}'),
+        _line(AppStrings.isEnglish ? 'Contract' : 'Срок контракта', '${offer.contractYears}'),
+        const SizedBox(height: 6),
+        Row(children: [
+          Expanded(child: OutlinedButton(
+            onPressed: () => _declineSponsorOffer(offer),
+            child: Text(AppStrings.isEnglish ? 'Decline' : 'Отклонить'),
+          )),
+          const SizedBox(width: 8),
+          Expanded(child: ElevatedButton(
+            onPressed: career.sponsorContract == null ? () => _acceptSponsorOffer(offer) : null,
+            child: Text(AppStrings.isEnglish ? 'Sign' : 'Подписать'),
+          )),
+        ]),
+      ]),
     );
   }
 
