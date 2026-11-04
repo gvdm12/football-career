@@ -15,6 +15,8 @@ class SeasonAwardService {
     required List<LeagueTableEntry> leagueTable,
     required List<PositionRival> rivals,
     List<String> additionalTrophyWinningClubs = const [],
+    SeasonStats? overallSeasonStats,
+    required Map<League, List<LeagueTableEntry>> worldLeagueStandings,
   }) {
     final sortedTable = [...leagueTable]
       ..sort(
