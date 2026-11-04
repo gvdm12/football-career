@@ -29,7 +29,9 @@ class _TransferScreenState extends State<TransferScreen> {
   }
 
   void _generateTransferOffers() {
-    offers = TransferService.generateCombinedOffers(career);
+    offers = career.canChangeClub
+        ? TransferService.generateCombinedOffers(career)
+        : <TransferOffer>[];
     renewalOffer = TransferService.generateRenewalOffer(career);
 
     // Если игроку запрещено менять клуб, но контракт уже истёк и клуб
