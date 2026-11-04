@@ -143,6 +143,7 @@ void main() {
           assists: 0,
           yellowCards: 0,
           redCards: 0,
+          averageRating: null,
         ),
         leaguePlayerStats: const [
           LeaguePlayerSeasonStats(
