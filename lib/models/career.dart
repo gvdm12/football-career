@@ -52,6 +52,7 @@ class Career {
   final List<CareerObjective> objectives;
   final List<double> recentMatchRatings;
   final List<SponsorOffer> sponsorOffers;
+  final int sponsorOffersSeason;
   final SponsorContract? sponsorContract;
   final List<PositionRival> rivals;
   final int coachTrust;
@@ -176,6 +177,7 @@ class Career {
     this.objectives = const [],
     this.recentMatchRatings = const [],
     this.sponsorOffers = const [],
+    this.sponsorOffersSeason = 0,
     this.sponsorContract,
     this.rivals = const [],
     this.coachTrust = 65,
@@ -465,6 +467,7 @@ class Career {
       monthlySalary: startingSalary,
       objectives: startingObjectives,
       sponsorOffers: startingSponsorOffers,
+      sponsorOffersSeason: 1,
       news: startingSponsorOffers.map((offer) => CareerNews(
         id: 'sponsor_offer_${offer.id}', season: 1, matchNumber: -1,
         title: 'Спонсорское предложение от ${offer.brand}',
@@ -525,6 +528,7 @@ class Career {
       'objectives': objectives.map((item) => item.toJson()).toList(),
       'recentMatchRatings': recentMatchRatings,
       'sponsorOffers': sponsorOffers.map((item) => item.toJson()).toList(),
+      'sponsorOffersSeason': sponsorOffersSeason,
       'sponsorContract': sponsorContract?.toJson(),
       'rivals': rivals.map((item) => item.toJson()).toList(),
       'coachTrust': coachTrust,
@@ -705,11 +709,13 @@ class Career {
     final restoredAgentInterests = (json['agentInterestedClubs'] as List?)
         ?.whereType<String>().toList() ?? const <String>[];
     final restoredNews = readList('news', CareerNews.fromJson);
-    final migratedSponsorOffers = restoredSponsorOffers.isEmpty && restoredSponsorContract == null
+    final restoredSponsorOffersSeason = (json['sponsorOffersSeason'] as num?)?.toInt() ?? 0;
+    final needsSponsorMigration = restoredSponsorOffersSeason <= 0 && restoredSponsorContract == null;
+    final migratedSponsorOffers = needsSponsorMigration
         ? _createSponsorOffers(loadedPlayer, currentSeason)
         : restoredSponsorOffers;
     final migrationNews = <CareerNews>[
-      if (restoredSponsorOffers.isEmpty && restoredSponsorContract == null)
+      if (needsSponsorMigration)
         for (final offer in migratedSponsorOffers)
           CareerNews(
             id: 'sponsor_offer_${offer.id}',
@@ -863,6 +869,7 @@ class Career {
       recentMatchRatings: ((json['recentMatchRatings'] as List?) ?? const [])
           .whereType<num>().map((value) => value.toDouble()).toList().take(5).toList(),
       sponsorOffers: migratedSponsorOffers,
+      sponsorOffersSeason: restoredSponsorOffersSeason > 0 ? restoredSponsorOffersSeason : currentSeason,
       sponsorContract: restoredSponsorContract,
       rivals: restoredRivals,
       coachTrust: ((json['coachTrust'] as num?)?.toInt() ?? 65)
@@ -950,6 +957,7 @@ class Career {
     List<CareerObjective>? objectives,
     List<double>? recentMatchRatings,
     List<SponsorOffer>? sponsorOffers,
+    int? sponsorOffersSeason,
     SponsorContract? sponsorContract,
     bool clearSponsorContract = false,
     List<PositionRival>? rivals,
@@ -1014,6 +1022,7 @@ class Career {
       objectives: objectives ?? this.objectives,
       recentMatchRatings: recentMatchRatings ?? this.recentMatchRatings,
       sponsorOffers: sponsorOffers ?? this.sponsorOffers,
+      sponsorOffersSeason: sponsorOffersSeason ?? this.sponsorOffersSeason,
       sponsorContract: clearSponsorContract ? null : sponsorContract ?? this.sponsorContract,
       rivals: rivals ?? this.rivals,
       coachTrust: coachTrust ?? this.coachTrust,
@@ -2239,6 +2248,7 @@ class Career {
       objectives: nextObjectives,
       recentMatchRatings: const [],
       sponsorOffers: nextSponsorOffers,
+      sponsorOffersSeason: newSeason,
       sponsorContract: activeSponsor,
       rivals: PositionRival.nextSeason(rivals, newSeason, player: newPlayer),
       coachTrust: coachTrust,
