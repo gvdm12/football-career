@@ -615,6 +615,16 @@ class Career {
           final assistThreshold =
               Clubs.leagueOf(award.club)?.bestAssisterThreshold ?? 999;
           return award.matches >= 10 && award.assists >= assistThreshold;
+        case 'Лучший молодой игрок':
+          return award.age <= 21 &&
+              award.matches >= 15 &&
+              award.averageRating >= 7.0;
+        case 'Команда года':
+          return award.matches >= 10 && award.averageRating >= 6.0;
+        case 'Золотой мяч':
+          return award.matches >= 25 &&
+              award.averageRating >= 7.4 &&
+              award.goals + award.assists >= 22;
         default:
           return true;
       }
@@ -640,6 +650,27 @@ class Career {
         )
         .map((award) => award.season)
         .toSet();
+    final validYoungPlayerSeasons = validSeasonAwards
+        .where(
+          (award) =>
+              award.isCareerPlayer &&
+              award.category == 'Лучший молодой игрок',
+        )
+        .map((award) => award.season)
+        .toSet();
+    final validTeamOfSeasonSeasons = validSeasonAwards
+        .where(
+          (award) =>
+              award.isCareerPlayer && award.category == 'Команда года',
+        )
+        .map((award) => award.season)
+        .toSet();
+    final validBallonDorSeasons = validSeasonAwards
+        .where(
+          (award) => award.isCareerPlayer && award.category == 'Золотой мяч',
+        )
+        .map((award) => award.season)
+        .toSet();
 
     final normalizedHistory = readList('history', SeasonStats.fromJson).map((
       stats,
@@ -654,6 +685,15 @@ class Career {
         }
         if (achievement == 'Лучший игрок сезона') {
           return validPlayerOfSeasonSeasons.contains(stats.season);
+        }
+        if (achievement == 'Лучший молодой игрок сезона') {
+          return validYoungPlayerSeasons.contains(stats.season);
+        }
+        if (achievement == 'В сборной сезона') {
+          return validTeamOfSeasonSeasons.contains(stats.season);
+        }
+        if (achievement == 'Золотой мяч') {
+          return validBallonDorSeasons.contains(stats.season);
         }
         return true;
       }).toList();
