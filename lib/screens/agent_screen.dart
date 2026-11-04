@@ -75,7 +75,8 @@ class _AgentScreenState extends State<AgentScreen> {
     });
   }
 
-  bool get _canTalk => career.matches - career.lastConversationMatch >= 4;
+  bool get _canTalk =>
+      career.teamMatches - career.lastAgentNegotiationTeamMatch >= 7;
 
   Future<void> _talkToAgent() async {
     if (!_canTalk) return;
@@ -132,7 +133,10 @@ class _AgentScreenState extends State<AgentScreen> {
       }
     }
 
-    updated = updated.copyWith(lastConversationMatch: career.matches);
+    updated = updated.copyWith(
+      lastConversationMatch: career.matches,
+      lastAgentNegotiationTeamMatch: career.teamMatches,
+    );
     setState(() {
       career = updated;
       interests = TransferService.generateAgentOffersFromInterest(career);
@@ -247,7 +251,7 @@ class _AgentScreenState extends State<AgentScreen> {
                       label: Text(
                         _canTalk
                             ? 'Переговоры с агентом'
-                            : 'Новый разговор через ${(4 - (career.matches - career.lastConversationMatch)).clamp(0, 4)} матча',
+                            : 'Новый разговор через ${(7 - (career.teamMatches - career.lastAgentNegotiationTeamMatch)).clamp(0, 7)} матчей команды',
                       ),
                     ),
                   ),
