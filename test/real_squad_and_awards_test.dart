@@ -234,7 +234,7 @@ void main() {
       expect(ballonDor.goals + ballonDor.assists, 70);
     });
 
-    test('does not award the Ballon d\'Or to a career player below 35 contributions', () {
+    test('does not award the Ballon d\'Or to a career player below 40 contributions', () {
       const skills = PlayerSkills(
         pace: 90,
         physical: 90,
