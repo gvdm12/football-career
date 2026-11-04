@@ -73,7 +73,12 @@ class RealClubCoaches {
 
     for (final transfer in ordered) {
       if (coaches[transfer.fromClub] != transfer.coachName) continue;
-      coaches.remove(transfer.fromClub);
+      final replacement = transfer.replacementCoachName;
+      if (replacement.isEmpty ||
+          coaches[transfer.toClub] != replacement) {
+        continue;
+      }
+      coaches[transfer.fromClub] = replacement;
       coaches[transfer.toClub] = transfer.coachName;
     }
     return coaches;
@@ -111,12 +116,7 @@ class RealClubCoaches {
         coachName: firstCoach,
         fromClub: firstClub,
         toClub: secondClub,
-        season: season,
-      ),
-      CareerCoachTransfer(
-        coachName: secondCoach,
-        fromClub: secondClub,
-        toClub: firstClub,
+        replacementCoachName: secondCoach,
         season: season,
       ),
     ];
