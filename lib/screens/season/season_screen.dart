@@ -3133,15 +3133,16 @@ class _SeasonScreenState extends State<SeasonScreen> {
         (previousFive.length < 5 || lossesInPreviousFive < 4);
     final poorSeasonCheckpoint = max(6, (totalMatches * 0.65).round());
     final poorSeasonProgress = playedBefore + 1;
-    // Окно в несколько матчей защищает событие от перехвата другими вопросами.
+    final seasonLosses = completedResults
+        .where((item) => item.isPlayerLoss(updatedCareer.player.club))
+        .length;
+    // Окно до восьми матчей учитывает общий лимит пресс-конференций
+    // и не позволяет другим поводам полностью вытеснить этот вопрос.
     final poorSeason =
         poorSeasonProgress >= poorSeasonCheckpoint &&
-        poorSeasonProgress <= poorSeasonCheckpoint + 3 &&
-        ((updatedCareer.averageRating ?? 6.5) < 6.2 ||
-            completedResults
-                    .where((item) => item.isPlayerLoss(updatedCareer.player.club))
-                    .length >=
-                (completedResults.length * 0.55).ceil());
+        poorSeasonProgress <= poorSeasonCheckpoint + 7 &&
+        ((updatedCareer.averageRating ?? 6.5) < 6.4 ||
+            seasonLosses >= (completedResults.length * 0.45).ceil());
 
     String? category;
     final firstInterestCheckpoint = max(2, (totalMatches / 3).round());
