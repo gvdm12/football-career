@@ -31,10 +31,10 @@ class _AgentScreenState extends State<AgentScreen> {
         ? TransferService.generateAgentOffersFromInterest(career)
         : TransferService.generateOffers(career);
     if (career.agentInterestedClubs.isEmpty) {
+      final generatedClubs = interests.map((offer) => offer.club.name).toList();
       career = career.copyWith(
-        agentInterestedClubs: interests
-            .map((offer) => offer.club.name)
-            .toList(),
+        agentInterestedClubs: generatedClubs,
+        news: [...career.news, ..._rumorsFor(generatedClubs)],
       );
     }
   }
@@ -88,6 +88,19 @@ class _AgentScreenState extends State<AgentScreen> {
         sponsorOffers: career.sponsorOffers.where((item) => item.id != offer.id).toList(),
       );
     });
+  }
+
+  List<CareerNews> _rumorsFor(List<String> clubs) {
+    return clubs.map((club) => CareerNews(
+      id: 'rumor_s${career.season}_${club.hashCode}',
+      season: career.season,
+      matchNumber: -1,
+      title: AppStrings.isEnglish ? 'Transfer rumours: interest from $club' : 'Трансферные слухи: интерес со стороны $club',
+      description: AppStrings.isEnglish
+          ? 'Scouts are monitoring your recent performances. There is no official offer yet.'
+          : 'Скауты клуба следят за вашими последними выступлениями. Официального предложения пока нет.',
+      type: CareerNewsType.rumor,
+    )).toList();
   }
 
   void _upgradeAgent() {
@@ -146,8 +159,10 @@ class _AgentScreenState extends State<AgentScreen> {
           .take(2)
           .map((offer) => offer.club.name)
           .toList();
+      final newClubs = generated.where((club) => !career.agentInterestedClubs.contains(club)).toList();
       updated = career.copyWith(
         agentInterestedClubs: {...career.agentInterestedClubs, ...generated}.toList(),
+        news: [...career.news, ..._rumorsFor(newClubs)],
       );
     } else if (choice == 1) {
       final former = career.history
@@ -157,8 +172,13 @@ class _AgentScreenState extends State<AgentScreen> {
           .toList()
         ..shuffle();
       if (former.isNotEmpty) {
+        final newClub = former.first;
         updated = career.copyWith(
-          agentInterestedClubs: {...career.agentInterestedClubs, former.first}.toList(),
+          agentInterestedClubs: {...career.agentInterestedClubs, newClub}.toList(),
+          news: [
+            ...career.news,
+            if (!career.agentInterestedClubs.contains(newClub)) ..._rumorsFor([newClub]),
+          ],
         );
       }
     } else {
