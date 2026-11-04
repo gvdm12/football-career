@@ -38,9 +38,9 @@ class CareerSettings {
       limitTransfersToFiveYears:
           json['limitTransfersToFiveYears'] as bool? ?? false,
       playWithoutInjuries: json['playWithoutInjuries'] as bool? ?? false,
-      injuryFrequency: ((json['injuryFrequency'] as num?)?.toDouble() ?? 1.0)
-          .clamp(0.0, 2.0)
-          .toDouble(),
+      // Раньше частота травм дополнительно менялась сложностью.
+      // Нормализуем старые сохранения, чтобы коэффициент не применялся дважды.
+      injuryFrequency: 1.0,
       developmentSpeed: ((json['developmentSpeed'] as num?)?.toDouble() ?? 1.0)
           .clamp(0.5, 1.5)
           .toDouble(),
