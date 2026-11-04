@@ -1097,7 +1097,7 @@ class RealClubSquads {
       ..addAll(_copyBaseSquads());
 
     for (final transfer in transfers) {
-      final position = transfer.position as String;
+      final position = transfer.position;
       final source = squads[transfer.fromClub]?[position];
       if (source == null) continue;
       final index = source.indexWhere(
