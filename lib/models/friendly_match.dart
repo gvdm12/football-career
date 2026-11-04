@@ -5,21 +5,25 @@ class FriendlyMatch {
   final String opponent;
   final bool isHome;
   final Match? result;
+  final bool isSkipped;
 
   const FriendlyMatch({
     required this.number,
     required this.opponent,
     required this.isHome,
     this.result,
+    this.isSkipped = false,
   });
 
   bool get isPlayed => result != null;
+  bool get isResolved => isPlayed || isSkipped;
 
-  FriendlyMatch copyWith({Match? result}) => FriendlyMatch(
+  FriendlyMatch copyWith({Match? result, bool? isSkipped}) => FriendlyMatch(
     number: number,
     opponent: opponent,
     isHome: isHome,
     result: result ?? this.result,
+    isSkipped: isSkipped ?? this.isSkipped,
   );
 
   Map<String, dynamic> toJson() => {
@@ -27,6 +31,7 @@ class FriendlyMatch {
     'opponent': opponent,
     'isHome': isHome,
     'result': result?.toJson(),
+    'isSkipped': isSkipped,
   };
 
   factory FriendlyMatch.fromJson(Map<String, dynamic> json) {
@@ -38,6 +43,7 @@ class FriendlyMatch {
       result: rawResult is Map
           ? Match.fromJson(Map<String, dynamic>.from(rawResult))
           : null,
+      isSkipped: json['isSkipped'] as bool? ?? false,
     );
   }
 }

@@ -31,8 +31,10 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
   String selectedNationality = 'Россия';
 
   bool _isCreating = false;
+  bool _showCareerSettings = false;
   bool _allowAnyClub = false;
-  bool _realisticTransfers = true;
+  bool _limitTransfersToFiveYears = false;
+  bool _playWithoutInjuries = false;
   CareerDifficulty _difficulty = CareerDifficulty.normal;
 
   List<Club> get _availableStartingClubs =>
@@ -268,8 +270,9 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
       player.copyWith(jerseyNumber: jerseyNumber),
       settings: CareerSettings(
         allowAnyStartingClub: _allowAnyClub,
-        realisticTransfers: _realisticTransfers,
         difficulty: _difficulty,
+        limitTransfersToFiveYears: _limitTransfersToFiveYears,
+        playWithoutInjuries: _playWithoutInjuries,
         injuryFrequency: _difficulty == CareerDifficulty.hard ? 1.2 : _difficulty == CareerDifficulty.easy ? 0.8 : 1.0,
         developmentSpeed: _difficulty == CareerDifficulty.easy ? 1.15 : _difficulty == CareerDifficulty.hard ? 0.85 : 1.0,
       ),
@@ -399,63 +402,110 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                   ),
                   child: SwitchListTile.adaptive(
                     contentPadding: EdgeInsets.zero,
-                    value: _allowAnyClub,
+                    value: _showCareerSettings,
                     activeColor: green,
                     title: Text(
-                      AppStrings.isEnglish ? 'Career settings: choose any club' : 'Настройки карьеры: выбор любого клуба',
+                      AppStrings.isEnglish ? 'Career settings' : 'Настройки карьеры',
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13),
                     ),
                     subtitle: Text(
-                      AppStrings.isEnglish ? 'When enabled, the full club database is available.' : 'При включении можно выбрать любой клуб из всех доступных лиг.',
+                      AppStrings.isEnglish
+                          ? 'Enable additional career modes and difficulty options.'
+                          : 'Включите, чтобы настроить сложность и дополнительные режимы.',
                       style: const TextStyle(color: Colors.white60, fontSize: 11),
                     ),
-                    onChanged: (value) {
-                      setState(() {
-                        _allowAnyClub = value;
-                        if (!value && !startingClubs.any((club) => club.name == selectedClub)) {
-                          selectedClub = startingClubs.first.name;
-                        }
-                      });
-                    },
+                    onChanged: (value) => setState(() => _showCareerSettings = value),
                   ),
                 ),
 
-                DropdownButtonFormField<CareerDifficulty>(
-                  value: _difficulty,
-                  dropdownColor: const Color(0xFF0B3A1A),
-                  decoration: InputDecoration(
-                    labelText: AppStrings.isEnglish ? 'Difficulty' : 'Сложность карьеры',
-                    labelStyle: const TextStyle(color: Colors.white70),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF24552C)),
+                if (_showCareerSettings) ...[
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(13),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                    ),
+                    child: SwitchListTile.adaptive(
+                      contentPadding: EdgeInsets.zero,
+                      value: _allowAnyClub,
+                      activeColor: green,
+                      title: Text(
+                        AppStrings.isEnglish ? 'Choose any club' : 'Выбор любого клуба',
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13),
+                      ),
+                      subtitle: Text(
+                        AppStrings.isEnglish
+                            ? 'Unlock every club in all available leagues.'
+                            : 'Позволяет выбрать любой клуб из всех доступных лиг.',
+                        style: const TextStyle(color: Colors.white60, fontSize: 11),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          _allowAnyClub = value;
+                          if (!value && !startingClubs.any((club) => club.name == selectedClub)) {
+                            selectedClub = startingClubs.first.name;
+                          }
+                        });
+                      },
                     ),
                   ),
-                  style: const TextStyle(color: Colors.white),
-                  items: [
-                    DropdownMenuItem(value: CareerDifficulty.easy, child: Text(AppStrings.isEnglish ? 'Easy' : 'Лёгкая')),
-                    DropdownMenuItem(value: CareerDifficulty.normal, child: Text(AppStrings.isEnglish ? 'Normal' : 'Обычная')),
-                    DropdownMenuItem(value: CareerDifficulty.hard, child: Text(AppStrings.isEnglish ? 'Hard' : 'Сложная')),
-                  ],
-                  onChanged: (value) {
-                    if (value != null) setState(() => _difficulty = value);
-                  },
-                ),
-
-                SwitchListTile.adaptive(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-                  value: _realisticTransfers,
-                  activeColor: green,
-                  title: Text(
-                    AppStrings.isEnglish ? 'Realistic transfers' : 'Реалистичные трансферы',
-                    style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700),
+                  DropdownButtonFormField<CareerDifficulty>(
+                    value: _difficulty,
+                    dropdownColor: const Color(0xFF0B3A1A),
+                    decoration: InputDecoration(
+                      labelText: AppStrings.isEnglish ? 'Difficulty' : 'Сложность карьеры',
+                      labelStyle: const TextStyle(color: Colors.white70),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Color(0xFF24552C)),
+                      ),
+                    ),
+                    style: const TextStyle(color: Colors.white),
+                    items: [
+                      DropdownMenuItem(value: CareerDifficulty.easy, child: Text(AppStrings.isEnglish ? 'Easy' : 'Лёгкая')),
+                      DropdownMenuItem(value: CareerDifficulty.normal, child: Text(AppStrings.isEnglish ? 'Normal' : 'Обычная')),
+                      DropdownMenuItem(value: CareerDifficulty.hard, child: Text(AppStrings.isEnglish ? 'Hard' : 'Сложная')),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) setState(() => _difficulty = value);
+                    },
                   ),
-                  subtitle: Text(
-                    AppStrings.isEnglish ? 'Clubs sign players with a similar level.' : 'Клубы подписывают футболистов с подходящим уровнем.',
-                    style: const TextStyle(color: Colors.white60, fontSize: 11),
+                  const SizedBox(height: 8),
+                  SwitchListTile.adaptive(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                    value: _limitTransfersToFiveYears,
+                    activeColor: green,
+                    title: Text(
+                      AppStrings.isEnglish ? 'Change club once every 5 seasons' : 'Переход в другой клуб раз в 5 сезонов',
+                      style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700),
+                    ),
+                    subtitle: Text(
+                      AppStrings.isEnglish
+                          ? 'After a transfer, another club change is locked for five seasons.'
+                          : 'После перехода следующий трансфер будет доступен через пять сезонов.',
+                      style: const TextStyle(color: Colors.white60, fontSize: 11),
+                    ),
+                    onChanged: (value) => setState(() => _limitTransfersToFiveYears = value),
                   ),
-                  onChanged: (value) => setState(() => _realisticTransfers = value),
-                ),
+                  SwitchListTile.adaptive(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                    value: _playWithoutInjuries,
+                    activeColor: green,
+                    title: Text(
+                      AppStrings.isEnglish ? 'Play without injuries' : 'Игра без травм',
+                      style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700),
+                    ),
+                    subtitle: Text(
+                      AppStrings.isEnglish
+                          ? 'Your player will never receive an injury.'
+                          : 'Игрок не будет получать травмы на протяжении карьеры.',
+                      style: const TextStyle(color: Colors.white60, fontSize: 11),
+                    ),
+                    onChanged: (value) => setState(() => _playWithoutInjuries = value),
+                  ),
+                ],
 
                 Text(
                   AppStrings.startingClub,

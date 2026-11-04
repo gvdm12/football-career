@@ -28,7 +28,7 @@ class PreSeasonService {
     }).toList()
       ..shuffle(random);
 
-    final selected = candidates.take(2 + random.nextInt(3)).toList();
+    final selected = candidates.take(2).toList();
     return List.generate(selected.length, (index) => FriendlyMatch(
       number: index + 1,
       opponent: selected[index].name,

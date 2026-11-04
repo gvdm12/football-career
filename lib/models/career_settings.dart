@@ -4,14 +4,16 @@ enum CareerDifficulty { easy, normal, hard }
 class CareerSettings {
   final bool allowAnyStartingClub;
   final CareerDifficulty difficulty;
-  final bool realisticTransfers;
+  final bool limitTransfersToFiveYears;
+  final bool playWithoutInjuries;
   final double injuryFrequency;
   final double developmentSpeed;
 
   const CareerSettings({
     this.allowAnyStartingClub = false,
     this.difficulty = CareerDifficulty.normal,
-    this.realisticTransfers = true,
+    this.limitTransfersToFiveYears = false,
+    this.playWithoutInjuries = false,
     this.injuryFrequency = 1.0,
     this.developmentSpeed = 1.0,
   });
@@ -19,7 +21,8 @@ class CareerSettings {
   Map<String, dynamic> toJson() => {
     'allowAnyStartingClub': allowAnyStartingClub,
     'difficulty': difficulty.name,
-    'realisticTransfers': realisticTransfers,
+    'limitTransfersToFiveYears': limitTransfersToFiveYears,
+    'playWithoutInjuries': playWithoutInjuries,
     'injuryFrequency': injuryFrequency,
     'developmentSpeed': developmentSpeed,
   };
@@ -32,7 +35,9 @@ class CareerSettings {
         (value) => value.name == json['difficulty'],
         orElse: () => CareerDifficulty.normal,
       ),
-      realisticTransfers: json['realisticTransfers'] as bool? ?? true,
+      limitTransfersToFiveYears:
+          json['limitTransfersToFiveYears'] as bool? ?? false,
+      playWithoutInjuries: json['playWithoutInjuries'] as bool? ?? false,
       injuryFrequency: ((json['injuryFrequency'] as num?)?.toDouble() ?? 1.0)
           .clamp(0.0, 2.0)
           .toDouble(),

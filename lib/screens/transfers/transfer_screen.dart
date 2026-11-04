@@ -34,6 +34,18 @@ class _TransferScreenState extends State<TransferScreen> {
   }
 
   Future<void> _acceptTransfer(TransferOffer offer) async {
+    if (!offer.isRenewal && !career.canChangeClub) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppStrings.isEnglish
+                ? 'You can change clubs again in ${career.seasonsUntilClubChange} seasons.'
+                : 'Следующий переход в другой клуб будет доступен через ${career.seasonsUntilClubChange} сезонов.',
+          ),
+        ),
+      );
+      return;
+    }
     final newCareer = career.acceptTransfer(offer);
     if (offer.isRenewal) {
       Navigator.pop(context, newCareer);
@@ -116,6 +128,24 @@ class _TransferScreenState extends State<TransferScreen> {
               children: [
                 _buildHeader(),
 
+                if (!career.canChangeClub) ...[
+                  const SizedBox(height: 10),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF4A3515).withValues(alpha: 0.55),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.orangeAccent.withValues(alpha: 0.55)),
+                    ),
+                    child: Text(
+                      AppStrings.isEnglish
+                          ? 'The five-season transfer limit is active. You can move again in ${career.seasonsUntilClubChange} seasons.'
+                          : 'Действует ограничение на трансферы: следующий переход будет доступен через ${career.seasonsUntilClubChange} сезонов.',
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 10),
 
                 if (renewalOffer != null) ...[
@@ -270,7 +300,9 @@ class _TransferScreenState extends State<TransferScreen> {
             width: 80,
             height: 46,
             child: ElevatedButton(
-              onPressed: () => _acceptTransfer(offer),
+              onPressed: career.canChangeClub
+                  ? () => _acceptTransfer(offer)
+                  : null,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 backgroundColor: const Color(0xFF22C55E),
