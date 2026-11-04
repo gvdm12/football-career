@@ -196,7 +196,7 @@ void main() {
       );
     });
 
-    test('does not award the Premier League Golden Boot for 16 goals', () {
+    test('awards the league Golden Boot to the actual top scorer below the achievement threshold', () {
       final player = Player.create(
         name: 'Career Player',
         nationality: 'Россия',
@@ -232,10 +232,12 @@ void main() {
         worldLeagueStandings: const <League, List<LeagueTableEntry>>{},
       );
 
-      expect(
-        awards.any((award) => award.category == 'Лучший бомбардир'),
-        isFalse,
-      );
+      final goldenBoot = awards.where(
+        (award) => award.category == 'Лучший бомбардир',
+      ).toList();
+      expect(goldenBoot, isNotEmpty);
+      expect(goldenBoot.every((award) => !award.isCareerPlayer), isTrue);
+      expect(goldenBoot.first.goals, greaterThan(16));
     });
   });
 
