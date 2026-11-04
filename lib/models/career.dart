@@ -1023,13 +1023,8 @@ class Career {
       );
     }
 
-    final difficultyInjuryMultiplier = switch (settings.difficulty) {
-      CareerDifficulty.easy => 0.85,
-      CareerDifficulty.normal => 1.0,
-      CareerDifficulty.hard => 1.15,
-    };
     final injuryChance =
-        0.030 * settings.injuryFrequency * difficultyInjuryMultiplier;
+        0.030 * settings.injuryFrequency * settings.difficulty.injuryChanceMultiplier;
     if (settings.playWithoutInjuries ||
         !playerParticipated ||
         Random().nextDouble() >= injuryChance) {
@@ -1086,7 +1081,11 @@ class Career {
         : match.playerRating < 6.5
         ? -1
         : 0;
-    final updatedTrust = (coachTrust + trustChange).clamp(0, 100).toInt();
+    final difficultyAdjustedTrustChange =
+        (trustChange * settings.difficulty.coachTrustMultiplier).round();
+    final updatedTrust = (coachTrust + difficultyAdjustedTrustChange)
+        .clamp(0, 100)
+        .toInt();
     final trustedCareer = matchCareer.copyWith(coachTrust: updatedTrust);
 
     // Травмированный игрок пропускает матч, но срок восстановления уменьшается.
