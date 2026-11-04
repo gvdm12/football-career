@@ -234,7 +234,7 @@ void main() {
       expect(ballonDor.goals + ballonDor.assists, 70);
     });
 
-    test('does not award the Ballon d\'Or to a career player below 40 contributions', () {
+    test('does not award the Ballon d\'Or to a career player with 34 contributions and no team trophy', () {
       const skills = PlayerSkills(
         pace: 90,
         physical: 90,
@@ -259,15 +259,15 @@ void main() {
         season: 4,
         club: 'Real Madrid',
         matches: 32,
-        goals: 20,
-        assists: 14,
+        goals: 30,
+        assists: 4,
         yellowCards: 1,
         redCards: 0,
-        averageRating: 8.2,
+        averageRating: 9.8,
       );
       const table = [
         LeagueTableEntry(
-          club: 'Real Madrid',
+          club: 'Barcelona',
           played: 38,
           wins: 30,
           draws: 5,
@@ -288,13 +288,13 @@ void main() {
         worldLeagueStandings: const <League, List<LeagueTableEntry>>{},
       );
 
-      expect(
-        awards.where(
-          (award) =>
-              award.category == 'Золотой мяч' && award.isCareerPlayer,
-        ),
-        isEmpty,
+      final ballonDor = awards.firstWhere(
+        (award) => award.category == 'Золотой мяч',
       );
+      expect(ballonDor.playerName, 'Career Star');
+      expect(ballonDor.isCareerPlayer, isTrue);
+      expect(ballonDor.goals + ballonDor.assists, 34);
+      expect(ballonDor.wonTrophy, isFalse);
     });
   });
 }
