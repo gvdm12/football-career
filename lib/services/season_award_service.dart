@@ -292,7 +292,7 @@ class SeasonAwardService {
         wonTrophy: trophyWinningClubs.contains(player.club),
       ));
     }
-    final knownPlayers = ballonCandidates
+    final knownPlayers = candidates
         .map((item) => '${item.name}|${item.club}')
         .toSet();
 
