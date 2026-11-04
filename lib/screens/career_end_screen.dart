@@ -54,11 +54,18 @@ class CareerEndScreen extends StatelessWidget {
         sum + item.achievements.where((a) => a == 'Чемпион мира').length,
   );
 
-  int get goldenBoots => career.history.fold(
+  int _achievementCount(String achievement) => career.history.fold(
     0,
     (sum, item) =>
-        sum + item.achievements.where((a) => a == 'Золотая бутса').length,
+        sum + item.achievements.where((value) => value == achievement).length,
   );
+
+  int get goldenBoots => _achievementCount('Золотая бутса');
+  int get goldenBalls => _achievementCount('Золотой мяч');
+  int get playerOfSeasonAwards => _achievementCount('Лучший игрок сезона');
+  int get youngPlayerAwards => _achievementCount('Лучший молодой игрок сезона');
+  int get bestAssisterAwards => _achievementCount('Лучший ассистент');
+  int get teamOfSeasonSelections => _achievementCount('В сборной сезона');
 
   int get totalTrophies =>
       leagueTitles +
@@ -195,6 +202,26 @@ class CareerEndScreen extends StatelessWidget {
                   ),
                   const Divider(color: Color(0xFF24552C)),
                   _stat(AppStrings.goldenBootTrophy, goldenBoots.toString()),
+                  _stat(
+                    AppStrings.isEnglish ? 'Ballon d’Or' : 'Золотой мяч',
+                    goldenBalls.toString(),
+                  ),
+                  _stat(
+                    AppStrings.isEnglish ? 'Player of the Season' : 'Игрок сезона',
+                    playerOfSeasonAwards.toString(),
+                  ),
+                  _stat(
+                    AppStrings.isEnglish ? 'Best Young Player' : 'Лучший молодой игрок',
+                    youngPlayerAwards.toString(),
+                  ),
+                  _stat(
+                    AppStrings.isEnglish ? 'Top Assister' : 'Лучший ассистент',
+                    bestAssisterAwards.toString(),
+                  ),
+                  _stat(
+                    AppStrings.isEnglish ? 'Team of the Season' : 'В сборной сезона',
+                    teamOfSeasonSelections.toString(),
+                  ),
                 ]),
                 const SizedBox(height: 10),
                 _section(AppStrings.careerRecords, [
