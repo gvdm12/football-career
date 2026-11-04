@@ -212,15 +212,11 @@ class SeasonAwardService {
     }
 
     // «Золотая бутса» появляется только при достижении порога конкретной лиги.
-    final league = Clubs.leagueOf(player.club);
-    final goldenBootThreshold = league?.goldenBootGoalThreshold ?? 21;
     final goalLeaders =
         candidates
             .where(
               (item) =>
-                  item.matches >= 10 &&
-                  item.goals > 0 &&
-                  item.goals >= goldenBootThreshold,
+                  item.matches >= 10 && item.goals > 0,
             )
             .toList()
           ..sort((a, b) {
@@ -240,17 +236,11 @@ class SeasonAwardService {
       );
     }
 
-    // Не выдаём награду ассистента за несколько случайных передач.
-    final assistLeaders =
-        candidates.where((item) {
-          if (item.matches < 20) return false;
-          final league = Clubs.leagueOf(item.club);
-          if (league == null) return false;
-          if (item.assists >= league.bestAssisterThreshold) return true;
-          final isTopLeague =
-              league == League.england || league == League.spain;
-          return isTopLeague && item.assists >= 18 && item.rating >= 8.0;
-        }).toList()..sort((a, b) {
+    // Показываем лидера по передачам даже тогда, когда старый порог
+    // конкретной лиги не был достигнут.
+    final assistLeaders = candidates
+        .where((item) => item.matches >= 10 && item.assists > 0)
+        .toList()..sort((a, b) {
           final compare = b.assists.compareTo(a.assists);
           if (compare != 0) return compare;
           final ratingCompare = b.rating.compareTo(a.rating);
