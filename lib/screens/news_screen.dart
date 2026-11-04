@@ -26,6 +26,14 @@ class NewsScreen extends StatelessWidget {
         return Icons.description_rounded;
       case CareerNewsType.season:
         return Icons.calendar_month_rounded;
+      case CareerNewsType.form:
+        return Icons.trending_up_rounded;
+      case CareerNewsType.objective:
+        return Icons.flag_rounded;
+      case CareerNewsType.sponsor:
+        return Icons.handshake_rounded;
+      case CareerNewsType.rumor:
+        return Icons.campaign_rounded;
     }
   }
 
@@ -41,6 +49,14 @@ class NewsScreen extends StatelessWidget {
         return const Color(0xFFC3A6FF);
       case CareerNewsType.season:
         return const Color(0xFFFFA875);
+      case CareerNewsType.form:
+        return const Color(0xFF71D6B3);
+      case CareerNewsType.objective:
+        return const Color(0xFF8EB8FF);
+      case CareerNewsType.sponsor:
+        return const Color(0xFFE6C56F);
+      case CareerNewsType.rumor:
+        return const Color(0xFFB99AFF);
     }
   }
 
@@ -56,6 +72,14 @@ class NewsScreen extends StatelessWidget {
         return AppStrings.contractNewsCategory;
       case CareerNewsType.season:
         return AppStrings.seasonNewsCategory;
+      case CareerNewsType.form:
+        return AppStrings.isEnglish ? 'FORM' : 'ФОРМА';
+      case CareerNewsType.objective:
+        return AppStrings.isEnglish ? 'OBJECTIVES' : 'ЦЕЛИ';
+      case CareerNewsType.sponsor:
+        return AppStrings.isEnglish ? 'SPONSORS' : 'СПОНСОРЫ';
+      case CareerNewsType.rumor:
+        return AppStrings.isEnglish ? 'RUMOURS' : 'СЛУХИ';
     }
   }
 
@@ -158,6 +182,10 @@ class NewsScreen extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(16, 6, 16, 30),
                   children: [
                     _buildHero(visibleNews.length, transferCount, matchCount),
+                    if (career.objectives.isNotEmpty) ...[
+                      const SizedBox(height: 14),
+                      _buildObjectivesPanel(),
+                    ],
                     const SizedBox(height: 23),
                     Row(
                       children: [
@@ -397,6 +425,44 @@ class NewsScreen extends StatelessWidget {
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildObjectivesPanel() {
+    final objectives = career.objectives.where((item) => item.season == career.season).toList();
+    if (objectives.isEmpty) return const SizedBox.shrink();
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.055),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(AppStrings.isEnglish ? 'COACH OBJECTIVES' : 'ЗАДАЧИ ТРЕНЕРА',
+            style: const TextStyle(color: accentColor, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1)),
+          const SizedBox(height: 10),
+          for (final objective in objectives) ...[
+            Row(children: [
+              Expanded(child: Text(objective.title, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800))),
+              Text(objective.completed ? (AppStrings.isEnglish ? 'DONE' : 'ВЫПОЛНЕНО') : '${objective.progress}/${objective.target}',
+                style: TextStyle(color: objective.completed ? accentColor : Colors.white70, fontSize: 10, fontWeight: FontWeight.w800)),
+            ]),
+            const SizedBox(height: 5),
+            ClipRRect(borderRadius: BorderRadius.circular(8), child: LinearProgressIndicator(
+              value: objective.progressRatio, minHeight: 6,
+              backgroundColor: Colors.white.withValues(alpha: 0.10),
+              valueColor: AlwaysStoppedAnimation<Color>(objective.completed ? accentColor : const Color(0xFF8EB8FF)),
+            )),
+            const SizedBox(height: 4),
+            Text('${objective.description} · ${AppStrings.isEnglish ? 'Reward' : 'Премия'} €${objective.reward}',
+              style: const TextStyle(color: mutedColor, fontSize: 10)),
+            if (objective != objectives.last) const SizedBox(height: 12),
+          ],
         ],
       ),
     );
