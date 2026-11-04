@@ -1085,112 +1085,136 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Future<void> _showPlayerOfMonthAward(PlayerOfMonthAward award) async {
     if (!mounted) return;
+    final isEnglish = AppStrings.isEnglish;
     await showGeneralDialog<void>(
       context: context,
-      barrierDismissible: false,
-      barrierColor: Colors.transparent,
-      pageBuilder: (dialogContext, animation, secondaryAnimation) => Stack(
-        children: [
-          Positioned.fill(
-            child: BackdropFilter(
-              filter: ui.ImageFilter.blur(sigmaX: 11, sigmaY: 11),
-              child: Container(color: Colors.black.withValues(alpha: 0.48)),
-            ),
-          ),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 380),
-                child: _buildLiquidGlassSurface(
-                  radius: 24,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Row(
-                          children: [
-                            Icon(
-                              Icons.emoji_events,
-                              color: Color(0xFFFFD54F),
-                              size: 26,
-                            ),
-                            SizedBox(width: 9),
-                            Expanded(
-                              child: Text(
-                                'Игрок месяца',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 17,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          award.monthName,
-                          style: const TextStyle(
-                            color: Color(0xFF8BE07F),
-                            fontWeight: FontWeight.bold,
+      barrierDismissible: true,
+      barrierLabel: isEnglish ? 'Close award' : 'Закрыть награду',
+      barrierColor: Colors.black.withValues(alpha: 0.58),
+      transitionDuration: const Duration(milliseconds: 220),
+      pageBuilder: (dialogContext, animation, secondaryAnimation) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 340, maxHeight: 390),
+              child: _buildLiquidGlassSurface(
+                radius: 22,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(18, 18, 18, 12),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFD54F).withValues(alpha: 0.13),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(0xFFFFD54F).withValues(alpha: 0.45),
                           ),
                         ),
-                        const SizedBox(height: 5),
-                        Text(
-                          award.playerName,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900,
-                          ),
+                        child: const Icon(
+                          Icons.emoji_events_rounded,
+                          color: Color(0xFFFFD54F),
+                          size: 27,
                         ),
-                        Text(
-                          award.club,
-                          style: const TextStyle(color: Colors.white70),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        isEnglish ? 'PLAYER OF THE MONTH' : 'ИГРОК МЕСЯЦА',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0xFFFFD54F),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.7,
                         ),
-                        const SizedBox(height: 14),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _awardStat('МАТЧИ', award.matches.toString()),
-                            _awardStat('ГОЛЫ', award.goals.toString()),
-                            _awardStat('АССИСТЫ', award.assists.toString()),
-                            _awardStat(
-                              'ОЦЕНКА',
-                              award.averageRating.toStringAsFixed(1),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        award.monthName,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0xFF8BE07F),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        award.playerName,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 19,
+                          height: 1.15,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        award.club,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: Colors.white70, fontSize: 11),
+                      ),
+                      const SizedBox(height: 14),
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _awardStat(isEnglish ? 'MATCHES' : 'МАТЧИ', award.matches.toString()),
+                          _awardStat(isEnglish ? 'GOALS' : 'ГОЛЫ', award.goals.toString()),
+                          _awardStat(isEnglish ? 'ASSISTS' : 'АССИСТЫ', award.assists.toString()),
+                          _awardStat(isEnglish ? 'RATING' : 'ОЦЕНКА', award.averageRating.toStringAsFixed(1)),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 40,
+                        child: FilledButton(
+                          onPressed: () => Navigator.pop(dialogContext),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: const Color(0xFF8BE07F),
+                            foregroundColor: const Color(0xFF082A12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          'Поздравляем! Вы стали лучшим игроком месяца.',
-                          style: const TextStyle(
-                            color: Color(0xFF8BE07F),
-                            height: 1.3,
+                          ),
+                          child: Text(
+                            isEnglish ? 'Continue' : 'Продолжить',
+                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
                           ),
                         ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () => Navigator.pop(dialogContext),
-                            child: const Text(
-                              'Продолжить',
-                              style: TextStyle(color: Color(0xFF8BE07F)),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
           ),
-        ],
-      ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+        return FadeTransition(
+          opacity: curved,
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.94, end: 1).animate(curved),
+            child: child,
+          ),
+        );
+      },
     );
   }
 
