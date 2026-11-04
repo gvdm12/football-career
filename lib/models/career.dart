@@ -2,6 +2,8 @@ import 'dart:math';
 import 'package:flutter_football/models/career_news.dart';
 import 'package:flutter_football/models/career_settings.dart';
 import 'package:flutter_football/models/career_world_transfer.dart';
+import 'package:flutter_football/models/career_coach_transfer.dart';
+import 'package:flutter_football/models/real_club_coaches.dart';
 import 'package:flutter_football/models/real_club_squads.dart';
 import 'package:flutter_football/models/friendly_match.dart';
 import 'package:flutter_football/services/pre_season_service.dart';
@@ -31,6 +33,7 @@ class Career {
   final Player player;
   final CareerSettings settings;
   final List<CareerWorldTransfer> worldTransfers;
+  final List<CareerCoachTransfer> coachTransfers;
   final List<FriendlyMatch> friendlyMatches;
   final int lastConversationMatch;
   final int teamMatches;
@@ -122,6 +125,7 @@ class Career {
     required this.player,
     this.settings = const CareerSettings(),
     this.worldTransfers = const [],
+    this.coachTransfers = const [],
     this.friendlyMatches = const [],
     this.lastConversationMatch = -4,
     this.teamMatches = 0,
@@ -346,7 +350,8 @@ class Career {
       settings: settings,
       season: 1,
       rivals: PositionRival.generate(player: player, season: 1),
-      coachName: _generateCoachName(),
+      coachName: RealClubCoaches.coachForClub(player.club, const []) ??
+          _generateCoachName(),
       matches: 0,
       goals: 0,
       assists: 0,
@@ -379,6 +384,7 @@ class Career {
       'player': player.toJson(),
       'settings': settings.toJson(),
       'worldTransfers': worldTransfers.map((item) => item.toJson()).toList(),
+      'coachTransfers': coachTransfers.map((item) => item.toJson()).toList(),
       'friendlyMatches': friendlyMatches.map((item) => item.toJson()).toList(),
       'lastConversationMatch': lastConversationMatch,
       'teamMatches': teamMatches,
@@ -462,6 +468,10 @@ class Career {
       CareerWorldTransfer.fromJson,
     );
     RealClubSquads.applyCareerTransfers(restoredWorldTransfers);
+    final restoredCoachTransfers = readList(
+      'coachTransfers',
+      CareerCoachTransfer.fromJson,
+    );
     final rawClubStrengths = json['clubStrengths'];
     final restoredClubStrengths = rawClubStrengths is Map
         ? rawClubStrengths.map(
@@ -657,6 +667,7 @@ class Career {
             : null,
       ),
       worldTransfers: restoredWorldTransfers,
+      coachTransfers: restoredCoachTransfers,
       friendlyMatches: readList(
         'friendlyMatches',
         FriendlyMatch.fromJson,
@@ -721,7 +732,11 @@ class Career {
       agentLevel: ((json['agentLevel'] as num?)?.toInt() ?? 1)
           .clamp(1, 10)
           .toInt(),
-      coachName: json['coachName'] as String? ?? 'Главный тренер',
+      coachName: RealClubCoaches.coachForClub(
+            loadedPlayer.club,
+            restoredCoachTransfers,
+          ) ??
+          (json['coachName'] as String? ?? 'Главный тренер'),
       monthlySalary: (json['monthlySalary'] as num?)?.toInt() ?? 0,
       isCareerFinished: json['isCareerFinished'] as bool? ?? false,
       domesticCup: restoredCup,
@@ -764,6 +779,7 @@ class Career {
     Player? player,
     CareerSettings? settings,
     List<CareerWorldTransfer>? worldTransfers,
+    List<CareerCoachTransfer>? coachTransfers,
     List<FriendlyMatch>? friendlyMatches,
     int? lastConversationMatch,
     int? teamMatches,
@@ -816,6 +832,7 @@ class Career {
       player: player ?? this.player,
       settings: settings ?? this.settings,
       worldTransfers: worldTransfers ?? this.worldTransfers,
+      coachTransfers: coachTransfers ?? this.coachTransfers,
       friendlyMatches: friendlyMatches ?? this.friendlyMatches,
       lastConversationMatch:
           lastConversationMatch ?? this.lastConversationMatch,
@@ -1784,6 +1801,29 @@ class Career {
     );
     final allWorldTransfers = [...worldTransfers, ...newWorldTransfers];
     RealClubSquads.applyCareerTransfers(allWorldTransfers);
+
+    final newCoachTransfers = RealClubCoaches.simulateSeason(
+      season: newSeason,
+      previousTransfers: coachTransfers,
+    );
+    final allCoachTransfers = [...coachTransfers, ...newCoachTransfers];
+    final updatedPlayerCoach = RealClubCoaches.coachForClub(
+      player.club,
+      allCoachTransfers,
+    );
+    final coachTransferNews = newCoachTransfers
+        .map(
+          (transfer) => CareerNews(
+            id: 'coach_transfer_s${newSeason}_${transfer.coachName.hashCode}',
+            season: newSeason,
+            matchNumber: 0,
+            title: 'Managerial change: ${transfer.coachName}',
+            description:
+                '${transfer.coachName} moved from ${transfer.fromClub} to ${transfer.toClub}.',
+            type: CareerNewsType.season,
+          ),
+        )
+        .toList();
     final worldTransferNews = newWorldTransfers
         .map(
           (transfer) => CareerNews(
@@ -1940,6 +1980,7 @@ class Career {
       player: newPlayer,
       settings: settings,
       worldTransfers: allWorldTransfers,
+      coachTransfers: allCoachTransfers,
       friendlyMatches: newFriendlyMatches,
       lastConversationMatch: -4,
       season: newSeason,
@@ -1959,14 +2000,14 @@ class Career {
       history: newHistory,
       leagueTable: newLeagueTable,
       leagueMatches: newLeagueMatches,
-      news: [...news, ...worldTransferNews, ...leagueNews],
+      news: [...news, ...worldTransferNews, ...coachTransferNews, ...leagueNews],
       rivals: PositionRival.nextSeason(rivals, newSeason, player: newPlayer),
       coachTrust: coachTrust,
       agentLevel: agentLevel,
       agentInterestedClubs: const [],
       // В новом сезоне разрешаем снова показать интерес клубов на пресс-конференции.
       lastTransferInterestConferenceSeason: 0,
-      coachName: coachName,
+      coachName: updatedPlayerCoach ?? coachName,
       monthlySalary: monthlySalary,
       isCareerFinished: false,
       domesticCup: newDomesticCup,
