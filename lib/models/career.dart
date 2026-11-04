@@ -33,6 +33,10 @@ class Career {
   final List<CareerWorldTransfer> worldTransfers;
   final List<FriendlyMatch> friendlyMatches;
   final int lastConversationMatch;
+  final int teamMatches;
+  final int lastCoachNegotiationTeamMatch;
+  final int lastAgentNegotiationTeamMatch;
+  final int lastClubChangeSeason;
   final int season;
   final List<SeasonStats> history;
   final List<PlayerOfMonthAward> playerOfMonthAwards;
@@ -74,7 +78,18 @@ class Career {
   final Map<String, int> temporarySkillBoostMatches;
   final Map<String, int> clubStrengths;
 
-  bool get isInjured => injuryMatchesRemaining > 0;
+  bool get isInjured =>
+      !settings.playWithoutInjuries && injuryMatchesRemaining > 0;
+
+  bool get canChangeClub =>
+      !settings.limitTransfersToFiveYears ||
+      lastClubChangeSeason == 0 ||
+      season - lastClubChangeSeason >= 5 ||
+      contractYears <= 0;
+
+  int get seasonsUntilClubChange => canChangeClub
+      ? 0
+      : (5 - (season - lastClubChangeSeason)).clamp(0, 5).toInt();
 
   Player get playerForMatch {
     var skills = player.skills;
@@ -110,6 +125,10 @@ class Career {
     this.worldTransfers = const [],
     this.friendlyMatches = const [],
     this.lastConversationMatch = -4,
+    this.teamMatches = 0,
+    this.lastCoachNegotiationTeamMatch = -7,
+    this.lastAgentNegotiationTeamMatch = -7,
+    this.lastClubChangeSeason = 0,
     required this.season,
     required this.matches,
     required this.goals,
@@ -363,6 +382,10 @@ class Career {
       'worldTransfers': worldTransfers.map((item) => item.toJson()).toList(),
       'friendlyMatches': friendlyMatches.map((item) => item.toJson()).toList(),
       'lastConversationMatch': lastConversationMatch,
+      'teamMatches': teamMatches,
+      'lastCoachNegotiationTeamMatch': lastCoachNegotiationTeamMatch,
+      'lastAgentNegotiationTeamMatch': lastAgentNegotiationTeamMatch,
+      'lastClubChangeSeason': lastClubChangeSeason,
       'season': season,
       'history': history.map((item) => item.toJson()).toList(),
       'playerOfMonthAwards': playerOfMonthAwards
@@ -644,9 +667,21 @@ class Career {
             : null,
       ),
       worldTransfers: restoredWorldTransfers,
-      friendlyMatches: readList('friendlyMatches', FriendlyMatch.fromJson),
+      friendlyMatches: readList('friendlyMatches', FriendlyMatch.fromJson)
+          .take(2)
+          .toList(),
       lastConversationMatch:
           (json['lastConversationMatch'] as num?)?.toInt() ?? -4,
+      teamMatches: (json['teamMatches'] as num?)?.toInt() ??
+          (json['matches'] as num?)?.toInt() ?? 0,
+      lastCoachNegotiationTeamMatch:
+          (json['lastCoachNegotiationTeamMatch'] as num?)?.toInt() ??
+          (json['lastConversationMatch'] as num?)?.toInt() ?? -7,
+      lastAgentNegotiationTeamMatch:
+          (json['lastAgentNegotiationTeamMatch'] as num?)?.toInt() ??
+          (json['lastConversationMatch'] as num?)?.toInt() ?? -7,
+      lastClubChangeSeason:
+          (json['lastClubChangeSeason'] as num?)?.toInt() ?? 0,
       season: (json['season'] as num?)?.toInt() ?? 1,
       history: normalizedHistory,
       playerOfMonthAwards: readList(
@@ -736,6 +771,10 @@ class Career {
     List<CareerWorldTransfer>? worldTransfers,
     List<FriendlyMatch>? friendlyMatches,
     int? lastConversationMatch,
+    int? teamMatches,
+    int? lastCoachNegotiationTeamMatch,
+    int? lastAgentNegotiationTeamMatch,
+    int? lastClubChangeSeason,
     int? season,
     int? matches,
     int? goals,
@@ -785,6 +824,12 @@ class Career {
       friendlyMatches: friendlyMatches ?? this.friendlyMatches,
       lastConversationMatch:
           lastConversationMatch ?? this.lastConversationMatch,
+      teamMatches: teamMatches ?? this.teamMatches,
+      lastCoachNegotiationTeamMatch:
+          lastCoachNegotiationTeamMatch ?? this.lastCoachNegotiationTeamMatch,
+      lastAgentNegotiationTeamMatch:
+          lastAgentNegotiationTeamMatch ?? this.lastAgentNegotiationTeamMatch,
+      lastClubChangeSeason: lastClubChangeSeason ?? this.lastClubChangeSeason,
       season: season ?? this.season,
       matches: matches ?? this.matches,
       goals: goals ?? this.goals,
@@ -919,6 +964,13 @@ class Career {
   /// Продвигает восстановление после любого матча игрока — клубного или сборной.
   /// Новая травма появляется только после матча, в котором игрок участвовал.
   Career advanceAfterCompetitionMatch({required bool playerParticipated}) {
+    if (settings.playWithoutInjuries) {
+      return copyWith(
+        injuryMatchesRemaining: 0,
+        injuryRecoveryUsed: false,
+        clearInjury: true,
+      );
+    }
     if (isInjured) {
       final remaining = (injuryMatchesRemaining - 1).clamp(0, 10).toInt();
       return copyWith(
@@ -993,6 +1045,7 @@ class Career {
         ? 1
         : (((rivalRound * 12) - 1) ~/ seasonMatches.length) + 1;
     final matchCareer = copyWith(
+      teamMatches: teamMatches + 1,
       rivals: PositionRival.advanceMatch(rivals, month: rivalMonth),
     );
     final trustChange = !match.playerPlayed
@@ -1160,7 +1213,9 @@ class Career {
       );
     }
 
-    if (match.injuryName != null && match.injuryMatchesRemaining > 0) {
+    if (!settings.playWithoutInjuries &&
+        match.injuryName != null &&
+        match.injuryMatchesRemaining > 0) {
       return careerWithCompetitionNews.copyWith(
         injuryName: match.injuryName,
         injuryMatchesRemaining: match.injuryMatchesRemaining,
@@ -1174,6 +1229,7 @@ class Career {
   // ============================================================
 
   Career acceptTransfer(TransferOffer offer) {
+    if (!offer.isRenewal && !canChangeClub) return this;
     final newPlayer = player.copyWith(club: offer.club.name);
 
     return copyWith(
@@ -1186,6 +1242,7 @@ class Career {
       coachTrust: offer.isRenewal ? coachTrust : 65,
       agentLevel: agentLevel,
       coachName: offer.isRenewal ? coachName : _generateCoachName(),
+      lastClubChangeSeason: offer.isRenewal ? lastClubChangeSeason : season,
     );
   }
 
@@ -1720,7 +1777,7 @@ class Career {
     final newWorldTransfers = WorldTransferService.simulateSeason(
       season: newSeason,
       previousTransfers: worldTransfers,
-      realistic: settings.realisticTransfers,
+      realistic: true,
     );
     final allWorldTransfers = [...worldTransfers, ...newWorldTransfers];
     RealClubSquads.applyCareerTransfers(allWorldTransfers);
