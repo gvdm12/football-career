@@ -2823,8 +2823,20 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     // Зарплата и очки развития начисляются только один раз.
     if (!alreadyArchived) {
+      final sponsorPayout = completedCareer.sponsorContract?.payoutForSeason(completedCareer.goals) ?? 0;
       completedCareer = completedCareer.copyWith(
-        money: completedCareer.money + completedCareer.monthlySalary * 12,
+        money: completedCareer.money + completedCareer.monthlySalary * 12 + sponsorPayout,
+        news: sponsorPayout <= 0 ? completedCareer.news : [
+          ...completedCareer.news,
+          CareerNews(
+            id: 'sponsor_payout_s${completedCareer.season}',
+            season: completedCareer.season,
+            matchNumber: 0,
+            title: 'Выплата от спонсора',
+            description: '${completedCareer.sponsorContract!.brand} перечислил €$sponsorPayout за сезон с учётом бонусов.',
+            type: CareerNewsType.sponsor,
+          ),
+        ],
       );
     }
 
