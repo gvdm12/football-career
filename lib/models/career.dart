@@ -630,73 +630,23 @@ class Career {
       }
     }).toList();
 
-    final validGoldenBootSeasons = validSeasonAwards
-        .where(
-          (award) =>
-              award.isCareerPlayer && award.category == 'Лучший бомбардир',
-        )
-        .map((award) => award.season)
-        .toSet();
-    final validAssisterSeasons = validSeasonAwards
-        .where(
-          (award) =>
-              award.isCareerPlayer && award.category == 'Лучший ассистент',
-        )
-        .map((award) => award.season)
-        .toSet();
-    final validPlayerOfSeasonSeasons = validSeasonAwards
-        .where(
-          (award) => award.isCareerPlayer && award.category == 'Игрок сезона',
-        )
-        .map((award) => award.season)
-        .toSet();
-    final validYoungPlayerSeasons = validSeasonAwards
-        .where(
-          (award) =>
-              award.isCareerPlayer &&
-              award.category == 'Лучший молодой игрок',
-        )
-        .map((award) => award.season)
-        .toSet();
-    final validTeamOfSeasonSeasons = validSeasonAwards
-        .where(
-          (award) =>
-              award.isCareerPlayer && award.category == 'Команда года',
-        )
-        .map((award) => award.season)
-        .toSet();
-    final validBallonDorSeasons = validSeasonAwards
-        .where(
-          (award) => award.isCareerPlayer && award.category == 'Золотой мяч',
-        )
-        .map((award) => award.season)
-        .toSet();
-
+    // Награды сезона хранятся отдельно в seasonAwards и не дублируются
+    // в архиве статистики каждого сезона. Заодно очищаем их из старых сохранений.
+    const seasonAwardAchievements = {
+      'Золотая бутса',
+      'Бомбардир сезона',
+      'Лучший ассистент',
+      'Лучший игрок сезона',
+      'Лучший молодой игрок сезона',
+      'В сборной сезона',
+      'Золотой мяч',
+    };
     final normalizedHistory = readList('history', SeasonStats.fromJson).map((
       stats,
     ) {
-      final achievements = stats.achievements.where((achievement) {
-        if (achievement == 'Золотая бутса' ||
-            achievement == 'Бомбардир сезона') {
-          return validGoldenBootSeasons.contains(stats.season);
-        }
-        if (achievement == 'Лучший ассистент') {
-          return validAssisterSeasons.contains(stats.season);
-        }
-        if (achievement == 'Лучший игрок сезона') {
-          return validPlayerOfSeasonSeasons.contains(stats.season);
-        }
-        if (achievement == 'Лучший молодой игрок сезона') {
-          return validYoungPlayerSeasons.contains(stats.season);
-        }
-        if (achievement == 'В сборной сезона') {
-          return validTeamOfSeasonSeasons.contains(stats.season);
-        }
-        if (achievement == 'Золотой мяч') {
-          return validBallonDorSeasons.contains(stats.season);
-        }
-        return true;
-      }).toList();
+      final achievements = stats.achievements
+          .where((achievement) => !seasonAwardAchievements.contains(achievement))
+          .toList();
 
       return SeasonStats(
         season: stats.season,

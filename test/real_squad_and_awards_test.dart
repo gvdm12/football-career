@@ -170,6 +170,46 @@ void main() {
     });
   });
 
+  group('Season award coverage', () {
+    test('builds a full team of the season from real club squads', () {
+      const player = Player(
+        name: 'Career Player',
+        nationality: 'Россия',
+        position: PlayerPosition.midfielder,
+        age: 24,
+        season: 1,
+        club: 'Real Madrid',
+        overall: 75,
+        skills: PlayerSkills(
+          pace: 75, physical: 75, passing: 75, shooting: 75,
+          defending: 70, dribbling: 75, heading: 70, vision: 75,
+        ),
+      );
+      final awards = SeasonAwardService.create(
+        season: 1,
+        player: player,
+        seasonStats: const SeasonStats(
+          season: 1, club: 'Real Madrid', matches: 20, goals: 5,
+          assists: 5, yellowCards: 0, redCards: 0, averageRating: 7.2,
+        ),
+        leaguePlayerStats: const [],
+        leagueTable: const [
+          LeagueTableEntry(
+            club: 'Real Madrid', played: 38, wins: 25, draws: 8,
+            losses: 5, goalsFor: 80, goalsAgainst: 30,
+          ),
+        ],
+        rivals: const <PositionRival>[],
+        worldLeagueStandings: const <League, List<LeagueTableEntry>>{},
+      );
+      expect(
+        awards.where((award) => award.category == 'Команда года').length,
+        11,
+      );
+      expect(awards.any((award) => award.category == 'Лучший молодой игрок'), isTrue);
+    });
+  });
+
   group('Ballon d\'Or', () {
     test('uses overall season stats and requires the career-player thresholds', () {
       const skills = PlayerSkills(
