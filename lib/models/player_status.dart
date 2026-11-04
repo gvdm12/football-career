@@ -39,10 +39,11 @@ class PlayerStatusCalculator {
     int coachTrust = 65,
     int reputation = 60,
     double? averageRating,
+    double? formRating,
   }) {
     final club = Clubs.getByName(clubName);
     final difference = overall - club.strength;
-    final formBonus = ((averageRating ?? 6.0) - 6.0).clamp(-1.5, 1.5);
+    final formBonus = ((formRating ?? averageRating ?? 6.0) - 6.0).clamp(-1.5, 1.5);
     final trustBonus = (coachTrust - 65) / 20;
     final reputationBonus = (reputation - 60) / 25;
     final squadScore = difference + trustBonus + reputationBonus + formBonus;
