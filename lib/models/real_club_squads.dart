@@ -1055,6 +1055,11 @@ class RealClubSquads {
     },
   };
 
+  /// Показывает, что для клуба существует база реального состава.
+  /// Проверка не зависит от того, остались ли игроки после трансферов.
+  static bool hasRealSquad(String clubName) =>
+      _baseSquads.containsKey(clubName);
+
   static final Map<String, Map<String, List<RealClubPlayer>>> squads =
       _copyBaseSquads();
 
@@ -1092,7 +1097,7 @@ class RealClubSquads {
       ..addAll(_copyBaseSquads());
 
     for (final transfer in transfers) {
-      final position = transfer.position as String;
+      final position = transfer.position;
       final source = squads[transfer.fromClub]?[position];
       if (source == null) continue;
       final index = source.indexWhere(
