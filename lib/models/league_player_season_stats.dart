@@ -220,7 +220,7 @@ class LeaguePlayerStatsService {
     // Если для клуба уже задан реальный состав, не добавляем к нему
     // вымышленных футболистов. Генерация применяется только к клубам
     // без базы реальных игроков.
-    if (real == null || real.values.every((players) => players.isEmpty)) {
+    if (!RealClubSquads.hasRealSquad(club)) {
       const targetCounts = <PlayerPosition, int>{
         PlayerPosition.goalkeeper: 2,
         PlayerPosition.defender: 6,
@@ -261,8 +261,7 @@ class LeaguePlayerStatsService {
   ) {
     for (final club in clubs) {
       final realSquad = RealClubSquads.squads[club];
-      if (realSquad == null ||
-          realSquad.values.every((items) => items.isEmpty)) {
+      if (!RealClubSquads.hasRealSquad(club) || realSquad == null) {
         continue;
       }
 
