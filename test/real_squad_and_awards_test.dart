@@ -210,6 +210,50 @@ void main() {
     });
   });
 
+    test('always assigns Golden Boot and Best Assister to other league players when career player loses', () {
+      const player = Player(
+        name: 'Career Player',
+        nationality: 'Россия',
+        position: PlayerPosition.forward,
+        age: 24,
+        season: 1,
+        club: 'Real Madrid',
+        overall: 70,
+        skills: PlayerSkills(
+          pace: 70, physical: 70, passing: 70, shooting: 70,
+          defending: 65, dribbling: 70, heading: 65, vision: 70,
+        ),
+      );
+      final awards = SeasonAwardService.create(
+        season: 1,
+        player: player,
+        seasonStats: const SeasonStats(
+          season: 1, club: 'Real Madrid', matches: 30, goals: 1,
+          assists: 0, yellowCards: 0, redCards: 0, averageRating: 6.5,
+        ),
+        leaguePlayerStats: const [],
+        leagueTable: const [
+          LeagueTableEntry(
+            club: 'Real Madrid', played: 38, wins: 20, draws: 8,
+            losses: 10, goalsFor: 60, goalsAgainst: 40,
+          ),
+      ],
+        rivals: const <PositionRival>[],
+        worldLeagueStandings: const <League, List<LeagueTableEntry>>{},
+      );
+
+      for (final category in ['Лучший бомбардир', 'Лучший ассистент', 'Золотой мяч']) {
+        final winners = awards.where((award) => award.category == category).toList();
+        expect(winners, isNotEmpty, reason: '$category must always have a winner');
+        expect(
+          winners.every((award) => !award.isCareerPlayer),
+          isTrue,
+          reason: '$category should go to another player when the career player is not the leader',
+        );
+      }
+    });
+  });
+
   group('Ballon d\'Or', () {
     test('uses overall season stats and requires the career-player thresholds', () {
       const skills = PlayerSkills(
