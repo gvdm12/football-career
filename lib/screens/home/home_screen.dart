@@ -181,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 SizedBox(height: compact ? 16 : 28),
 
-                const Text(
+                Text(
                   'FOOTBALL',
                   style: TextStyle(
                     fontSize: compact ? 28 : 32,
@@ -191,10 +191,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                const Text(
+                Text(
                   'Journey',
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: compact ? 28 : 32,
                     fontWeight: FontWeight.w300,
                     letterSpacing: 7,
                     color: green,
