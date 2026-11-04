@@ -7,12 +7,14 @@ class PressConferenceOption {
   final String text;
   final String detail;
   final int trustChange;
+  final int reputationChange;
   final IconData icon;
 
   const PressConferenceOption({
     required this.text,
     required this.detail,
     required this.trustChange,
+    this.reputationChange = 0,
     required this.icon,
   });
 }
@@ -279,7 +281,8 @@ class PressConferenceContentFactory {
             'If a serious offer arrives, I will consider it',
           ),
           detail: choose('Честный ответ о будущем', 'Honest answer about the future'),
-          trustChange: -1,
+          trustChange: 0,
+          reputationChange: -2,
           icon: Icons.forum_outlined,
         ),
       ],
@@ -387,7 +390,8 @@ class PressConferenceContentFactory {
             'I want more playing time',
           ),
           detail: choose('Прямое заявление', 'Direct statement'),
-          trustChange: -1,
+          trustChange: 0,
+          reputationChange: -3,
           icon: Icons.timer_outlined,
         ),
         PressConferenceOption(
@@ -530,7 +534,7 @@ class PressConferenceContentFactory {
             'Критика тренера: пресса может поддержать, но доверие тренера снизится',
             'Criticising the coach may appeal to the media but hurts the relationship',
           ),
-          trustChange: -4,
+          trustChange: -6,
           icon: Icons.warning_amber_rounded,
         ),
         PressConferenceOption(
@@ -666,7 +670,8 @@ class PressConferenceContentFactory {
             'Амбициозное заявление: тренер может воспринять это как сомнение в проекте клуба',
             'An ambitious statement that may be seen as doubt in the club project',
           ),
-          trustChange: -3,
+          trustChange: 0,
+          reputationChange: -5,
           icon: Icons.emoji_events_outlined,
         ),
       ],
@@ -1186,17 +1191,23 @@ class PressConferenceContentFactory {
   }
 }
 
+class PressConferenceResult {
+  final int trustChange;
+  final int reputationChange;
+  const PressConferenceResult({required this.trustChange, required this.reputationChange});
+}
+
 class PressConferenceDialog {
   static const _accent = Color(0xFF8BE07F);
   static const _panel = Color(0xFF102B17);
 
-  static Future<int?> show({
+  static Future<PressConferenceResult?> show({
     required BuildContext context,
     required PressConferenceContent content,
     required String title,
     required String skipLabel,
   }) {
-    return showDialog<int>(
+    return showDialog<PressConferenceResult>(
       context: context,
       barrierDismissible: true,
       barrierColor: Colors.black.withValues(alpha: 0.28),
@@ -1396,7 +1407,7 @@ class PressConferenceDialog {
                                         borderRadius: BorderRadius.circular(13),
                                         onTap: () => Navigator.pop(
                                           dialogContext,
-                                          option.trustChange,
+                                          PressConferenceResult(trustChange: option.trustChange, reputationChange: option.reputationChange),
                                         ),
                                         child: Ink(
                                           padding: const EdgeInsets.symmetric(
