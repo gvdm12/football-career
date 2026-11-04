@@ -210,6 +210,7 @@ void main() {
     });
   });
 
+  group('Guaranteed season award winners', () {
     test('always assigns Golden Boot and Best Assister to other league players when career player loses', () {
       const player = Player(
         name: 'Career Player',
