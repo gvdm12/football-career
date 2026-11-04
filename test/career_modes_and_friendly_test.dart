@@ -94,6 +94,8 @@ void main() {
       ).copyWith(
         injuryName: 'Test injury',
         injuryMatchesRemaining: 4,
+        temporarySkillBoosts: const {'shooting': 1},
+        temporarySkillBoostMatches: const {'shooting': 2},
       );
 
       expect(career.isInjured, isFalse);
@@ -104,6 +106,7 @@ void main() {
       expect(updated.injuryMatchesRemaining, 0);
       expect(updated.injuryName, isNull);
       expect(updated.isInjured, isFalse);
+      expect(updated.temporarySkillBoostMatches['shooting'], 1);
     });
 
     test('new career settings survive JSON serialization', () {
