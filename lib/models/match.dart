@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter_football/models/club.dart';
 import 'player.dart';
 import 'career.dart';
+import 'career_settings.dart';
 import 'player_status.dart';
 
 class Match {
