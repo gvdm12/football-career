@@ -1261,7 +1261,6 @@ class Career {
         averageRating: value.averageRating,
         coachTrust: value.coachTrust,
         reputationModifier: value.reputationModifier,
-        reputationModifier: value.reputationModifier,
         trophies: value.history.fold<int>(
           0,
           (sum, item) => sum + item.achievements.length,
@@ -1272,8 +1271,6 @@ class Career {
         clubName: value.player.club,
         rivals: value.rivals,
         coachTrust: value.coachTrust,
-        reputationModifier: value.reputationModifier,
-        reputationModifier: value.reputationModifier,
         reputation: reputation,
         averageRating: value.averageRating,
         formRating: value.currentFormRating,
