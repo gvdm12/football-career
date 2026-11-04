@@ -98,7 +98,10 @@ class SeasonAwardService {
 
     // Сохраняем исходный пул текущей лиги отдельно: бомбардир и ассистент
     // должны определяться только среди игроков этого чемпионата.
-    final leagueCandidates = [...candidates];
+    final leagueCandidates = candidates
+        .where((item) => playerLeague != null &&
+            Clubs.leagueOf(item.club) == playerLeague)
+        .toList();
 
     // Игроки всех реальных составов участвуют во всех общих сезонных наградах,
     // а не только в гонке за «Золотой мяч».
