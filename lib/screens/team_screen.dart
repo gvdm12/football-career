@@ -45,6 +45,7 @@ class TeamScreen extends StatelessWidget {
         trophies: career.history.fold<int>(0, (sum, item) => sum + item.achievements.length),
       ),
       averageRating: career.averageRating,
+      formRating: career.currentFormRating,
     );
     final rivals = [...career.rivals]
       ..sort((a, b) => b.overall.compareTo(a.overall));

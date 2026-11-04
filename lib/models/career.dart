@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'package:flutter_football/models/career_news.dart';
+import 'package:flutter_football/models/career_objective.dart';
+import 'package:flutter_football/models/sponsor_deal.dart';
 import 'package:flutter_football/models/career_settings.dart';
 import 'package:flutter_football/models/career_world_transfer.dart';
 import 'package:flutter_football/models/career_coach_transfer.dart';
@@ -47,6 +49,11 @@ class Career {
   final List<LeaguePlayerSeasonStats> leaguePlayerStats;
   final List<String> leagueStatsProcessedMatchKeys;
   final List<CareerNews> news;
+  final List<CareerObjective> objectives;
+  final List<double> recentMatchRatings;
+  final List<SponsorOffer> sponsorOffers;
+  final int sponsorOffersSeason;
+  final SponsorContract? sponsorContract;
   final List<PositionRival> rivals;
   final int coachTrust;
   final int agentLevel;
@@ -83,6 +90,14 @@ class Career {
 
   bool get isInjured =>
       !settings.playWithoutInjuries && injuryMatchesRemaining > 0;
+
+  double get currentFormRating {
+    if (recentMatchRatings.isEmpty) return averageRating ?? 6.0;
+    return recentMatchRatings.reduce((a, b) => a + b) / recentMatchRatings.length;
+  }
+
+  int get currentFormLevel =>
+      ((currentFormRating - 6.5) * 2).round().clamp(-3, 3).toInt();
 
   // Стартовый клуб считается первым клубом карьеры: при включённом
   // ограничении первая смена клуба доступна только в 5-м сезоне.
@@ -159,6 +174,11 @@ class Career {
     required this.leagueTable,
     required this.leagueMatches,
     this.news = const [],
+    this.objectives = const [],
+    this.recentMatchRatings = const [],
+    this.sponsorOffers = const [],
+    this.sponsorOffersSeason = 0,
+    this.sponsorContract,
     this.rivals = const [],
     this.coachTrust = 65,
     this.agentLevel = 1,
@@ -275,6 +295,74 @@ class Career {
   // НОВАЯ КАРЬЕРА
   // ============================================================
 
+  static List<CareerObjective> _createSeasonObjectives(Player player, int season) {
+    final overall = player.overall;
+    final appearancesTarget = (overall >= 85 ? 24 : overall >= 75 ? 21 : 18);
+    final contributionTarget = player.position == PlayerPosition.forward
+        ? (overall >= 85 ? 18 : overall >= 75 ? 14 : 10)
+        : player.position == PlayerPosition.midfielder
+            ? (overall >= 85 ? 13 : overall >= 75 ? 10 : 7)
+            : (overall >= 85 ? 6 : overall >= 75 ? 4 : 2);
+    final metric = player.position == PlayerPosition.forward
+        ? CareerObjectiveMetric.goals
+        : player.position == PlayerPosition.midfielder
+            ? CareerObjectiveMetric.assists
+            : CareerObjectiveMetric.goals;
+    final contributionLabel = metric == CareerObjectiveMetric.goals
+        ? 'Забить $contributionTarget голов'
+        : 'Сделать $contributionTarget голевых передач';
+    final contributionDescription = metric == CareerObjectiveMetric.goals
+        ? 'Забить не менее $contributionTarget голов за сезон'
+        : 'Отдать не менее $contributionTarget голевых передач за сезон';
+    final defensiveLabel = 'Забить $contributionTarget голов';
+    return [
+      CareerObjective(
+        id: 's${season}_contribution',
+        season: season,
+        metric: metric,
+        title: player.position == PlayerPosition.defender ? defensiveLabel : contributionLabel,
+        description: contributionDescription,
+        target: contributionTarget,
+        reward: 30000 + overall * 250,
+      ),
+      CareerObjective(
+        id: 's${season}_appearances',
+        season: season,
+        metric: CareerObjectiveMetric.appearances,
+        title: 'Провести $appearancesTarget матчей',
+        description: 'Принять участие минимум в $appearancesTarget матчах сезона',
+        target: appearancesTarget,
+        reward: 25000 + overall * 180,
+      ),
+    ];
+  }
+
+  static List<SponsorOffer> _createSponsorOffers(Player player, int season) {
+    const brands = [
+      'Northstar Athletics',
+      'Veloce Performance',
+      'Apex Sportswear',
+      'Stride Energy',
+      'Vertex Football',
+      'Momentum Gear',
+    ];
+    final random = Random(season * 97 + player.overall * 13 + player.age);
+    final count = player.overall >= 82 ? 2 : 1;
+    final selected = [...brands]..shuffle(random);
+    return List.generate(count, (index) {
+      final brand = selected[index];
+      final multiplier = index == 0 ? 1.0 : 0.72;
+      final annual = ((player.overall * player.overall * 8) * multiplier).round();
+      return SponsorOffer(
+        id: 's${season}_sponsor_$index',
+        brand: brand,
+        paymentPerSeason: annual,
+        signingBonus: (annual * 0.20).round(),
+        contractYears: player.overall >= 85 && index == 0 ? 3 : 2,
+      );
+    });
+  }
+
   static int _startingClubSalary(String clubName) {
     final club = Clubs.all.firstWhere(
       (club) => club.name == clubName,
@@ -321,6 +409,8 @@ class Career {
 
     final leagueTable = _createLeagueTable(player.club, seasonMatches);
     final startingSalary = _startingClubSalary(player.club);
+    final startingObjectives = _createSeasonObjectives(player, 1);
+    final startingSponsorOffers = _createSponsorOffers(player, 1);
 
     final clubLeague = Clubs.leagueOf(player.club);
 
@@ -375,6 +465,15 @@ class Career {
       leagueTable: leagueTable,
       leagueMatches: leagueMatches,
       monthlySalary: startingSalary,
+      objectives: startingObjectives,
+      sponsorOffers: startingSponsorOffers,
+      sponsorOffersSeason: 1,
+      news: startingSponsorOffers.map((offer) => CareerNews(
+        id: 'sponsor_offer_${offer.id}', season: 1, matchNumber: -1,
+        title: 'Спонсорское предложение от ${offer.brand}',
+        description: '${offer.brand} предлагает контракт на ${offer.contractYears} сезона: €${offer.paymentPerSeason} за сезон и бонус €${offer.signingBonus} при подписании. Подробности доступны у агента.',
+        type: CareerNewsType.sponsor,
+      )).toList(),
       isCareerFinished: false,
       domesticCup: cup,
       europeanLeagueStandings: europeanLeagueStandings,
@@ -426,6 +525,11 @@ class Career {
       'seasonMatches': seasonMatches.map((item) => item.toJson()).toList(),
       'leagueMatches': leagueMatches.map((item) => item.toJson()).toList(),
       'news': news.map((item) => item.toJson()).toList(),
+      'objectives': objectives.map((item) => item.toJson()).toList(),
+      'recentMatchRatings': recentMatchRatings,
+      'sponsorOffers': sponsorOffers.map((item) => item.toJson()).toList(),
+      'sponsorOffersSeason': sponsorOffersSeason,
+      'sponsorContract': sponsorContract?.toJson(),
       'rivals': rivals.map((item) => item.toJson()).toList(),
       'coachTrust': coachTrust,
       'agentLevel': agentLevel,
@@ -596,6 +700,42 @@ class Career {
       season: currentSeason,
       existing: normalizedRivals,
     );
+    final restoredObjectives = readList('objectives', CareerObjective.fromJson);
+    final restoredSponsorOffers = readList('sponsorOffers', SponsorOffer.fromJson);
+    final rawSponsorContract = json['sponsorContract'];
+    final restoredSponsorContract = rawSponsorContract is Map
+        ? SponsorContract.fromJson(Map<String, dynamic>.from(rawSponsorContract))
+        : null;
+    final restoredAgentInterests = (json['agentInterestedClubs'] as List?)
+        ?.whereType<String>().toList() ?? const <String>[];
+    final restoredNews = readList('news', CareerNews.fromJson);
+    final restoredSponsorOffersSeason = (json['sponsorOffersSeason'] as num?)?.toInt() ?? 0;
+    final needsSponsorMigration = restoredSponsorOffersSeason <= 0 && restoredSponsorContract == null;
+    final migratedSponsorOffers = needsSponsorMigration
+        ? _createSponsorOffers(loadedPlayer, currentSeason)
+        : restoredSponsorOffers;
+    final migrationNews = <CareerNews>[
+      if (needsSponsorMigration)
+        for (final offer in migratedSponsorOffers)
+          CareerNews(
+            id: 'sponsor_offer_${offer.id}',
+            season: currentSeason,
+            matchNumber: -1,
+            title: 'Новое предложение от ${offer.brand}',
+            description: '${offer.brand} предлагает €${offer.paymentPerSeason} за сезон, бонус €${offer.signingBonus} и контракт на ${offer.contractYears} сезона. Обсудите предложение с агентом.',
+            type: CareerNewsType.sponsor,
+          ),
+      for (final club in restoredAgentInterests.take(2))
+        if (!restoredNews.any((item) => item.id == 'rumor_s${currentSeason}_${club.hashCode}'))
+          CareerNews(
+            id: 'rumor_s${currentSeason}_${club.hashCode}',
+            season: currentSeason,
+            matchNumber: -1,
+            title: 'Трансферные слухи: интерес со стороны ${club}',
+            description: 'Скауты клуба следят за вашими последними выступлениями. Официального предложения пока нет.',
+            type: CareerNewsType.rumor,
+          ),
+    ];
 
     // Миграция старых сохранений: удаляем индивидуальные награды,
     // которые ранее могли выдаваться без реальных сезонных показателей.
@@ -715,18 +855,22 @@ class Career {
       leagueTable: leagueTable,
       money: (json['money'] as num?)?.toInt() ?? 0,
       agentCredits: (json['agentCredits'] as num?)?.toInt() ?? 0,
-      agentInterestedClubs:
-          (json['agentInterestedClubs'] as List?)
-              ?.whereType<String>()
-              .toList() ??
-          const [],
+      agentInterestedClubs: restoredAgentInterests,
       lastTransferInterestConferenceSeason:
           (json['lastTransferInterestConferenceSeason'] as num?)?.toInt() ?? 0,
       contractYears: (json['contractYears'] as num?)?.toInt() ?? 0,
       developmentPoints: (json['developmentPoints'] as num?)?.toInt() ?? 0,
       seasonMatches: seasonMatches,
       leagueMatches: leagueMatches,
-      news: readList('news', CareerNews.fromJson),
+      news: [...restoredNews, ...migrationNews],
+      objectives: restoredObjectives.isNotEmpty
+          ? restoredObjectives
+          : _createSeasonObjectives(loadedPlayer, currentSeason),
+      recentMatchRatings: ((json['recentMatchRatings'] as List?) ?? const [])
+          .whereType<num>().map((value) => value.toDouble()).toList().take(5).toList(),
+      sponsorOffers: migratedSponsorOffers,
+      sponsorOffersSeason: restoredSponsorOffersSeason > 0 ? restoredSponsorOffersSeason : currentSeason,
+      sponsorContract: restoredSponsorContract,
       rivals: restoredRivals,
       coachTrust: ((json['coachTrust'] as num?)?.toInt() ?? 65)
           .clamp(0, 100)
@@ -810,6 +954,12 @@ class Career {
     List<LeagueTableEntry>? leagueTable,
     List<LeagueMatch>? leagueMatches,
     List<CareerNews>? news,
+    List<CareerObjective>? objectives,
+    List<double>? recentMatchRatings,
+    List<SponsorOffer>? sponsorOffers,
+    int? sponsorOffersSeason,
+    SponsorContract? sponsorContract,
+    bool clearSponsorContract = false,
     List<PositionRival>? rivals,
     int? coachTrust,
     int? agentLevel,
@@ -869,6 +1019,11 @@ class Career {
       leagueTable: leagueTable ?? this.leagueTable,
       leagueMatches: leagueMatches ?? this.leagueMatches,
       news: news ?? this.news,
+      objectives: objectives ?? this.objectives,
+      recentMatchRatings: recentMatchRatings ?? this.recentMatchRatings,
+      sponsorOffers: sponsorOffers ?? this.sponsorOffers,
+      sponsorOffersSeason: sponsorOffersSeason ?? this.sponsorOffersSeason,
+      sponsorContract: clearSponsorContract ? null : sponsorContract ?? this.sponsorContract,
       rivals: rivals ?? this.rivals,
       coachTrust: coachTrust ?? this.coachTrust,
       agentLevel: agentLevel ?? this.agentLevel,
@@ -1060,8 +1215,12 @@ class Career {
     final rivalMonth = seasonMatches.isEmpty
         ? 1
         : (((rivalRound * 12) - 1) ~/ seasonMatches.length) + 1;
+    final nextRatings = match.playerPlayed
+        ? [...recentMatchRatings, match.playerRating].take(5).toList()
+        : recentMatchRatings;
     final matchCareer = copyWith(
       teamMatches: teamMatches + 1,
+      recentMatchRatings: nextRatings,
       rivals: PositionRival.advanceMatch(rivals, month: rivalMonth),
     );
     final trustChange = !match.playerPlayed
@@ -1107,6 +1266,7 @@ class Career {
         coachTrust: value.coachTrust,
         reputation: reputation,
         averageRating: value.averageRating,
+        formRating: value.currentFormRating,
       );
     }
 
@@ -1233,15 +1393,67 @@ class Career {
       );
     }
 
+    // Обновляем задачи тренера по накопленной статистике сезона.
+    final objectiveNews = <CareerNews>[];
+    var objectiveReward = 0;
+    final updatedObjectives = careerWithCompetitionNews.objectives.map((objective) {
+      if (objective.season != season || objective.completed) return objective;
+      final value = switch (objective.metric) {
+        CareerObjectiveMetric.goals => newGoals,
+        CareerObjectiveMetric.assists => newAssists,
+        CareerObjectiveMetric.appearances => newMatches,
+      };
+      final updated = objective.updateProgress(value);
+      if (!objective.completed && updated.completed) {
+        objectiveReward += objective.reward;
+        objectiveNews.add(CareerNews(
+          id: 'objective_${objective.id}_completed',
+          season: season,
+          matchNumber: competitionRound,
+          title: 'Цель тренера выполнена!',
+          description: 'Задача «${objective.title}» выполнена. Премия: €${objective.reward}.',
+          type: CareerNewsType.objective,
+        ));
+      }
+      return updated;
+    }).toList();
+
+    var finalCareer = careerWithCompetitionNews.copyWith(
+      objectives: updatedObjectives,
+      money: careerWithCompetitionNews.money + objectiveReward,
+      news: [...careerWithCompetitionNews.news, ...objectiveNews],
+    );
+
+    // Изменение формы фиксируем после трёх выступлений подряд.
+    if (nextRatings.length >= 3) {
+      final previousBand = currentFormRating >= 7.2 ? 1 : currentFormRating <= 5.9 ? -1 : 0;
+      final nextForm = finalCareer.currentFormRating;
+      final nextBand = nextForm >= 7.2 ? 1 : nextForm <= 5.9 ? -1 : 0;
+      if (previousBand != nextBand) {
+        final rising = nextBand > previousBand;
+        final formNews = CareerNews(
+          id: 'form_s${season}_m${competitionRound}_${nextBand}',
+          season: season,
+          matchNumber: competitionRound,
+          title: rising ? 'Форма игрока улучшается' : 'Спад игровой формы',
+          description: rising
+              ? 'Последние матчи показывают прогресс: средняя оценка за последние выступления — ${nextForm.toStringAsFixed(1)}.'
+              : 'Последние выступления получились менее удачными. Средняя оценка за последние матчи — ${nextForm.toStringAsFixed(1)}.',
+          type: CareerNewsType.form,
+        );
+        finalCareer = finalCareer.copyWith(news: [...finalCareer.news, formNews]);
+      }
+    }
+
     if (!settings.playWithoutInjuries &&
         match.injuryName != null &&
         match.injuryMatchesRemaining > 0) {
-      return careerWithCompetitionNews.copyWith(
+      return finalCareer.copyWith(
         injuryName: match.injuryName,
         injuryMatchesRemaining: match.injuryMatchesRemaining,
       );
     }
-    return careerWithCompetitionNews;
+    return finalCareer;
   }
 
   // ============================================================
@@ -1841,6 +2053,36 @@ class Career {
         .toList();
 
     final newAge = player.age + 1;
+    final nextSponsorContract = sponsorContract?.copyWith(
+      seasonsRemaining: sponsorContract!.seasonsRemaining - 1,
+    );
+    final activeSponsor = nextSponsorContract != null && nextSponsorContract.seasonsRemaining > 0
+        ? nextSponsorContract
+        : null;
+    final nextObjectives = _createSeasonObjectives(
+      player.copyWith(age: newAge),
+      newSeason,
+    );
+    final nextSponsorOffers = activeSponsor == null
+        ? _createSponsorOffers(player.copyWith(age: newAge), newSeason)
+        : <SponsorOffer>[];
+    final sponsorOfferNews = nextSponsorOffers.map((offer) => CareerNews(
+      id: 'sponsor_offer_${offer.id}', season: newSeason, matchNumber: -1,
+      title: 'Новое предложение от ${offer.brand}',
+      description: '${offer.brand} предлагает €${offer.paymentPerSeason} за сезон, бонус €${offer.signingBonus} и контракт на ${offer.contractYears} сезона. Обсудите предложение с агентом.',
+      type: CareerNewsType.sponsor,
+    )).toList();
+    final transferRumorNews = agentInterestedClubs
+        .where((club) => club != player.club)
+        .take(2)
+        .map((club) => CareerNews(
+          id: 'rumor_s${newSeason}_${club.hashCode}',
+          season: newSeason,
+          matchNumber: -1,
+          title: 'Трансферные слухи: интерес к игроку',
+          description: 'По информации из окружения клуба, $club следит за выступлениями ${player.name}. Пока речь идёт только о предварительном интересе, официального предложения нет.',
+          type: CareerNewsType.rumor,
+        )).toList();
 
     final agedPlayer = _applyAgeDecline(player, newAge, newSeason);
     final newPlayer = agedPlayer.copyWith(season: newSeason);
@@ -2002,7 +2244,12 @@ class Career {
       history: newHistory,
       leagueTable: newLeagueTable,
       leagueMatches: newLeagueMatches,
-      news: [...news, ...worldTransferNews, ...coachTransferNews, ...leagueNews],
+      news: [...news, ...worldTransferNews, ...coachTransferNews, ...leagueNews, ...transferRumorNews, ...sponsorOfferNews],
+      objectives: nextObjectives,
+      recentMatchRatings: const [],
+      sponsorOffers: nextSponsorOffers,
+      sponsorOffersSeason: newSeason,
+      sponsorContract: activeSponsor,
       rivals: PositionRival.nextSeason(rivals, newSeason, player: newPlayer),
       coachTrust: coachTrust,
       agentLevel: agentLevel,

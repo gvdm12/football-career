@@ -43,6 +43,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
         ),
       ),
       averageRating: career.averageRating,
+      formRating: career.currentFormRating,
     );
   }
 

@@ -104,6 +104,7 @@ class _CoachScreenState extends State<CoachScreen> {
         trophies: career.history.fold<int>(0, (sum, item) => sum + item.achievements.length),
       ),
       averageRating: career.averageRating,
+      formRating: career.currentFormRating,
     );
 
     return PopScope<Career>(
@@ -250,7 +251,7 @@ class _CoachScreenState extends State<CoachScreen> {
                 _line(AppStrings.ratingLabel, career.player.overall.toString()),
                 _line(
                   AppStrings.currentForm,
-                  career.averageRating?.toStringAsFixed(2) ?? '—',
+                  career.currentFormRating.toStringAsFixed(2),
                 ),
                 _line(AppStrings.matches, career.matches.toString()),
                 _line(AppStrings.goalsLabel, career.goals.toString()),
