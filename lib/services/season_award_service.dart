@@ -100,12 +100,15 @@ class SeasonAwardService {
       );
     }
 
-    // Игроки всех реальных составов участвуют во всех сезонных наградах,
+    // Сохраняем исходный пул текущей лиги отдельно: бомбардир и ассистент
+    // должны определяться только среди игроков этого чемпионата.
+    final leagueCandidates = [...candidates];
+
+    // Игроки всех реальных составов участвуют во всех общих сезонных наградах,
     // а не только в гонке за «Золотой мяч».
     final knownCandidateKeys = candidates
         .map((item) => '${item.name}|${item.club}')
         .toSet();
-    final globalCandidateKeys = <String>{};
     for (final clubEntry in RealClubSquads.squads.entries) {
       final clubLeague = Clubs.leagueOf(clubEntry.key);
       final seasonMatches = clubLeague?.matchesPerSeason ?? 34;
@@ -148,7 +151,6 @@ class SeasonAwardService {
             PlayerPosition.defender => random.nextInt(10),
             PlayerPosition.goalkeeper => 0,
           };
-          globalCandidateKeys.add(key);
           candidates.add(
             _Candidate(
               name: realPlayer.name,
@@ -172,20 +174,20 @@ class SeasonAwardService {
     if (seasonStats.matches > 0) {
       // Игрок карьеры участвует в гонке бомбардиров даже при малом числе
       // матчей; минимальный порог применяется отдельно к другим наградам.
-      candidates.add(
-        _Candidate(
-          name: player.name,
-          club: player.club,
-          position: player.position,
-          age: player.age,
-          matches: seasonStats.matches,
-          goals: seasonStats.goals,
-          assists: seasonStats.assists,
-          rating: seasonStats.averageRating ?? 0,
-          isCareerPlayer: true,
-          wonTrophy: trophyWinningClubs.contains(player.club),
-        ),
+      final careerCandidate = _Candidate(
+        name: player.name,
+        club: player.club,
+        position: player.position,
+        age: player.age,
+        matches: seasonStats.matches,
+        goals: seasonStats.goals,
+        assists: seasonStats.assists,
+        rating: seasonStats.averageRating ?? 0,
+        isCareerPlayer: true,
+        wonTrophy: trophyWinningClubs.contains(player.club),
       );
+      candidates.add(careerCandidate);
+      leagueCandidates.add(careerCandidate);
     }
 
     final eligible = candidates
@@ -305,12 +307,10 @@ class SeasonAwardService {
     // Награды бомбардиру и ассистенту выдаются только при выполнении
     // порога конкретной лиги. Лидер с 16 голами не получает приз,
     // если для его чемпионата требуется 21/23/27/35 голов.
-    final goalLeaders = candidates
+    final goalLeaders = leagueCandidates
         .where(
           (item) =>
               goldenBootThreshold > 0 &&
-              (!globalCandidateKeys.contains('${item.name}|${item.club}') ||
-                  Clubs.leagueOf(item.club) == playerLeague) &&
               item.matches >= 10 &&
               item.goals >= goldenBootThreshold,
         )
@@ -331,12 +331,10 @@ class SeasonAwardService {
       }
     }
 
-    final assistLeaders = candidates
+    final assistLeaders = leagueCandidates
         .where(
           (item) =>
               bestAssisterThreshold > 0 &&
-              (!globalCandidateKeys.contains('${item.name}|${item.club}') ||
-                  Clubs.leagueOf(item.club) == playerLeague) &&
               item.matches >= 10 &&
               item.assists >= bestAssisterThreshold,
         )
