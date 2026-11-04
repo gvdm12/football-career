@@ -47,3 +47,44 @@ class CareerSettings {
     );
   }
 }
+
+
+/// Единые коэффициенты сложности. Скорость развития игрока намеренно
+/// не зависит от сложности и остаётся отдельной настройкой карьеры.
+extension CareerDifficultyEffects on CareerDifficulty {
+  double get matchExpectedGoalsShift => switch (this) {
+    CareerDifficulty.easy => 0.15,
+    CareerDifficulty.normal => 0.0,
+    CareerDifficulty.hard => -0.15,
+  };
+
+  double get injuryChanceMultiplier => switch (this) {
+    CareerDifficulty.easy => 0.85,
+    CareerDifficulty.normal => 1.0,
+    CareerDifficulty.hard => 1.2,
+  };
+
+  double get selectionChanceAdjustment => switch (this) {
+    CareerDifficulty.easy => 0.06,
+    CareerDifficulty.normal => 0.0,
+    CareerDifficulty.hard => -0.06,
+  };
+
+  double get interactiveActionAdjustment => switch (this) {
+    CareerDifficulty.easy => 0.05,
+    CareerDifficulty.normal => 0.0,
+    CareerDifficulty.hard => -0.05,
+  };
+
+  double get opponentPressureMultiplier => switch (this) {
+    CareerDifficulty.easy => 0.85,
+    CareerDifficulty.normal => 1.0,
+    CareerDifficulty.hard => 1.15,
+  };
+
+  double get coachTrustMultiplier => switch (this) {
+    CareerDifficulty.easy => 0.8,
+    CareerDifficulty.normal => 1.0,
+    CareerDifficulty.hard => 1.2,
+  };
+}
