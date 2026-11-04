@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_football/models/career_world_transfer.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/league_match.dart';
 import 'package:flutter_football/models/league_player_season_stats.dart';
@@ -43,6 +44,43 @@ void main() {
 
         expect(actual, expected);
       }
+    });
+
+    test('does not add generated players to a club receiving a real transfer', () {
+      final transferredPlayer =
+          RealClubSquads.squads['Real Madrid']!['forward']!.first;
+      RealClubSquads.applyCareerTransfers([
+        CareerWorldTransfer(
+          playerName: transferredPlayer.name,
+          fromClub: 'Real Madrid',
+          toClub: 'Newly Promoted FC',
+          position: 'forward',
+          age: transferredPlayer.age,
+          overall: transferredPlayer.overall,
+          jerseyNumber: transferredPlayer.jerseyNumber,
+          season: 2,
+        ),
+      ]);
+
+      final update = LeaguePlayerStatsService.update(
+        season: 2,
+        current: const [],
+        processedMatchKeys: const [],
+        fixtures: const [
+          LeagueMatch(
+            id: 1,
+            round: 1,
+            homeTeam: 'Newly Promoted FC',
+            awayTeam: 'Real Madrid',
+          ),
+        ],
+      );
+
+      final destinationPlayers = update.players
+          .where((player) => player.club == 'Newly Promoted FC')
+          .map((player) => player.playerName)
+          .toList();
+      expect(destinationPlayers, [transferredPlayer.name]);
     });
 
     test('keeps monthly history for real rosters smaller than eleven players', () {
