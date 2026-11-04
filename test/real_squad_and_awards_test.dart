@@ -46,17 +46,15 @@ void main() {
     });
 
     test('keeps monthly history for real rosters smaller than eleven players', () {
-      final firstRealPlayer = RealClubSquads.squads['Real Madrid']!
-          .values
-          .expand((players) => players)
-          .first;
+      final firstRealPlayer =
+          RealClubSquads.squads['Real Madrid']!['goalkeeper']!.first;
       final update = LeaguePlayerStatsService.update(
         season: 1,
         current: [
           LeaguePlayerSeasonStats(
             playerName: firstRealPlayer.name,
             club: 'Real Madrid',
-            position: PlayerPosition.forward,
+            position: PlayerPosition.goalkeeper,
             age: firstRealPlayer.age,
             overall: firstRealPlayer.overall,
             matches: 1,
