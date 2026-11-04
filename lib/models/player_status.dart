@@ -22,11 +22,13 @@ class PlayerStatusCalculator {
     required double? averageRating,
     required int coachTrust,
     int trophies = 0,
+    int reputationModifier = 0,
   }) {
     return (overall * 0.55 +
             (averageRating ?? 6.0) * 4 +
             coachTrust * 0.12 +
-            trophies * 1.5)
+            trophies * 1.5 +
+            reputationModifier)
         .round()
         .clamp(1, 100)
         .toInt();

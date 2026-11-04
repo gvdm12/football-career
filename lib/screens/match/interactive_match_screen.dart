@@ -110,6 +110,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         overall: _player.overall,
         averageRating: widget.career.averageRating,
         coachTrust: widget.career.coachTrust,
+        reputationModifier: widget.career.reputationModifier,
         trophies: widget.career.history.fold<int>(
           0,
           (sum, item) => sum + item.achievements.length,

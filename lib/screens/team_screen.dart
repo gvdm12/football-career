@@ -42,6 +42,7 @@ class TeamScreen extends StatelessWidget {
         overall: player.overall,
         averageRating: career.averageRating,
         coachTrust: career.coachTrust,
+        reputationModifier: career.reputationModifier,
         trophies: career.history.fold<int>(0, (sum, item) => sum + item.achievements.length),
       ),
       averageRating: career.averageRating,

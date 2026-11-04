@@ -56,6 +56,7 @@ class Career {
   final SponsorContract? sponsorContract;
   final List<PositionRival> rivals;
   final int coachTrust;
+  final int reputationModifier;
   final int agentLevel;
   final String coachName;
 
@@ -181,6 +182,7 @@ class Career {
     this.sponsorContract,
     this.rivals = const [],
     this.coachTrust = 65,
+    this.reputationModifier = 0,
     this.agentLevel = 1,
     this.agentCredits = 0,
     this.agentInterestedClubs = const [],
@@ -532,6 +534,7 @@ class Career {
       'sponsorContract': sponsorContract?.toJson(),
       'rivals': rivals.map((item) => item.toJson()).toList(),
       'coachTrust': coachTrust,
+      'reputationModifier': reputationModifier,
       'agentLevel': agentLevel,
       'coachName': coachName,
       'monthlySalary': monthlySalary,
@@ -875,6 +878,7 @@ class Career {
       coachTrust: ((json['coachTrust'] as num?)?.toInt() ?? 65)
           .clamp(0, 100)
           .toInt(),
+      reputationModifier: (json['reputationModifier'] as num?)?.toInt() ?? 0,
       agentLevel: ((json['agentLevel'] as num?)?.toInt() ?? 1)
           .clamp(1, 10)
           .toInt(),
@@ -962,6 +966,7 @@ class Career {
     bool clearSponsorContract = false,
     List<PositionRival>? rivals,
     int? coachTrust,
+    int? reputationModifier,
     int? agentLevel,
     String? coachName,
     int? monthlySalary,
@@ -1026,6 +1031,7 @@ class Career {
       sponsorContract: clearSponsorContract ? null : sponsorContract ?? this.sponsorContract,
       rivals: rivals ?? this.rivals,
       coachTrust: coachTrust ?? this.coachTrust,
+      reputationModifier: reputationModifier ?? this.reputationModifier,
       agentLevel: agentLevel ?? this.agentLevel,
       coachName: coachName ?? this.coachName,
       monthlySalary: monthlySalary ?? this.monthlySalary,
@@ -1254,6 +1260,7 @@ class Career {
         overall: value.player.overall,
         averageRating: value.averageRating,
         coachTrust: value.coachTrust,
+        reputationModifier: value.reputationModifier,
         trophies: value.history.fold<int>(
           0,
           (sum, item) => sum + item.achievements.length,

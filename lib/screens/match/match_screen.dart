@@ -121,18 +121,16 @@ class MatchScreen extends StatelessWidget {
           lastTransferInterestConferenceSeason: career.season,
         );
       }
-      final trustChange = await PressConferenceDialog.show(
+      final conferenceResult = await PressConferenceDialog.show(
         context: context,
         content: content,
         title: AppStrings.pressConferenceTitle,
         skipLabel: AppStrings.skipPressConference,
       );
-
-      if (trustChange != null && trustChange != 0) {
+      if (conferenceResult != null) {
         updatedCareer = updatedCareer.copyWith(
-          coachTrust: (updatedCareer.coachTrust + trustChange)
-              .clamp(0, 100)
-              .toInt(),
+          coachTrust: (updatedCareer.coachTrust + conferenceResult.trustChange).clamp(0, 100).toInt(),
+          reputationModifier: updatedCareer.reputationModifier + conferenceResult.reputationChange,
         );
       }
     }
