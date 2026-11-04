@@ -119,6 +119,21 @@ class NewsScreen extends StatelessWidget {
     final matchCount = sortedNews
         .where((item) => item.type == CareerNewsType.match)
         .length;
+    const categoryOrder = [
+      CareerNewsType.transfer,
+      CareerNewsType.rumor,
+      CareerNewsType.contract,
+      CareerNewsType.match,
+      CareerNewsType.achievement,
+      CareerNewsType.form,
+      CareerNewsType.objective,
+      CareerNewsType.sponsor,
+      CareerNewsType.season,
+    ];
+    final groupedNews = {
+      for (final type in categoryOrder)
+        type: visibleNews.where((item) => item.type == type).toList(),
+    };
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -220,12 +235,11 @@ class NewsScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 13),
-                    ...visibleNews.asMap().entries.map(
-                      (entry) => _buildTimelineItem(
-                        entry.value,
-                        isLast: entry.key == visibleNews.length - 1,
-                      ),
-                    ),
+                    ...categoryOrder
+                        .where((type) => groupedNews[type]!.isNotEmpty)
+                        .map(
+                          (type) => _buildNewsSection(type, groupedNews[type]!),
+                        ),
                   ],
                 ),
               ],
@@ -468,130 +482,162 @@ class NewsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTimelineItem(CareerNews news, {required bool isLast}) {
-    final accent = _getAccent(news.type);
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+  Widget _buildNewsSection(CareerNewsType type, List<CareerNews> news) {
+    final accent = _getAccent(type);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 25,
-            child: Column(
-              children: [
-                Container(
-                  width: 23,
-                  height: 23,
-                  decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.13),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: accent.withValues(alpha: 0.5),
-                      width: 1,
-                    ),
-                  ),
-                  child: Icon(_getIcon(news.type), color: accent, size: 12),
+          Row(
+            children: [
+              Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.13),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: accent.withValues(alpha: 0.28)),
                 ),
-                if (!isLast)
-                  Expanded(
-                    child: Container(
-                      width: 1,
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      color: Colors.white.withValues(alpha: 0.12),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 9),
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(18),
-                child: BackdropFilter(
-                  filter: ui.ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(14, 13, 14, 12),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.055),
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.11),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: accent.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                _getCategory(news.type).toUpperCase(),
-                                style: TextStyle(
-                                  color: accent,
-                                  fontSize: 8,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: 0.7,
-                                ),
-                              ),
-                            ),
-                            const Spacer(),
-                            const Icon(
-                              Icons.circle,
-                              color: Colors.white24,
-                              size: 5,
-                            ),
-                            const SizedBox(width: 5),
-                            Flexible(
-                              child: Text(
-                                _getMeta(news),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: mutedColor,
-                                  fontSize: 8,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.25,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          news.title,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            height: 1.25,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          news.description,
-                          style: const TextStyle(
-                            color: Color(0xFFC0CBC3),
-                            fontSize: 11,
-                            height: 1.45,
-                          ),
-                        ),
-                      ],
-                    ),
+                child: Icon(_getIcon(type), color: accent, size: 16),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  _getCategory(type).toUpperCase(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.1,
                   ),
                 ),
               ),
+              Text(
+                '${news.length} ${AppStrings.isEnglish ? 'NEWS' : 'НОВОСТЕЙ'}',
+                style: const TextStyle(
+                  color: mutedColor,
+                  fontSize: 9,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(width: 5),
+              Icon(Icons.swipe_rounded, color: Colors.white.withValues(alpha: 0.35), size: 15),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 190,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.only(right: 4),
+              itemCount: news.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 11),
+              itemBuilder: (context, index) => _buildTimelineItem(news[index]),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTimelineItem(CareerNews news) {
+    final accent = _getAccent(news.type);
+    return SizedBox(
+      width: 286,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(14, 13, 14, 12),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.055),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.11)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: accent.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        _getCategory(news.type).toUpperCase(),
+                        style: TextStyle(
+                          color: accent,
+                          fontSize: 8,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.7,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    Flexible(
+                      child: Text(
+                        _getMeta(news),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: mutedColor,
+                          fontSize: 8,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  news.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    height: 1.25,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 7),
+                Expanded(
+                  child: Text(
+                    news.description,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Color(0xFFC0CBC3),
+                      fontSize: 11,
+                      height: 1.45,
+                    ),
+                  ),
+                ),
+                Row(
+                  children: [
+                    Icon(_getIcon(news.type), color: accent.withValues(alpha: 0.8), size: 13),
+                    const SizedBox(width: 5),
+                    Text(
+                      AppStrings.isEnglish ? 'CAREER NEWS' : 'НОВОСТИ КАРЬЕРЫ',
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 8,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
