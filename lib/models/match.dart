@@ -61,8 +61,9 @@ class Match {
     final rivalPenalty = (strongerRivals * 0.035).clamp(0.0, 0.12);
     final trustBonus = ((career?.coachTrust ?? 65) - 65) * 0.004;
     final averageRating = career?.averageRating ?? 6.0;
+    final currentFormRating = career?.currentFormRating ?? averageRating;
     final playerFormBonus =
-        ((averageRating - 6.5) * 0.025).clamp(-0.06, 0.08);
+        ((currentFormRating - 6.5) * 0.025).clamp(-0.06, 0.08);
     final trophyCount = career?.history.fold<int>(
           0,
           (sum, season) => sum + season.achievements.length,
@@ -86,6 +87,7 @@ class Match {
       coachTrust: career?.coachTrust ?? 65,
       reputation: reputation,
       averageRating: averageRating,
+      formRating: currentFormRating,
     );
 
     final rolePlayChance = switch (playerStatus) {

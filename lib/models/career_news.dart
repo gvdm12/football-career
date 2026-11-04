@@ -1,4 +1,4 @@
-enum CareerNewsType { match, achievement, transfer, contract, season }
+enum CareerNewsType { match, achievement, transfer, contract, season, form, objective, sponsor, rumor }
 
 class CareerNews {
   final String id;

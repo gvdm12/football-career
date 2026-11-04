@@ -116,6 +116,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         ),
       ),
       averageRating: widget.career.averageRating,
+      formRating: widget.career.currentFormRating,
     );
     _playerPlayed = widget.forcePlayerParticipation
         ? !widget.career.isInjured
