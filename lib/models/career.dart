@@ -566,7 +566,7 @@ class Career {
           return award.wonTrophy &&
               award.matches >= 20 &&
               award.averageRating >= 7.8 &&
-              award.goals + award.assists >= 35;
+              award.goals + award.assists >= 40;
         case 'Лучший бомбардир':
           final league = Clubs.leagueOf(award.club);
           final threshold = league?.goldenBootGoalThreshold ?? 21;
@@ -645,7 +645,8 @@ class Career {
       ),
       worldTransfers: restoredWorldTransfers,
       friendlyMatches: readList('friendlyMatches', FriendlyMatch.fromJson),
-      lastConversationMatch: (json['lastConversationMatch'] as num?)?.toInt() ?? -4,
+      lastConversationMatch:
+          (json['lastConversationMatch'] as num?)?.toInt() ?? -4,
       season: (json['season'] as num?)?.toInt() ?? 1,
       history: normalizedHistory,
       playerOfMonthAwards: readList(
@@ -782,7 +783,8 @@ class Career {
       settings: settings ?? this.settings,
       worldTransfers: worldTransfers ?? this.worldTransfers,
       friendlyMatches: friendlyMatches ?? this.friendlyMatches,
-      lastConversationMatch: lastConversationMatch ?? this.lastConversationMatch,
+      lastConversationMatch:
+          lastConversationMatch ?? this.lastConversationMatch,
       season: season ?? this.season,
       matches: matches ?? this.matches,
       goals: goals ?? this.goals,
@@ -949,7 +951,8 @@ class Career {
       CareerDifficulty.normal => 1.0,
       CareerDifficulty.hard => 1.15,
     };
-    final injuryChance = 0.030 * settings.injuryFrequency * difficultyInjuryMultiplier;
+    final injuryChance =
+        0.030 * settings.injuryFrequency * difficultyInjuryMultiplier;
     if (!playerParticipated || Random().nextDouble() >= injuryChance) {
       return updatedCareer;
     }
@@ -1721,14 +1724,19 @@ class Career {
     );
     final allWorldTransfers = [...worldTransfers, ...newWorldTransfers];
     RealClubSquads.applyCareerTransfers(allWorldTransfers);
-    final worldTransferNews = newWorldTransfers.map((transfer) => CareerNews(
-      id: 'world_transfer_s${newSeason}_${transfer.playerName.hashCode}',
-      season: newSeason,
-      matchNumber: 0,
-      title: 'Трансфер: ${transfer.playerName}',
-      description: '${transfer.playerName} (${transfer.overall}) перешёл из ${transfer.fromClub} в ${transfer.toClub}.',
-      type: CareerNewsType.transfer,
-    )).toList();
+    final worldTransferNews = newWorldTransfers
+        .map(
+          (transfer) => CareerNews(
+            id: 'world_transfer_s${newSeason}_${transfer.playerName.hashCode}',
+            season: newSeason,
+            matchNumber: 0,
+            title: 'Трансфер: ${transfer.playerName}',
+            description:
+                '${transfer.playerName} (${transfer.overall}) перешёл из ${transfer.fromClub} в ${transfer.toClub}.',
+            type: CareerNewsType.transfer,
+          ),
+        )
+        .toList();
 
     final newAge = player.age + 1;
 
@@ -1762,7 +1770,11 @@ class Career {
       newDomesticCup = null;
     }
 
-    final baseDevelopmentPoints = season < 5 ? 3 : season == 5 ? 5 : 6;
+    final baseDevelopmentPoints = season < 5
+        ? 3
+        : season == 5
+        ? 5
+        : 6;
     final newDevelopmentPoints = alreadyArchived
         ? developmentPoints
         : developmentPoints +
@@ -1816,30 +1828,38 @@ class Career {
 
     // Пресса освещает не только клуб игрока, но и результаты других лиг.
     final currentPlayerLeague = Clubs.leagueOf(newPlayer.club);
-    final otherLeagues = League.values
-        .where((league) => league != currentPlayerLeague)
-        .toList()
-      ..shuffle(Random(newSeason * 97 + newPlayer.overall));
+    final otherLeagues =
+        League.values.where((league) => league != currentPlayerLeague).toList()
+          ..shuffle(Random(newSeason * 97 + newPlayer.overall));
     final newsLeagues = <League>[
       if (currentPlayerLeague != null) currentPlayerLeague,
       ...otherLeagues.take(3),
     ];
-    final leagueNews = newsLeagues.map((league) {
-      final table = [...(qualificationStandings[league] ?? const <LeagueTableEntry>[])]
-        ..sort((a, b) => b.points != a.points
-            ? b.points.compareTo(a.points)
-            : b.goalDifference.compareTo(a.goalDifference));
-      if (table.isEmpty) return null;
-      final champion = table.first.club;
-      return CareerNews(
-        id: 'league_result_s${newSeason}_${league.name}',
-        season: newSeason,
-        matchNumber: 0,
-        title: 'Итоги сезона в ${league.displayName}',
-        description: '$champion завершил предыдущий сезон на первом месте и стал чемпионом лиги.',
-        type: CareerNewsType.season,
-      );
-    }).whereType<CareerNews>().toList();
+    final leagueNews = newsLeagues
+        .map((league) {
+          final table =
+              [
+                ...(qualificationStandings[league] ??
+                    const <LeagueTableEntry>[]),
+              ]..sort(
+                (a, b) => b.points != a.points
+                    ? b.points.compareTo(a.points)
+                    : b.goalDifference.compareTo(a.goalDifference),
+              );
+          if (table.isEmpty) return null;
+          final champion = table.first.club;
+          return CareerNews(
+            id: 'league_result_s${newSeason}_${league.name}',
+            season: newSeason,
+            matchNumber: 0,
+            title: 'Итоги сезона в ${league.displayName}',
+            description:
+                '$champion завершил предыдущий сезон на первом месте и стал чемпионом лиги.',
+            type: CareerNewsType.season,
+          );
+        })
+        .whereType<CareerNews>()
+        .toList();
 
     final previousStats = previousSeasonStats.isNotEmpty
         ? previousSeasonStats.last
