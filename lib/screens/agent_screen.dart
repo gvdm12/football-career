@@ -250,8 +250,12 @@ class _AgentScreenState extends State<AgentScreen> {
                       icon: const Icon(Icons.handshake_outlined, size: 17),
                       label: Text(
                         _canTalk
-                            ? 'Переговоры с агентом'
-                            : 'Новый разговор через ${(7 - (career.teamMatches - career.lastAgentNegotiationTeamMatch)).clamp(0, 7)} матчей команды',
+                            ? (AppStrings.isEnglish
+                                ? 'Talk to agent'
+                                : 'Переговоры с агентом')
+                            : (AppStrings.isEnglish
+                                ? 'Next talk in ${(7 - (career.teamMatches - career.lastAgentNegotiationTeamMatch)).clamp(0, 7)} team matches'
+                                : 'Новый разговор через ${(7 - (career.teamMatches - career.lastAgentNegotiationTeamMatch)).clamp(0, 7)} матчей команды'),
                       ),
                     ),
                   ),
