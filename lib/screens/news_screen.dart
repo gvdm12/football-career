@@ -134,6 +134,7 @@ class NewsScreen extends StatelessWidget {
     final accent = news.type == CareerNewsType.transfer
         ? const Color(0xFFFFC857)
         : accentColor;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 9),
       child: ClipRRect(
@@ -145,68 +146,80 @@ class NewsScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.075),
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.16),
+              ),
             ),
             child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 39,
-            height: 39,
-            decoration: BoxDecoration(
-              color: accent.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(13),
-            ),
-            child: Icon(_getIcon(news.type), color: accent, size: 20),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  _getCategory(news.type),
-                  style: TextStyle(
-                    color: accent,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1,
+                Container(
+                  width: 39,
+                  height: 39,
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
                   ),
+                  child: Icon(_getIcon(news.type), color: accent, size: 20),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  news.title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _getCategory(news.type),
+                        style: TextStyle(
+                          color: accent,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        news.title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        news.description,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        news.matchNumber == 0 &&
+                                news.type == CareerNewsType.transfer
+                            ? 'ТРАНСФЕРНОЕ ОКНО · СЕЗОН ${news.season}'
+                            : news.matchNumber == 0 &&
+                                  news.type == CareerNewsType.season
+                            ? 'ИТОГИ ДРУГИХ ЛИГ · СЕЗОН ${news.season}'
+                            : news.matchNumber == 0 &&
+                                  news.type == CareerNewsType.achievement
+                            ? 'ЗОЛОТОЙ МЯЧ · СЕЗОН ${news.season}'
+                            : news.matchNumber < 0
+                            ? 'ПРЕДСЕЗОННАЯ ПОДГОТОВКА · СЕЗОН ${news.season}'
+                            : AppStrings.newsSeasonAndMatch(
+                                news.season,
+                                news.matchNumber,
+                              ),
+                        style: const TextStyle(
+                          color: Colors.white38,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 7),
-                Text(
-                  news.description,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  news.matchNumber == 0 && news.type == CareerNewsType.transfer
-                      ? 'ТРАНСФЕРНОЕ ОКНО · СЕЗОН ${news.season}'
-                      : news.matchNumber == 0 && news.type == CareerNewsType.season
-                          ? 'ИТОГИ ДРУГИХ ЛИГ · СЕЗОН ${news.season}'
-                          : news.matchNumber == 0 && news.type == CareerNewsType.achievement
-                              ? 'ЗОЛОТОЙ МЯЧ · СЕЗОН ${news.season}'
-                              : news.matchNumber < 0
-                              ? 'ПРЕДСЕЗОННАЯ ПОДГОТОВКА · СЕЗОН ${news.season}'
-                              : AppStrings.newsSeasonAndMatch(news.season, news.matchNumber),
-                  style: const TextStyle(color: Colors.white38, fontSize: 11),
                 ),
               ],
-            ),
-          ),
             ),
           ),
         ),
