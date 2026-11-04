@@ -591,18 +591,9 @@ class Career {
               award.averageRating >= 7.8 &&
               award.goals + award.assists >= 40;
         case 'Лучший бомбардир':
-          final league = Clubs.leagueOf(award.club);
-          final threshold = league?.goldenBootGoalThreshold ?? 21;
-          return award.matches >= 10 && award.goals >= threshold;
+          return award.matches >= 10 && award.goals > 0;
         case 'Лучший ассистент':
-          final league = Clubs.leagueOf(award.club);
-          if (league == null || award.matches < 20) return false;
-          if (award.assists >= league.bestAssisterThreshold) return true;
-          final isTopLeague =
-              league == League.england || league == League.spain;
-          return isTopLeague &&
-              award.assists >= 18 &&
-              award.averageRating >= 8.0;
+          return award.matches >= 10 && award.assists > 0;
         default:
           return true;
       }
