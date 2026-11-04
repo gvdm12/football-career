@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/career_news.dart';
@@ -10,6 +12,7 @@ class NewsScreen extends StatelessWidget {
 
   static const Color backgroundColor = Color(0xFF04160A);
   static const Color cardColor = Color(0xFF0B2B14);
+  static const Color glassBorder = Color(0x66FFFFFF);
   static const Color accentColor = Color(0xFF8BE07F);
 
   IconData _getIcon(CareerNewsType type) {
@@ -92,18 +95,16 @@ class NewsScreen extends StatelessWidget {
 
   Widget _buildHeader(int newsCount) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF14401E), Color(0xFF0B2B14)],
-        ),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: accentColor.withValues(alpha: 0.25)),
+        color: Colors.white.withValues(alpha: 0.075),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: glassBorder.withValues(alpha: 0.55)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.newspaper, color: accentColor, size: 32),
-          const SizedBox(width: 14),
+          const Icon(Icons.newspaper, color: accentColor, size: 27),
+          const SizedBox(width: 11),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,7 +113,7 @@ class NewsScreen extends StatelessWidget {
                   AppStrings.careerNewsHeader,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 17,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -134,29 +135,31 @@ class NewsScreen extends StatelessWidget {
         ? const Color(0xFFFFC857)
         : accentColor;
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: accent.withValues(alpha: 0.22)),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.14), blurRadius: 14, offset: const Offset(0, 5)),
-        ],
-      ),
-      child: Row(
+      margin: const EdgeInsets.only(bottom: 9),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 13, sigmaY: 13),
+          child: Container(
+            padding: const EdgeInsets.all(13),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.075),
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+            ),
+            child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 46,
-            height: 46,
+            width: 39,
+            height: 39,
             decoration: BoxDecoration(
               color: accent.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(13),
             ),
-            child: Icon(_getIcon(news.type), color: accent, size: 24),
+            child: Icon(_getIcon(news.type), color: accent, size: 20),
           ),
-          const SizedBox(width: 13),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,7 +178,7 @@ class NewsScreen extends StatelessWidget {
                   news.title,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -184,8 +187,8 @@ class NewsScreen extends StatelessWidget {
                   news.description,
                   style: const TextStyle(
                     color: Colors.white70,
-                    fontSize: 13,
-                    height: 1.5,
+                    fontSize: 12,
+                    height: 1.4,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -204,7 +207,9 @@ class NewsScreen extends StatelessWidget {
               ],
             ),
           ),
-        ],
+            ),
+          ),
+        ),
       ),
     );
   }
