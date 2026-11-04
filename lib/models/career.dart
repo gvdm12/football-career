@@ -657,19 +657,24 @@ class Career {
             : null,
       ),
       worldTransfers: restoredWorldTransfers,
-      friendlyMatches: readList('friendlyMatches', FriendlyMatch.fromJson)
-          .take(2)
-          .toList(),
+      friendlyMatches: readList(
+        'friendlyMatches',
+        FriendlyMatch.fromJson,
+      ).take(2).toList(),
       lastConversationMatch:
           (json['lastConversationMatch'] as num?)?.toInt() ?? -4,
-      teamMatches: (json['teamMatches'] as num?)?.toInt() ??
-          (json['matches'] as num?)?.toInt() ?? 0,
+      teamMatches:
+          (json['teamMatches'] as num?)?.toInt() ??
+          (json['matches'] as num?)?.toInt() ??
+          0,
       lastCoachNegotiationTeamMatch:
           (json['lastCoachNegotiationTeamMatch'] as num?)?.toInt() ??
-          (json['lastConversationMatch'] as num?)?.toInt() ?? -7,
+          (json['lastConversationMatch'] as num?)?.toInt() ??
+          -7,
       lastAgentNegotiationTeamMatch:
           (json['lastAgentNegotiationTeamMatch'] as num?)?.toInt() ??
-          (json['lastConversationMatch'] as num?)?.toInt() ?? -7,
+          (json['lastConversationMatch'] as num?)?.toInt() ??
+          -7,
       lastClubChangeSeason:
           (json['lastClubChangeSeason'] as num?)?.toInt() ?? 0,
       season: (json['season'] as num?)?.toInt() ?? 1,
@@ -962,7 +967,8 @@ class Career {
       );
     }
 
-    var updatedCareer = settings.playWithoutInjuries &&
+    var updatedCareer =
+        settings.playWithoutInjuries &&
             (injuryMatchesRemaining > 0 || injuryName != null)
         ? copyWith(
             injuryMatchesRemaining: 0,
@@ -971,9 +977,12 @@ class Career {
           )
         : this;
     if (playerParticipated) {
-      final nextBoosts = Map<String, int>.from(updatedCareer.temporarySkillBoosts);
-      final nextDurations =
-          Map<String, int>.from(updatedCareer.temporarySkillBoostMatches);
+      final nextBoosts = Map<String, int>.from(
+        updatedCareer.temporarySkillBoosts,
+      );
+      final nextDurations = Map<String, int>.from(
+        updatedCareer.temporarySkillBoostMatches,
+      );
       for (final skillName in nextDurations.keys.toList()) {
         final remaining = (nextDurations[skillName] ?? 0) - 1;
         if (remaining <= 0) {
@@ -1467,6 +1476,7 @@ class Career {
 
         if (isGoodSeason && goals >= 14) {
           addBonus(SkillName.pace, 1);
+          addBonus(SkillName.vision, 1);
         }
 
         if (contributions >= 18) {
