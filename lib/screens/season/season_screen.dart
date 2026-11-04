@@ -1099,42 +1099,38 @@ class _SeasonScreenState extends State<SeasonScreen> {
           ),
           Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 430),
+                constraints: const BoxConstraints(maxWidth: 380),
                 child: _buildLiquidGlassSurface(
                   radius: 24,
-                  child: AlertDialog(
-                    backgroundColor: Colors.transparent,
-                    surfaceTintColor: Colors.transparent,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
-                      side: BorderSide.none,
-                    ),
-                    title: const Row(
-                      children: [
-                        Icon(
-                          Icons.emoji_events,
-                          color: Color(0xFFFFD54F),
-                          size: 28,
-                        ),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            'Игрок месяца',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    content: Column(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
+                    child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        const Row(
+                          children: [
+                            Icon(
+                              Icons.emoji_events,
+                              color: Color(0xFFFFD54F),
+                              size: 26,
+                            ),
+                            SizedBox(width: 9),
+                            Expanded(
+                              child: Text(
+                                'Игрок месяца',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 17,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
                         Text(
                           award.monthName,
                           style: const TextStyle(
@@ -1142,7 +1138,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 5),
                         Text(
                           award.playerName,
                           style: const TextStyle(
@@ -1168,29 +1164,26 @@ class _SeasonScreenState extends State<SeasonScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 12),
                         Text(
-                          award.isCareerPlayer
-                              ? 'Поздравляем! Вы стали лучшим игроком месяца.'
-                              : 'В этом месяце награду получил другой футболист.',
-                          style: TextStyle(
-                            color: award.isCareerPlayer
-                                ? const Color(0xFF8BE07F)
-                                : Colors.white70,
-                            height: 1.35,
+                          'Поздравляем! Вы стали лучшим игроком месяца.',
+                          style: const TextStyle(
+                            color: Color(0xFF8BE07F),
+                            height: 1.3,
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () => Navigator.pop(dialogContext),
+                            child: const Text(
+                              'Продолжить',
+                              style: TextStyle(color: Color(0xFF8BE07F)),
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(dialogContext),
-                        child: const Text(
-                          'Продолжить',
-                          style: TextStyle(color: Color(0xFF8BE07F)),
-                        ),
-                      ),
-                    ],
                   ),
                 ),
               ),
@@ -3674,6 +3667,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
                             padding: const EdgeInsets.all(16),
                             children: [
                               _buildProgressCard(),
+                              if (!worldCupBlocksSeason &&
+                                  career.friendlyMatches.any((item) => !item.isResolved)) ...[
+                                const SizedBox(height: 10),
+                                _buildFriendlyMatchesSection(),
+                              ],
                               const SizedBox(height: 8),
                               if (isSaving)
                                 const Padding(
@@ -4810,12 +4808,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     final List<MapEntry<double, Widget>> calendarItems = [];
 
-    for (final friendly in career.friendlyMatches) {
-      calendarItems.add(
-        MapEntry(-2.0 + friendly.number * 0.1, _buildFriendlyMatchRow(friendly)),
-      );
-    }
-
     for (final match in career.seasonMatches) {
       calendarItems.add(
         MapEntry(match.number.toDouble(), _buildMatchRow(match)),
@@ -5428,6 +5420,24 @@ class _SeasonScreenState extends State<SeasonScreen> {
     await _saveCareer(updatedCareer);
   }
 
+  Future<void> _skipFriendlyMatch(FriendlyMatch friendly) async {
+    if (isSaving || seasonFinishing || friendly.isResolved) return;
+    final updated = career.copyWith(
+      friendlyMatches: career.friendlyMatches.map((item) {
+        return item.number == friendly.number
+            ? item.copyWith(isSkipped: true)
+            : item;
+      }).toList(),
+    );
+    setState(() {
+      career = updated;
+      isSaving = true;
+    });
+    await _saveCareer(updated);
+    if (!mounted) return;
+    setState(() => isSaving = false);
+  }
+
   Widget _buildFriendlyMatchRow(FriendlyMatch friendly) {
     final result = friendly.result;
     final score = result == null
@@ -5460,7 +5470,12 @@ class _SeasonScreenState extends State<SeasonScreen> {
         children: [
           const Text(
             'ПРЕДСЕЗОННАЯ ПОДГОТОВКА · ТОВАРИЩЕСКИЙ МАТЧ',
-            style: TextStyle(color: Color(0xFFB9C8BC), fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 0.6),
+            style: TextStyle(
+              color: Color(0xFFB9C8BC),
+              fontSize: 9,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0.6,
+            ),
           ),
           const SizedBox(height: 7),
           Row(
@@ -5468,30 +5483,53 @@ class _SeasonScreenState extends State<SeasonScreen> {
               Expanded(
                 child: Text(
                   '${friendly.isHome ? career.player.club : friendly.opponent} — ${friendly.isHome ? friendly.opponent : career.player.club}',
-                  style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
-              Text(score, style: TextStyle(color: resultColor, fontSize: 13, fontWeight: FontWeight.w900)),
+              Text(
+                friendly.isSkipped ? 'Пропущен' : score,
+                style: TextStyle(
+                  color: friendly.isSkipped ? Colors.white54 : resultColor,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
             ],
           ),
-          if (result == null) ...[
+          if (!friendly.isResolved) ...[
             const SizedBox(height: 9),
-            Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton.icon(
-                onPressed: isSaving || seasonFinishing
-                    ? null
-                    : () => _playFriendlyMatch(friendly),
-                icon: const Icon(Icons.sports_soccer, size: 15),
-                label: const Text('Сыграть'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF8BE07F),
-                  foregroundColor: const Color(0xFF082A12),
-                  visualDensity: VisualDensity.compact,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: isSaving || seasonFinishing
+                      ? null
+                      : () => _skipFriendlyMatch(friendly),
+                  child: const Text(
+                    'Пропустить',
+                    style: TextStyle(color: Colors.white70),
+                  ),
                 ),
-              ),
+                const SizedBox(width: 6),
+                ElevatedButton.icon(
+                  onPressed: isSaving || seasonFinishing
+                      ? null
+                      : () => _playFriendlyMatch(friendly),
+                  icon: const Icon(Icons.sports_soccer, size: 15),
+                  label: const Text('Сыграть'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF8BE07F),
+                    foregroundColor: const Color(0xFF082A12),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ),
+              ],
             ),
-          ] else
+          ] else if (result != null)
             Padding(
               padding: const EdgeInsets.only(top: 5),
               child: Text(
@@ -5499,6 +5537,44 @@ class _SeasonScreenState extends State<SeasonScreen> {
                 style: const TextStyle(color: Colors.white60, fontSize: 10),
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFriendlyMatchesSection() {
+    final unresolved = career.friendlyMatches
+        .where((friendly) => !friendly.isResolved)
+        .toList();
+    if (unresolved.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0B2113).withValues(alpha: 0.94),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF54745C)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'ТОВАРИЩЕСКИЕ МАТЧИ',
+            style: TextStyle(
+              color: Color(0xFF8BE07F),
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0.8,
+            ),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Перед началом официальных турниров можно сыграть матчи для подготовки или пропустить их.',
+            style: TextStyle(color: Colors.white60, fontSize: 11),
+          ),
+          const SizedBox(height: 9),
+          ...unresolved.map(_buildFriendlyMatchRow),
         ],
       ),
     );
