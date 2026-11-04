@@ -1232,52 +1232,6 @@ class _CompactStatTile extends StatelessWidget {
   }
 }
 
-class _StatRow extends StatelessWidget {
-  final _Stat stat;
-
-  const _StatRow({required this.stat});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(stat.icon, color: stat.color, size: 20),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                stat.label,
-                style: const TextStyle(
-                  color: Color(0xFFD5E8D8),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 4),
-              _StatBar(value: stat.value),
-            ],
-          ),
-        ),
-        const SizedBox(width: 12),
-        SizedBox(
-          width: 32,
-          child: Text(
-            '${stat.value}',
-            textAlign: TextAlign.right,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class _StatBar extends StatelessWidget {
   final int value;
 
