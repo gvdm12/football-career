@@ -80,35 +80,51 @@ class _ShopScreenState extends State<ShopScreen> {
 
   int get _recoveryPrice => 25000;
 
-  int get _psychologistPrice =>
-      (45000 * (1 + (career.skillTrainingPurchases['psychologist'] ?? 0) * 0.5)).round();
+  int get _staffPurchaseBasePrice => career.season <= 4 ? 60000 : 180000;
 
-  int get _personalTrainerPrice =>
-      (60000 * (1 + (career.skillTrainingPurchases['personalTrainer'] ?? 0) * 0.5)).round();
+  int get _psychologistCooldown =>
+      career.temporarySkillBoostMatches['psychologist'] ?? 0;
+
+  int get _personalTrainerCooldown =>
+      career.temporarySkillBoostMatches['personalTrainer'] ?? 0;
+
+  int _nextStaffPurchasePrice(String key) {
+    final purchases = (career.skillTrainingPurchases[key] ?? 0).clamp(0, 10);
+    return _staffPurchaseBasePrice * (1 << purchases);
+  }
+
+  int get _psychologistPrice => _nextStaffPurchasePrice('psychologist');
+  int get _personalTrainerPrice => _nextStaffPurchasePrice('personalTrainer');
 
   Future<void> _buyPsychologist() async {
-    if (career.money < _psychologistPrice) return;
+    if (career.money < _psychologistPrice || _psychologistCooldown > 0) return;
     final purchases = Map<String, int>.from(career.skillTrainingPurchases);
+    final cooldowns = Map<String, int>.from(career.temporarySkillBoostMatches);
     purchases['psychologist'] = (purchases['psychologist'] ?? 0) + 1;
+    cooldowns['psychologist'] = 10;
     setState(() {
       career = career.copyWith(
         money: career.money - _psychologistPrice,
         coachTrust: (career.coachTrust + 8).clamp(0, 100).toInt(),
         skillTrainingPurchases: purchases,
+        temporarySkillBoostMatches: cooldowns,
       );
     });
     await CareerStorage.save(career);
   }
 
   Future<void> _buyPersonalTrainer() async {
-    if (career.money < _personalTrainerPrice) return;
+    if (career.money < _personalTrainerPrice || _personalTrainerCooldown > 0) return;
     final purchases = Map<String, int>.from(career.skillTrainingPurchases);
+    final cooldowns = Map<String, int>.from(career.temporarySkillBoostMatches);
     purchases['personalTrainer'] = (purchases['personalTrainer'] ?? 0) + 1;
+    cooldowns['personalTrainer'] = 10;
     setState(() {
       career = career.copyWith(
         money: career.money - _personalTrainerPrice,
         developmentPoints: career.developmentPoints + 2,
         skillTrainingPurchases: purchases,
+        temporarySkillBoostMatches: cooldowns,
       );
     });
     await CareerStorage.save(career);
@@ -446,17 +462,21 @@ class _ShopScreenState extends State<ShopScreen> {
                 _purchaseCard(
                   icon: Icons.psychology_alt,
                   title: 'Спортивный психолог',
-                  description: 'Помогает восстановить контакт с тренером и повышает доверие на 8 пунктов.',
+                  description: _psychologistCooldown > 0
+                      ? 'Повышает доверие тренера на 8 пунктов. Повторная покупка через $_psychologistCooldown матчей.'
+                      : 'Повышает доверие тренера на 8 пунктов. Повторная покупка доступна через 10 матчей.',
                   price: _psychologistPrice,
-                  onPressed: career.money >= _psychologistPrice ? _buyPsychologist : null,
+                  onPressed: career.money >= _psychologistPrice && _psychologistCooldown == 0 ? _buyPsychologist : null,
                 ),
                 const SizedBox(height: 8),
                 _purchaseCard(
                   icon: Icons.sports,
                   title: 'Персональный тренер',
-                  description: 'Индивидуальная программа подготовки. Даёт 2 дополнительных очка развития без прямого повышения характеристик.',
+                  description: _personalTrainerCooldown > 0
+                      ? 'Даёт 2 очка развития. Повторная покупка через $_personalTrainerCooldown матчей.'
+                      : 'Даёт 2 очка развития. Повторная покупка доступна через 10 матчей.',
                   price: _personalTrainerPrice,
-                  onPressed: career.money >= _personalTrainerPrice ? _buyPersonalTrainer : null,
+                  onPressed: career.money >= _personalTrainerPrice && _personalTrainerCooldown == 0 ? _buyPersonalTrainer : null,
                 ),
               ],
               ),
