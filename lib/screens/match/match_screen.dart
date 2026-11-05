@@ -45,6 +45,13 @@ class MatchScreen extends StatelessWidget {
   String? _pressConferenceCategory() {
     if (!match.playerPlayed) return null;
 
+    final opponentClub = match.homeTeam == career.player.club
+        ? match.awayTeam
+        : match.homeTeam;
+    final facedFormerClub = opponentClub != career.player.club &&
+        career.history.any((season) => season.club == opponentClub);
+    if (facedFormerClub) return 'formerClub';
+
     final playedBefore = career.seasonMatches
         .where((item) => item.isPlayed)
         .length;
@@ -109,10 +116,14 @@ class MatchScreen extends StatelessWidget {
           category == 'transferInterest' && interestedClubs.isNotEmpty
           ? interestedClubs[Random().nextInt(interestedClubs.length)]
           : null;
+      final opponentClub = match.homeTeam == career.player.club
+          ? match.awayTeam
+          : match.homeTeam;
       final content = PressConferenceContentFactory.create(
         category: category,
         english: AppStrings.isEnglish,
         interestedClub: interestedClub,
+        opponentClub: category == 'formerClub' ? opponentClub : null,
       );
       if (category == 'transferInterest') {
         updatedCareer = updatedCareer.copyWith(
