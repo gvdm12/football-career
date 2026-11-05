@@ -116,7 +116,7 @@ class CareerEndScreen extends StatelessWidget {
             (a, b) => a.goals + a.assists >= b.goals + b.assists ? a : b,
           );
 
-    return PopScope<void>(
+    return PopScope<Career>(
       canPop: false,
       child: Scaffold(
       backgroundColor: const Color(0xFF061B0C),
