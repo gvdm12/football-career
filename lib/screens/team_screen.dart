@@ -5,6 +5,7 @@ import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/player_status.dart';
+import 'package:flutter_football/models/real_club_squads.dart';
 
 class TeamScreen extends StatelessWidget {
   final Career career;
@@ -32,6 +33,7 @@ class TeamScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final player = career.player;
+    final hasRealSquad = RealClubSquads.hasRealSquad(player.club);
     final club = Clubs.getByName(player.club);
     final status = PlayerStatusCalculator.calculate(
       overall: player.overall,
@@ -51,7 +53,9 @@ class TeamScreen extends StatelessWidget {
     final rivals = [...career.rivals]
       ..sort((a, b) => b.overall.compareTo(a.overall));
 
-    return Scaffold(
+    return DefaultTabController(
+      length: hasRealSquad ? 2 : 1,
+      child: Scaffold(
       backgroundColor: const Color(0xFF07130F),
       appBar: AppBar(
         backgroundColor: const Color(0xAA18241F),
@@ -64,8 +68,25 @@ class TeamScreen extends StatelessWidget {
             fontSize: 14,
           ),
         ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(44),
+          child: TabBar(
+            indicatorColor: _accent,
+            indicatorWeight: 3,
+            labelColor: _accent,
+            unselectedLabelColor: Colors.white60,
+            labelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900),
+            tabs: [
+              if (hasRealSquad) const Tab(text: 'СОСТАВ'),
+              const Tab(text: 'КОНКУРЕНТЫ'),
+            ],
+          ),
+        ),
       ),
-      body: Container(
+      body: TabBarView(
+        children: [
+          if (hasRealSquad) _buildSquadTab(career),
+          Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -382,6 +403,145 @@ class TeamScreen extends StatelessWidget {
             ),
           ),
         ),
+          ),
+        ],
+      ),
+    ),
+    );
+  }
+
+  Widget _buildSquadTab(Career career) {
+    const positions = <String>['goalkeeper', 'defender', 'midfielder', 'forward'];
+    final squad = RealClubSquads.squads[career.player.club] ?? const <String, List<RealClubPlayer>>{};
+    final totalPlayers = positions.fold<int>(0, (sum, position) => sum + (squad[position]?.length ?? 0)) +
+        (positions.any((position) => position == career.player.position.name &&
+                !(squad[position] ?? const <RealClubPlayer>[]).any((item) => item.name == career.player.name))
+            ? 1
+            : 0);
+
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF0B3A1A), Color(0xFF082A12), _background],
+        ),
+      ),
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.075),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: _border),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.groups_rounded, color: _accent, size: 25),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(career.player.club, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 15)),
+                      const SizedBox(height: 3),
+                      const Text('СОСТАВ КЛУБА', style: TextStyle(color: Colors.white60, fontSize: 9, letterSpacing: 1, fontWeight: FontWeight.w800)),
+                    ],
+                  ),
+                ),
+                Text('$totalPlayers', style: const TextStyle(color: _accent, fontWeight: FontWeight.w900, fontSize: 20)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          ...positions.map((position) => _buildSquadPosition(career, squad, position)),
+          const SizedBox(height: 8),
+          const Text(
+            'Состав учитывает реальные трансферы, сохранённые в вашей карьере. Игровые рейтинги используются внутри игры.',
+            style: TextStyle(color: Colors.white54, fontSize: 10, height: 1.4),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSquadPosition(
+    Career career,
+    Map<String, List<RealClubPlayer>> squad,
+    String position,
+  ) {
+    const titles = <String, String>{
+      'goalkeeper': 'ВРАТАРИ',
+      'defender': 'ЗАЩИТНИКИ',
+      'midfielder': 'ПОЛУЗАЩИТНИКИ',
+      'forward': 'НАПАДАЮЩИЕ',
+    };
+    final players = List<RealClubPlayer>.from(squad[position] ?? const <RealClubPlayer>[]);
+    final isPlayerPosition = career.player.position.name == position;
+    if (isPlayerPosition && !players.any((item) => item.name == career.player.name)) {
+      players.add(RealClubPlayer(
+        career.player.name,
+        career.player.age,
+        career.player.overall,
+        career.player.jerseyNumber,
+      ));
+    }
+    players.sort((a, b) => b.overall.compareTo(a.overall));
+    if (players.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.055),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(child: Text(titles[position]!, style: const TextStyle(color: _accent, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1))),
+              Text('${players.length}', style: const TextStyle(color: Colors.white54, fontSize: 10, fontWeight: FontWeight.w800)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ...players.map((item) {
+            final isCareerPlayer = item.name == career.player.name && isPlayerPosition;
+            final age = isCareerPlayer ? career.player.age : item.age;
+            final overall = isCareerPlayer ? career.player.overall : item.overall;
+            final number = isCareerPlayer ? career.player.jerseyNumber : item.jerseyNumber;
+            return Container(
+              margin: const EdgeInsets.only(bottom: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+              decoration: BoxDecoration(
+                color: isCareerPlayer ? const Color(0x332E9B50) : Colors.white.withValues(alpha: 0.045),
+                borderRadius: BorderRadius.circular(11),
+                border: Border.all(color: isCareerPlayer ? _accent.withValues(alpha: 0.65) : Colors.white.withValues(alpha: 0.10)),
+              ),
+              child: Row(
+                children: [
+                  SizedBox(width: 25, child: Text('#$number', style: const TextStyle(color: Colors.white54, fontSize: 10, fontWeight: FontWeight.w800))),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(item.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800)),
+                        const SizedBox(height: 2),
+                        Text('$age лет${isCareerPlayer ? ' · ВАШ ИГРОК' : ''}', style: TextStyle(color: isCareerPlayer ? _accent : Colors.white54, fontSize: 9, fontWeight: isCareerPlayer ? FontWeight.w800 : FontWeight.normal)),
+                      ],
+                    ),
+                  ),
+                  Text('$overall', style: TextStyle(color: overall >= 88 ? const Color(0xFFFFD27A) : _accent, fontSize: 15, fontWeight: FontWeight.w900)),
+                ],
+              ),
+            );
+          }),
+        ],
       ),
     );
   }
