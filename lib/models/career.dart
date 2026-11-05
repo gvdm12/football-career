@@ -1362,9 +1362,9 @@ class Career {
           ),
         );
       }
-      return trustedCareer.copyWith(
-        news: [...trustedCareer.news, ...competitionNews],
-      );
+      return trustedCareer
+          .copyWith(news: [...trustedCareer.news, ...competitionNews])
+          .advanceAfterCompetitionMatch(playerParticipated: false);
     }
 
     final newMatches = matches + 1;
