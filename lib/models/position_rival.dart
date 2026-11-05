@@ -357,6 +357,7 @@ class PositionRival {
   static List<PositionRival> advanceMatch(
     List<PositionRival> rivals, {
     int? month,
+    int clubStrength = 75,
   }) {
     final random = Random();
     return rivals.map((rival) {
@@ -390,17 +391,71 @@ class PositionRival {
 
       var goals = 0;
       var assists = 0;
+      final quality = (rival.overall - 70).toDouble();
+      final clubFactor = (clubStrength - 75).toDouble();
       switch (rival.position) {
         case PlayerPosition.forward:
-          if (random.nextDouble() < rival.overall / 260) goals = 1;
-          if (random.nextDouble() < 0.16) assists = 1;
+          // У сильных нападающих есть шанс оформить дубль или хет-трик.
+          // Вероятности учитывают рейтинг, форму и силу клуба.
+          final firstGoalChance = (0.22 +
+                  quality * 0.012 +
+                  clubFactor * 0.006 +
+                  rival.form * 0.008)
+              .clamp(0.12, 0.72)
+              .toDouble();
+          final secondGoalChance = (0.015 +
+                  (rival.overall - 75) * 0.006 +
+                  clubFactor * 0.004 +
+                  rival.form * 0.004)
+              .clamp(0.01, 0.28)
+              .toDouble();
+          final thirdGoalChance = (0.002 +
+                  (rival.overall - 85) * 0.003 +
+                  (clubStrength - 88) * 0.002)
+              .clamp(0.0, 0.07)
+              .toDouble();
+          if (random.nextDouble() < firstGoalChance) {
+            goals = 1;
+            if (random.nextDouble() < secondGoalChance) {
+              goals = 2;
+              if (random.nextDouble() < thirdGoalChance) goals = 3;
+            }
+          }
+          final forwardAssistChance = (0.12 +
+                  (rival.overall - 70) * 0.003 +
+                  clubFactor * 0.002)
+              .clamp(0.10, 0.38)
+              .toDouble();
+          if (random.nextDouble() < forwardAssistChance) assists = 1;
           break;
         case PlayerPosition.midfielder:
-          if (random.nextDouble() < rival.overall / 500) goals = 1;
-          if (random.nextDouble() < 0.24) assists = 1;
+          final midfielderGoalChance = (0.05 +
+                  quality * 0.003 +
+                  clubFactor * 0.0018 +
+                  rival.form * 0.003)
+              .clamp(0.04, 0.30)
+              .toDouble();
+          if (random.nextDouble() < midfielderGoalChance) goals = 1;
+          if (goals == 1 &&
+              random.nextDouble() <
+                  (0.015 + (rival.overall - 80) * 0.003)
+                      .clamp(0.0, 0.08)) {
+            goals = 2;
+          }
+          final midfielderAssistChance = (0.16 +
+                  (rival.overall - 70) * 0.004 +
+                  clubFactor * 0.002)
+              .clamp(0.14, 0.42)
+              .toDouble();
+          if (random.nextDouble() < midfielderAssistChance) assists = 1;
           break;
         case PlayerPosition.defender:
-          if (random.nextDouble() < 0.055) goals = 1;
+          final defenderGoalChance = (0.035 +
+                  quality * 0.0015 +
+                  clubFactor * 0.001)
+              .clamp(0.025, 0.12)
+              .toDouble();
+          if (random.nextDouble() < defenderGoalChance) goals = 1;
           if (random.nextDouble() < 0.10) assists = 1;
           break;
         case PlayerPosition.goalkeeper:
