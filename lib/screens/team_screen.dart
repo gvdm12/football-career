@@ -45,7 +45,10 @@ class TeamScreen extends StatelessWidget {
         averageRating: career.averageRating,
         coachTrust: career.coachTrust,
         reputationModifier: career.reputationModifier,
-        trophies: career.history.fold<int>(0, (sum, item) => sum + item.achievements.length),
+        trophies: career.history.fold<int>(
+          0,
+          (sum, item) => sum + item.achievements.length,
+        ),
       ),
       averageRating: career.averageRating,
       formRating: career.currentFormRating,
@@ -56,366 +59,412 @@ class TeamScreen extends StatelessWidget {
     return DefaultTabController(
       length: hasRealSquad ? 2 : 1,
       child: Scaffold(
-      backgroundColor: const Color(0xFF07130F),
-      appBar: AppBar(
-        backgroundColor: const Color(0xAA18241F),
-        foregroundColor: Colors.white,
-        title: const Text(
-          'КОМАНДА',
-          style: TextStyle(
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1,
-            fontSize: 14,
+        backgroundColor: const Color(0xFF07130F),
+        appBar: AppBar(
+          backgroundColor: const Color(0xAA18241F),
+          foregroundColor: Colors.white,
+          title: const Text(
+            'КОМАНДА',
+            style: TextStyle(
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1,
+              fontSize: 14,
+            ),
           ),
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(44),
-          child: TabBar(
-            indicatorColor: _accent,
-            indicatorWeight: 3,
-            labelColor: _accent,
-            unselectedLabelColor: Colors.white60,
-            labelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900),
-            tabs: [
-              if (hasRealSquad) const Tab(text: 'СОСТАВ'),
-              const Tab(text: 'КОНКУРЕНТЫ'),
-            ],
-          ),
-        ),
-      ),
-      body: TabBarView(
-        children: [
-          if (hasRealSquad) _buildSquadTab(career),
-          Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF0B3A1A), Color(0xFF082A12), _background],
-          ),
-        ),
-        child: ClipRect(
-          child: BackdropFilter(
-            filter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.075),
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(44),
+            child: TabBar(
+              indicatorColor: _accent,
+              indicatorWeight: 3,
+              labelColor: _accent,
+              unselectedLabelColor: Colors.white60,
+              labelStyle: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w900,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // const Text(
-                  //   'ТВОЙ КЛУБ',
-                  //   style: TextStyle(
-                  //     color: _accent,
-                  //     fontSize: 10,
-                  //     fontWeight: FontWeight.w900,
-                  //     letterSpacing: 1.2,
-                  //   ),
-                  // ),
-                  const SizedBox(height: 10),
-                  Row(
+              tabs: [
+                if (hasRealSquad) const Tab(text: 'СОСТАВ'),
+                const Tab(text: 'КОНКУРЕНТЫ'),
+              ],
+            ),
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            if (hasRealSquad) _buildSquadTab(career),
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFF0B3A1A), Color(0xFF082A12), _background],
+                ),
+              ),
+              child: ClipRect(
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                  child: ListView(
+                    padding: const EdgeInsets.all(16),
                     children: [
                       Container(
-                        width: 44,
-                        height: 44,
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.10),
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: _border),
+                          color: Colors.white.withValues(alpha: 0.075),
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.22),
+                          ),
                         ),
-                        child: const Icon(
-                          Icons.shield_outlined,
-                          color: _accent,
-                          size: 24,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              player.club,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              'Сила клуба: ${club.strength}',
-                              style: const TextStyle(
-                                color: Colors.white60,
-                                fontSize: 11,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.07),
-                      borderRadius: BorderRadius.circular(13),
-                      border: Border.all(color: _border),
-                    ),
-                    child: Row(
-                      children: [
-                        const CircleAvatar(
-                          radius: 17,
-                          backgroundColor: Color(0xFF205B2D),
-                          child: Icon(Icons.person, color: _accent),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${player.name}  #${player.jerseyNumber}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 13,
-                                ),
-                              ),
-                              Text(
-                                '${_positionName(player.position)} · ${player.age} лет',
-                                style: const TextStyle(
-                                  color: Colors.white60,
-                                  fontSize: 10,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              '${player.overall}',
-                              style: const TextStyle(
-                                color: _accent,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                            Text(
-                              status.displayName.toUpperCase(),
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 8,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 1),
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                const Expanded(
-                  child: Text(
-                    'КОНКУРЕНТЫ ЗА ПОЗИЦИЮ',
-                    style: TextStyle(
-                      color: _accent,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                ),
-                Text(
-                  '${rivals.length}',
-                  style: const TextStyle(
-                    color: Colors.white60,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 9),
-            if (rivals.isEmpty)
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: _panel,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: _border),
-                ),
-                child: const Text(
-                  'Пока нет игроков, конкурирующих с вами за место в составе.',
-                  style: TextStyle(color: Colors.white70, height: 1.4),
-                ),
-              )
-            else
-              ...rivals.map((rival) {
-                final isStronger = rival.overall + rival.form > player.overall;
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 9),
-                  padding: const EdgeInsets.all(13),
-                  decoration: BoxDecoration(
-                    color: _panel,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: isStronger
-                          ? const Color(0xFFFFD27A).withValues(alpha: 0.55)
-                          : Colors.white.withValues(alpha: 0.22),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 38,
-                            height: 38,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.09),
-                              borderRadius: BorderRadius.circular(11),
-                            ),
-                            child: Center(
-                              child: Text(
-                                _positionName(rival.position),
-                                style: const TextStyle(
-                                  color: _accent,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w900,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            // const Text(
+                            //   'ТВОЙ КЛУБ',
+                            //   style: TextStyle(
+                            //     color: _accent,
+                            //     fontSize: 10,
+                            //     fontWeight: FontWeight.w900,
+                            //     letterSpacing: 1.2,
+                            //   ),
+                            // ),
+                            const SizedBox(height: 10),
+                            Row(
                               children: [
-                                Text(
-                                  '${rival.name}  #${rival.jerseyNumber}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 13,
+                                Container(
+                                  width: 44,
+                                  height: 44,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.10),
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: _border),
+                                  ),
+                                  child: const Icon(
+                                    Icons.shield_outlined,
+                                    color: _accent,
+                                    size: 24,
                                   ),
                                 ),
-                                const SizedBox(height: 3),
-                                Text(
-                                  '${rival.age} лет · Форма ${rival.form > 0 ? '+' : ''}${rival.form}',
-                                  style: const TextStyle(
-                                    color: Colors.white54,
-                                    fontSize: 10,
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        player.club,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        'Сила клуба: ${club.strength}',
+                                        style: const TextStyle(
+                                          color: Colors.white60,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
+                            const SizedBox(height: 10),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.07),
+                                borderRadius: BorderRadius.circular(13),
+                                border: Border.all(color: _border),
+                              ),
+                              child: Row(
+                                children: [
+                                  const CircleAvatar(
+                                    radius: 17,
+                                    backgroundColor: Color(0xFF205B2D),
+                                    child: Icon(Icons.person, color: _accent),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${player.name}  #${player.jerseyNumber}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                        Text(
+                                          '${_positionName(player.position)} · ${player.age} лет',
+                                          style: const TextStyle(
+                                            color: Colors.white60,
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        '${player.overall}',
+                                        style: const TextStyle(
+                                          color: _accent,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
+                                      Text(
+                                        status.displayName.toUpperCase(),
+                                        style: const TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 1),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          const Expanded(
+                            child: Text(
+                              'КОНКУРЕНТЫ ЗА ПОЗИЦИЮ',
+                              style: TextStyle(
+                                color: _accent,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1,
+                              ),
+                            ),
                           ),
                           Text(
-                            '${rival.overall}',
-                            style: TextStyle(
-                              color: isStronger
-                                  ? const Color(0xFFFFD27A)
-                                  : _accent,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
+                            '${rivals.length}',
+                            style: const TextStyle(
+                              color: Colors.white60,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
                         ],
                       ),
-                      const Divider(color: Color(0xFF24552C), height: 18),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          rival.selectionStrength >= player.overall + 4
-                              ? 'Серьёзный конкурент за место в основе'
-                              : rival.selectionStrength > player.overall
-                                  ? 'Претендент на игровое время'
-                                  : 'Пока уступает в борьбе за позицию',
+                      const SizedBox(height: 9),
+                      if (rivals.isEmpty)
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: _panel,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: _border),
+                          ),
+                          child: const Text(
+                            'Пока нет игроков, конкурирующих с вами за место в составе.',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              height: 1.4,
+                            ),
+                          ),
+                        )
+                      else
+                        ...rivals.map((rival) {
+                          final isStronger =
+                              rival.overall + rival.form > player.overall;
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 9),
+                            padding: const EdgeInsets.all(13),
+                            decoration: BoxDecoration(
+                              color: _panel,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: isStronger
+                                    ? const Color(
+                                        0xFFFFD27A,
+                                      ).withValues(alpha: 0.55)
+                                    : Colors.white.withValues(alpha: 0.22),
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 38,
+                                      height: 38,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.09,
+                                        ),
+                                        borderRadius: BorderRadius.circular(11),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          _positionName(rival.position),
+                                          style: const TextStyle(
+                                            color: _accent,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '${rival.name}  #${rival.jerseyNumber}',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w800,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 3),
+                                          Text(
+                                            '${rival.age} лет · Форма ${rival.form > 0 ? '+' : ''}${rival.form}',
+                                            style: const TextStyle(
+                                              color: Colors.white54,
+                                              fontSize: 10,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Text(
+                                      '${rival.overall}',
+                                      style: TextStyle(
+                                        color: isStronger
+                                            ? const Color(0xFFFFD27A)
+                                            : _accent,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Divider(
+                                  color: Color(0xFF24552C),
+                                  height: 18,
+                                ),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    rival.selectionStrength >=
+                                            player.overall + 4
+                                        ? 'Серьёзный конкурент за место в основе'
+                                        : rival.selectionStrength >
+                                              player.overall
+                                        ? 'Претендент на игровое время'
+                                        : 'Пока уступает в борьбе за позицию',
+                                    style: TextStyle(
+                                      color:
+                                          rival.selectionStrength >=
+                                              player.overall + 4
+                                          ? const Color(0xFFFFB86B)
+                                          : rival.selectionStrength >
+                                                player.overall
+                                          ? Colors.white70
+                                          : _accent,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 9),
+                                Wrap(
+                                  spacing: 14,
+                                  runSpacing: 9,
+                                  children: [
+                                    _stat('Матчи', '${rival.matches}'),
+                                    _stat('Голы', '${rival.goals}'),
+                                    _stat('Ассисты', '${rival.assists}'),
+                                    _stat(
+                                      'Средняя оценка',
+                                      rival.matches == 0
+                                          ? '—'
+                                          : rival.averageRating.toStringAsFixed(
+                                              2,
+                                            ),
+                                    ),
+                                    _stat(
+                                      'Форма',
+                                      rival.form > 0
+                                          ? '+${rival.form}'
+                                          : '${rival.form}',
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      const SizedBox(height: 1),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.055),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.18),
+                          ),
+                        ),
+                        child: const Text(
+                          'Игровое время зависит от рейтинга и репутации игрока, формы конкурентов и доверия тренера. Статус в команде может меняться по ходу сезона.',
                           style: TextStyle(
-                            color: rival.selectionStrength >= player.overall + 4
-                                ? const Color(0xFFFFB86B)
-                                : rival.selectionStrength > player.overall
-                                    ? Colors.white70
-                                    : _accent,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
+                            color: Colors.white60,
+                            fontSize: 9,
+                            height: 1.4,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 9),
-                      Wrap(
-                        spacing: 14,
-                        runSpacing: 9,
-                        children: [
-                          _stat('Матчи', '${rival.matches}'),
-                          _stat('Голы', '${rival.goals}'),
-                          _stat('Ассисты', '${rival.assists}'),
-                          _stat(
-                            'Средняя оценка',
-                            rival.matches == 0
-                                ? '—'
-                                : rival.averageRating.toStringAsFixed(2),
-                          ),
-                          _stat(
-                            'Форма',
-                            rival.form > 0 ? '+${rival.form}' : '${rival.form}',
-                          ),
-                        ],
-                      ),
                     ],
                   ),
-                );
-              }),
-            const SizedBox(height: 1),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.055),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
-              ),
-              child: const Text(
-                'Игровое время зависит от рейтинга и репутации игрока, формы конкурентов и доверия тренера. Статус в команде может меняться по ходу сезона.',
-                style: TextStyle(
-                  color: Colors.white60,
-                  fontSize: 9,
-                  height: 1.4,
                 ),
               ),
             ),
-              ],
-            ),
-          ),
+          ],
         ),
-          ),
-        ],
       ),
-    ),
     );
   }
 
   Widget _buildSquadTab(Career career) {
-    const positions = <String>['goalkeeper', 'defender', 'midfielder', 'forward'];
-    final squad = RealClubSquads.squads[career.player.club] ?? const <String, List<RealClubPlayer>>{};
-    final totalPlayers = positions.fold<int>(0, (sum, position) => sum + (squad[position]?.length ?? 0)) +
-        (positions.any((position) => position == career.player.position.name &&
-                !(squad[position] ?? const <RealClubPlayer>[]).any((item) => item.name == career.player.name))
+    const positions = <String>[
+      'goalkeeper',
+      'defender',
+      'midfielder',
+      'forward',
+    ];
+    final squad =
+        RealClubSquads.squads[career.player.club] ??
+        const <String, List<RealClubPlayer>>{};
+    final totalPlayers =
+        positions.fold<int>(
+          0,
+          (sum, position) => sum + (squad[position]?.length ?? 0),
+        ) +
+        (positions.any(
+              (position) =>
+                  position == career.player.position.name &&
+                  !(squad[position] ?? const <RealClubPlayer>[]).any(
+                    (item) => item.name == career.player.name,
+                  ),
+            )
             ? 1
             : 0);
 
@@ -445,22 +494,41 @@ class TeamScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(career.player.club, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 15)),
+                      Text(
+                        career.player.club,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 15,
+                        ),
+                      ),
                       const SizedBox(height: 3),
-                      const Text('СОСТАВ КЛУБА', style: TextStyle(color: Colors.white60, fontSize: 9, letterSpacing: 1, fontWeight: FontWeight.w800)),
+                      const Text(
+                        'СОСТАВ КЛУБА',
+                        style: TextStyle(
+                          color: Colors.white60,
+                          fontSize: 9,
+                          letterSpacing: 1,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                Text('$totalPlayers', style: const TextStyle(color: _accent, fontWeight: FontWeight.w900, fontSize: 20)),
+                Text(
+                  '$totalPlayers',
+                  style: const TextStyle(
+                    color: _accent,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 20,
+                  ),
+                ),
               ],
             ),
           ),
           const SizedBox(height: 12),
-          ...positions.map((position) => _buildSquadPosition(career, squad, position)),
-          const SizedBox(height: 8),
-          const Text(
-            'Состав учитывает реальные трансферы, сохранённые в вашей карьере. Игровые рейтинги используются внутри игры.',
-            style: TextStyle(color: Colors.white54, fontSize: 10, height: 1.4),
+          ...positions.map(
+            (position) => _buildSquadPosition(career, squad, position),
           ),
         ],
       ),
@@ -478,15 +546,20 @@ class TeamScreen extends StatelessWidget {
       'midfielder': 'ПОЛУЗАЩИТНИКИ',
       'forward': 'НАПАДАЮЩИЕ',
     };
-    final players = List<RealClubPlayer>.from(squad[position] ?? const <RealClubPlayer>[]);
+    final players = List<RealClubPlayer>.from(
+      squad[position] ?? const <RealClubPlayer>[],
+    );
     final isPlayerPosition = career.player.position.name == position;
-    if (isPlayerPosition && !players.any((item) => item.name == career.player.name)) {
-      players.add(RealClubPlayer(
-        career.player.name,
-        career.player.age,
-        career.player.overall,
-        career.player.jerseyNumber,
-      ));
+    if (isPlayerPosition &&
+        !players.any((item) => item.name == career.player.name)) {
+      players.add(
+        RealClubPlayer(
+          career.player.name,
+          career.player.age,
+          career.player.overall,
+          career.player.jerseyNumber,
+        ),
+      );
     }
     players.sort((a, b) => b.overall.compareTo(a.overall));
     if (players.isEmpty) return const SizedBox.shrink();
@@ -504,39 +577,102 @@ class TeamScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(child: Text(titles[position]!, style: const TextStyle(color: _accent, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1))),
-              Text('${players.length}', style: const TextStyle(color: Colors.white54, fontSize: 10, fontWeight: FontWeight.w800)),
+              Expanded(
+                child: Text(
+                  titles[position]!,
+                  style: const TextStyle(
+                    color: _accent,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ),
+              Text(
+                '${players.length}',
+                style: const TextStyle(
+                  color: Colors.white54,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
           ...players.map((item) {
-            final isCareerPlayer = item.name == career.player.name && isPlayerPosition;
+            final isCareerPlayer =
+                item.name == career.player.name && isPlayerPosition;
             final age = isCareerPlayer ? career.player.age : item.age;
-            final overall = isCareerPlayer ? career.player.overall : item.overall;
-            final number = isCareerPlayer ? career.player.jerseyNumber : item.jerseyNumber;
+            final overall = isCareerPlayer
+                ? career.player.overall
+                : item.overall;
+            final number = isCareerPlayer
+                ? career.player.jerseyNumber
+                : item.jerseyNumber;
             return Container(
               margin: const EdgeInsets.only(bottom: 6),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
               decoration: BoxDecoration(
-                color: isCareerPlayer ? const Color(0x332E9B50) : Colors.white.withValues(alpha: 0.045),
+                color: isCareerPlayer
+                    ? const Color(0x332E9B50)
+                    : Colors.white.withValues(alpha: 0.045),
                 borderRadius: BorderRadius.circular(11),
-                border: Border.all(color: isCareerPlayer ? _accent.withValues(alpha: 0.65) : Colors.white.withValues(alpha: 0.10)),
+                border: Border.all(
+                  color: isCareerPlayer
+                      ? _accent.withValues(alpha: 0.65)
+                      : Colors.white.withValues(alpha: 0.10),
+                ),
               ),
               child: Row(
                 children: [
-                  SizedBox(width: 25, child: Text('#$number', style: const TextStyle(color: Colors.white54, fontSize: 10, fontWeight: FontWeight.w800))),
+                  SizedBox(
+                    width: 25,
+                    child: Text(
+                      '#$number',
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(item.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800)),
+                        Text(
+                          item.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
                         const SizedBox(height: 2),
-                        Text('$age лет${isCareerPlayer ? ' · ВАШ ИГРОК' : ''}', style: TextStyle(color: isCareerPlayer ? _accent : Colors.white54, fontSize: 9, fontWeight: isCareerPlayer ? FontWeight.w800 : FontWeight.normal)),
+                        Text(
+                          '$age лет${isCareerPlayer ? '' : ''}',
+                          style: TextStyle(
+                            color: isCareerPlayer ? _accent : Colors.white54,
+                            fontSize: 9,
+                            fontWeight: isCareerPlayer
+                                ? FontWeight.w800
+                                : FontWeight.normal,
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                  Text('$overall', style: TextStyle(color: overall >= 88 ? const Color(0xFFFFD27A) : _accent, fontSize: 15, fontWeight: FontWeight.w900)),
+                  Text(
+                    '$overall',
+                    style: TextStyle(
+                      color: overall >= 88 ? const Color(0xFFFFD27A) : _accent,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
                 ],
               ),
             );
