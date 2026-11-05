@@ -129,7 +129,7 @@ void main() {
 
 
   group('Season leader awards', () {
-    test('awards scorer and assist prizes only after league thresholds', () {
+    test('awards the top scorer and assist leader among current league candidates', () {
       final player = Player.create(
         name: 'Career Player',
         nationality: 'Россия',
@@ -169,7 +169,7 @@ void main() {
             overall: 85,
             matches: 30,
             goals: 3,
-            assists: 20,
+            assists: 100,
             ratingSum: 210,
           ),
         ],
