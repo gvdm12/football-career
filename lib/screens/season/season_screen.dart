@@ -1877,6 +1877,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
             isHome: isHome,
             playerWillPlay: true,
             isKnockout: isFinal || !isFirstLeg,
+            competition: 'championsLeague',
             homeAggregateGoalsBeforeMatch: isFinal
                 ? 0
                 : (tie.firstLegAwayGoals ?? 0),
@@ -2129,6 +2130,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
             isHome: isHome,
             playerWillPlay: true,
             isKnockout: isFinal || !isFirstLeg,
+            competition: 'europaLeague',
             homeAggregateGoalsBeforeMatch: isFinal
                 ? 0
                 : (tie.firstLegAwayGoals ?? 0),
