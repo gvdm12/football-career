@@ -55,6 +55,9 @@ class JerseyNumberPicker {
     return showDialog<int>(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 28, vertical: 20),
+        contentPadding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
+        actionsPadding: const EdgeInsets.fromLTRB(12, 0, 16, 8),
         backgroundColor: const Color(0xFF0B2A12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -69,12 +72,14 @@ class JerseyNumberPicker {
           ),
         ),
         content: SizedBox(
-          width: 340,
-          height: 340,
+          width: 280,
+          height: 66,
           child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: choices.length,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 5,
+              crossAxisCount: 4,
               mainAxisSpacing: 8,
               crossAxisSpacing: 8,
               childAspectRatio: 1.15,
