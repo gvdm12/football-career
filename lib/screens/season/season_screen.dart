@@ -4627,6 +4627,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
   // }
 
   Widget _buildNextMatchCard(SeasonMatch match) {
+    final isElClasico =
+        (career.player.club == 'Barcelona' && match.opponent == 'Real Madrid') ||
+        (career.player.club == 'Real Madrid' && match.opponent == 'Barcelona');
     final playerColor = ClubColors.primary(career.player.club);
     final opponentColor = ClubColors.primary(match.opponent);
     final interactiveAvailable = _canPlayInteractiveMatch(
@@ -4643,7 +4646,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            AppStrings.nextMatch,
+            isElClasico ? AppStrings.elClasico : AppStrings.nextMatch,
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.75),
               fontWeight: FontWeight.w600,
