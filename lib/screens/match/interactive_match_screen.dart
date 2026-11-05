@@ -2190,9 +2190,9 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           width: double.infinity,
           padding: const EdgeInsets.all(17),
           decoration: BoxDecoration(
-            color: const Color(0xFF123D2A).withOpacity(0.68),
+            color: _competitionDeep.withOpacity(0.76),
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: Colors.white.withOpacity(0.14)),
+            border: Border.all(color: _competitionAccent.withOpacity(0.22)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
