@@ -21,6 +21,7 @@ class InteractiveMatchScreen extends StatefulWidget {
   final bool forcePlayerParticipation;
   final bool? playerWillPlay;
   final bool isKnockout;
+  final String competition;
   final int homeAggregateGoalsBeforeMatch;
   final int awayAggregateGoalsBeforeMatch;
 
@@ -35,6 +36,7 @@ class InteractiveMatchScreen extends StatefulWidget {
     this.forcePlayerParticipation = false,
     this.playerWillPlay,
     this.isKnockout = false,
+    this.competition = 'league',
     this.homeAggregateGoalsBeforeMatch = 0,
     this.awayAggregateGoalsBeforeMatch = 0,
   });
@@ -80,6 +82,29 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   late final String _awayTeam;
 
   Player get _player => widget.career.player;
+
+  bool get _isChampionsLeague => widget.competition == 'championsLeague';
+  bool get _isEuropaLeague => widget.competition == 'europaLeague';
+  Color get _competitionAccent => _isChampionsLeague
+      ? const Color(0xFF93C5FD)
+      : _isEuropaLeague
+      ? const Color(0xFFFFB36B)
+      : const Color(0xFF86EFAC);
+  Color get _competitionDeep => _isChampionsLeague
+      ? const Color(0xFF102B66)
+      : _isEuropaLeague
+      ? const Color(0xFF6B3215)
+      : const Color(0xFF123D2A);
+  Color get _competitionBackgroundTop => _isChampionsLeague
+      ? const Color(0xFF142D68)
+      : _isEuropaLeague
+      ? const Color(0xFF633116)
+      : const Color(0xFF174A32);
+  Color get _competitionBackgroundMiddle => _isChampionsLeague
+      ? const Color(0xFF0A1D48)
+      : _isEuropaLeague
+      ? const Color(0xFF351B12)
+      : const Color(0xFF0A2D20);
   // int get _playerTeamStrength => widget.isHome ? _homeStrength : _awayStrength;
   // int get _opponentTeamStrength =>
   //     widget.isHome ? _awayStrength : _homeStrength;
@@ -1633,9 +1658,9 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
           width: double.infinity,
           padding: padding,
           decoration: BoxDecoration(
-            color: const Color(0xFF123D2A).withOpacity(0.68),
+            color: _competitionDeep.withOpacity(0.76),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withOpacity(0.14)),
+            border: Border.all(color: _competitionAccent.withOpacity(0.24)),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.14),
@@ -1665,9 +1690,9 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Color(0xFF174A32),
-                      Color(0xFF0A2D20),
-                      Color(0xFF04170F),
+                      _competitionBackgroundTop,
+                      _competitionBackgroundMiddle,
+                      const Color(0xFF04170F),
                     ],
                     stops: [0, 0.52, 1],
                   ),
@@ -1682,7 +1707,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                 height: 260,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFF4ADE80).withOpacity(0.08),
+                  color: _competitionAccent.withOpacity(0.10),
                 ),
               ),
             ),
@@ -1731,18 +1756,16 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF14532D).withOpacity(0.7),
+                              color: _competitionDeep.withOpacity(0.78),
                               borderRadius: BorderRadius.circular(14),
                               border: Border.all(
-                                color: const Color(
-                                  0xFF4ADE80,
-                                ).withOpacity(0.25),
+                                color: _competitionAccent.withOpacity(0.38),
                               ),
                             ),
                             child: Text(
                               'ОЦЕНКА ${_rating.clamp(4.0, 10.0).toStringAsFixed(1)}',
                               style: const TextStyle(
-                                color: Color(0xFFBBF7D0),
+                                color: _competitionAccent,
                                 fontSize: 10,
                                 fontWeight: FontWeight.w900,
                               ),
@@ -2043,19 +2066,19 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
               end: Alignment.bottomRight,
               colors: [
                 Colors.white.withOpacity(0.19),
-                const Color(0xFF4ADE80).withOpacity(0.12),
-                const Color(0xFF082B1C).withOpacity(0.58),
+                _competitionAccent.withOpacity(0.16),
+                _competitionDeep.withOpacity(0.68),
                 Colors.white.withOpacity(0.07),
               ],
               stops: const [0, 0.32, 0.72, 1],
             ),
             border: Border.all(
-              color: Colors.white.withOpacity(0.28),
+              color: _competitionAccent.withOpacity(0.42),
               width: 1.2,
             ),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF4ADE80).withOpacity(0.16),
+                color: _competitionAccent.withOpacity(0.22),
                 blurRadius: 30,
                 spreadRadius: 1,
                 offset: const Offset(0, 8),
@@ -2328,7 +2351,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(17),
                   border: Border.all(
-                    color: const Color(0xFF86EFAC).withOpacity(0.16),
+                    color: _competitionAccent.withOpacity(0.24),
                   ),
                 ),
                 child: Row(
@@ -2337,12 +2360,12 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                       width: 37,
                       height: 37,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF4ADE80).withOpacity(0.13),
+                        color: _competitionAccent.withOpacity(0.16),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
                         icon,
-                        color: const Color(0xFF86EFAC),
+                        color: _competitionAccent,
                         size: 19,
                       ),
                     ),
