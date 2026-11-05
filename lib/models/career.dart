@@ -1147,11 +1147,24 @@ class Career {
   /// Продвигает восстановление после любого матча игрока — клубного или сборной.
   /// Новая травма появляется только после матча, в котором игрок участвовал.
   Career advanceAfterCompetitionMatch({required bool playerParticipated}) {
+    // Покупки психолога и персонального тренера перезаряжаются
+    // по матчам команды, даже если игрок остался в запасе или травмирован.
+    final staffCooldowns = Map<String, int>.from(temporarySkillBoostMatches);
+    for (final key in ['psychologist', 'personalTrainer']) {
+      final remaining = (staffCooldowns[key] ?? 0) - 1;
+      if (remaining <= 0) {
+        staffCooldowns.remove(key);
+      } else {
+        staffCooldowns[key] = remaining;
+      }
+    }
+
     if (isInjured) {
       final remaining = (injuryMatchesRemaining - 1).clamp(0, 10).toInt();
       return copyWith(
         injuryMatchesRemaining: remaining,
         clearInjury: remaining == 0,
+        temporarySkillBoostMatches: staffCooldowns,
       );
     }
 
@@ -1162,8 +1175,9 @@ class Career {
             injuryMatchesRemaining: 0,
             injuryRecoveryUsed: false,
             clearInjury: true,
+            temporarySkillBoostMatches: staffCooldowns,
           )
-        : this;
+        : copyWith(temporarySkillBoostMatches: staffCooldowns);
     if (playerParticipated) {
       final nextBoosts = Map<String, int>.from(
         updatedCareer.temporarySkillBoosts,
@@ -1172,6 +1186,9 @@ class Career {
         updatedCareer.temporarySkillBoostMatches,
       );
       for (final skillName in nextDurations.keys.toList()) {
+        if (skillName == 'psychologist' || skillName == 'personalTrainer') {
+          continue;
+        }
         final remaining = (nextDurations[skillName] ?? 0) - 1;
         if (remaining <= 0) {
           nextDurations.remove(skillName);
