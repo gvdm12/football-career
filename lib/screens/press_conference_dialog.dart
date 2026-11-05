@@ -57,11 +57,26 @@ class PressConferenceContentFactory {
     required bool english,
     String? interestedClub,
     String? clubName,
+    String? opponentClub,
   }) {
     String choose(String ru, String en) => english ? en : ru;
     final random = Random();
 
     final questions = switch (category) {
+      'formerClub' => [
+        choose(
+          'Сегодня вы сыграли против ${opponentClub ?? 'бывшего клуба'}. Какие чувства вызывает эта встреча?',
+          'You faced ${opponentClub ?? 'your former club'} today. How does this reunion feel?',
+        ),
+        choose(
+          'Вы провели важный матч против бывшей команды. Хотели что-то доказать?',
+          'You played an important match against your former team. Did you have something to prove?',
+        ),
+        choose(
+          'Насколько особенным для вас был матч против ${opponentClub ?? 'бывшего клуба'}?',
+          'How special was this match against ${opponentClub ?? 'your former club'}?',
+        ),
+      ],
       'transferInterest' => [
         choose(
           '${interestedClub ?? 'Другой клуб'} следит за вашими выступлениями. Что думаете об этом интересе?',
@@ -247,6 +262,45 @@ class PressConferenceContentFactory {
     };
 
     var options = switch (category) {
+      'formerClub' => [
+        PressConferenceOption(
+          text: choose(
+            'Я с уважением отношусь к бывшему клубу, но сейчас защищаю другие цвета',
+            'I respect my former club, but now I represent different colours',
+          ),
+          detail: choose('Уважение и профессионализм', 'Respect and professionalism'),
+          trustChange: 2,
+          icon: Icons.handshake_outlined,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Конечно, хотелось показать, что я стал сильнее',
+            'Of course, I wanted to show that I have become a better player',
+          ),
+          detail: choose('Спортивные амбиции', 'Competitive ambition'),
+          trustChange: 1,
+          icon: Icons.bolt,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'Для меня это был обычный матч, главное — результат команды',
+            'It was just another match for me; the team result matters most',
+          ),
+          detail: choose('Концентрация на команде', 'Focused on the team'),
+          trustChange: 2,
+          icon: Icons.groups_outlined,
+        ),
+        PressConferenceOption(
+          text: choose(
+            'У меня остались вопросы к бывшему клубу',
+            'I still have some unfinished business with my former club',
+          ),
+          detail: choose('Резкое заявление', 'A controversial statement'),
+          trustChange: -2,
+          reputationChange: 1,
+          icon: Icons.forum_outlined,
+        ),
+      ],
       'transferInterest' => [
         PressConferenceOption(
           text: choose(
