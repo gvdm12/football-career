@@ -340,13 +340,28 @@ class Career {
   }
 
   static List<SponsorOffer> _createSponsorOffers(Player player, int season) {
-    const brands = [
-      'Northstar Athletics',
-      'Veloce Performance',
-      'Apex Sportswear',
-      'Stride Energy',
-      'Vertex Football',
-      'Momentum Gear',
+    final brands = <String>[
+      'Nike',
+      'Adidas',
+      'Puma',
+      'New Balance',
+      'Under Armour',
+      'Red Bull',
+      'Coca-Cola',
+      if (player.overall >= 75) ...[
+        'Samsung',
+        'LG',
+        'HP',
+        'Lenovo',
+        'Visa',
+        'Pepsi',
+      ],
+      if (player.overall >= 85) ...[
+        'Apple',
+        'Emirates',
+        'Rolex',
+      ],
+      if (player.overall >= 90) 'Louis Vuitton',
     ];
     final random = Random(season * 97 + player.overall * 13 + player.age);
     final count = player.overall >= 82 ? 2 : 1;
@@ -748,13 +763,9 @@ class Career {
         case 'Игрок сезона':
           return false;
         case 'Лучший бомбардир':
-          final goalThreshold =
-              Clubs.leagueOf(award.club)?.goldenBootGoalThreshold ?? 999;
-          return award.matches >= 10 && award.goals >= goalThreshold;
+          return award.matches >= 10 && award.goals > 0;
         case 'Лучший ассистент':
-          final assistThreshold =
-              Clubs.leagueOf(award.club)?.bestAssisterThreshold ?? 999;
-          return award.matches >= 10 && award.assists >= assistThreshold;
+          return award.matches >= 10 && award.assists > 0;
         case 'Лучший молодой игрок':
           return award.age <= 21 &&
               award.matches >= 15 &&
@@ -1136,11 +1147,24 @@ class Career {
   /// Продвигает восстановление после любого матча игрока — клубного или сборной.
   /// Новая травма появляется только после матча, в котором игрок участвовал.
   Career advanceAfterCompetitionMatch({required bool playerParticipated}) {
+    // Покупки психолога и персонального тренера перезаряжаются
+    // по матчам команды, даже если игрок остался в запасе или травмирован.
+    final staffCooldowns = Map<String, int>.from(temporarySkillBoostMatches);
+    for (final key in ['psychologist', 'personalTrainer']) {
+      final remaining = (staffCooldowns[key] ?? 0) - 1;
+      if (remaining <= 0) {
+        staffCooldowns.remove(key);
+      } else {
+        staffCooldowns[key] = remaining;
+      }
+    }
+
     if (isInjured) {
       final remaining = (injuryMatchesRemaining - 1).clamp(0, 10).toInt();
       return copyWith(
         injuryMatchesRemaining: remaining,
         clearInjury: remaining == 0,
+        temporarySkillBoostMatches: staffCooldowns,
       );
     }
 
@@ -1151,8 +1175,9 @@ class Career {
             injuryMatchesRemaining: 0,
             injuryRecoveryUsed: false,
             clearInjury: true,
+            temporarySkillBoostMatches: staffCooldowns,
           )
-        : this;
+        : copyWith(temporarySkillBoostMatches: staffCooldowns);
     if (playerParticipated) {
       final nextBoosts = Map<String, int>.from(
         updatedCareer.temporarySkillBoosts,
@@ -1161,6 +1186,9 @@ class Career {
         updatedCareer.temporarySkillBoostMatches,
       );
       for (final skillName in nextDurations.keys.toList()) {
+        if (skillName == 'psychologist' || skillName == 'personalTrainer') {
+          continue;
+        }
         final remaining = (nextDurations[skillName] ?? 0) - 1;
         if (remaining <= 0) {
           nextDurations.remove(skillName);
@@ -1334,9 +1362,9 @@ class Career {
           ),
         );
       }
-      return trustedCareer.copyWith(
-        news: [...trustedCareer.news, ...competitionNews],
-      );
+      return trustedCareer
+          .copyWith(news: [...trustedCareer.news, ...competitionNews])
+          .advanceAfterCompetitionMatch(playerParticipated: false);
     }
 
     final newMatches = matches + 1;

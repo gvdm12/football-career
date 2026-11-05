@@ -183,13 +183,14 @@ class _AgentScreenState extends State<AgentScreen> {
       }
     } else {
       final remainingCareer = (21 - career.season).clamp(1, 20).toInt();
+      final maxRenewalYears = remainingCareer.clamp(1, 4).toInt();
       final successChance = (0.35 + career.agentLevel * 0.045 +
               (career.averageRating ?? 6.0) * 0.015)
           .clamp(0.35, 0.85);
       if (career.contractYears <= 1 && Random().nextDouble() < successChance) {
         updated = career.copyWith(
           monthlySalary: (career.monthlySalary * 1.08).round(),
-          contractYears: remainingCareer < 2 ? remainingCareer : 2,
+          contractYears: 1 + Random().nextInt(maxRenewalYears),
         );
       }
     }

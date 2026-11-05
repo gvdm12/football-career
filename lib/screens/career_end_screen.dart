@@ -54,17 +54,15 @@ class CareerEndScreen extends StatelessWidget {
         sum + item.achievements.where((a) => a == 'Чемпион мира').length,
   );
 
-  int _achievementCount(String achievement) => career.history.fold(
-    0,
-    (sum, item) =>
-        sum + item.achievements.where((value) => value == achievement).length,
-  );
+  int _seasonAwardCount(String category) => career.seasonAwards
+      .where((award) => award.isCareerPlayer && award.category == category)
+      .length;
 
-  int get goldenBoots => _achievementCount('Золотая бутса');
-  int get goldenBalls => _achievementCount('Золотой мяч');
-  int get youngPlayerAwards => _achievementCount('Лучший молодой игрок сезона');
-  int get bestAssisterAwards => _achievementCount('Лучший ассистент');
-  int get teamOfSeasonSelections => _achievementCount('В сборной сезона');
+  int get goldenBoots => _seasonAwardCount('Лучший бомбардир');
+  int get goldenBalls => _seasonAwardCount('Золотой мяч');
+  int get youngPlayerAwards => _seasonAwardCount('Лучший молодой игрок');
+  int get bestAssisterAwards => _seasonAwardCount('Лучший ассистент');
+  int get teamOfSeasonSelections => _seasonAwardCount('Команда года');
 
   int get totalTrophies =>
       leagueTitles +
@@ -118,7 +116,9 @@ class CareerEndScreen extends StatelessWidget {
             (a, b) => a.goals + a.assists >= b.goals + b.assists ? a : b,
           );
 
-    return Scaffold(
+    return PopScope<Career>(
+      canPop: false,
+      child: Scaffold(
       backgroundColor: const Color(0xFF061B0C),
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -292,6 +292,7 @@ class CareerEndScreen extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 

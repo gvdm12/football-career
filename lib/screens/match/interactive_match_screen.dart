@@ -200,13 +200,27 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     return count - 1;
   }
 
-  void _addGoal({required bool home}) {
-    // xG задаёт ожидаемую результативность, но не ограничивает число голов.
-    // Забитый мяч не должен обнулять оставшуюся вероятность следующих голов.
+  double _goalBudgetFactor(bool home) {
+    final remainingXg = home ? _homeXgRemaining : _awayXgRemaining;
+    if (remainingXg <= 0.05) return 0;
+    // Дополнительные голы из интерактивных эпизодов используют тот же
+    // оставшийся xG-бюджет, что и обычные атаки команды.
+    return (remainingXg / (remainingXg + 0.55))
+        .clamp(0.0, 0.78)
+        .toDouble();
+  }
+
+  void _addGoal({required bool home, bool consumeBudget = true}) {
     if (home) {
       _homeGoals++;
+      if (consumeBudget) {
+        _homeXgRemaining = (_homeXgRemaining - 0.55).clamp(0.0, 2.8).toDouble();
+      }
     } else {
       _awayGoals++;
+      if (consumeBudget) {
+        _awayXgRemaining = (_awayXgRemaining - 0.55).clamp(0.0, 2.8).toDouble();
+      }
     }
   }
 
@@ -234,12 +248,12 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     final homeScored = _random.nextDouble() < homeChance;
     final awayScored = _random.nextDouble() < awayChance;
     if (homeScored) {
-      _addGoal(home: true);
+      _addGoal(home: true, consumeBudget: false);
       _event = 'ГОЛ! $_homeTeam забивает после атаки.';
       _recordEvent(_event);
     }
     if (awayScored) {
-      _addGoal(home: false);
+      _addGoal(home: false, consumeBudget: false);
       _event = 'ГОЛ! $_awayTeam забивает после быстрой атаки.';
       _recordEvent(_event);
     }
@@ -1070,7 +1084,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
             (0.20 +
                     _skillTierBonus(_skill('pass')) * 0.45 +
                     (attackXg / 1.1).clamp(0.0, 1.0) * 0.12)
-                .clamp(0.12, 0.42);
+                .clamp(0.12, 0.42) *
+            _goalBudgetFactor(widget.isHome);
         final partnerScores = _random.nextDouble() < partnerScoreChance;
         _phase = 'buildUp';
         if (partnerScores) {
@@ -1132,7 +1147,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                   (_player.skills.vision - 70) * 0.001 +
                   _skillTierBonus(_skill('shoot')) * 0.45 +
                   widget.career.settings.difficulty.interactiveActionAdjustment)
-              .clamp(0.62, 0.97);
+              .clamp(0.62, 0.97) *
+          _goalBudgetFactor(widget.isHome);
       final scored = _random.nextDouble() < penaltyChance;
       String penaltyMessage;
       if (scored) {
@@ -1361,7 +1377,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                   overallBonus +
                   advantage * 0.35 +
                   _skillTierBonus(finishingSkill) * 0.45)
-              .clamp(0.05, 0.85);
+              .clamp(0.05, 0.85) *
+          _goalBudgetFactor(widget.isHome);
 
       if (success && _random.nextDouble() < finishingChance) {
         if (widget.isHome) {
@@ -1391,7 +1408,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         message = _random.nextBool()
             ? 'СЕЙВ! Вы отбили сложный удар и спасли команду.'
             : 'Отличная реакция! Вы поймали мяч и быстро начали атаку.';
-      } else {
+      } else if (_random.nextDouble() < _goalBudgetFactor(!widget.isHome)) {
         if (widget.isHome) {
           _addGoal(home: false);
         } else {
@@ -1400,6 +1417,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         _rating -= 0.35;
         _phase = 'buildUp';
         message = 'Гол соперника. На этот раз удар оказался слишком точным.';
+      } else {
+        _rating -= 0.08;
+        _phase = 'buildUp';
+        message = 'Удар соперника не достиг цели. Команда сохраняет мяч.';
       }
     } else if (action == 'pass' ||
         action == 'backPass' ||
@@ -1461,7 +1482,8 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
             : _phase == 'finalThird'
             ? 'Вы прошли соперника и продвинули команду к штрафной.'
             : 'Удачная обводка! Вы освободились от опеки вблизи ворот.';
-        if (_phase == 'chance' && _random.nextDouble() < 0.08) {
+        if (_phase == 'chance' &&
+            _random.nextDouble() < 0.08 * _goalBudgetFactor(widget.isHome)) {
           if (widget.isHome) {
             _addGoal(home: true);
           } else {
@@ -1491,7 +1513,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         _phase = 'defend';
         _rating -= 0.18;
         message = 'Не удалось остановить атаку соперника.';
-        if (_random.nextDouble() < 0.20) {
+        if (_random.nextDouble() < 0.20 * _goalBudgetFactor(!widget.isHome)) {
           if (widget.isHome) {
             _addGoal(home: false);
           } else {

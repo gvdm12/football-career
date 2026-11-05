@@ -48,6 +48,24 @@ void main() {
       expect(updated.matches, 0);
     });
 
+    test('staff purchase cooldown advances after a team match even when the player does not play', () {
+      final career = createTestCareer().copyWith(
+        temporarySkillBoosts: const {'shooting': 5},
+        temporarySkillBoostMatches: const {
+          'shooting': 2,
+          'psychologist': 10,
+          'personalTrainer': 10,
+        },
+      );
+
+      final updated = career.afterMatch(unplayedTeamMatch);
+
+      expect(updated.temporarySkillBoostMatches['psychologist'], 9);
+      expect(updated.temporarySkillBoostMatches['personalTrainer'], 9);
+      expect(updated.temporarySkillBoostMatches['shooting'], 2);
+      expect(updated.temporarySkillBoosts['shooting'], 5);
+    });
+
     test('coach and agent cooldowns are independent', () {
       final career = createTestCareer().copyWith(
         teamMatches: 12,
@@ -129,7 +147,7 @@ void main() {
 
 
   group('Season leader awards', () {
-    test('awards scorer and assist prizes only after league thresholds', () {
+    test('awards the top scorer and assist leader among current league candidates', () {
       final player = Player.create(
         name: 'Career Player',
         nationality: 'Россия',
@@ -169,7 +187,7 @@ void main() {
             overall: 85,
             matches: 30,
             goals: 3,
-            assists: 20,
+            assists: 100,
             ratingSum: 210,
           ),
         ],

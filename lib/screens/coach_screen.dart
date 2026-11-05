@@ -211,6 +211,10 @@ class _CoachScreenState extends State<CoachScreen> {
               ],
             ),
           ),
+          if (career.objectives.any((item) => item.season == career.season)) ...[
+            const SizedBox(height: 8),
+            _buildObjectivesPanel(),
+          ],
           const SizedBox(height: 8),
           _panel(
             child: Column(
@@ -273,6 +277,79 @@ class _CoachScreenState extends State<CoachScreen> {
 
         ],
       ),
+      ),
+    );
+  }
+
+  Widget _buildObjectivesPanel() {
+    final objectives = career.objectives
+        .where((item) => item.season == career.season)
+        .toList();
+    if (objectives.isEmpty) return const SizedBox.shrink();
+
+    return _panel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppStrings.isEnglish ? 'COACH OBJECTIVES' : 'ЦЕЛИ ТРЕНЕРА',
+            style: const TextStyle(
+              color: Color(0xFF8BE07F),
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.1,
+            ),
+          ),
+          const SizedBox(height: 12),
+          for (final objective in objectives) ...[
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    objective.title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                Text(
+                  objective.completed
+                      ? (AppStrings.isEnglish ? 'DONE' : 'ВЫПОЛНЕНО')
+                      : '${objective.progress}/${objective.target}',
+                  style: TextStyle(
+                    color: objective.completed
+                        ? const Color(0xFF8BE07F)
+                        : Colors.white70,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(
+                value: objective.progressRatio,
+                minHeight: 6,
+                backgroundColor: Colors.white.withValues(alpha: 0.10),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  objective.completed
+                      ? const Color(0xFF8BE07F)
+                      : const Color(0xFF8EB8FF),
+                ),
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              '${objective.description} · ${AppStrings.isEnglish ? 'Reward' : 'Премия'} €${objective.reward}',
+              style: const TextStyle(color: Colors.white60, fontSize: 10),
+            ),
+            if (objective != objectives.last) const SizedBox(height: 13),
+          ],
+        ],
       ),
     );
   }

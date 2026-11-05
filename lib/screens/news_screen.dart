@@ -197,10 +197,6 @@ class NewsScreen extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(16, 6, 16, 30),
                   children: [
                     _buildHero(visibleNews.length, transferCount, matchCount),
-                    if (career.objectives.isNotEmpty) ...[
-                      const SizedBox(height: 14),
-                      _buildObjectivesPanel(),
-                    ],
                     const SizedBox(height: 23),
                     Row(
                       children: [
@@ -439,44 +435,6 @@ class NewsScreen extends StatelessWidget {
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildObjectivesPanel() {
-    final objectives = career.objectives.where((item) => item.season == career.season).toList();
-    if (objectives.isEmpty) return const SizedBox.shrink();
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.055),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(AppStrings.isEnglish ? 'COACH OBJECTIVES' : 'ЗАДАЧИ ТРЕНЕРА',
-            style: const TextStyle(color: accentColor, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1)),
-          const SizedBox(height: 10),
-          for (final objective in objectives) ...[
-            Row(children: [
-              Expanded(child: Text(objective.title, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800))),
-              Text(objective.completed ? (AppStrings.isEnglish ? 'DONE' : 'ВЫПОЛНЕНО') : '${objective.progress}/${objective.target}',
-                style: TextStyle(color: objective.completed ? accentColor : Colors.white70, fontSize: 10, fontWeight: FontWeight.w800)),
-            ]),
-            const SizedBox(height: 5),
-            ClipRRect(borderRadius: BorderRadius.circular(8), child: LinearProgressIndicator(
-              value: objective.progressRatio, minHeight: 6,
-              backgroundColor: Colors.white.withValues(alpha: 0.10),
-              valueColor: AlwaysStoppedAnimation<Color>(objective.completed ? accentColor : const Color(0xFF8EB8FF)),
-            )),
-            const SizedBox(height: 4),
-            Text('${objective.description} · ${AppStrings.isEnglish ? 'Reward' : 'Премия'} €${objective.reward}',
-              style: const TextStyle(color: mutedColor, fontSize: 10)),
-            if (objective != objectives.last) const SizedBox(height: 12),
-          ],
         ],
       ),
     );
