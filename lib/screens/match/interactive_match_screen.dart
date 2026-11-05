@@ -1408,7 +1408,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         message = _random.nextBool()
             ? 'СЕЙВ! Вы отбили сложный удар и спасли команду.'
             : 'Отличная реакция! Вы поймали мяч и быстро начали атаку.';
-      } else {
+      } else if (_random.nextDouble() < _goalBudgetFactor(!widget.isHome)) {
         if (widget.isHome) {
           _addGoal(home: false);
         } else {
@@ -1417,6 +1417,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         _rating -= 0.35;
         _phase = 'buildUp';
         message = 'Гол соперника. На этот раз удар оказался слишком точным.';
+      } else {
+        _rating -= 0.08;
+        _phase = 'buildUp';
+        message = 'Удар соперника не достиг цели. Команда сохраняет мяч.';
       }
     } else if (action == 'pass' ||
         action == 'backPass' ||
