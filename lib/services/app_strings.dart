@@ -297,6 +297,7 @@ class AppStrings {
   static String get seasonStats =>
       _en ? 'Season statistics' : 'Статистика сезона';
   static String get nextMatch => _en ? 'NEXT MATCH' : 'СЛЕДУЮЩИЙ МАТЧ';
+  static String get elClasico => _en ? 'EL CLÁSICO' : 'ЭЛЬ-КЛАСИКО';
   static String get home => _en ? 'Home' : 'Дома';
   static String get away => _en ? 'Away' : 'В гостях';
   static String get playMatch => _en ? 'PLAY MATCH' : 'ИГРАТЬ МАТЧ';

@@ -1252,7 +1252,11 @@ class Career {
     final matchCareer = copyWith(
       teamMatches: teamMatches + 1,
       recentMatchRatings: nextRatings,
-      rivals: PositionRival.advanceMatch(rivals, month: rivalMonth),
+      rivals: PositionRival.advanceMatch(
+        rivals,
+        month: rivalMonth,
+        clubStrength: Clubs.getByName(player.club).strength,
+      ),
     );
     final trustChange = !match.playerPlayed
         ? 0
