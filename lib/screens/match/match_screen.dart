@@ -497,7 +497,8 @@ class MatchScreen extends StatelessWidget {
       ),
         ),
       ),
-    );  }
+    );
+  }
 }
 
 class _StatRow extends StatelessWidget {
