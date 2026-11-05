@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
@@ -161,30 +162,13 @@ class MatchScreen extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Color(0xFF0B2815), Color(0xFF06170D), Color(0xFF041009)],
+                colors: [Color(0xFF102D20), Color(0xFF082017), Color(0xFF04150F)],
               ),
             ),
             child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 22),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 22),
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.sports_soccer, color: Color(0xFF8BE07F), size: 18),
-                    const SizedBox(width: 8),
-                    Text(
-                      AppStrings.isEnglish ? 'MATCH REPORT' : 'ОТЧЁТ О МАТЧЕ',
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.8,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
                 Text(
                   resultText,
                   style: TextStyle(
@@ -258,23 +242,35 @@ class MatchScreen extends StatelessWidget {
     final awayPrimary = ClubColors.primary(match.awayTeam);
     final awaySecondary = ClubColors.secondary(match.awayTeam);
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF183A25), Color(0xFF0B2114), Color(0xFF07170E)],
-        ),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
-        boxShadow: const [
-          BoxShadow(color: Colors.black38, blurRadius: 18, offset: Offset(0, 8)),
-        ],
-      ),
-      child: Column(
-        children: [
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(26),
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withValues(alpha: 0.17),
+                const Color(0xFF4ADE80).withValues(alpha: 0.13),
+                const Color(0xFF0B3323).withValues(alpha: 0.52),
+                Colors.white.withValues(alpha: 0.06),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(26),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.25), width: 1.2),
+            boxShadow: [
+              BoxShadow(color: const Color(0xFF4ADE80).withValues(alpha: 0.12), blurRadius: 28, offset: const Offset(0, 8)),
+              BoxShadow(color: Colors.black.withValues(alpha: 0.18), blurRadius: 22, offset: const Offset(0, 12)),
+            ],
+          ),
+          child: Column(
+            children: [
+              Text(resultText.toUpperCase(), style: TextStyle(color: resultColor, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+              const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
@@ -305,21 +301,14 @@ class MatchScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.24),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-            ),
-            child: Text(
+          Text(
             '${match.homeGoals} : ${match.awayGoals}',
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 30,
+              fontSize: 42,
               fontWeight: FontWeight.w900,
-              letterSpacing: 2,
-            ),
+              letterSpacing: 3,
+              shadows: [Shadow(color: Color(0x664ADE80), blurRadius: 20)],
             ),
           ),
           if (match.hasPenalties) ...[
@@ -333,7 +322,9 @@ class MatchScreen extends StatelessWidget {
               ),
             ),
           ],
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -389,17 +380,22 @@ class MatchScreen extends StatelessWidget {
   }
 
   Widget _buildPlayerStats() {
-    return Container(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(22),
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+        child: Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF142F20), Color(0xFF0A1C12)],
+          colors: [Colors.white.withValues(alpha: 0.15), const Color(0xFF4ADE80).withValues(alpha: 0.10), const Color(0xFF0B3323).withValues(alpha: 0.48)],
         ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.22), width: 1.1),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.14), blurRadius: 20, offset: const Offset(0, 8))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -445,21 +441,27 @@ class MatchScreen extends StatelessWidget {
           ],
         ],
       ),
-    );
-  }
+        ),
+      ),
+    );  }
 
   Widget _buildMatchInfo() {
-    return Container(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(22),
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+        child: Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF10291A), Color(0xFF09190F)],
+          colors: [Colors.white.withValues(alpha: 0.15), const Color(0xFF4ADE80).withValues(alpha: 0.10), const Color(0xFF0B3323).withValues(alpha: 0.48)],
         ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.22), width: 1.1),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.14), blurRadius: 20, offset: const Offset(0, 8))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -492,6 +494,8 @@ class MatchScreen extends StatelessWidget {
               value: '+🪙 ${Career.currencyRewardForMatch(match)}',
             ),
         ],
+      ),
+        ),
       ),
     );
   }
