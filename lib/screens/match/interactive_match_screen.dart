@@ -1764,7 +1764,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                             ),
                             child: Text(
                               'ОЦЕНКА ${_rating.clamp(4.0, 10.0).toStringAsFixed(1)}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: _competitionAccent,
                                 fontSize: 10,
                                 fontWeight: FontWeight.w900,
