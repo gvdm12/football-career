@@ -60,17 +60,14 @@ class MatchScreen extends StatelessWidget {
     }
 
     final seasonStart = !isCupMatch && playedBefore == 0;
-    final seasonMiddle = !isCupMatch &&
+    final seasonMiddle =
+        !isCupMatch &&
         totalMatches > 2 &&
         playedBefore == (totalMatches / 2).round();
-    final seasonEnd = !isCupMatch &&
-        totalMatches > 0 &&
-        playedBefore >= totalMatches - 1;
+    final seasonEnd =
+        !isCupMatch && totalMatches > 0 && playedBefore >= totalMatches - 1;
 
-    if (!cooldownReady &&
-        !seasonStart &&
-        !seasonMiddle &&
-        !seasonEnd) {
+    if (!cooldownReady && !seasonStart && !seasonMiddle && !seasonEnd) {
       return null;
     }
 
@@ -108,8 +105,8 @@ class MatchScreen extends StatelessWidget {
       final interestedClubs = career.agentInterestedClubs
           .where((club) => club.trim().isNotEmpty)
           .toList();
-      final interestedClub = category == 'transferInterest' &&
-              interestedClubs.isNotEmpty
+      final interestedClub =
+          category == 'transferInterest' && interestedClubs.isNotEmpty
           ? interestedClubs[Random().nextInt(interestedClubs.length)]
           : null;
       final content = PressConferenceContentFactory.create(
@@ -130,8 +127,12 @@ class MatchScreen extends StatelessWidget {
       );
       if (conferenceResult != null) {
         updatedCareer = updatedCareer.copyWith(
-          coachTrust: (updatedCareer.coachTrust + conferenceResult.trustChange).clamp(0, 100).toInt(),
-          reputationModifier: updatedCareer.reputationModifier + conferenceResult.reputationChange,
+          coachTrust: (updatedCareer.coachTrust + conferenceResult.trustChange)
+              .clamp(0, 100)
+              .toInt(),
+          reputationModifier:
+              updatedCareer.reputationModifier +
+              conferenceResult.reputationChange,
         );
       }
     }
@@ -162,73 +163,74 @@ class MatchScreen extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Color(0xFF102D20), Color(0xFF082017), Color(0xFF04150F)],
+                colors: [
+                  Color(0xFF102D20),
+                  Color(0xFF082017),
+                  Color(0xFF04150F),
+                ],
               ),
             ),
             child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 22),
-            child: Column(
-              children: [
-                Text(
-                  resultText,
-                  style: TextStyle(
-                    color: resultColor,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                if (career.isInjured) ...[
-                  const SizedBox(height: 8),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF351717),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: const Color(0xFFFF7777)),
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 22),
+              child: Column(
+                children: [
+                  if (career.isInjured) ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF351717),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: const Color(0xFFFF7777)),
+                      ),
+                      child: Text(
+                        'Вы пропускаете матч из-за травмы: ${career.injuryName ?? 'повреждение'}. До восстановления осталось матчей: ${career.injuryMatchesRemaining}.',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0xFFFF9999),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12,
+                        ),
+                      ),
                     ),
-                    child: Text(
-                      'Вы пропускаете матч из-за травмы: ${career.injuryName ?? 'повреждение'}. До восстановления осталось матчей: ${career.injuryMatchesRemaining}.',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Color(0xFFFF9999),
-                        fontWeight: FontWeight.w700,
-                        fontSize: 12,
+                  ],
+                  const SizedBox(height: 4),
+                  _buildScoreCard(),
+                  const SizedBox(height: 8),
+                  _buildPlayerStats(),
+                  const SizedBox(height: 8),
+                  _buildMatchInfo(),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(
+                          213,
+                          255,
+                          255,
+                          255,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadiusGeometry.circular(8),
+                        ),
+                        side: BorderSide(color: ClubColors.defaultPrimary),
+                      ),
+                      onPressed: () => _finishMatch(context),
+                      child: Text(
+                        AppStrings.finishMatch,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w900,
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ),
                 ],
-                const SizedBox(height: 10),
-                _buildScoreCard(),
-                const SizedBox(height: 8),
-                _buildPlayerStats(),
-                const SizedBox(height: 8),
-                _buildMatchInfo(),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  height: 60,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(213, 255, 255, 255),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadiusGeometry.circular(8),
-                      ),
-                      side: BorderSide(color: ClubColors.defaultPrimary),
-                    ),
-                    onPressed: () => _finishMatch(context),
-                    child: Text(
-                      AppStrings.finishMatch,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w900,
-                        color: Colors.black,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
             ),
           ),
         ),
@@ -261,67 +263,91 @@ class MatchScreen extends StatelessWidget {
               ],
             ),
             borderRadius: BorderRadius.circular(26),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.25), width: 1.2),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.25),
+              width: 1.2,
+            ),
             boxShadow: [
-              BoxShadow(color: const Color(0xFF4ADE80).withValues(alpha: 0.12), blurRadius: 28, offset: const Offset(0, 8)),
-              BoxShadow(color: Colors.black.withValues(alpha: 0.18), blurRadius: 22, offset: const Offset(0, 12)),
+              BoxShadow(
+                color: const Color(0xFF4ADE80).withValues(alpha: 0.12),
+                blurRadius: 28,
+                offset: const Offset(0, 8),
+              ),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.18),
+                blurRadius: 22,
+                offset: const Offset(0, 12),
+              ),
             ],
           ),
           child: Column(
             children: [
-              Text(resultText.toUpperCase(), style: TextStyle(color: resultColor, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
-              const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildTeam(
-                  name: match.homeTeam,
-                  primary: homePrimary,
-                  secondary: homeSecondary,
+              Text(
+                resultText.toUpperCase(),
+                style: TextStyle(
+                  color: resultColor,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.5,
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12),
-                child: Text(
-                  'VS',
-                  style: TextStyle(
-                    color: Colors.white54,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w900,
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTeam(
+                      name: match.homeTeam,
+                      primary: homePrimary,
+                      secondary: homeSecondary,
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      'VS',
+                      style: TextStyle(
+                        color: Colors.white54,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: _buildTeam(
+                      name: match.awayTeam,
+                      primary: awayPrimary,
+                      secondary: awaySecondary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                '${match.homeGoals} : ${match.awayGoals}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 30,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2,
+                  shadows: [
+                    Shadow(
+                      color: ui.Color.fromARGB(251, 205, 223, 6),
+                      blurRadius: 20,
+                    ),
+                  ],
+                ),
+              ),
+              if (match.hasPenalties) ...[
+                const SizedBox(height: 6),
+                Text(
+                  '${AppStrings.penaltiesShort} ${match.homePenalties} : ${match.awayPenalties}',
+                  style: const TextStyle(
+                    color: Color(0xFF8BE07F),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
-              ),
-              Expanded(
-                child: _buildTeam(
-                  name: match.awayTeam,
-                  primary: awayPrimary,
-                  secondary: awaySecondary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            '${match.homeGoals} : ${match.awayGoals}',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 42,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 3,
-              shadows: [Shadow(color: Color(0x664ADE80), blurRadius: 20)],
-            ),
-          ),
-          if (match.hasPenalties) ...[
-            const SizedBox(height: 6),
-            Text(
-              '${AppStrings.penaltiesShort} ${match.homePenalties} : ${match.awayPenalties}',
-              style: const TextStyle(
-                color: Color(0xFF8BE07F),
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ],
+              ],
             ],
           ),
         ),
@@ -385,65 +411,85 @@ class MatchScreen extends StatelessWidget {
       child: BackdropFilter(
         filter: ui.ImageFilter.blur(sigmaX: 22, sigmaY: 22),
         child: Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Colors.white.withValues(alpha: 0.15), const Color(0xFF4ADE80).withValues(alpha: 0.10), const Color(0xFF0B3323).withValues(alpha: 0.48)],
-        ),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.22), width: 1.1),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.14), blurRadius: 20, offset: const Offset(0, 8))],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            AppStrings.playerStatistics,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.2,
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withValues(alpha: 0.15),
+                const Color(0xFF4ADE80).withValues(alpha: 0.10),
+                const Color(0xFF0B3323).withValues(alpha: 0.48),
+              ],
             ),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.22),
+              width: 1.1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.14),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
-          const SizedBox(height: 1),
-          if (!match.playerPlayed)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: Text(
-                'Игрок не участвовал в матче',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                AppStrings.playerStatistics,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.2,
                 ),
               ),
-            )
-          else ...[
-            _StatRow(
-              title: AppStrings.rating,
-              value: match.playerRating.toStringAsFixed(1),
-            ),
-            _StatRow(title: AppStrings.goals, value: '${match.playerGoals}'),
-            _StatRow(
-              title: AppStrings.assists,
-              value: '${match.playerAssists}',
-            ),
-            _StatRow(
-              title: AppStrings.yellowCards,
-              value: '${match.yellowCards}',
-            ),
-            _StatRow(title: AppStrings.redCards, value: '${match.redCards}'),
-          ],
-        ],
-      ),
+              const SizedBox(height: 1),
+              if (!match.playerPlayed)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  child: Text(
+                    'Игрок не участвовал в матче',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                )
+              else ...[
+                _StatRow(
+                  title: AppStrings.rating,
+                  value: match.playerRating.toStringAsFixed(1),
+                ),
+                _StatRow(
+                  title: AppStrings.goals,
+                  value: '${match.playerGoals}',
+                ),
+                _StatRow(
+                  title: AppStrings.assists,
+                  value: '${match.playerAssists}',
+                ),
+                _StatRow(
+                  title: AppStrings.yellowCards,
+                  value: '${match.yellowCards}',
+                ),
+                _StatRow(
+                  title: AppStrings.redCards,
+                  value: '${match.redCards}',
+                ),
+              ],
+            ],
+          ),
         ),
       ),
-    );  }
+    );
+  }
 
   Widget _buildMatchInfo() {
     return ClipRRect(
@@ -451,50 +497,63 @@ class MatchScreen extends StatelessWidget {
       child: BackdropFilter(
         filter: ui.ImageFilter.blur(sigmaX: 22, sigmaY: 22),
         child: Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Colors.white.withValues(alpha: 0.15), const Color(0xFF4ADE80).withValues(alpha: 0.10), const Color(0xFF0B3323).withValues(alpha: 0.48)],
-        ),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.22), width: 1.1),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.14), blurRadius: 20, offset: const Offset(0, 8))],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            AppStrings.afterMatch,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.2,
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withValues(alpha: 0.15),
+                const Color(0xFF4ADE80).withValues(alpha: 0.10),
+                const Color(0xFF0B3323).withValues(alpha: 0.48),
+              ],
             ),
-          ),
-          const SizedBox(height: 1),
-          _StatRow(
-            title: AppStrings.totalMatches,
-            value: '${career.matches + (match.playerPlayed ? 1 : 0)}',
-          ),
-          _StatRow(
-            title: AppStrings.totalGoals,
-            value: '${career.goals + match.playerGoals}',
-          ),
-          _StatRow(
-            title: AppStrings.totalAssists,
-            value: '${career.assists + match.playerAssists}',
-          ),
-          if (match.playerPlayed)
-            _StatRow(
-              title: AppStrings.currencyEarned,
-              value: '+🪙 ${Career.currencyRewardForMatch(match)}',
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.22),
+              width: 1.1,
             ),
-        ],
-      ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.14),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Text(
+              //   AppStrings.afterMatch,
+              //   style: const TextStyle(
+              //     color: Colors.white,
+              //     fontSize: 11,
+              //     fontWeight: FontWeight.w800,
+              //     letterSpacing: 1.2,
+              //   ),
+              // ),
+              // const SizedBox(height: 1),
+              // _StatRow(
+              //   title: AppStrings.totalMatches,
+              //   value: '${career.matches + (match.playerPlayed ? 1 : 0)}',
+              // ),
+              // _StatRow(
+              //   title: AppStrings.totalGoals,
+              //   value: '${career.goals + match.playerGoals}',
+              // ),
+              // _StatRow(
+              //   title: AppStrings.totalAssists,
+              //   value: '${career.assists + match.playerAssists}',
+              // ),
+              if (match.playerPlayed)
+                _StatRow(
+                  title: AppStrings.currencyEarned,
+                  value: '+🪙 ${Career.currencyRewardForMatch(match)}',
+                ),
+            ],
+          ),
         ),
       ),
     );
