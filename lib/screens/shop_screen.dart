@@ -89,7 +89,7 @@ class _ShopScreenState extends State<ShopScreen> {
       career.temporarySkillBoostMatches['personalTrainer'] ?? 0;
 
   int _nextStaffPurchasePrice(String key) {
-    final purchases = (career.skillTrainingPurchases[key] ?? 0).clamp(0, 10);
+    final purchases = (career.skillTrainingPurchases[key] ?? 0).clamp(0, 10).toInt();
     return _staffPurchaseBasePrice * (1 << purchases);
   }
 
