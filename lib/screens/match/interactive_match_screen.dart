@@ -1683,7 +1683,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         backgroundColor: const Color(0xFF061B12),
         body: Stack(
           children: [
-            const Positioned.fill(
+            Positioned.fill(
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
