@@ -348,6 +348,8 @@ class Career {
       'Under Armour',
       'Red Bull',
       'Coca-Cola',
+      // Средний уровень: крупные технологические, спортивные и
+      // международные компании, доступные игрокам с рейтингом 75+.
       if (player.overall >= 75) ...[
         'Samsung',
         'LG',
@@ -355,13 +357,43 @@ class Career {
         'Lenovo',
         'Visa',
         'Pepsi',
+        'Sony',
+        'JBL',
+        'Gatorade',
+        'Spotify',
+        'Mastercard',
+        'DHL',
+        'Uber',
+        'PlayStation',
+        'EA SPORTS',
+        'Expedia',
       ],
+      // Высокий уровень: глобальные технологические и премиальные бренды.
       if (player.overall >= 85) ...[
         'Apple',
         'Emirates',
         'Rolex',
+        'Google',
+        'Microsoft',
+        'Amazon',
+        'Mercedes-Benz',
+        'BMW',
+        'Audi',
+        'Qatar Airways',
+        'Marriott Bonvoy',
+        'Porsche',
       ],
-      if (player.overall >= 90) 'Louis Vuitton',
+      // Элитные бренды становятся доступны только игрокам с рейтингом 90+.
+      if (player.overall >= 90) ...[
+        'Louis Vuitton',
+        'Gucci',
+        'Dior',
+        'Prada',
+        'TAG Heuer',
+        'Hublot',
+        'Cartier',
+        'Bentley',
+      ],
     ];
     final random = Random(season * 97 + player.overall * 13 + player.age);
     final count = player.overall >= 82 ? 2 : 1;
