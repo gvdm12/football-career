@@ -64,22 +64,21 @@ void main() {
             .where((match) => match.round == round)
             .toList();
         for (final match in roundMatches) {
+          final playerIsHome = match.homeTeam == secondDivisionClub;
+          final playerIsAway = match.awayTeam == secondDivisionClub;
           cup = cup.recordResult(
             matchId: match.id,
-            homeGoals: 1,
-            awayGoals: 0,
+            homeGoals: playerIsAway ? 0 : 1,
+            awayGoals: playerIsHome ? 1 : 0,
           );
         }
         cup = cup.advanceRound();
       }
 
+      final finalMatch = cup.matches.singleWhere((match) => match.round == 5);
       expect(cup.currentRound, 5);
-      expect(cup.matches.where((match) => match.round == 5), hasLength(1));
-      expect(cup.matches.any(
-        (match) =>
-            match.homeTeam == secondDivisionClub ||
-            match.awayTeam == secondDivisionClub,
-      ), isTrue);
+      expect(finalMatch.homeTeam == secondDivisionClub ||
+          finalMatch.awayTeam == secondDivisionClub, isTrue);
     });
   });
   group('Negotiation cooldowns', () {
