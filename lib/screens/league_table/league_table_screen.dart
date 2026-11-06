@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/league_season_simulator.dart';
+import 'package:flutter_football/models/league_division_service.dart';
 import 'package:flutter_football/services/app_strings.dart';
 
 class LeagueTableScreen extends StatelessWidget {
@@ -18,9 +19,26 @@ class LeagueTableScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(82, 81, 84, 82),
         foregroundColor: Colors.white,
-        title: Text(
-          AppStrings.leagueTable,
-          style: const TextStyle(fontWeight: FontWeight.w900),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              AppStrings.leagueTable,
+              style: const TextStyle(fontWeight: FontWeight.w900),
+            ),
+            if (Clubs.leagueOf(career.player.club) != null)
+              Text(
+                career.currentLeagueDivision == 1
+                    ? 'Высший дивизион'
+                    : 'Второй дивизион',
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: Colors.white70,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+          ],
         ),
       ),
       body: Stack(
@@ -61,12 +79,22 @@ class LeagueTableScreen extends StatelessWidget {
   }
 
   Widget _buildQualificationLegend() {
+    if (career.currentLeagueDivision == 2) {
+      return Wrap(
+        spacing: 12,
+        runSpacing: 6,
+        children: [
+          _legendItem(const Color(0xFF42A5F5), 'Повышение'),
+        ],
+      );
+    }
     return Wrap(
       spacing: 12,
       runSpacing: 6,
       children: [
         _legendItem(const Color(0xFF42A5F5), 'Лига чемпионов'),
         _legendItem(const Color(0xFFFFA726), 'Лига Европы'),
+        _legendItem(const Color(0xFFFF7777), 'Вылет во второй дивизион'),
       ],
     );
   }
@@ -170,12 +198,16 @@ class LeagueTableScreen extends StatelessWidget {
     final difference = entry.goalDifference;
 
     final league = Clubs.leagueOf(career.player.club);
-    final qualificationSlots = league == null
+    final isSecondDivision = career.currentLeagueDivision == 2;
+    final isTwoTierLeague =
+        league != null && LeagueDivisionService.hasSecondDivision(league);
+    final qualificationSlots = league == null || isSecondDivision
         ? 0
         : LeagueSeasonSimulator.qualificationSlots[league] ?? 0;
 
-    final qualifiesForChampionsLeague = position <= qualificationSlots;
-    final europaSlots = league == null
+    final qualifiesForChampionsLeague =
+        !isSecondDivision && position <= qualificationSlots;
+    final europaSlots = league == null || isSecondDivision
         ? null
         : LeagueSeasonSimulator.europaLeagueSlots[league];
     final qualifiesForEuropaLeague =
@@ -183,11 +215,22 @@ class LeagueTableScreen extends StatelessWidget {
         europaSlots != null &&
         position >= europaSlots.$1 &&
         position < europaSlots.$1 + europaSlots.$2;
+    final movementPlaces = league == null
+        ? 2
+        : LeagueDivisionService.movementPlaces(league);
+    final promotionPosition =
+        isSecondDivision && position <= movementPlaces;
+    final relegationPosition =
+        isTwoTierLeague &&
+        !isSecondDivision &&
+        position > career.leagueTable.length - movementPlaces;
 
-    final qualificationColor = qualifiesForChampionsLeague
+    final qualificationColor = qualifiesForChampionsLeague || promotionPosition
         ? const Color(0xFF42A5F5)
         : qualifiesForEuropaLeague
         ? const Color(0xFFFFA726)
+        : relegationPosition
+        ? const Color(0xFFFF7777)
         : Colors.white70;
 
     final positionColor = isPlayerClub ? green : qualificationColor;
@@ -197,19 +240,23 @@ class LeagueTableScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: isPlayerClub
             ? const Color.fromARGB(184, 86, 81, 7)
-            : qualifiesForChampionsLeague
+            : qualifiesForChampionsLeague || promotionPosition
             ? const Color.fromARGB(205, 22, 59, 98)
             : qualifiesForEuropaLeague
             ? const Color.fromARGB(205, 112, 67, 18)
+            : relegationPosition
+            ? const Color.fromARGB(160, 100, 30, 30)
             : const Color.fromARGB(114, 86, 83, 83),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isPlayerClub
               ? const Color(0xFF4F9F59)
-              : qualifiesForChampionsLeague
+              : qualifiesForChampionsLeague || promotionPosition
               ? const Color(0xFF42A5F5)
               : qualifiesForEuropaLeague
               ? const Color(0xFFFFA726)
+              : relegationPosition
+              ? const Color(0xFFFF7777)
               : const Color(0xFF14401E),
         ),
       ),

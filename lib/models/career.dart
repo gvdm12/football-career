@@ -15,6 +15,7 @@ import 'package:flutter_football/models/europa_league.dart';
 import 'package:flutter_football/models/world_cup.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/club_strength_service.dart';
+import 'package:flutter_football/models/league_division_service.dart';
 
 import 'package:flutter_football/models/league_match.dart';
 import 'package:flutter_football/models/league_season_simulator.dart';
@@ -88,6 +89,13 @@ class Career {
   final Map<String, int> temporarySkillBoosts;
   final Map<String, int> temporarySkillBoostMatches;
   final Map<String, int> clubStrengths;
+  final Map<String, List<String>> leagueDivisions;
+
+  int get currentLeagueDivision {
+    final league = Clubs.leagueOf(player.club);
+    if (league == null) return 1;
+    return LeagueDivisionService.divisionForClub(player.club, leagueDivisions) ?? 1;
+  }
 
   bool get isInjured =>
       !settings.playWithoutInjuries && injuryMatchesRemaining > 0;
@@ -202,21 +210,25 @@ class Career {
     this.temporarySkillBoosts = const {},
     this.temporarySkillBoostMatches = const {},
     this.clubStrengths = const {},
+    this.leagueDivisions = const {},
   });
 
   // ============================================================
   // КАЛЕНДАРЬ ЧЕМПИОНАТА
   // ============================================================
 
-  static List<LeagueMatch> _createLeagueMatches(String playerClub) {
+  static List<LeagueMatch> _createLeagueMatches(
+    String playerClub, {
+    Map<String, List<String>>? leagueDivisions,
+  }) {
     final league = Clubs.leagueOf(playerClub);
+    if (league == null) return [];
 
-    if (league == null) {
-      return [];
-    }
-
-    final clubs = Clubs.byLeague(league);
-
+    final divisions = leagueDivisions ??
+        LeagueDivisionService.createInitialDivisions();
+    final division =
+        LeagueDivisionService.divisionForClub(playerClub, divisions) ?? 1;
+    final clubs = LeagueDivisionService.clubsFor(league, division, divisions);
     return LeagueCalendar.generate(clubs);
   }
 
@@ -269,18 +281,22 @@ class Career {
 
   static List<LeagueTableEntry> _createLeagueTable(
     String playerClub,
-    List<SeasonMatch> seasonMatches,
-  ) {
+    List<SeasonMatch> seasonMatches, {
+    Map<String, List<String>>? leagueDivisions,
+  }) {
     final league = Clubs.leagueOf(playerClub);
 
     if (league != null) {
-      final clubs = Clubs.byLeague(league);
-
+      final divisions = leagueDivisions ??
+          LeagueDivisionService.createInitialDivisions();
+      final division =
+          LeagueDivisionService.divisionForClub(playerClub, divisions) ?? 1;
+      final clubs =
+          LeagueDivisionService.clubsFor(league, division, divisions);
       final opponents = clubs
           .where((club) => club.name != playerClub)
           .map((club) => club.name)
           .toList();
-
       return LeagueTable.create(playerClub, opponents);
     }
 
@@ -448,7 +464,11 @@ class Career {
   }) {
     Clubs.applyStrengthOverrides(const {});
     RealClubSquads.applyCareerTransfers(const []);
-    final leagueMatches = _createLeagueMatches(player.club);
+    final leagueDivisions = LeagueDivisionService.createInitialDivisions();
+    final leagueMatches = _createLeagueMatches(
+      player.club,
+      leagueDivisions: leagueDivisions,
+    );
 
     final seasonMatches = _createSeasonMatches(player.club, leagueMatches);
     final friendlyMatches = PreSeasonService.create(
@@ -456,7 +476,11 @@ class Career {
       season: 1,
     );
 
-    final leagueTable = _createLeagueTable(player.club, seasonMatches);
+    final leagueTable = _createLeagueTable(
+      player.club,
+      seasonMatches,
+      leagueDivisions: leagueDivisions,
+    );
     final startingSalary = _startingClubSalary(player.club);
     final startingObjectives = _createSeasonObjectives(player, 1);
     final startingSponsorOffers = _createSponsorOffers(player, 1);
@@ -471,10 +495,12 @@ class Career {
       league: clubLeague,
       season: 1,
       playerClub: player.club,
+      leagueDivisions: leagueDivisions,
     );
 
     final europeanLeagueStandings = LeagueSeasonSimulator.simulateAll(
       season: 1,
+      leagueDivisions: leagueDivisions,
     );
 
     final qualifiedClubs = LeagueSeasonSimulator.getQualifiedClubs(
@@ -525,6 +551,7 @@ class Career {
       )).toList(),
       isCareerFinished: false,
       domesticCup: cup,
+      leagueDivisions: leagueDivisions,
       europeanLeagueStandings: europeanLeagueStandings,
       championsLeague: championsLeague,
       europaLeague: europaLeague,
@@ -601,6 +628,7 @@ class Career {
       'temporarySkillBoosts': temporarySkillBoosts,
       'temporarySkillBoostMatches': temporarySkillBoostMatches,
       'clubStrengths': clubStrengths,
+      'leagueDivisions': leagueDivisions,
     };
   }
 
@@ -625,6 +653,8 @@ class Career {
     }
 
     final loadedPlayer = Player.fromJson(Map<String, dynamic>.from(rawPlayer));
+    final restoredLeagueDivisions =
+        LeagueDivisionService.restoreDivisions(json['leagueDivisions']);
     final restoredWorldTransfers = readList(
       'worldTransfers',
       CareerWorldTransfer.fromJson,
@@ -646,7 +676,10 @@ class Career {
 
     final leagueMatches = savedLeagueMatches.isNotEmpty
         ? savedLeagueMatches
-        : _createLeagueMatches(loadedPlayer.club);
+        : _createLeagueMatches(
+            loadedPlayer.club,
+            leagueDivisions: restoredLeagueDivisions,
+          );
 
     // Сохраняем календарь и результаты старых карьер.
     // Если календаря игрока нет в сохранении, создаём его.
@@ -660,7 +693,11 @@ class Career {
 
     final leagueTable = savedTable.isNotEmpty
         ? savedTable
-        : _createLeagueTable(loadedPlayer.club, seasonMatches);
+        : _createLeagueTable(
+            loadedPlayer.club,
+            seasonMatches,
+            leagueDivisions: restoredLeagueDivisions,
+          );
 
     final rawCup = json['domesticCup'];
 
@@ -677,6 +714,7 @@ class Career {
               league: clubLeague,
               season: (json['season'] as num?)?.toInt() ?? 1,
               playerClub: loadedPlayer.club,
+              leagueDivisions: restoredLeagueDivisions,
             );
     }
 
@@ -702,6 +740,7 @@ class Career {
     } else {
       europeanLeagueStandings = LeagueSeasonSimulator.simulateAll(
         season: (json['season'] as num?)?.toInt() ?? 1,
+        leagueDivisions: restoredLeagueDivisions,
       );
     }
 
@@ -953,6 +992,7 @@ class Career {
           ) ??
           const {},
       clubStrengths: restoredClubStrengths,
+      leagueDivisions: restoredLeagueDivisions,
       temporarySkillBoostMatches:
           (json['temporarySkillBoostMatches'] as Map?)?.map(
             (key, value) => MapEntry(key.toString(), (value as num).toInt()),
@@ -1023,6 +1063,7 @@ class Career {
     Map<String, int>? temporarySkillBoosts,
     Map<String, int>? temporarySkillBoostMatches,
     Map<String, int>? clubStrengths,
+    Map<String, List<String>>? leagueDivisions,
     bool clearInjury = false,
   }) {
     return Career(
@@ -1092,6 +1133,7 @@ class Career {
       temporarySkillBoostMatches:
           temporarySkillBoostMatches ?? this.temporarySkillBoostMatches,
       clubStrengths: clubStrengths ?? this.clubStrengths,
+      leagueDivisions: leagueDivisions ?? this.leagueDivisions,
     );
   }
 
@@ -2040,6 +2082,34 @@ class Career {
             ),
           ];
 
+    // Подготавливаем итоговые таблицы обоих дивизионов и меняем
+    // участников местами перед созданием календаря нового сезона.
+    final finalDivisionTables = LeagueDivisionService.simulateAllDivisions(
+      divisions: leagueDivisions.isEmpty
+          ? LeagueDivisionService.createInitialDivisions()
+          : leagueDivisions,
+      season: season,
+    );
+    final currentLeague = Clubs.leagueOf(player.club);
+    final currentDivision = currentLeague == null
+        ? 1
+        : LeagueDivisionService.divisionForClub(
+              player.club,
+              leagueDivisions,
+            ) ??
+            1;
+    if (currentLeague != null && leagueTable.isNotEmpty) {
+      finalDivisionTables[
+        LeagueDivisionService.key(currentLeague, currentDivision)
+      ] = List<LeagueTableEntry>.from(leagueTable);
+    }
+    final newLeagueDivisions = LeagueDivisionService.advanceSeason(
+      divisions: leagueDivisions.isEmpty
+          ? LeagueDivisionService.createInitialDivisions()
+          : leagueDivisions,
+      finalTables: finalDivisionTables,
+    );
+
     // Сила клубов меняется только один раз при переходе в новый сезон.
     final performanceStandings = <League, List<LeagueTableEntry>>{
       for (final entry in europeanLeagueStandings.entries)
@@ -2054,7 +2124,14 @@ class Career {
     final previousLeague = previousClub == null
         ? null
         : Clubs.leagueOf(previousClub.club);
-    if (previousLeague != null && leagueTable.isNotEmpty) {
+    final previousDivision = previousClub == null
+        ? 1
+        : LeagueDivisionService.divisionForClub(
+                previousClub.club,
+                leagueDivisions,
+              ) ??
+              1;
+    if (previousLeague != null && previousDivision == 1 && leagueTable.isNotEmpty) {
       performanceStandings[previousLeague] = List<LeagueTableEntry>.from(
         leagueTable,
       );
@@ -2065,6 +2142,8 @@ class Career {
       domesticCupWinner: domesticCup?.champion,
       championsLeagueWinner: championsLeague?.champion,
       europaLeagueWinner: europaLeague?.champion,
+      divisionStandings: finalDivisionTables,
+      leagueDivisions: leagueDivisions,
     );
     Clubs.applyStrengthOverrides(updatedClubStrengths);
 
@@ -2153,14 +2232,21 @@ class Career {
       season: newSeason,
     );
     // Клуб берётся после трансферного окна.
-    final newLeagueMatches = _createLeagueMatches(newPlayer.club);
+    final newLeagueMatches = _createLeagueMatches(
+      newPlayer.club,
+      leagueDivisions: newLeagueDivisions,
+    );
 
     final newSeasonMatches = _createSeasonMatches(
       newPlayer.club,
       newLeagueMatches,
     );
 
-    final newLeagueTable = _createLeagueTable(newPlayer.club, newSeasonMatches);
+    final newLeagueTable = _createLeagueTable(
+      newPlayer.club,
+      newSeasonMatches,
+      leagueDivisions: newLeagueDivisions,
+    );
 
     final newClubLeague = Clubs.leagueOf(newPlayer.club);
 
@@ -2171,6 +2257,7 @@ class Career {
         league: newClubLeague,
         season: newSeason,
         playerClub: newPlayer.club,
+        leagueDivisions: newLeagueDivisions,
       );
     } else {
       newDomesticCup = null;
@@ -2230,6 +2317,7 @@ class Career {
     // на квалификацию, которая уже определена по прошлому сезону.
     final newEuropeanLeagueStandings = LeagueSeasonSimulator.simulateAll(
       season: newSeason,
+      leagueDivisions: newLeagueDivisions,
     );
 
     // Пресса освещает не только клуб игрока, но и результаты других лиг.
@@ -2266,6 +2354,38 @@ class Career {
         })
         .whereType<CareerNews>()
         .toList();
+
+    final divisionNews = <CareerNews>[];
+    for (final league in LeagueDivisionService.twoTierLeagues) {
+      final previousTop =
+          leagueDivisions[LeagueDivisionService.key(league, 1)] ?? const [];
+      final nextTop =
+          newLeagueDivisions[LeagueDivisionService.key(league, 1)] ?? const [];
+      final promoted =
+          nextTop.where((club) => !previousTop.contains(club)).toList();
+      final relegated =
+          previousTop.where((club) => !nextTop.contains(club)).toList();
+      if (promoted.isEmpty || relegated.isEmpty) continue;
+
+      final playerWasPromoted = promoted.contains(newPlayer.club);
+      final playerWasRelegated = relegated.contains(newPlayer.club);
+      divisionNews.add(
+        CareerNews(
+          id: 'division_movement_s${newSeason}_${league.name}',
+          season: newSeason,
+          matchNumber: 0,
+          title: playerWasPromoted
+              ? 'Повышение в высший дивизион!'
+              : playerWasRelegated
+                  ? 'Клуб вылетел во второй дивизион'
+                  : 'Повышение и вылет в ${league.displayName}',
+          description:
+              'В высший дивизион вышли: ${promoted.join(', ')}. '
+              'Во второй дивизион вылетели: ${relegated.join(', ')}.',
+          type: CareerNewsType.season,
+        ),
+      );
+    }
 
     final previousStats = previousSeasonStats.isNotEmpty
         ? previousSeasonStats.last
@@ -2306,7 +2426,7 @@ class Career {
       history: newHistory,
       leagueTable: newLeagueTable,
       leagueMatches: newLeagueMatches,
-      news: [...news, ...worldTransferNews, ...coachTransferNews, ...leagueNews, ...transferRumorNews, ...sponsorOfferNews],
+      news: [...news, ...worldTransferNews, ...coachTransferNews, ...leagueNews, ...divisionNews, ...transferRumorNews, ...sponsorOfferNews],
       objectives: nextObjectives,
       recentMatchRatings: const [],
       sponsorOffers: nextSponsorOffers,
@@ -2322,6 +2442,7 @@ class Career {
       monthlySalary: monthlySalary,
       isCareerFinished: false,
       domesticCup: newDomesticCup,
+      leagueDivisions: newLeagueDivisions,
       europeanLeagueStandings: newEuropeanLeagueStandings,
       championsLeague: newChampionsLeague,
       europaLeague: newEuropaLeague,

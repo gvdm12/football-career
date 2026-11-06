@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/league_match.dart';
 import 'package:flutter_football/models/league_table.dart';
+import 'package:flutter_football/models/league_division_service.dart';
 
 /// Автоматически симулирует национальные чемпионаты
 /// для квалификации в Лигу чемпионов.
@@ -70,11 +71,16 @@ class LeagueSeasonSimulator {
   /// Возвращает итоговые таблицы всех десяти стран.
   static Map<League, List<LeagueTableEntry>> simulateAll({
     required int season,
+    Map<String, List<String>>? leagueDivisions,
   }) {
     final result = <League, List<LeagueTableEntry>>{};
 
     for (final league in qualificationSlots.keys) {
-      result[league] = simulateLeague(league: league, season: season);
+      result[league] = simulateLeague(
+        league: league,
+        season: season,
+        leagueDivisions: leagueDivisions,
+      );
     }
 
     return result;
@@ -84,8 +90,11 @@ class LeagueSeasonSimulator {
   static List<LeagueTableEntry> simulateLeague({
     required League league,
     required int season,
+    Map<String, List<String>>? leagueDivisions,
   }) {
-    final clubs = Clubs.byLeague(league);
+    final divisions = leagueDivisions ??
+        LeagueDivisionService.createInitialDivisions();
+    final clubs = LeagueDivisionService.clubsFor(league, 1, divisions);
 
     if (clubs.length < qualificationSlots[league]!) {
       throw StateError(

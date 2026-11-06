@@ -194,6 +194,7 @@ class Club {
   final String name;
   final League league;
   final int baseStrength;
+  final int division;
   final int? _resolvedStrength;
   int get strength =>
       _resolvedStrength ?? Clubs.strengthOverrides[name] ?? baseStrength;
@@ -205,6 +206,7 @@ class Club {
     required this.name,
     required this.league,
     required int strength,
+    this.division = 1,
     int? resolvedStrength,
   }) : baseStrength = strength,
        _resolvedStrength = resolvedStrength;
@@ -500,6 +502,142 @@ class Clubs {
     Club(name: 'St. Louis City', league: League.mls, strength: 74),
     Club(name: 'Toronto FC', league: League.mls, strength: 74),
     Club(name: 'Vancouver Whitecaps', league: League.mls, strength: 79),
+
+    // =====================================================
+    // ВТОРЫЕ ДИВИЗИОНЫ — СЕЗОН 2026/27
+    // =====================================================
+
+    // АНГЛИЯ — CHAMPIONSHIP (24)
+    Club(name: 'Blackburn Rovers', league: League.england, strength: 70, division: 2),
+    Club(name: 'Bristol City', league: League.england, strength: 70, division: 2),
+    Club(name: 'Burnley', league: League.england, strength: 74, division: 2),
+    Club(name: 'Cardiff City', league: League.england, strength: 69, division: 2),
+    Club(name: 'Derby County', league: League.england, strength: 69, division: 2),
+    Club(name: 'Leicester City', league: League.england, strength: 75, division: 2),
+    Club(name: 'Middlesbrough', league: League.england, strength: 71, division: 2),
+    Club(name: 'Millwall', league: League.england, strength: 69, division: 2),
+    Club(name: 'Norwich City', league: League.england, strength: 71, division: 2),
+    Club(name: 'Oxford United', league: League.england, strength: 67, division: 2),
+    Club(name: 'Plymouth Argyle', league: League.england, strength: 66, division: 2),
+    Club(name: 'Portsmouth', league: League.england, strength: 68, division: 2),
+    Club(name: 'Preston North End', league: League.england, strength: 68, division: 2),
+    Club(name: 'Queens Park Rangers', league: League.england, strength: 68, division: 2),
+    Club(name: 'Sheffield United', league: League.england, strength: 73, division: 2),
+    Club(name: 'Sheffield Wednesday', league: League.england, strength: 68, division: 2),
+    Club(name: 'Stoke City', league: League.england, strength: 69, division: 2),
+    Club(name: 'Swansea City', league: League.england, strength: 69, division: 2),
+    Club(name: 'Watford', league: League.england, strength: 70, division: 2),
+    Club(name: 'West Bromwich Albion', league: League.england, strength: 72, division: 2),
+    Club(name: 'Wrexham', league: League.england, strength: 68, division: 2),
+    Club(name: 'Reading', league: League.england, strength: 65, division: 2),
+    Club(name: 'Huddersfield Town', league: League.england, strength: 66, division: 2),
+    Club(name: 'Rotherham United', league: League.england, strength: 64, division: 2),
+
+    // ИСПАНИЯ — SEGUNDA DIVISIÓN (22)
+    Club(name: 'Albacete', league: League.spain, strength: 67, division: 2),
+    Club(name: 'Burgos', league: League.spain, strength: 67, division: 2),
+    Club(name: 'Cadiz', league: League.spain, strength: 71, division: 2),
+    Club(name: 'Castellon', league: League.spain, strength: 66, division: 2),
+    Club(name: 'Eibar', league: League.spain, strength: 70, division: 2),
+    Club(name: 'Granada', league: League.spain, strength: 72, division: 2),
+    Club(name: 'Huesca', league: League.spain, strength: 66, division: 2),
+    Club(name: 'Leganes', league: League.spain, strength: 72, division: 2),
+    Club(name: 'Mirandes', league: League.spain, strength: 65, division: 2),
+    Club(name: 'CD Lugo', league: League.spain, strength: 65, division: 2),
+    Club(name: 'Real Oviedo', league: League.spain, strength: 71, division: 2),
+    Club(name: 'Sporting Gijon', league: League.spain, strength: 69, division: 2),
+    Club(name: 'Tenerife', league: League.spain, strength: 67, division: 2),
+    Club(name: 'Real Zaragoza', league: League.spain, strength: 69, division: 2),
+    Club(name: 'Cordoba', league: League.spain, strength: 65, division: 2),
+    Club(name: 'Eldense', league: League.spain, strength: 64, division: 2),
+    Club(name: 'Cartagena', league: League.spain, strength: 64, division: 2),
+    Club(name: 'Almeria', league: League.spain, strength: 73, division: 2),
+    Club(name: 'Real Valladolid', league: League.spain, strength: 72, division: 2),
+    Club(name: 'Las Palmas', league: League.spain, strength: 73, division: 2),
+    Club(name: 'Racing de Ferrol', league: League.spain, strength: 65, division: 2),
+    Club(name: 'Cultural Leonesa', league: League.spain, strength: 64, division: 2),
+
+    // ГЕРМАНИЯ — 2. BUNDESLIGA (18)
+    Club(name: 'Hannover 96', league: League.germany, strength: 71, division: 2),
+    Club(name: 'Hertha Berlin', league: League.germany, strength: 73, division: 2),
+    Club(name: 'Kaiserslautern', league: League.germany, strength: 70, division: 2),
+    Club(name: 'Karlsruher SC', league: League.germany, strength: 69, division: 2),
+    Club(name: 'Nurnberg', league: League.germany, strength: 69, division: 2),
+    Club(name: 'Fortuna Dusseldorf', league: League.germany, strength: 71, division: 2),
+    Club(name: 'Darmstadt 98', league: League.germany, strength: 70, division: 2),
+    Club(name: 'VfL Bochum', league: League.germany, strength: 72, division: 2),
+    Club(name: 'Hansa Rostock', league: League.germany, strength: 66, division: 2),
+    Club(name: 'Magdeburg', league: League.germany, strength: 68, division: 2),
+    Club(name: 'Greuther Furth', league: League.germany, strength: 67, division: 2),
+    Club(name: 'Preussen Munster', league: League.germany, strength: 65, division: 2),
+    Club(name: 'Jahn Regensburg', league: League.germany, strength: 65, division: 2),
+    Club(name: 'Eintracht Braunschweig', league: League.germany, strength: 66, division: 2),
+    Club(name: 'Arminia Bielefeld', league: League.germany, strength: 68, division: 2),
+    Club(name: 'Dynamo Dresden', league: League.germany, strength: 68, division: 2),
+    Club(name: 'FC St. Pauli', league: League.germany, strength: 73, division: 2),
+    Club(name: 'Wehen Wiesbaden', league: League.germany, strength: 65, division: 2),
+
+    // ИТАЛИЯ — SERIE B (20)
+    Club(name: 'Bari', league: League.italy, strength: 68, division: 2),
+    Club(name: 'Brescia', league: League.italy, strength: 67, division: 2),
+    Club(name: 'Cesena', league: League.italy, strength: 67, division: 2),
+    Club(name: 'Cittadella', league: League.italy, strength: 66, division: 2),
+    Club(name: 'Cremonese', league: League.italy, strength: 72, division: 2),
+    Club(name: 'Empoli', league: League.italy, strength: 72, division: 2),
+    Club(name: 'Juve Stabia', league: League.italy, strength: 65, division: 2),
+    Club(name: 'Mantova', league: League.italy, strength: 64, division: 2),
+    Club(name: 'Modena', league: League.italy, strength: 68, division: 2),
+    Club(name: 'Palermo', league: League.italy, strength: 73, division: 2),
+    Club(name: 'Pisa', league: League.italy, strength: 70, division: 2),
+    Club(name: 'Reggiana', league: League.italy, strength: 66, division: 2),
+    Club(name: 'Sampdoria', league: League.italy, strength: 71, division: 2),
+    Club(name: 'Spezia', league: League.italy, strength: 70, division: 2),
+    Club(name: 'Sudtirol', league: League.italy, strength: 66, division: 2),
+    Club(name: 'Catanzaro', league: League.italy, strength: 67, division: 2),
+    Club(name: 'Carrarese', league: League.italy, strength: 64, division: 2),
+    Club(name: 'Avellino', league: League.italy, strength: 65, division: 2),
+    Club(name: 'Virtus Entella', league: League.italy, strength: 64, division: 2),
+    Club(name: 'Feralpisalo', league: League.italy, strength: 64, division: 2),
+
+    // ФРАНЦИЯ — LIGUE 2 (18)
+    Club(name: 'Amiens', league: League.france, strength: 66, division: 2),
+    Club(name: 'Annecy', league: League.france, strength: 65, division: 2),
+    Club(name: 'Bastia', league: League.france, strength: 66, division: 2),
+    Club(name: 'Caen', league: League.france, strength: 68, division: 2),
+    Club(name: 'Clermont', league: League.france, strength: 70, division: 2),
+    Club(name: 'Dunkerque', league: League.france, strength: 67, division: 2),
+    Club(name: 'Grenoble', league: League.france, strength: 66, division: 2),
+    Club(name: 'Guingamp', league: League.france, strength: 68, division: 2),
+    Club(name: 'Laval', league: League.france, strength: 65, division: 2),
+    Club(name: 'Martigues', league: League.france, strength: 64, division: 2),
+    Club(name: 'Pau FC', league: League.france, strength: 65, division: 2),
+    Club(name: 'Red Star', league: League.france, strength: 67, division: 2),
+    Club(name: 'Rodez', league: League.france, strength: 66, division: 2),
+    Club(name: 'Saint-Etienne', league: League.france, strength: 73, division: 2),
+    Club(name: 'Valenciennes', league: League.france, strength: 65, division: 2),
+    Club(name: 'Ajaccio', league: League.france, strength: 67, division: 2),
+    Club(name: 'Nancy', league: League.france, strength: 66, division: 2),
+    Club(name: 'Le Mans FC', league: League.france, strength: 67, division: 2),
+
+    // РОССИЯ — ПЕРВАЯ ЛИГА (18)
+    Club(name: 'Alania Vladikavkaz', league: League.russia, strength: 66, division: 2),
+    Club(name: 'Arsenal Tula', league: League.russia, strength: 68, division: 2),
+    Club(name: 'Chernomorets Novorossiysk', league: League.russia, strength: 65, division: 2),
+    Club(name: 'Chayka Peschanokopskoye', league: League.russia, strength: 63, division: 2),
+    Club(name: 'Kamaz Naberezhnye Chelny', league: League.russia, strength: 64, division: 2),
+    Club(name: 'Neftekhimik Nizhnekamsk', league: League.russia, strength: 64, division: 2),
+    Club(name: 'Rotor Volgograd', league: League.russia, strength: 67, division: 2),
+    Club(name: 'Sokol Saratov', league: League.russia, strength: 63, division: 2),
+    Club(name: 'SKA-Khabarovsk', league: League.russia, strength: 65, division: 2),
+    Club(name: 'Shinnik Yaroslavl', league: League.russia, strength: 64, division: 2),
+    Club(name: 'Torpedo Moscow', league: League.russia, strength: 69, division: 2),
+    Club(name: 'Ufa', league: League.russia, strength: 65, division: 2),
+    Club(name: 'Ural Yekaterinburg', league: League.russia, strength: 71, division: 2),
+    Club(name: 'Yenisey Krasnoyarsk', league: League.russia, strength: 65, division: 2),
+    Club(name: 'Volga Ulyanovsk', league: League.russia, strength: 63, division: 2),
+    Club(name: 'Rodina-2 Moscow', league: League.russia, strength: 64, division: 2),
+    Club(name: 'Dynamo Bryansk', league: League.russia, strength: 62, division: 2),
+    Club(name: 'Tyumen', league: League.russia, strength: 64, division: 2),
   ];
 
   /// Рассчитывает силу клуба с учётом рейтинга игрока.
@@ -559,16 +697,29 @@ class Clubs {
       name: club.name,
       league: club.league,
       strength: baseStrength,
+      division: club.division,
       resolvedStrength: adjustedStrength,
     );
   }
 
   /// Возвращает клубы выбранного чемпионата.
-  static List<Club> byLeague(League league) {
+  /// Клубы высшего дивизиона. Старое поведение сохранено.
+  static List<Club> byLeague(League league) =>
+      byLeagueDivision(league, 1);
+
+  /// Клубы конкретного дивизиона страны.
+  static List<Club> byLeagueDivision(League league, int division) {
     return all
-        .where((club) => club.league == league)
+        .where((club) => club.league == league && club.division == division)
         .map((club) => getByName(club.name))
         .toList();
+  }
+
+  static int? divisionOf(String clubName) {
+    for (final club in all) {
+      if (club.name == clubName) return club.division;
+    }
+    return null;
   }
 
   /// Возвращает чемпионат по названию клуба.
