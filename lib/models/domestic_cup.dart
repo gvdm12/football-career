@@ -31,6 +31,7 @@ class DomesticCup {
     final playerDivision =
         LeagueDivisionService.divisionForClub(playerClub, divisions);
     if (playerDivision == null ||
+        Clubs.leagueOf(playerClub) != league ||
         !divisions.values.any((clubs) => clubs.contains(playerClub))) {
       throw ArgumentError('Клуб $playerClub не найден в выбранной лиге.');
     }
