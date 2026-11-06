@@ -640,7 +640,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
         );
       case 1:
         return _buildSectionCard(
-          title: AppStrings.isEnglish ? 'PLAYER ATTRIBUTES' : 'ХАРАКТЕРИСТИКИ ИГРОКА',
+          title: AppStrings.isEnglish
+              ? 'PLAYER ATTRIBUTES'
+              : 'ХАРАКТЕРИСТИКИ ИГРОКА',
           subtitle: AppStrings.isEnglish
               ? 'Current level of all eight skills'
               : 'Текущий уровень всех восьми навыков',
@@ -678,17 +680,17 @@ class _PlayerScreenState extends State<PlayerScreen> {
               title,
               style: const TextStyle(
                 color: Color(0xFF8BE07F),
-                fontSize: 11,
+                fontSize: 14,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 0.8,
               ),
             ),
             if (subtitle != null) ...[
               const SizedBox(height: 5),
-              Text(
-                subtitle,
-                style: const TextStyle(color: Colors.white54, fontSize: 11),
-              ),
+              // Text(
+              //   subtitle,
+              //   style: const TextStyle(color: Colors.white54, fontSize: 11),
+              // ),
             ],
             const SizedBox(height: 14),
             child,
@@ -700,13 +702,18 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   Widget _buildAchievementsSection() {
     final achievements = career.history
-        .expand((season) => season.achievements.map((name) => (season: season, name: name)))
+        .expand(
+          (season) =>
+              season.achievements.map((name) => (season: season, name: name)),
+        )
         .toList()
         .reversed
         .toList();
 
     return _buildSectionCard(
-      title: AppStrings.isEnglish ? 'CAREER ACHIEVEMENTS' : 'ДОСТИЖЕНИЯ ЗА КАРЬЕРУ',
+      title: AppStrings.isEnglish
+          ? 'CAREER ACHIEVEMENTS'
+          : 'ДОСТИЖЕНИЯ ЗА КАРЬЕРУ',
       subtitle: AppStrings.isEnglish
           ? 'Awards and trophies earned in completed seasons'
           : 'Награды и трофеи, полученные по итогам завершённых сезонов',
@@ -731,7 +738,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.emoji_events, color: Color(0xFFFFD75A), size: 24),
+                      const Icon(
+                        Icons.emoji_events,
+                        color: Color(0xFFFFD75A),
+                        size: 24,
+                      ),
                       const SizedBox(width: 11),
                       Expanded(
                         child: Column(
@@ -748,7 +759,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
                             const SizedBox(height: 3),
                             Text(
                               '${AppStrings.seasonNumber(item.season.season)} · ${item.season.club}',
-                              style: const TextStyle(color: Colors.white54, fontSize: 10),
+                              style: const TextStyle(
+                                color: Colors.white54,
+                                fontSize: 10,
+                              ),
                             ),
                           ],
                         ),
@@ -769,16 +783,34 @@ class _PlayerScreenState extends State<PlayerScreen> {
           title: AppStrings.careerHistory,
           child: Row(
             children: [
-              Expanded(child: _CareerHistoryStat(label: AppStrings.seasons, value: '${career.history.length}')),
-              Expanded(child: _CareerHistoryStat(label: AppStrings.clubs, value: '${career.history.map((item) => item.club).toSet().length}')),
-              Expanded(child: _CareerHistoryStat(label: AppStrings.matches, value: '${careerMatches}')),
+              Expanded(
+                child: _CareerHistoryStat(
+                  label: AppStrings.seasons,
+                  value: '${career.history.length}',
+                ),
+              ),
+              Expanded(
+                child: _CareerHistoryStat(
+                  label: AppStrings.clubs,
+                  value:
+                      '${career.history.map((item) => item.club).toSet().length}',
+                ),
+              ),
+              Expanded(
+                child: _CareerHistoryStat(
+                  label: AppStrings.matches,
+                  value: '${careerMatches}',
+                ),
+              ),
             ],
           ),
         ),
         const SizedBox(height: 12),
         if (history.isEmpty)
           _buildSectionCard(
-            title: AppStrings.isEnglish ? 'CAREER TIMELINE' : 'ХРОНОЛОГИЯ КАРЬЕРЫ',
+            title: AppStrings.isEnglish
+                ? 'CAREER TIMELINE'
+                : 'ХРОНОЛОГИЯ КАРЬЕРЫ',
             child: Center(
               child: Padding(
                 padding: const EdgeInsets.all(20),
@@ -817,18 +849,39 @@ class _PlayerScreenState extends State<PlayerScreen> {
                       ),
                       Text(
                         stats.averageRating?.toStringAsFixed(2) ?? '—',
-                        style: const TextStyle(color: Color(0xFFFFD75A), fontWeight: FontWeight.w900),
+                        style: const TextStyle(
+                          color: Color(0xFFFFD75A),
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text(stats.club, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                  Text(
+                    stats.club,
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
                   const Divider(color: Color(0x33FFFFFF), height: 18),
                   Row(
                     children: [
-                      Expanded(child: _CareerHistoryStat(label: AppStrings.matches, value: '${stats.matches}')),
-                      Expanded(child: _CareerHistoryStat(label: AppStrings.goalsLabel, value: '${stats.goals}')),
-                      Expanded(child: _CareerHistoryStat(label: AppStrings.assistsLabel, value: '${stats.assists}')),
+                      Expanded(
+                        child: _CareerHistoryStat(
+                          label: AppStrings.matches,
+                          value: '${stats.matches}',
+                        ),
+                      ),
+                      Expanded(
+                        child: _CareerHistoryStat(
+                          label: AppStrings.goalsLabel,
+                          value: '${stats.goals}',
+                        ),
+                      ),
+                      Expanded(
+                        child: _CareerHistoryStat(
+                          label: AppStrings.assistsLabel,
+                          value: '${stats.assists}',
+                        ),
+                      ),
                     ],
                   ),
                   if (stats.achievements.isNotEmpty) ...[
@@ -838,14 +891,21 @@ class _PlayerScreenState extends State<PlayerScreen> {
                       runSpacing: 6,
                       children: stats.achievements.map((name) {
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 9,
+                            vertical: 5,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFF14401E),
                             borderRadius: BorderRadius.circular(9),
                           ),
                           child: Text(
                             AppStrings.achievementName(name),
-                            style: const TextStyle(color: Color(0xFF8BE07F), fontSize: 10, fontWeight: FontWeight.w700),
+                            style: const TextStyle(
+                              color: Color(0xFF8BE07F),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         );
                       }).toList(),
@@ -855,11 +915,18 @@ class _PlayerScreenState extends State<PlayerScreen> {
               ),
             );
           }),
+        SizedBox(height: 4),
         OutlinedButton.icon(
           onPressed: _showCareerHistory,
           icon: const Icon(Icons.open_in_new, size: 16),
-          label: Text(AppStrings.isEnglish ? 'Detailed career summary' : 'Подробная сводка карьеры'),
-          style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF8BE07F)),
+          label: Text(
+            AppStrings.isEnglish
+                ? 'Detailed career summary'
+                : 'Подробная сводка карьеры',
+          ),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: const Color(0xFF8BE07F),
+          ),
         ),
       ],
     );
@@ -1046,8 +1113,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
               ),
             ],
           ),
-
-
         ],
       ),
     );
@@ -1270,37 +1335,31 @@ class _PlayerScreenState extends State<PlayerScreen> {
   Widget _buildSeasonStatsCard() {
     final stats = [
       _SeasonStatData(
-        icon: Icons.event_available,
         label: AppStrings.matches,
         value: '${career.matches + currentWorldCupMatches}',
         accent: const Color(0xFF8BE07F),
       ),
       _SeasonStatData(
-        icon: Icons.sports_soccer,
         label: AppStrings.goalsLabel,
         value: '${career.goals + currentWorldCupGoals}',
         accent: const Color(0xFFFFD75A),
       ),
       _SeasonStatData(
-        icon: Icons.assistant,
         label: AppStrings.assistsLabel,
         value: '${career.assists + currentWorldCupAssists}',
         accent: const Color(0xFF78C9FF),
       ),
       _SeasonStatData(
-        icon: Icons.star_rounded,
         label: AppStrings.averageRating,
         value: career.averageRating?.toStringAsFixed(2) ?? '—',
         accent: const Color(0xFFC6A0FF),
       ),
       _SeasonStatData(
-        icon: Icons.square_rounded,
         label: AppStrings.yellowCardsColon,
         value: '${career.yellowCards}',
         accent: const Color(0xFFFFD75A),
       ),
       _SeasonStatData(
-        icon: Icons.crop_square_rounded,
         label: AppStrings.redCardsColon,
         value: '${career.redCards}',
         accent: const Color(0xFFFF7777),
@@ -1459,13 +1518,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
 }
 
 class _SeasonStatData {
-  final IconData icon;
   final String label;
   final String value;
   final Color accent;
 
   const _SeasonStatData({
-    required this.icon,
     required this.label,
     required this.value,
     required this.accent,
@@ -1484,14 +1541,11 @@ class _SeasonStatTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.055),
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.09),
-        ),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(stat.icon, color: stat.accent, size: 17),
           const SizedBox(height: 5),
           FittedBox(
             fit: BoxFit.scaleDown,
