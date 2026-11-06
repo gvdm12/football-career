@@ -639,79 +639,19 @@ class _PlayerScreenState extends State<PlayerScreen> {
           ],
         );
       case 1:
-        return Column(
-          children: [
-            _buildSectionCard(
-              title: AppStrings.isEnglish ? 'PLAYER ATTRIBUTES' : 'ХАРАКТЕРИСТИКИ ИГРОКА',
-              subtitle: AppStrings.isEnglish
-                  ? 'Current level of all eight skills'
-                  : 'Текущий уровень всех восьми навыков',
-              child: _buildStatRows(),
-            ),
-            const SizedBox(height: 12),
-            _buildSectionCard(
-              title: AppStrings.isEnglish ? 'DEVELOPMENT POINTS' : 'ОЧКИ РАЗВИТИЯ',
-              child: Row(
-                children: [
-                  const Icon(Icons.trending_up, color: Color(0xFFFFD75A), size: 25),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      AppStrings.isEnglish
-                          ? 'Available after the season ends'
-                          : 'Доступны для распределения после завершения сезона',
-                      style: const TextStyle(color: Colors.white70, fontSize: 12),
-                    ),
-                  ),
-                  Text(
-                    '${career.developmentPoints}',
-                    style: const TextStyle(
-                      color: Color(0xFFFFD75A),
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+        return _buildSectionCard(
+          title: AppStrings.isEnglish ? 'PLAYER ATTRIBUTES' : 'ХАРАКТЕРИСТИКИ ИГРОКА',
+          subtitle: AppStrings.isEnglish
+              ? 'Current level of all eight skills'
+              : 'Текущий уровень всех восьми навыков',
+          child: _buildStatRows(),
         );
       case 2:
         return Column(
           children: [
             _buildStatisticsCard(),
             const SizedBox(height: 12),
-            _buildSectionCard(
-              title: AppStrings.seasonStats,
-              child: Column(
-                children: [
-                  _HistoryLine(
-                    label: AppStrings.matches,
-                    value: '${career.matches + currentWorldCupMatches}',
-                  ),
-                  _HistoryLine(
-                    label: AppStrings.goalsColon,
-                    value: '${career.goals + currentWorldCupGoals}',
-                  ),
-                  _HistoryLine(
-                    label: AppStrings.assistsColon,
-                    value: '${career.assists + currentWorldCupAssists}',
-                  ),
-                  _HistoryLine(
-                    label: AppStrings.averageRating,
-                    value: career.averageRating?.toStringAsFixed(2) ?? '—',
-                  ),
-                  _HistoryLine(
-                    label: AppStrings.yellowCardsColon,
-                    value: '${career.yellowCards}',
-                  ),
-                  _HistoryLine(
-                    label: AppStrings.redCardsColon,
-                    value: '${career.redCards}',
-                  ),
-                ],
-              ),
-            ),
+            _buildSeasonStatsCard(),
           ],
         );
       case 3:
@@ -1107,35 +1047,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
             ],
           ),
 
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _profileTag(Icons.tag, '#${player.jerseyNumber}'),
-              _profileTag(Icons.cake_outlined, '${player.age} ${AppStrings.yearsOld}'),
-              _profileTag(Icons.sports, _positionName(player.position)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _profileTag(IconData icon, String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(11),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 13, color: const Color(0xFF8BE07F)),
-          const SizedBox(width: 5),
-          Text(label, style: const TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w700)),
         ],
       ),
     );
@@ -1355,6 +1267,92 @@ class _PlayerScreenState extends State<PlayerScreen> {
     );
   }
 
+  Widget _buildSeasonStatsCard() {
+    final stats = [
+      _SeasonStatData(
+        icon: Icons.event_available,
+        label: AppStrings.matches,
+        value: '${career.matches + currentWorldCupMatches}',
+        accent: const Color(0xFF8BE07F),
+      ),
+      _SeasonStatData(
+        icon: Icons.sports_soccer,
+        label: AppStrings.goalsLabel,
+        value: '${career.goals + currentWorldCupGoals}',
+        accent: const Color(0xFFFFD75A),
+      ),
+      _SeasonStatData(
+        icon: Icons.assistant,
+        label: AppStrings.assistsLabel,
+        value: '${career.assists + currentWorldCupAssists}',
+        accent: const Color(0xFF78C9FF),
+      ),
+      _SeasonStatData(
+        icon: Icons.star_rounded,
+        label: AppStrings.averageRating,
+        value: career.averageRating?.toStringAsFixed(2) ?? '—',
+        accent: const Color(0xFFC6A0FF),
+      ),
+      _SeasonStatData(
+        icon: Icons.square_rounded,
+        label: AppStrings.yellowCardsColon,
+        value: '${career.yellowCards}',
+        accent: const Color(0xFFFFD75A),
+      ),
+      _SeasonStatData(
+        icon: Icons.crop_square_rounded,
+        label: AppStrings.redCardsColon,
+        value: '${career.redCards}',
+        accent: const Color(0xFFFF7777),
+      ),
+    ];
+
+    return LiquidGlass(
+      radius: 22,
+      padding: const EdgeInsets.fromLTRB(14, 16, 14, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.query_stats_rounded,
+                color: Color(0xFF8BE07F),
+                size: 19,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                AppStrings.seasonStats,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFF8BE07F),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.9,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 15),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: stats.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+              childAspectRatio: 1.12,
+            ),
+            itemBuilder: (context, index) =>
+                _SeasonStatTile(stat: stats[index]),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildClubCard() {
     return Container(
       width: double.infinity,
@@ -1457,6 +1455,72 @@ class _PlayerScreenState extends State<PlayerScreen> {
       case PlayerPosition.forward:
         return 'ST';
     }
+  }
+}
+
+class _SeasonStatData {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color accent;
+
+  const _SeasonStatData({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.accent,
+  });
+}
+
+class _SeasonStatTile extends StatelessWidget {
+  final _SeasonStatData stat;
+
+  const _SeasonStatTile({required this.stat});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 9),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.055),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.09),
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(stat.icon, color: stat.accent, size: 17),
+          const SizedBox(height: 5),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              stat.value,
+              maxLines: 1,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 19,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            stat.label,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 9,
+              height: 1.15,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
