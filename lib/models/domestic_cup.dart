@@ -36,15 +36,18 @@ class DomesticCup {
       throw ArgumentError('Клуб $playerClub не найден в выбранной лиге.');
     }
 
+    final topDivisionClubs =
+        LeagueDivisionService.clubsFor(league, 1, divisions);
+    final hasSecondDivision =
+        LeagueDivisionService.hasSecondDivision(league);
+    final secondDivisionClubs = hasSecondDivision
+        ? LeagueDivisionService.clubsFor(league, 2, divisions)
+        : <Club>[];
+    final participantCount = hasSecondDivision ? 32 : 16;
     final allCountryClubs = <String>{
-      ...LeagueDivisionService.clubsFor(league, 1, divisions)
-          .map((club) => club.name),
-      if (LeagueDivisionService.hasSecondDivision(league))
-        ...LeagueDivisionService.clubsFor(league, 2, divisions)
-            .map((club) => club.name),
+      ...topDivisionClubs.map((club) => club.name),
+      ...secondDivisionClubs.map((club) => club.name),
     };
-    final participantCount =
-        LeagueDivisionService.hasSecondDivision(league) ? 32 : 16;
     if (allCountryClubs.length < participantCount) {
       throw StateError(
         'Для кубка необходимо минимум $participantCount клубов.',
@@ -52,14 +55,38 @@ class DomesticCup {
     }
 
     final random = Random(seed);
-    final availableClubs = allCountryClubs
-        .where((name) => name != playerClub)
-        .toList()
-      ..shuffle(random);
-    final selectedTeams = <String>[
-      playerClub,
-      ...availableClubs.take(participantCount - 1),
-    ]..shuffle(random);
+    final List<String> selectedTeams;
+    if (hasSecondDivision) {
+      // Все клубы высшего дивизиона попадают в основную сетку.
+      // Оставшиеся места занимают сильнейшие команды второго дивизиона.
+      final requiredSecondTier =
+          participantCount - topDivisionClubs.length;
+      final rankedSecondTier = [...secondDivisionClubs]
+        ..sort((a, b) => b.strength.compareTo(a.strength));
+      final selectedSecondTier = rankedSecondTier
+          .take(requiredSecondTier)
+          .map((club) => club.name)
+          .toList();
+
+      // Игрок из второго дивизиона гарантированно участвует в кубке.
+      if (playerDivision == 2 &&
+          !selectedSecondTier.contains(playerClub) &&
+          selectedSecondTier.isNotEmpty) {
+        selectedSecondTier[selectedSecondTier.length - 1] = playerClub;
+      }
+      selectedTeams = [
+        ...topDivisionClubs.map((club) => club.name),
+        ...selectedSecondTier,
+      ];
+    } else {
+      final availableClubs = topDivisionClubs
+          .map((club) => club.name)
+          .where((name) => name != playerClub)
+          .toList()
+        ..shuffle(random);
+      selectedTeams = [playerClub, ...availableClubs.take(15)];
+    }
+    selectedTeams.shuffle(random);
 
     final firstRoundMatches = <CupMatch>[];
     for (int i = 0; i < selectedTeams.length; i += 2) {
