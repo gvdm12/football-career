@@ -35,9 +35,13 @@ class LeagueTableScreen extends StatelessWidget {
     final divisions = career.leagueDivisions.isEmpty
         ? LeagueDivisionService.createInitialDivisions()
         : career.leagueDivisions;
+    final playedRounds = career.leagueTable.isEmpty
+        ? 0
+        : career.leagueTable.first.played;
     final simulatedTables = LeagueDivisionService.simulateAllDivisions(
       divisions: divisions,
       season: career.season,
+      roundsToSimulate: playedRounds,
     );
     final firstDivisionTable = career.currentLeagueDivision == 1
         ? career.leagueTable
