@@ -731,11 +731,8 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
               child: Image.asset(
                 club.league.logoAsset,
                 fit: BoxFit.contain,
-                errorBuilder: (_, _, _) => const Icon(
-                  Icons.sports_soccer,
-                  color: green,
-                  size: 28,
-                ),
+                errorBuilder: (_, _, _) =>
+                    const Icon(Icons.sports_soccer, color: green, size: 28),
               ),
             ),
             const SizedBox(width: 12),
@@ -770,7 +767,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
             const SizedBox(width: 8),
             Column(
               children: [
-                const Icon(Icons.edit_outlined, color: green, size: 20),
+                // const Icon(Icons.edit_outlined, color: green, size: 20),
                 const SizedBox(height: 3),
                 Text(
                   AppStrings.isEnglish ? 'CHANGE' : 'ИЗМЕНИТЬ',
@@ -804,18 +801,21 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
             final isChoosingLeague = allowAnyClub && selectedLeague == null;
             final clubs = allowAnyClub
                 ? (selectedLeague == null
-                    ? <Club>[]
-                    : Clubs.byLeagueDivision(selectedLeague!, selectedDivision))
+                      ? <Club>[]
+                      : Clubs.byLeagueDivision(
+                          selectedLeague!,
+                          selectedDivision,
+                        ))
                 : startingClubs;
             final title = !allowAnyClub
                 ? (AppStrings.isEnglish
-                    ? 'Choose a starting club'
-                    : 'Выбери стартовый клуб')
+                      ? 'Choose a starting club'
+                      : 'Выбери стартовый клуб')
                 : selectedLeague == null
-                    ? (AppStrings.isEnglish ? 'Choose a league' : 'Выбери лигу')
-                    : (LanguageService.isEnglish
-                        ? selectedLeague!.displayName
-                        : selectedLeague!.countryName);
+                ? (AppStrings.isEnglish ? 'Choose a league' : 'Выбери лигу')
+                : (LanguageService.isEnglish
+                      ? selectedLeague!.displayName
+                      : selectedLeague!.countryName);
 
             return SafeArea(
               top: false,
@@ -823,9 +823,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                 height: MediaQuery.of(context).size.height * 0.84,
                 decoration: const BoxDecoration(
                   color: Color(0xFF071B0D),
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(24),
-                  ),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                 ),
                 child: Column(
                   children: [
@@ -868,20 +866,20 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                                     fontWeight: FontWeight.w900,
                                   ),
                                 ),
-                                const SizedBox(height: 3),
-                                Text(
-                                  isChoosingLeague
-                                      ? (AppStrings.isEnglish
-                                          ? 'Select a country to see its clubs'
-                                          : 'Сначала выбери страну и лигу')
-                                      : (AppStrings.isEnglish
-                                          ? 'Select the club for your career'
-                                          : 'Выбери команду для своей карьеры'),
-                                  style: const TextStyle(
-                                    color: Colors.white54,
-                                    fontSize: 11,
-                                  ),
-                                ),
+                                // const SizedBox(height: 3),
+                                // Text(
+                                //   isChoosingLeague
+                                //       ? (AppStrings.isEnglish
+                                //             ? 'Select a country to see its clubs'
+                                //             : 'Сначала выбери страну и лигу')
+                                //       : (AppStrings.isEnglish
+                                //             ? 'Select the club for your career'
+                                //             : 'Выбери команду для своей карьеры'),
+                                //   style: const TextStyle(
+                                //     color: Colors.white54,
+                                //     fontSize: 11,
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),
@@ -902,11 +900,11 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                           itemCount: League.values.length,
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 10,
-                            crossAxisSpacing: 10,
-                            childAspectRatio: 1.42,
-                          ),
+                                crossAxisCount: 2,
+                                mainAxisSpacing: 10,
+                                crossAxisSpacing: 10,
+                                childAspectRatio: 1.42,
+                              ),
                           itemBuilder: (context, index) {
                             final league = League.values[index];
                             final hasTwoDivisions =
@@ -925,7 +923,9 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(15),
                                     border: Border.all(
-                                      color: Colors.white.withValues(alpha: 0.12),
+                                      color: Colors.white.withValues(
+                                        alpha: 0.12,
+                                      ),
                                     ),
                                   ),
                                   child: Column(
@@ -935,8 +935,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                                         child: Image.asset(
                                           league.logoAsset,
                                           fit: BoxFit.contain,
-                                          errorBuilder: (_, _, _) =>
-                                              const Icon(
+                                          errorBuilder: (_, _, _) => const Icon(
                                             Icons.emoji_events_outlined,
                                             color: green,
                                             size: 34,
@@ -960,11 +959,11 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                                       Text(
                                         hasTwoDivisions
                                             ? (AppStrings.isEnglish
-                                                ? '2 divisions'
-                                                : '2 дивизиона')
+                                                  ? '2 divisions'
+                                                  : '2 дивизиона')
                                             : (AppStrings.isEnglish
-                                                ? '1 league'
-                                                : '1 лига'),
+                                                  ? '1 league'
+                                                  : '1 лига'),
                                         style: const TextStyle(
                                           color: green,
                                           fontSize: 10,
@@ -981,7 +980,9 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                       )
                     else ...[
                       if (allowAnyClub &&
-                          LeagueDivisionService.hasSecondDivision(selectedLeague!))
+                          LeagueDivisionService.hasSecondDivision(
+                            selectedLeague!,
+                          ))
                         Padding(
                           padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                           child: Row(
@@ -999,13 +1000,21 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                                         () => selectedDivision = division,
                                       ),
                                       child: AnimatedContainer(
-                                        duration: const Duration(milliseconds: 160),
-                                        padding: const EdgeInsets.symmetric(vertical: 12),
+                                        duration: const Duration(
+                                          milliseconds: 160,
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 12,
+                                        ),
                                         decoration: BoxDecoration(
                                           color: selectedDivision == division
                                               ? const Color(0xFF1C5A2A)
-                                              : Colors.white.withValues(alpha: 0.05),
-                                          borderRadius: BorderRadius.circular(12),
+                                              : Colors.white.withValues(
+                                                  alpha: 0.05,
+                                                ),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
                                           border: Border.all(
                                             color: selectedDivision == division
                                                 ? green
@@ -1015,11 +1024,11 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                                         child: Text(
                                           division == 1
                                               ? (AppStrings.isEnglish
-                                                  ? 'FIRST DIVISION'
-                                                  : 'ПЕРВАЯ ЛИГА')
+                                                    ? 'FIRST DIVISION'
+                                                    : 'ПЕРВАЯ ЛИГА')
                                               : (AppStrings.isEnglish
-                                                  ? 'SECOND DIVISION'
-                                                  : 'ВТОРАЯ ЛИГА'),
+                                                    ? 'SECOND DIVISION'
+                                                    : 'ВТОРАЯ ЛИГА'),
                                           textAlign: TextAlign.center,
                                           style: const TextStyle(
                                             color: Colors.white,
@@ -1040,7 +1049,9 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                           child: Align(
                             alignment: Alignment.centerLeft,
                             child: Text(
-                              AppStrings.isEnglish ? 'AVAILABLE CLUBS' : 'ДОСТУПНЫЕ КЛУБЫ',
+                              AppStrings.isEnglish
+                                  ? 'AVAILABLE CLUBS'
+                                  : 'ДОСТУПНЫЕ КЛУБЫ',
                               style: const TextStyle(
                                 color: green,
                                 fontSize: 10,
@@ -1062,7 +1073,8 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                               borderRadius: BorderRadius.circular(14),
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(14),
-                                onTap: () => Navigator.pop(sheetContext, club.name),
+                                onTap: () =>
+                                    Navigator.pop(sheetContext, club.name),
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 13,
@@ -1074,8 +1086,12 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                                         width: 42,
                                         height: 42,
                                         decoration: BoxDecoration(
-                                          color: club.primaryColor.withValues(alpha: 0.22),
-                                          borderRadius: BorderRadius.circular(11),
+                                          color: club.primaryColor.withValues(
+                                            alpha: 0.22,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            11,
+                                          ),
                                         ),
                                         child: const Icon(
                                           Icons.shield_outlined,
@@ -1086,7 +1102,8 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                                       const SizedBox(width: 12),
                                       Expanded(
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               club.name,
@@ -1109,7 +1126,10 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                                           ],
                                         ),
                                       ),
-                                      const Icon(Icons.chevron_right, color: green),
+                                      const Icon(
+                                        Icons.chevron_right,
+                                        color: green,
+                                      ),
                                     ],
                                   ),
                                 ),

@@ -2734,9 +2734,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
       'Золотой мяч',
     ];
     final hasAllMajorAwards = requiredAwardCategories.every(
-      (category) => existingSeasonAwards.any(
-        (award) => award.category == category,
-      ),
+      (category) =>
+          existingSeasonAwards.any((award) => award.category == category),
     );
     var awardsUpdated = false;
 
@@ -2894,8 +2893,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
             (wonBallonDor &&
                     !existingSeasonAwards.any(
                       (item) =>
-                          item.category == 'Золотой мяч' &&
-                          item.isCareerPlayer,
+                          item.category == 'Золотой мяч' && item.isCareerPlayer,
                     )
                 ? 30
                 : 0),
@@ -2904,20 +2902,30 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     // Зарплата и очки развития начисляются только один раз.
     if (!alreadyArchived) {
-      final sponsorPayout = completedCareer.sponsorContract?.payoutForSeason(completedCareer.goals) ?? 0;
+      final sponsorPayout =
+          completedCareer.sponsorContract?.payoutForSeason(
+            completedCareer.goals,
+          ) ??
+          0;
       completedCareer = completedCareer.copyWith(
-        money: completedCareer.money + completedCareer.monthlySalary * 12 + sponsorPayout,
-        news: sponsorPayout <= 0 ? completedCareer.news : [
-          ...completedCareer.news,
-          CareerNews(
-            id: 'sponsor_payout_s${completedCareer.season}',
-            season: completedCareer.season,
-            matchNumber: 0,
-            title: 'Выплата от спонсора',
-            description: '${completedCareer.sponsorContract!.brand} перечислил €$sponsorPayout за сезон с учётом бонусов.',
-            type: CareerNewsType.sponsor,
-          ),
-        ],
+        money:
+            completedCareer.money +
+            completedCareer.monthlySalary * 12 +
+            sponsorPayout,
+        news: sponsorPayout <= 0
+            ? completedCareer.news
+            : [
+                ...completedCareer.news,
+                CareerNews(
+                  id: 'sponsor_payout_s${completedCareer.season}',
+                  season: completedCareer.season,
+                  matchNumber: 0,
+                  title: 'Выплата от спонсора',
+                  description:
+                      '${completedCareer.sponsorContract!.brand} перечислил €$sponsorPayout за сезон с учётом бонусов.',
+                  type: CareerNewsType.sponsor,
+                ),
+              ],
       );
     }
 
@@ -3050,8 +3058,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
       if (!mounted) return;
       if (conferenceResult != null) {
         career = career.copyWith(
-          coachTrust: (career.coachTrust + conferenceResult.trustChange).clamp(0, 100).toInt(),
-          reputationModifier: career.reputationModifier + conferenceResult.reputationChange,
+          coachTrust: (career.coachTrust + conferenceResult.trustChange)
+              .clamp(0, 100)
+              .toInt(),
+          reputationModifier:
+              career.reputationModifier + conferenceResult.reputationChange,
         );
       }
     }
@@ -3262,8 +3273,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
     );
     if (conferenceResult == null) return updatedCareer;
     return updatedCareer.copyWith(
-      coachTrust: (updatedCareer.coachTrust + conferenceResult.trustChange).clamp(0, 100).toInt(),
-      reputationModifier: updatedCareer.reputationModifier + conferenceResult.reputationChange,
+      coachTrust: (updatedCareer.coachTrust + conferenceResult.trustChange)
+          .clamp(0, 100)
+          .toInt(),
+      reputationModifier:
+          updatedCareer.reputationModifier + conferenceResult.reputationChange,
     );
   }
 
@@ -3283,8 +3297,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
     );
     if (!mounted || conferenceResult == null) return;
     final updated = career.copyWith(
-      coachTrust: (career.coachTrust + conferenceResult.trustChange).clamp(0, 100).toInt(),
-      reputationModifier: career.reputationModifier + conferenceResult.reputationChange,
+      coachTrust: (career.coachTrust + conferenceResult.trustChange)
+          .clamp(0, 100)
+          .toInt(),
+      reputationModifier:
+          career.reputationModifier + conferenceResult.reputationChange,
     );
     setState(() => career = updated);
     await _saveCareer(updated);
@@ -4635,7 +4652,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
   Widget _buildNextMatchCard(SeasonMatch match) {
     final isElClasico =
-        (career.player.club == 'Barcelona' && match.opponent == 'Real Madrid') ||
+        (career.player.club == 'Barcelona' &&
+            match.opponent == 'Real Madrid') ||
         (career.player.club == 'Real Madrid' && match.opponent == 'Barcelona');
     final playerColor = ClubColors.primary(career.player.club);
     final opponentColor = ClubColors.primary(match.opponent);
@@ -5556,7 +5574,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'ПРЕДСЕЗОННАЯ ПОДГОТОВКА · ТОВАРИЩЕСКИЙ МАТЧ',
+            'ПРЕДСЕЗОННАЯ ПОДГОТОВКА',
             style: TextStyle(
               color: Color(0xFFB9C8BC),
               fontSize: 9,
@@ -5655,11 +5673,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
               letterSpacing: 0.8,
             ),
           ),
-          const SizedBox(height: 4),
-          const Text(
-            'Перед началом официальных турниров можно сыграть матчи для подготовки или пропустить их.',
-            style: TextStyle(color: Colors.white60, fontSize: 11),
-          ),
+          // const SizedBox(height: 4),
+          // const Text(
+          //   'Перед началом официальных турниров можно сыграть матчи для подготовки или пропустить их.',
+          //   style: TextStyle(color: Colors.white60, fontSize: 11),
+          // ),
           const SizedBox(height: 9),
           ...unresolved.map(_buildFriendlyMatchRow),
         ],
