@@ -85,7 +85,6 @@ class LeagueTableScreen extends StatelessWidget {
         runSpacing: 6,
         children: [
           _legendItem(const Color(0xFF42A5F5), 'Повышение'),
-          _legendItem(const Color(0xFFFF7777), 'Зона вылета'),
         ],
       );
     }
