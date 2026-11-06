@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/league_season_simulator.dart';
+import 'package:flutter_football/models/league_division_service.dart';
 import 'package:flutter_football/services/app_strings.dart';
 
 class LeagueTableScreen extends StatelessWidget {
@@ -84,7 +85,7 @@ class LeagueTableScreen extends StatelessWidget {
         runSpacing: 6,
         children: [
           _legendItem(const Color(0xFF42A5F5), 'Повышение'),
-          _legendItem(const Color(0xFFFF7777), 'Вылет в третий дивизион'),
+          _legendItem(const Color(0xFFFF7777), 'Зона вылета'),
         ],
       );
     }
@@ -199,6 +200,8 @@ class LeagueTableScreen extends StatelessWidget {
 
     final league = Clubs.leagueOf(career.player.club);
     final isSecondDivision = career.currentLeagueDivision == 2;
+    final isTwoTierLeague =
+        league != null && LeagueDivisionService.hasSecondDivision(league);
     final qualificationSlots = league == null || isSecondDivision
         ? 0
         : LeagueSeasonSimulator.qualificationSlots[league] ?? 0;
@@ -214,9 +217,8 @@ class LeagueTableScreen extends StatelessWidget {
         position >= europaSlots.$1 &&
         position < europaSlots.$1 + europaSlots.$2;
     final promotionPosition = isSecondDivision && position <= 2;
-    final relegationPosition = isSecondDivision
-        ? position > table.length - 3
-        : position > table.length - 2;
+    final relegationPosition =
+        isTwoTierLeague && !isSecondDivision && position > table.length - 2;
 
     final qualificationColor = qualifiesForChampionsLeague || promotionPosition
         ? const Color(0xFF42A5F5)
@@ -233,7 +235,7 @@ class LeagueTableScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: isPlayerClub
             ? const Color.fromARGB(184, 86, 81, 7)
-            : qualifiesForChampionsLeague
+            : qualifiesForChampionsLeague || promotionPosition
             ? const Color.fromARGB(205, 22, 59, 98)
             : qualifiesForEuropaLeague
             ? const Color.fromARGB(205, 112, 67, 18)
@@ -244,7 +246,7 @@ class LeagueTableScreen extends StatelessWidget {
         border: Border.all(
           color: isPlayerClub
               ? const Color(0xFF4F9F59)
-              : qualifiesForChampionsLeague
+              : qualifiesForChampionsLeague || promotionPosition
               ? const Color(0xFF42A5F5)
               : qualifiesForEuropaLeague
               ? const Color(0xFFFFA726)
