@@ -2287,28 +2287,23 @@ class Career {
 
     // Берём результаты чемпионатов текущего сезона.
     // Они используются для определения участников следующей ЛЧ.
-    final qualificationStandings = <League, List<LeagueTableEntry>>{
-      for (final entry in europeanLeagueStandings.entries)
-        entry.key: List<LeagueTableEntry>.from(entry.value),
-    };
-
     // Используем именно новую историю: она учитывает и старые
     // сохранения, в которых текущий сезон ещё не был архивирован.
     final previousSeasonStats = newHistory
         .where((stats) => stats.season == season)
         .toList();
+    final previousClubName = previousSeasonStats.isEmpty
+        ? null
+        : previousSeasonStats.last.club;
 
-    if (previousSeasonStats.isNotEmpty) {
-      final previousClubName = previousSeasonStats.last.club;
-      final previousLeague = Clubs.leagueOf(previousClubName);
-
-      // Подменяем симуляцию реальными итогами чемпионата игрока.
-      if (previousLeague != null && leagueTable.isNotEmpty) {
-        qualificationStandings[previousLeague] = List<LeagueTableEntry>.from(
-          leagueTable,
-        );
-      }
-    }
+    // Реальная таблица игрока заменяет симуляцию только для высшего
+    // дивизиона. Результат во втором дивизионе не является квалификацией в еврокубки.
+    final qualificationStandings = LeagueSeasonSimulator.standingsForQualification(
+      simulatedStandings: europeanLeagueStandings,
+      playerClub: previousClubName ?? '',
+      playerLeagueStandings: leagueTable,
+      leagueDivisions: leagueDivisions,
+    );
 
     final qualifiedClubs = LeagueSeasonSimulator.getQualifiedClubs(
       qualificationStandings,

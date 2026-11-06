@@ -134,6 +134,30 @@ class LeagueSeasonSimulator {
     return List<LeagueTableEntry>.unmodifiable(updatedTable);
   }
 
+  /// Подменяет симуляцию результатами игрока только если он играл
+  /// в высшем дивизионе. Таблица второго дивизиона не даёт путёвку в ЛЧ/ЛЕ.
+  static Map<League, List<LeagueTableEntry>> standingsForQualification({
+    required Map<League, List<LeagueTableEntry>> simulatedStandings,
+    required String playerClub,
+    required List<LeagueTableEntry> playerLeagueStandings,
+    required Map<String, List<String>> leagueDivisions,
+  }) {
+    final result = <League, List<LeagueTableEntry>>{
+      for (final entry in simulatedStandings.entries)
+        entry.key: List<LeagueTableEntry>.from(entry.value),
+    };
+    final league = Clubs.leagueOf(playerClub);
+    final division = league == null
+        ? null
+        : LeagueDivisionService.divisionForClub(playerClub, leagueDivisions);
+
+    if (league != null && division == 1 && playerLeagueStandings.isNotEmpty) {
+      result[league] = List<LeagueTableEntry>.from(playerLeagueStandings);
+    }
+
+    return result;
+  }
+
   /// Возвращает квалифицировавшиеся клубы в порядке стран.
   static List<String> getQualifiedClubs(
     Map<League, List<LeagueTableEntry>> standings,
