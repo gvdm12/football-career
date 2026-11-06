@@ -2406,7 +2406,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     final isHome = cupMatch.homeTeam == playerClub;
 
-    if (cupMatch.round == 4) {
+    if (cupMatch.round == cup.totalRounds) {
       await _showTournamentPreviewConference();
       if (!mounted) return;
     }
@@ -2506,7 +2506,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     if (!mounted || updatedCareer == null) return;
 
-    if (cupMatch.round == 4 && cupWinner == playerClub && match.playerPlayed) {
+    if (cupMatch.round == cup.totalRounds && cupWinner == playerClub && match.playerPlayed) {
       updatedCareer = updatedCareer.copyWith(
         agentCredits: updatedCareer.agentCredits + 10,
       );
@@ -2573,7 +2573,7 @@ class _SeasonScreenState extends State<SeasonScreen> {
         updatedCup.matches.firstWhere((m) => m.id == cupMatch.id).winner ==
         playerClub;
 
-    if (playerWon && cupMatch.round < 4) {
+    if (playerWon && cupMatch.round < updatedCup.totalRounds) {
       updatedCup = updatedCup.advanceRound();
     }
 
