@@ -2444,6 +2444,8 @@ class Career {
       coachTransfers: allCoachTransfers,
       friendlyMatches: newFriendlyMatches,
       lastConversationMatch: -4,
+      // Не сбрасываем сезон последнего перехода при создании новой карьеры.
+      lastClubChangeSeason: lastClubChangeSeason,
       season: newSeason,
       clubStrengths: updatedClubStrengths,
       matches: 0,
