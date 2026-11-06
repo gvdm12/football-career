@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'club.dart';
 import 'cup_match.dart';
+import 'league_division_service.dart';
 
 class DomesticCup {
   final League league;
@@ -22,29 +23,44 @@ class DomesticCup {
     required League league,
     required int season,
     required String playerClub,
+    Map<String, List<String>>? leagueDivisions,
     int? seed,
   }) {
-    final availableClubs = Clubs.byLeague(
-      league,
-    ).map((club) => club.name).where((name) => name != playerClub).toList();
-
-    if (!Clubs.byLeague(league).any((club) => club.name == playerClub)) {
+    final divisions = leagueDivisions ??
+        LeagueDivisionService.createInitialDivisions();
+    final playerDivision =
+        LeagueDivisionService.divisionForClub(playerClub, divisions);
+    if (playerDivision == null ||
+        !divisions.values.any((clubs) => clubs.contains(playerClub))) {
       throw ArgumentError('Клуб $playerClub не найден в выбранной лиге.');
     }
 
-    if (availableClubs.length < 15) {
-      throw StateError('Для кубка необходимо минимум 16 клубов в лиге.');
+    final allCountryClubs = <String>{
+      ...LeagueDivisionService.clubsFor(league, 1, divisions)
+          .map((club) => club.name),
+      if (LeagueDivisionService.hasSecondDivision(league))
+        ...LeagueDivisionService.clubsFor(league, 2, divisions)
+            .map((club) => club.name),
+    };
+    final participantCount =
+        LeagueDivisionService.hasSecondDivision(league) ? 32 : 16;
+    if (allCountryClubs.length < participantCount) {
+      throw StateError(
+        'Для кубка необходимо минимум $participantCount клубов.',
+      );
     }
 
     final random = Random(seed);
-    availableClubs.shuffle(random);
-
-    final selectedTeams = <String>[playerClub, ...availableClubs.take(15)];
-
-    selectedTeams.shuffle(random);
+    final availableClubs = allCountryClubs
+        .where((name) => name != playerClub)
+        .toList()
+      ..shuffle(random);
+    final selectedTeams = <String>[
+      playerClub,
+      ...availableClubs.take(participantCount - 1),
+    ]..shuffle(random);
 
     final firstRoundMatches = <CupMatch>[];
-
     for (int i = 0; i < selectedTeams.length; i += 2) {
       firstRoundMatches.add(
         CupMatch(
@@ -64,16 +80,20 @@ class DomesticCup {
     );
   }
 
+  int get totalRounds => teams.length >= 32 ? 5 : 4;
+
   /// Название текущей стадии турнира.
   String get roundName {
     switch (currentRound) {
       case 1:
-        return '1/8 финала';
+        return totalRounds == 5 ? '1/16 финала' : '1/8 финала';
       case 2:
-        return 'Четвертьфинал';
+        return totalRounds == 5 ? '1/8 финала' : 'Четвертьфинал';
       case 3:
-        return 'Полуфинал';
+        return totalRounds == 5 ? 'Четвертьфинал' : 'Полуфинал';
       case 4:
+        return totalRounds == 5 ? 'Полуфинал' : 'Финал';
+      case 5:
         return 'Финал';
       default:
         return 'Турнир завершён';
@@ -83,7 +103,7 @@ class DomesticCup {
   /// Первая стадия, в которой остались несыгранные матчи.
   /// Если все матчи завершены, возвращает последнюю стадию.
   int get currentRound {
-    for (int round = 1; round <= 4; round++) {
+    for (int round = 1; round <= totalRounds; round++) {
       final roundMatches = matches
           .where((match) => match.round == round)
           .toList();
@@ -104,7 +124,7 @@ class DomesticCup {
   }
 
   bool get isFinished {
-    final finalMatches = matches.where((match) => match.round == 4);
+    final finalMatches = matches.where((match) => match.round == totalRounds);
 
     return finalMatches.length == 1 &&
         finalMatches.first.isPlayed &&
@@ -114,7 +134,7 @@ class DomesticCup {
   String? get champion {
     if (!isFinished) return null;
 
-    return matches.firstWhere((match) => match.round == 4).winner;
+    return matches.firstWhere((match) => match.round == totalRounds).winner;
   }
 
   /// Проверяет, продолжает ли клуб участвовать в кубке.
@@ -224,7 +244,7 @@ class DomesticCup {
       );
     }
 
-    if (round >= 4) return this;
+    if (round >= totalRounds) return this;
 
     // Защита от повторного создания следующего раунда.
     final nextRound = round + 1;
