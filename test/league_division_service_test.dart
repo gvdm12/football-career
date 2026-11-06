@@ -4,6 +4,7 @@ import 'package:flutter_football/models/cup_match.dart';
 import 'package:flutter_football/models/domestic_cup.dart';
 import 'package:flutter_football/models/league_division_service.dart';
 import 'package:flutter_football/models/league_table.dart';
+import 'package:flutter_football/services/app_strings.dart';
 
 void main() {
   group('Career club state', () {
@@ -19,6 +20,21 @@ void main() {
 
       expect(Clubs.strengthOverrides, isEmpty);
       expect(Clubs.getByName('Arsenal').strength, baseStrength);
+    });
+  });
+
+  group('National cup stage labels', () {
+    test('32-team cup labels all five rounds correctly', () {
+      expect(AppStrings.cupStageName(1, hasRoundOf32: true), '1/16 финала');
+      expect(AppStrings.cupStageName(2, hasRoundOf32: true), '1/8 финала');
+      expect(AppStrings.cupStageName(3, hasRoundOf32: true), 'Четвертьфинал');
+      expect(AppStrings.cupStageName(4, hasRoundOf32: true), 'Полуфинал');
+      expect(AppStrings.cupStageName(5, hasRoundOf32: true), 'Финал');
+    });
+
+    test('16-team cup keeps its original four-round labels', () {
+      expect(AppStrings.cupStageName(1), '1/8 финала');
+      expect(AppStrings.cupStageName(4), 'Финал');
     });
   });
 
