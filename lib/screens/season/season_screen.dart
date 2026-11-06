@@ -7,12 +7,9 @@ import 'package:flutter_football/models/career_news.dart';
 import 'package:flutter_football/models/champions_league.dart';
 import 'package:flutter_football/models/europa_league.dart';
 import 'package:flutter_football/models/club.dart';
-import 'package:flutter_football/models/league_division_service.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/cup_match.dart';
-import 'package:flutter_football/models/league_match.dart';
 import 'package:flutter_football/models/league_player_season_stats.dart';
-import 'package:flutter_football/models/league_table.dart';
 import 'package:flutter_football/models/match.dart';
 import 'package:flutter_football/models/season_match.dart';
 import 'package:flutter_football/models/friendly_match.dart';
@@ -39,6 +36,7 @@ import 'package:flutter_football/screens/world_cup_screen.dart';
 import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/screens/press_conference_dialog.dart';
 import 'package:flutter_football/services/career_storage.dart';
+import 'package:flutter_football/services/match_simulation_service.dart';
 import 'package:flutter_football/screens/career_end_screen.dart';
 import 'package:flutter_football/widgets/liquid_glass.dart';
 import 'package:flutter_svg/svg.dart';
@@ -1664,15 +1662,21 @@ class _SeasonScreenState extends State<SeasonScreen> {
     }).toList();
 
     // Симулируем только ещё не сыгранные матчи этого тура.
-    final completedLeagueMatches = _simulateBackgroundRound(
-      updatedLeagueMatches,
-      seasonMatch.number,
-    );
+    final completedLeagueMatches =
+        MatchSimulationService.simulateBackgroundRound(
+          fixtures: updatedLeagueMatches,
+          round: seasonMatch.number,
+          playerClub: career.player.club,
+          playerOverall: career.player.overall,
+        );
 
     // Полностью пересчитываем таблицу по сохранённым результатам.
-    final updatedTable = _rebuildLeagueTable(
-      updatedCareer.player.club,
-      completedLeagueMatches,
+    final updatedTable = MatchSimulationService.rebuildLeagueTable(
+      playerClub: updatedCareer.player.club,
+      fixtures: completedLeagueMatches,
+      division: career.currentLeagueDivision,
+      divisions: career.leagueDivisions,
+      fallbackTable: career.leagueTable,
     );
 
     // Обновляем сезонную статистику футболистов всех клубов лиги.
@@ -2048,14 +2052,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
         final homeStrength = _effectiveClubStrength(actualHome);
         final awayStrength = _effectiveClubStrength(actualAway);
 
-        final simulatedHomeGoals = _simulateGoals(
+        final simulatedHomeGoals = MatchSimulationService.simulateGoals(
           homeStrength,
           awayStrength,
           random,
           homeAdvantage: true,
         );
 
-        final simulatedAwayGoals = _simulateGoals(
+        final simulatedAwayGoals = MatchSimulationService.simulateGoals(
           awayStrength,
           homeStrength,
           random,
@@ -2301,14 +2305,14 @@ class _SeasonScreenState extends State<SeasonScreen> {
         final homeStrength = _effectiveClubStrength(actualHome);
         final awayStrength = _effectiveClubStrength(actualAway);
 
-        final simulatedHomeGoals = _simulateGoals(
+        final simulatedHomeGoals = MatchSimulationService.simulateGoals(
           homeStrength,
           awayStrength,
           random,
           homeAdvantage: true,
         );
 
-        final simulatedAwayGoals = _simulateGoals(
+        final simulatedAwayGoals = MatchSimulationService.simulateGoals(
           awayStrength,
           homeStrength,
           random,
@@ -2506,7 +2510,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     if (!mounted || updatedCareer == null) return;
 
-    if (cupMatch.round == cup.totalRounds && cupWinner == playerClub && match.playerPlayed) {
+    if (cupMatch.round == cup.totalRounds &&
+        cupWinner == playerClub &&
+        match.playerPlayed) {
       updatedCareer = updatedCareer.copyWith(
         agentCredits: updatedCareer.agentCredits + 10,
       );
@@ -2538,14 +2544,18 @@ class _SeasonScreenState extends State<SeasonScreen> {
       final homeStrength = _effectiveClubStrength(otherMatch.homeTeam);
       final awayStrength = _effectiveClubStrength(otherMatch.awayTeam);
 
-      final homeGoals = _simulateGoals(
+      final homeGoals = MatchSimulationService.simulateGoals(
         homeStrength,
         awayStrength,
         random,
         homeAdvantage: true,
       );
 
-      final awayGoals = _simulateGoals(awayStrength, homeStrength, random);
+      final awayGoals = MatchSimulationService.simulateGoals(
+        awayStrength,
+        homeStrength,
+        random,
+      );
 
       int? penaltiesHome;
       int? penaltiesAway;
@@ -2586,114 +2596,12 @@ class _SeasonScreenState extends State<SeasonScreen> {
     await _saveCareer(resultCareer);
   }
 
-  List<LeagueMatch> _simulateBackgroundRound(
-    List<LeagueMatch> fixtures,
-    int round,
-  ) {
-    final random = Random();
-
-    return fixtures.map((fixture) {
-      if (fixture.round != round || fixture.isPlayed) {
-        return fixture;
-      }
-
-      if (fixture.homeTeam == career.player.club ||
-          fixture.awayTeam == career.player.club) {
-        return fixture;
-      }
-
-      final homeStrength = _effectiveClubStrength(fixture.homeTeam);
-      final awayStrength = _effectiveClubStrength(fixture.awayTeam);
-
-      final homeGoals = _simulateGoals(
-        homeStrength,
-        awayStrength,
-        random,
-        homeAdvantage: true,
-      );
-
-      final awayGoals = _simulateGoals(awayStrength, homeStrength, random);
-
-      return fixture.copyWith(homeGoals: homeGoals, awayGoals: awayGoals);
-    }).toList();
-  }
-
   int _effectiveClubStrength(String clubName) {
     return Clubs.effectiveStrength(
       clubName: clubName,
       playerClub: career.player.club,
       playerOverall: career.player.overall,
     );
-  }
-
-  int _simulateGoals(
-    int teamStrength,
-    int opponentStrength,
-    Random random, {
-    bool homeAdvantage = false,
-  }) {
-    final strengthDifference = teamStrength - opponentStrength;
-
-    // Базовое ожидаемое количество голов.
-    // Разница в силе влияет на атаку, но не гарантирует победу.
-    final expectedGoals =
-        (1.35 + strengthDifference * 0.035 + (homeAdvantage ? 0.15 : 0.0))
-            .clamp(0.35, 2.8)
-            .toDouble();
-
-    // Распределение Пуассона.
-    final threshold = exp(-expectedGoals);
-    var product = 1.0;
-    var goals = 0;
-
-    do {
-      goals++;
-      product *= random.nextDouble();
-    } while (product > threshold);
-
-    return (goals - 1).clamp(0, 8).toInt();
-  }
-
-  List<LeagueTableEntry> _rebuildLeagueTable(
-    String playerClub,
-    List<LeagueMatch> fixtures,
-  ) {
-    final league = Clubs.leagueOf(playerClub);
-
-    if (league == null) {
-      return career.leagueTable;
-    }
-
-    final clubs = LeagueDivisionService.clubsFor(
-      league,
-      career.currentLeagueDivision,
-      career.leagueDivisions,
-    );
-    final opponents = clubs
-        .where((club) => club.name != playerClub)
-        .map((club) => club.name)
-        .toList();
-
-    var table = LeagueTable.create(playerClub, opponents);
-
-    final playedFixtures =
-        fixtures.where((fixture) => fixture.isPlayed).toList()..sort((a, b) {
-          final roundComparison = a.round.compareTo(b.round);
-          if (roundComparison != 0) return roundComparison;
-          return a.id.compareTo(b.id);
-        });
-
-    for (final fixture in playedFixtures) {
-      table = LeagueTable.applyMatch(
-        table: table,
-        homeTeam: fixture.homeTeam,
-        awayTeam: fixture.awayTeam,
-        homeGoals: fixture.homeGoals!,
-        awayGoals: fixture.awayGoals!,
-      );
-    }
-
-    return table;
   }
 
   Future<void> _finishSeason() async {
