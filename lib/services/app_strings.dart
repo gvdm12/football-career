@@ -654,7 +654,26 @@ class AppStrings {
     return names[value] ?? value;
   }
 
-  static String cupStageName(int round) {
+  /// Название стадии национального кубка с учётом размера сетки.
+  /// В турнирах на 32 команды первый раунд — 1/16 финала.
+  static String cupStageName(int round, {bool hasRoundOf32 = false}) {
+    if (hasRoundOf32) {
+      switch (round) {
+        case 1:
+          return _en ? 'Round of 32' : '1/16 финала';
+        case 2:
+          return _en ? 'Round of 16' : '1/8 финала';
+        case 3:
+          return _en ? 'Quarter-final' : 'Четвертьфинал';
+        case 4:
+          return _en ? 'Semi-final' : 'Полуфинал';
+        case 5:
+          return _en ? 'Final' : 'Финал';
+        default:
+          return nationalCup;
+      }
+    }
+
     switch (round) {
       case 1:
         return _en ? 'Round of 16' : '1/8 финала';
