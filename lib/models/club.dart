@@ -543,7 +543,7 @@ class Clubs {
     Club(name: 'Huesca', league: League.spain, strength: 66, division: 2),
     Club(name: 'Leganes', league: League.spain, strength: 72, division: 2),
     Club(name: 'Mirandes', league: League.spain, strength: 65, division: 2),
-    Club(name: 'Racing Ferrol', league: League.spain, strength: 65, division: 2),
+    Club(name: 'CD Lugo', league: League.spain, strength: 65, division: 2),
     Club(name: 'Real Oviedo', league: League.spain, strength: 71, division: 2),
     Club(name: 'Sporting Gijon', league: League.spain, strength: 69, division: 2),
     Club(name: 'Tenerife', league: League.spain, strength: 67, division: 2),
