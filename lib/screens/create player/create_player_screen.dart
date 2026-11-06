@@ -588,36 +588,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
 
                 const SizedBox(height: 8),
 
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: const Color(0x14FFFFFF),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFF14401E)),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: selectedClub,
-                      dropdownColor: const Color(0xFF0B3A1A),
-                      isExpanded: true,
-                      icon: const Icon(Icons.keyboard_arrow_down, color: green),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                      ),
-                      items: _buildClubPickerItems(),
-                      onChanged: (value) {
-                        if (value == null) return;
-
-                        setState(() {
-                          selectedClub = value;
-                        });
-                      },
-                    ),
-                  ),
-                ),
+                _buildClubSelector(),
 
                 const SizedBox(height: 20),
 
@@ -733,72 +704,433 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
     );
   }
 
-  List<DropdownMenuItem<String>> _buildClubPickerItems() {
-    if (!_allowAnyClub) {
-      return startingClubs.map((club) {
-        return DropdownMenuItem<String>(
-          value: club.name,
-          child: Text(
-            '${club.name} • ${club.strength}',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        );
-      }).toList();
-    }
+  Widget _buildClubSelector() {
+    final club = Clubs.getByName(selectedClub!);
 
-    final items = <DropdownMenuItem<String>>[];
-    for (final league in League.values) {
-      for (final division in [1, 2]) {
-        final clubs = Clubs.byLeagueDivision(league, division);
-        if (clubs.isEmpty) continue;
-
-        final sectionLabel = LeagueDivisionService.hasSecondDivision(league)
-            ? (division == 1
-                ? (AppStrings.isEnglish ? 'FIRST DIVISION' : 'ПЕРВАЯ ЛИГА')
-                : (AppStrings.isEnglish ? 'SECOND DIVISION' : 'ВТОРАЯ ЛИГА'))
-            : (AppStrings.isEnglish ? 'LEAGUE' : 'ЛИГА');
-        final leagueName = LanguageService.isEnglish
-            ? league.displayName
-            : league.countryName;
-
-        items.add(
-          DropdownMenuItem<String>(
-            value: '__section_${league.name}_$division',
-            enabled: false,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 7, bottom: 3),
-              child: Text(
-                '$leagueName • $sectionLabel',
-                style: const TextStyle(
-                  color: Color(0xFF8BE07F),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0.4,
+    return InkWell(
+      onTap: _showClubPicker,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.07),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Image.asset(
+                club.league.logoAsset,
+                fit: BoxFit.contain,
+                errorBuilder: (_, _, _) => const Icon(
+                  Icons.sports_soccer,
+                  color: green,
+                  size: 28,
                 ),
               ),
             ),
-          ),
-        );
-
-        items.addAll(
-          clubs.map(
-            (club) => DropdownMenuItem<String>(
-              value: club.name,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Text(
-                  '${club.name} • ${club.strength}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    club.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${LanguageService.isEnglish ? club.league.displayName : club.league.countryName} • ${AppStrings.isEnglish ? 'Strength' : 'Сила'} ${club.strength}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white60,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
+            const SizedBox(width: 8),
+            Column(
+              children: [
+                const Icon(Icons.edit_outlined, color: green, size: 20),
+                const SizedBox(height: 3),
+                Text(
+                  AppStrings.isEnglish ? 'CHANGE' : 'ИЗМЕНИТЬ',
+                  style: const TextStyle(
+                    color: green,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showClubPicker() async {
+    final pickedClub = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        League? selectedLeague;
+        var selectedDivision = 1;
+        final allowAnyClub = _allowAnyClub;
+
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            final isChoosingLeague = allowAnyClub && selectedLeague == null;
+            final clubs = allowAnyClub
+                ? (selectedLeague == null
+                    ? <Club>[]
+                    : Clubs.byLeagueDivision(selectedLeague!, selectedDivision))
+                : startingClubs;
+            final title = !allowAnyClub
+                ? (AppStrings.isEnglish
+                    ? 'Choose a starting club'
+                    : 'Выбери стартовый клуб')
+                : selectedLeague == null
+                    ? (AppStrings.isEnglish ? 'Choose a league' : 'Выбери лигу')
+                    : (LanguageService.isEnglish
+                        ? selectedLeague!.displayName
+                        : selectedLeague!.countryName);
+
+            return SafeArea(
+              top: false,
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.84,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF071B0D),
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 10),
+                    Container(
+                      width: 42,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.white30,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 14, 12, 12),
+                      child: Row(
+                        children: [
+                          if (allowAnyClub && selectedLeague != null)
+                            IconButton(
+                              onPressed: () => setSheetState(() {
+                                selectedLeague = null;
+                                selectedDivision = 1;
+                              }),
+                              icon: const Icon(
+                                Icons.arrow_back_ios_new,
+                                color: Colors.white,
+                                size: 19,
+                              ),
+                            )
+                          else
+                            const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  title,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  isChoosingLeague
+                                      ? (AppStrings.isEnglish
+                                          ? 'Select a country to see its clubs'
+                                          : 'Сначала выбери страну и лигу')
+                                      : (AppStrings.isEnglish
+                                          ? 'Select the club for your career'
+                                          : 'Выбери команду для своей карьеры'),
+                                  style: const TextStyle(
+                                    color: Colors.white54,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.pop(sheetContext),
+                            icon: const Icon(
+                              Icons.close,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (isChoosingLeague)
+                      Expanded(
+                        child: GridView.builder(
+                          padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
+                          itemCount: League.values.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 10,
+                            crossAxisSpacing: 10,
+                            childAspectRatio: 1.42,
+                          ),
+                          itemBuilder: (context, index) {
+                            final league = League.values[index];
+                            final hasTwoDivisions =
+                                LeagueDivisionService.hasSecondDivision(league);
+                            return Material(
+                              color: Colors.white.withValues(alpha: 0.055),
+                              borderRadius: BorderRadius.circular(15),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(15),
+                                onTap: () => setSheetState(() {
+                                  selectedLeague = league;
+                                  selectedDivision = 1;
+                                }),
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(alpha: 0.12),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        child: Image.asset(
+                                          league.logoAsset,
+                                          fit: BoxFit.contain,
+                                          errorBuilder: (_, _, _) =>
+                                              const Icon(
+                                            Icons.emoji_events_outlined,
+                                            color: green,
+                                            size: 34,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 7),
+                                      Text(
+                                        LanguageService.isEnglish
+                                            ? league.displayName
+                                            : league.countryName,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        hasTwoDivisions
+                                            ? (AppStrings.isEnglish
+                                                ? '2 divisions'
+                                                : '2 дивизиона')
+                                            : (AppStrings.isEnglish
+                                                ? '1 league'
+                                                : '1 лига'),
+                                        style: const TextStyle(
+                                          color: green,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                    else ...[
+                      if (allowAnyClub &&
+                          LeagueDivisionService.hasSecondDivision(selectedLeague!))
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                          child: Row(
+                            children: [
+                              for (final division in [1, 2])
+                                Expanded(
+                                  child: Padding(
+                                    padding: EdgeInsets.only(
+                                      right: division == 1 ? 8 : 0,
+                                      left: division == 2 ? 8 : 0,
+                                    ),
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(12),
+                                      onTap: () => setSheetState(
+                                        () => selectedDivision = division,
+                                      ),
+                                      child: AnimatedContainer(
+                                        duration: const Duration(milliseconds: 160),
+                                        padding: const EdgeInsets.symmetric(vertical: 12),
+                                        decoration: BoxDecoration(
+                                          color: selectedDivision == division
+                                              ? const Color(0xFF1C5A2A)
+                                              : Colors.white.withValues(alpha: 0.05),
+                                          borderRadius: BorderRadius.circular(12),
+                                          border: Border.all(
+                                            color: selectedDivision == division
+                                                ? green
+                                                : Colors.white24,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          division == 1
+                                              ? (AppStrings.isEnglish
+                                                  ? 'FIRST DIVISION'
+                                                  : 'ПЕРВАЯ ЛИГА')
+                                              : (AppStrings.isEnglish
+                                                  ? 'SECOND DIVISION'
+                                                  : 'ВТОРАЯ ЛИГА'),
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        )
+                      else
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(18, 0, 18, 10),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              AppStrings.isEnglish ? 'AVAILABLE CLUBS' : 'ДОСТУПНЫЕ КЛУБЫ',
+                              style: const TextStyle(
+                                color: green,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1.1,
+                              ),
+                            ),
+                          ),
+                        ),
+                      Expanded(
+                        child: ListView.separated(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+                          itemCount: clubs.length,
+                          separatorBuilder: (_, _) => const SizedBox(height: 8),
+                          itemBuilder: (context, index) {
+                            final club = clubs[index];
+                            return Material(
+                              color: Colors.white.withValues(alpha: 0.055),
+                              borderRadius: BorderRadius.circular(14),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(14),
+                                onTap: () => Navigator.pop(sheetContext, club.name),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 13,
+                                    vertical: 12,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 42,
+                                        height: 42,
+                                        decoration: BoxDecoration(
+                                          color: club.primaryColor.withValues(alpha: 0.22),
+                                          borderRadius: BorderRadius.circular(11),
+                                        ),
+                                        child: const Icon(
+                                          Icons.shield_outlined,
+                                          color: Colors.white,
+                                          size: 23,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              club.name,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w900,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              '${AppStrings.isEnglish ? 'Club strength' : 'Сила клуба'}: ${club.strength}',
+                                              style: const TextStyle(
+                                                color: Colors.white54,
+                                                fontSize: 10,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const Icon(Icons.chevron_right, color: green),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            );
+          },
         );
-      }
+      },
+    );
+
+    if (pickedClub != null && mounted) {
+      setState(() => selectedClub = pickedClub);
     }
-    return items;
   }
 
   Widget _buildNationalityDropdown() {
