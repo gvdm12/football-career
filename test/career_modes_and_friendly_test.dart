@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_football/models/career.dart';
+import 'package:flutter_football/models/domestic_cup.dart';
+import 'package:flutter_football/models/league_division_service.dart';
 import 'package:flutter_football/models/career_settings.dart';
 import 'package:flutter_football/models/friendly_match.dart';
 import 'package:flutter_football/models/league_player_season_stats.dart';
@@ -39,6 +41,63 @@ const unplayedTeamMatch = Match(
 );
 
 void main() {
+  group('Domestic cup progression', () {
+    test('clubs from every league and division can progress to the final', () {
+      final divisions = LeagueDivisionService.createInitialDivisions();
+
+      for (final league in League.values) {
+        final divisionCount =
+            LeagueDivisionService.hasSecondDivision(league) ? 2 : 1;
+
+        for (var division = 1; division <= divisionCount; division++) {
+          final playerClub =
+              LeagueDivisionService.clubsFor(league, division, divisions)
+                  .first
+                  .name;
+          var cup = DomesticCup.create(
+            league: league,
+            season: 1,
+            playerClub: playerClub,
+            leagueDivisions: divisions,
+            seed: league.index * 10 + division,
+          );
+
+          expect(cup.teams, contains(playerClub),
+              reason: '$league, division $division');
+          expect(cup.totalRounds,
+              LeagueDivisionService.hasSecondDivision(league) ? 5 : 4);
+
+          // Разыгрываем все стадии до финала, каждый раз обеспечивая
+          // победу клуба игрока независимо от того, дома он или в гостях.
+          for (var round = 1; round < cup.totalRounds; round++) {
+            final roundMatches = cup.matches
+                .where((match) => match.round == round)
+                .toList();
+            for (final match in roundMatches) {
+              final playerIsAway = match.awayTeam == playerClub;
+              cup = cup.recordResult(
+                matchId: match.id,
+                homeGoals: playerIsAway ? 0 : 2,
+                awayGoals: playerIsAway ? 2 : 0,
+              );
+            }
+            cup = cup.advanceRound();
+          }
+
+          final finalMatch = cup.matches
+              .singleWhere((match) => match.round == cup.totalRounds);
+          expect(cup.currentRound, cup.totalRounds,
+              reason: '$league, division $division');
+          expect(
+            finalMatch.homeTeam == playerClub ||
+                finalMatch.awayTeam == playerClub,
+            isTrue,
+            reason: '$league, division $division',
+          );
+        }
+      }
+    });
+  });
   group('Negotiation cooldowns', () {
     test('counts a club fixture even when the player did not play', () {
       final career = createTestCareer();
