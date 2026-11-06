@@ -21,6 +21,27 @@ class LeagueDivisionService {
   static bool hasSecondDivision(League league) =>
       twoTierLeagues.contains(league);
 
+  /// Число клубов, напрямую меняющих дивизион за сезон.
+  /// В Англии, Испании и Италии — три; в остальных лигах — два.
+  static int movementPlaces(League league) {
+    switch (league) {
+      case League.england:
+      case League.spain:
+      case League.italy:
+        return 3;
+      case League.germany:
+      case League.france:
+      case League.russia:
+      case League.turkey:
+      case League.belgium:
+      case League.netherlands:
+      case League.saudiArabia:
+      case League.mls:
+      case League.portugal:
+        return 2;
+    }
+  }
+
   static Map<String, List<String>> createInitialDivisions() {
     final result = <String, List<String>>{};
     for (final league in League.values) {
@@ -132,13 +153,15 @@ class LeagueDivisionService {
       final secondKey = key(league, 2);
       final topTable = finalTables[topKey];
       final secondTable = finalTables[secondKey];
+      final places = movementPlaces(league);
       if (topTable == null || secondTable == null ||
-          topTable.length < 2 || secondTable.length < 2) {
+          topTable.length < places || secondTable.length < places) {
         continue;
       }
 
-      final promoted = secondTable.take(2).map((entry) => entry.club).toList();
-      final relegated = topTable.skip(topTable.length - 2)
+      final promoted =
+          secondTable.take(places).map((entry) => entry.club).toList();
+      final relegated = topTable.skip(topTable.length - places)
           .map((entry) => entry.club)
           .toList();
 
