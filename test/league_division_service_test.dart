@@ -92,6 +92,16 @@ void main() {
 
       expect(cup.teams.length, 32);
       expect(cup.teams.toSet().length, 32);
+      expect(
+        cup.teams,
+        containsAll(divisions[LeagueDivisionService.key(League.england, 1)]!),
+      );
+      expect(
+        cup.teams.where(
+          divisions[LeagueDivisionService.key(League.england, 2)]!.contains,
+        ).length,
+        12,
+      );
       expect(cup.currentRoundMatches.length, 16);
       expect(cup.roundName, '1/16 финала');
     });
