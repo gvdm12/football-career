@@ -6,7 +6,11 @@ import 'package:flutter_football/models/league_table.dart';
 import 'package:flutter_football/models/player.dart';
 
 void main() {
-  test('season news reports a Serie B club in Serie B, not Serie A', () {
+  test('season news uses the player club actual division table', () {
+    final divisions = LeagueDivisionService.createInitialDivisions();
+    final serieBClubs = divisions[LeagueDivisionService.key(League.italy, 2)]!;
+    final serieBChampion = serieBClubs.first;
+
     const skills = PlayerSkills(
       pace: 70,
       physical: 70,
@@ -23,7 +27,7 @@ void main() {
       position: PlayerPosition.forward,
       age: 17,
       season: 1,
-      club: 'Cremonese',
+      club: serieBChampion,
       overall: calculateOverall(
         skills: skills,
         position: PlayerPosition.forward,
@@ -31,27 +35,24 @@ void main() {
       skills: skills,
     );
 
-    final career = Career.create(player);
-    final serieBClubs = LeagueDivisionService.clubsFor(
-      League.italy,
-      2,
-      career.leagueDivisions,
-    );
     final serieBTable = [
       for (var index = 0; index < serieBClubs.length; index++)
         LeagueTableEntry(
-          club: serieBClubs[index].name,
+          club: serieBClubs[index],
           played: 38,
           wins: index == 0 ? 30 : 10,
-          draws: index == 0 ? 5 : 5,
+          draws: 5,
           losses: index == 0 ? 3 : 23,
           goalsFor: index == 0 ? 80 : 35,
           goalsAgainst: index == 0 ? 25 : 60,
         ),
     ];
 
-    final nextSeason = career
-        .copyWith(leagueTable: serieBTable)
+    final nextSeason = Career.create(player)
+        .copyWith(
+          leagueDivisions: divisions,
+          leagueTable: serieBTable,
+        )
         .startNextSeason();
 
     final serieBNews = nextSeason.news.firstWhere(
@@ -62,9 +63,9 @@ void main() {
     );
 
     expect(serieBNews.title, 'Итоги сезона в Serie B');
-    expect(serieBNews.description, contains('Cremonese'));
+    expect(serieBNews.description, contains(serieBChampion));
     expect(serieBNews.description, contains('Serie B'));
     expect(serieANews.title, 'Итоги сезона в Serie A');
-    expect(serieANews.description, isNot(contains('Cremonese')));
+    expect(serieANews.description, isNot(contains(serieBChampion)));
   });
 }
