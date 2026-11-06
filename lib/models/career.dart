@@ -2142,6 +2142,8 @@ class Career {
       domesticCupWinner: domesticCup?.champion,
       championsLeagueWinner: championsLeague?.champion,
       europaLeagueWinner: europaLeague?.champion,
+      divisionStandings: finalDivisionTables,
+      leagueDivisions: leagueDivisions,
     );
     Clubs.applyStrengthOverrides(updatedClubStrengths);
 
