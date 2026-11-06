@@ -755,7 +755,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '\${LanguageService.isEnglish ? club.league.displayName : club.league.countryName} • \${AppStrings.isEnglish ? 'Strength' : 'Сила'} \${club.strength}',
+                    '${LanguageService.isEnglish ? club.league.displayName : club.league.countryName} • ${AppStrings.isEnglish ? 'Strength' : 'Сила'} ${club.strength}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -1100,7 +1100,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                                             ),
                                             const SizedBox(height: 4),
                                             Text(
-                                              '\${AppStrings.isEnglish ? 'Club strength' : 'Сила клуба'}: \${club.strength}',
+                                              '${AppStrings.isEnglish ? 'Club strength' : 'Сила клуба'}: ${club.strength}',
                                               style: const TextStyle(
                                                 color: Colors.white54,
                                                 fontSize: 10,
