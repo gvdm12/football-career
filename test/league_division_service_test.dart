@@ -123,7 +123,7 @@ void main() {
         expect(cup.teams, containsAll(firstDivision), reason: league.name);
         expect(
           cup.teams.where(secondDivision.contains).length,
-          12,
+          32 - firstDivision.length,
           reason: league.name,
         );
         expect(cup.currentRoundMatches.length, 16, reason: league.name);
