@@ -7,6 +7,7 @@ import 'package:flutter_football/models/career_news.dart';
 import 'package:flutter_football/models/champions_league.dart';
 import 'package:flutter_football/models/europa_league.dart';
 import 'package:flutter_football/models/club.dart';
+import 'package:flutter_football/models/league_division_service.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/cup_match.dart';
 import 'package:flutter_football/models/league_match.dart';
@@ -2663,7 +2664,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
       return career.leagueTable;
     }
 
-    final clubs = Clubs.byLeague(league);
+    final clubs = LeagueDivisionService.clubsFor(
+      league,
+      career.currentLeagueDivision,
+      career.leagueDivisions,
+    );
     final opponents = clubs
         .where((club) => club.name != playerClub)
         .map((club) => club.name)
