@@ -4,6 +4,7 @@ import 'package:flutter_football/models/cup_match.dart';
 import 'package:flutter_football/models/domestic_cup.dart';
 import 'package:flutter_football/models/league_division_service.dart';
 import 'package:flutter_football/models/league_table.dart';
+import 'package:flutter_football/models/league_season_simulator.dart';
 import 'package:flutter_football/services/app_strings.dart';
 
 void main() {
@@ -63,6 +64,75 @@ void main() {
         );
       }
       expect(Clubs.all.map((club) => club.name).toSet().length, Clubs.all.length);
+    });
+
+    test('second-division results do not qualify a promoted club for Europe', () {
+      final divisions = LeagueDivisionService.createInitialDivisions();
+      final firstDivision = divisions[LeagueDivisionService.key(League.england, 1)]!;
+      final secondDivision = divisions[LeagueDivisionService.key(League.england, 2)]!;
+      final simulatedTopTable = [
+        for (var i = 0; i < firstDivision.length; i++)
+          LeagueTableEntry(
+            club: firstDivision[i],
+            played: 38,
+            wins: 20 - i,
+            draws: 0,
+            losses: 18 + i,
+            goalsFor: 40,
+            goalsAgainst: 20,
+          ),
+      ];
+      final secondDivisionTable = [
+        for (var i = 0; i < secondDivision.length; i++)
+          LeagueTableEntry(
+            club: secondDivision[i],
+            played: 46,
+            wins: 40 - i,
+            draws: 0,
+            losses: 6 + i,
+            goalsFor: 80,
+            goalsAgainst: 20,
+          ),
+      ];
+
+      final standings = LeagueSeasonSimulator.standingsForQualification(
+        simulatedStandings: {League.england: simulatedTopTable},
+        playerClub: secondDivision.first,
+        playerLeagueStandings: secondDivisionTable,
+        leagueDivisions: divisions,
+      );
+
+      expect(standings[League.england]!.first.club, simulatedTopTable.first.club);
+      expect(
+        standings[League.england]!.map((entry) => entry.club),
+        isNot(contains(secondDivision.first)),
+      );
+    });
+
+    test('first-division results are used for European qualification', () {
+      final divisions = LeagueDivisionService.createInitialDivisions();
+      final firstDivision = divisions[LeagueDivisionService.key(League.england, 1)]!;
+      final playerTable = [
+        for (var i = 0; i < firstDivision.length; i++)
+          LeagueTableEntry(
+            club: firstDivision[i],
+            played: 38,
+            wins: 20 - i,
+            draws: 0,
+            losses: 18 + i,
+            goalsFor: 40,
+            goalsAgainst: 20,
+          ),
+      ];
+
+      final standings = LeagueSeasonSimulator.standingsForQualification(
+        simulatedStandings: {League.england: const []},
+        playerClub: firstDivision.last,
+        playerLeagueStandings: playerTable,
+        leagueDivisions: divisions,
+      );
+
+      expect(standings[League.england], playerTable);
     });
 
     test('two clubs move in each direction after the season', () {
