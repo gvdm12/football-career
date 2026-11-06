@@ -11,6 +11,7 @@ import 'package:flutter_football/screens/home/home_screen.dart';
 import 'package:flutter_football/screens/match/match_screen.dart';
 import 'package:flutter_football/screens/season/season_screen.dart';
 import 'package:flutter_football/services/app_strings.dart';
+import 'package:flutter_football/widgets/liquid_glass.dart';
 import 'package:flutter_svg/svg.dart';
 
 class PlayerScreen extends StatefulWidget {
@@ -492,9 +493,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
     );
   }
 
+  int _selectedSection = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF04160A),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -506,87 +510,37 @@ class _PlayerScreenState extends State<PlayerScreen> {
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(22, 18, 22, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(context),
-                const SizedBox(height: 10),
-                _buildPlayerCard(),
-                if (career.isInjured) ...[
-                  const SizedBox(height: 10),
-                  _buildInjuryCard(),
-                ],
-                const SizedBox(height: 5),
-                _buildStatisticsCard(),
-                const SizedBox(height: 5),
-                _buildClubCard(),
-                const SizedBox(height: 5),
-
-                // const SizedBox(height: 10),
-
-                // SizedBox(
-                //   width: double.infinity,
-                //   height: 55,
-                //   child: ElevatedButton(
-                //     style: ElevatedButton.styleFrom(
-                //       side: const BorderSide(
-                //         color: Color.fromARGB(255, 255, 255, 255),
-                //       ),
-                //     ),
-                //     onPressed: _openDevelopment,
-                //     child: Text(
-                //       AppStrings.development,
-                //       style: const TextStyle(
-                //         fontWeight: FontWeight.w900,
-                //         color: Color.fromARGB(255, 255, 255, 255),
-                //       ),
-                //     ),
-                //   ),
-                // ),
-                SizedBox(
-                  width: double.infinity,
-                  height: 40,
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.white),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    onPressed: _showCareerHistory,
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        AppStrings.careerHistory,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(22, 18, 22, 12),
+                child: _buildHeader(context),
+              ),
+              _buildSectionSelector(),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(18, 12, 18, 18),
+                  child: _buildSelectedSection(),
                 ),
-
-                const SizedBox(height: 5),
-
-                // Сезон или итоги карьеры — ниже на всю ширину
-                SizedBox(
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 4, 18, 12),
+                child: SizedBox(
                   width: double.infinity,
-                  height: 46,
+                  height: 48,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: career.isCareerFinished
                           ? const Color(0xFFB8860B)
-                          : const Color.fromARGB(124, 77, 80, 78),
+                          : const Color(0xFF1B5E2A),
+                      foregroundColor: Colors.white,
                       side: BorderSide(
                         color: career.isCareerFinished
                             ? const Color(0xFFFFD700)
-                            : const Color.fromARGB(255, 255, 255, 255),
+                            : const Color(0xFF8BE07F).withValues(alpha: 0.65),
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadiusGeometry.circular(14),
+                        borderRadius: BorderRadius.circular(15),
                       ),
                     ),
                     onPressed: career.isCareerFinished
@@ -596,18 +550,378 @@ class _PlayerScreenState extends State<PlayerScreen> {
                       career.isCareerFinished
                           ? AppStrings.careerEndTitle.toUpperCase()
                           : AppStrings.seasonButton,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                      ),
+                      style: const TextStyle(fontWeight: FontWeight.w900),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSectionSelector() {
+    final english = AppStrings.isEnglish;
+    final sections = [
+      (english ? 'Profile' : 'Профиль', Icons.person_outline),
+      (english ? 'Skills' : 'Навыки', Icons.insights),
+      (english ? 'Stats' : 'Статистика', Icons.query_stats),
+      (english ? 'Awards' : 'Награды', Icons.emoji_events_outlined),
+      (english ? 'History' : 'История', Icons.history),
+    ];
+
+    return SizedBox(
+      height: 44,
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        scrollDirection: Axis.horizontal,
+        itemCount: sections.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final selected = _selectedSection == index;
+          return InkWell(
+            borderRadius: BorderRadius.circular(14),
+            onTap: () => setState(() => _selectedSection = index),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
+              decoration: BoxDecoration(
+                color: selected
+                    ? const Color(0xFF8BE07F).withValues(alpha: 0.18)
+                    : Colors.white.withValues(alpha: 0.07),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: selected
+                      ? const Color(0xFF8BE07F)
+                      : Colors.white.withValues(alpha: 0.12),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    sections[index].$2,
+                    size: 16,
+                    color: selected ? const Color(0xFF8BE07F) : Colors.white70,
+                  ),
+                  const SizedBox(width: 7),
+                  Text(
+                    sections[index].$1,
+                    style: TextStyle(
+                      color: selected ? Colors.white : Colors.white70,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildSelectedSection() {
+    switch (_selectedSection) {
+      case 0:
+        return Column(
+          children: [
+            _buildPlayerCard(),
+            if (career.isInjured) ...[
+              const SizedBox(height: 12),
+              _buildInjuryCard(),
+            ],
+            const SizedBox(height: 12),
+            _buildClubCard(),
+          ],
+        );
+      case 1:
+        return Column(
+          children: [
+            _buildSectionCard(
+              title: AppStrings.isEnglish ? 'PLAYER ATTRIBUTES' : 'ХАРАКТЕРИСТИКИ ИГРОКА',
+              subtitle: AppStrings.isEnglish
+                  ? 'Current level of all eight skills'
+                  : 'Текущий уровень всех восьми навыков',
+              child: _buildStatRows(),
+            ),
+            const SizedBox(height: 12),
+            _buildSectionCard(
+              title: AppStrings.isEnglish ? 'DEVELOPMENT POINTS' : 'ОЧКИ РАЗВИТИЯ',
+              child: Row(
+                children: [
+                  const Icon(Icons.trending_up, color: Color(0xFFFFD75A), size: 25),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      AppStrings.isEnglish
+                          ? 'Available after the season ends'
+                          : 'Доступны для распределения после завершения сезона',
+                      style: const TextStyle(color: Colors.white70, fontSize: 12),
+                    ),
+                  ),
+                  Text(
+                    '${career.developmentPoints}',
+                    style: const TextStyle(
+                      color: Color(0xFFFFD75A),
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      case 2:
+        return Column(
+          children: [
+            _buildStatisticsCard(),
+            const SizedBox(height: 12),
+            _buildSectionCard(
+              title: AppStrings.seasonStats,
+              child: Column(
+                children: [
+                  _HistoryLine(
+                    label: AppStrings.matches,
+                    value: '${career.matches + currentWorldCupMatches}',
+                  ),
+                  _HistoryLine(
+                    label: AppStrings.goalsColon,
+                    value: '${career.goals + currentWorldCupGoals}',
+                  ),
+                  _HistoryLine(
+                    label: AppStrings.assistsColon,
+                    value: '${career.assists + currentWorldCupAssists}',
+                  ),
+                  _HistoryLine(
+                    label: AppStrings.averageRating,
+                    value: career.averageRating?.toStringAsFixed(2) ?? '—',
+                  ),
+                  _HistoryLine(
+                    label: AppStrings.yellowCardsColon,
+                    value: '${career.yellowCards}',
+                  ),
+                  _HistoryLine(
+                    label: AppStrings.redCardsColon,
+                    value: '${career.redCards}',
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      case 3:
+        return _buildAchievementsSection();
+      default:
+        return _buildHistorySection();
+    }
+  }
+
+  Widget _buildSectionCard({
+    required String title,
+    String? subtitle,
+    required Widget child,
+  }) {
+    return LiquidGlass(
+      radius: 20,
+      padding: const EdgeInsets.all(15),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                color: Color(0xFF8BE07F),
+                fontSize: 11,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0.8,
+              ),
+            ),
+            if (subtitle != null) ...[
+              const SizedBox(height: 5),
+              Text(
+                subtitle,
+                style: const TextStyle(color: Colors.white54, fontSize: 11),
+              ),
+            ],
+            const SizedBox(height: 14),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAchievementsSection() {
+    final achievements = career.history
+        .expand((season) => season.achievements.map((name) => (season: season, name: name)))
+        .toList()
+        .reversed
+        .toList();
+
+    return _buildSectionCard(
+      title: AppStrings.isEnglish ? 'CAREER ACHIEVEMENTS' : 'ДОСТИЖЕНИЯ ЗА КАРЬЕРУ',
+      subtitle: AppStrings.isEnglish
+          ? 'Awards and trophies earned in completed seasons'
+          : 'Награды и трофеи, полученные по итогам завершённых сезонов',
+      child: achievements.isEmpty
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Text(
+                  AppStrings.noAchievements,
+                  style: const TextStyle(color: Colors.white60),
+                ),
+              ),
+            )
+          : Column(
+              children: achievements.map((item) {
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 9),
+                  padding: const EdgeInsets.all(11),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.06),
+                    borderRadius: BorderRadius.circular(13),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.emoji_events, color: Color(0xFFFFD75A), size: 24),
+                      const SizedBox(width: 11),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              AppStrings.achievementName(item.name),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              '${AppStrings.seasonNumber(item.season.season)} · ${item.season.club}',
+                              style: const TextStyle(color: Colors.white54, fontSize: 10),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+    );
+  }
+
+  Widget _buildHistorySection() {
+    final history = career.history.reversed.toList();
+    return Column(
+      children: [
+        _buildSectionCard(
+          title: AppStrings.careerHistory,
+          child: Row(
+            children: [
+              Expanded(child: _CareerHistoryStat(label: AppStrings.seasons, value: '${career.history.length}')),
+              Expanded(child: _CareerHistoryStat(label: AppStrings.clubs, value: '${career.history.map((item) => item.club).toSet().length}')),
+              Expanded(child: _CareerHistoryStat(label: AppStrings.matches, value: '${careerMatches}')),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        if (history.isEmpty)
+          _buildSectionCard(
+            title: AppStrings.isEnglish ? 'CAREER TIMELINE' : 'ХРОНОЛОГИЯ КАРЬЕРЫ',
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  AppStrings.noCompletedSeasons,
+                  style: const TextStyle(color: Colors.white60),
+                ),
+              ),
+            ),
+          )
+        else
+          ...history.map((stats) {
+            return Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.075),
+                borderRadius: BorderRadius.circular(17),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          AppStrings.seasonNumber(stats.season),
+                          style: const TextStyle(
+                            color: Color(0xFF8BE07F),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        stats.averageRating?.toStringAsFixed(2) ?? '—',
+                        style: const TextStyle(color: Color(0xFFFFD75A), fontWeight: FontWeight.w900),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(stats.club, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                  const Divider(color: Color(0x33FFFFFF), height: 18),
+                  Row(
+                    children: [
+                      Expanded(child: _CareerHistoryStat(label: AppStrings.matches, value: '${stats.matches}')),
+                      Expanded(child: _CareerHistoryStat(label: AppStrings.goalsLabel, value: '${stats.goals}')),
+                      Expanded(child: _CareerHistoryStat(label: AppStrings.assistsLabel, value: '${stats.assists}')),
+                    ],
+                  ),
+                  if (stats.achievements.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: stats.achievements.map((name) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF14401E),
+                            borderRadius: BorderRadius.circular(9),
+                          ),
+                          child: Text(
+                            AppStrings.achievementName(name),
+                            style: const TextStyle(color: Color(0xFF8BE07F), fontSize: 10, fontWeight: FontWeight.w700),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ],
+              ),
+            );
+          }),
+        OutlinedButton.icon(
+          onPressed: _showCareerHistory,
+          icon: const Icon(Icons.open_in_new, size: 16),
+          label: Text(AppStrings.isEnglish ? 'Detailed career summary' : 'Подробная сводка карьеры'),
+          style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF8BE07F)),
+        ),
+      ],
     );
   }
 
@@ -793,10 +1107,35 @@ class _PlayerScreenState extends State<PlayerScreen> {
             ],
           ),
 
-          const SizedBox(height: 22),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _profileTag(Icons.tag, '#${player.jerseyNumber}'),
+              _profileTag(Icons.cake_outlined, '${player.age} ${AppStrings.yearsOld}'),
+              _profileTag(Icons.sports, _positionName(player.position)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
-          // Нижняя часть: статистика
-          _buildStatRows(),
+  Widget _profileTag(IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(11),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: const Color(0xFF8BE07F)),
+          const SizedBox(width: 5),
+          Text(label, style: const TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w700)),
         ],
       ),
     );
