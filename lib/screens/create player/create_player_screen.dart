@@ -38,9 +38,6 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
   bool _playWithoutInjuries = false;
   CareerDifficulty _difficulty = CareerDifficulty.normal;
 
-  List<Club> get _availableStartingClubs =>
-      _allowAnyClub ? Clubs.all : startingClubs;
-
   List<Map<String, String>> get positions => [
     {'short': 'ST', 'name': AppStrings.striker},
     {'short': 'CM', 'name': AppStrings.midfielder},
