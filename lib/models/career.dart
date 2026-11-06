@@ -462,8 +462,7 @@ class Career {
     Player player, {
     CareerSettings settings = const CareerSettings(),
   }) {
-    Clubs.applyStrengthOverrides(const {});
-    RealClubSquads.applyCareerTransfers(const []);
+    Clubs.resetCareerState();
     final leagueDivisions = LeagueDivisionService.createInitialDivisions();
     final leagueMatches = _createLeagueMatches(
       player.club,
