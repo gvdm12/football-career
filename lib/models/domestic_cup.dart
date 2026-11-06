@@ -17,7 +17,7 @@ class DomesticCup {
     required this.matches,
   });
 
-  /// Создаёт кубок из 16 клубов одной лиги.
+  /// Создаёт кубок из 16 или 32 клубов одной лиги.
   /// Клуб игрока обязательно участвует в турнире.
   factory DomesticCup.create({
     required League league,
