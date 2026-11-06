@@ -5,6 +5,22 @@ import 'package:flutter_football/models/league_division_service.dart';
 import 'package:flutter_football/models/league_table.dart';
 
 void main() {
+  group('Career club state', () {
+    test('new career reset restores base club strengths', () {
+      final baseStrength = Clubs.all
+          .firstWhere((club) => club.name == 'Arsenal')
+          .baseStrength;
+      Clubs.applyStrengthOverrides({'Arsenal': baseStrength + 8});
+
+      expect(Clubs.getByName('Arsenal').strength, baseStrength + 8);
+
+      Clubs.resetCareerState();
+
+      expect(Clubs.strengthOverrides, isEmpty);
+      expect(Clubs.getByName('Arsenal').strength, baseStrength);
+    });
+  });
+
   group('League divisions', () {
     test('initial divisions contain the expected club counts', () {
       final divisions = LeagueDivisionService.createInitialDivisions();

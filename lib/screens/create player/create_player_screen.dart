@@ -4,6 +4,7 @@ import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/career_settings.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/club.dart';
+import 'package:flutter_football/models/league_division_service.dart';
 import 'package:flutter_football/models/position_rival.dart';
 import 'package:flutter_football/widgets/jersey_number_picker.dart';
 import 'package:flutter_football/screens/player/player_screen.dart';
@@ -36,9 +37,6 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
   bool _limitTransfersToFiveYears = false;
   bool _playWithoutInjuries = false;
   CareerDifficulty _difficulty = CareerDifficulty.normal;
-
-  List<Club> get _availableStartingClubs =>
-      _allowAnyClub ? Clubs.all : startingClubs;
 
   List<Map<String, String>> get positions => [
     {'short': 'ST', 'name': AppStrings.striker},
@@ -209,6 +207,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
   void initState() {
     super.initState();
 
+    Clubs.resetCareerState();
     startingClubs = Clubs.randomStartingClubs();
     selectedClub = startingClubs.first.name;
   }
@@ -608,20 +607,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                         fontWeight: FontWeight.w700,
                         fontSize: 14,
                       ),
-                      items: _availableStartingClubs.map((club) {
-                        final leagueName = LanguageService.isEnglish
-                            ? club.league.displayName
-                            : club.league.countryName;
-
-                        return DropdownMenuItem<String>(
-                          value: club.name,
-                          child: Text(
-                            '${club.name}-$leagueName-${club.strength}',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        );
-                      }).toList(),
+                      items: _buildClubPickerItems(),
                       onChanged: (value) {
                         if (value == null) return;
 
@@ -745,6 +731,74 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
         letterSpacing: 1.2,
       ),
     );
+  }
+
+  List<DropdownMenuItem<String>> _buildClubPickerItems() {
+    if (!_allowAnyClub) {
+      return startingClubs.map((club) {
+        return DropdownMenuItem<String>(
+          value: club.name,
+          child: Text(
+            '${club.name} • ${club.strength}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        );
+      }).toList();
+    }
+
+    final items = <DropdownMenuItem<String>>[];
+    for (final league in League.values) {
+      for (final division in [1, 2]) {
+        final clubs = Clubs.byLeagueDivision(league, division);
+        if (clubs.isEmpty) continue;
+
+        final sectionLabel = LeagueDivisionService.hasSecondDivision(league)
+            ? (division == 1
+                ? (AppStrings.isEnglish ? 'FIRST DIVISION' : 'ПЕРВАЯ ЛИГА')
+                : (AppStrings.isEnglish ? 'SECOND DIVISION' : 'ВТОРАЯ ЛИГА'))
+            : (AppStrings.isEnglish ? 'LEAGUE' : 'ЛИГА');
+        final leagueName = LanguageService.isEnglish
+            ? league.displayName
+            : league.countryName;
+
+        items.add(
+          DropdownMenuItem<String>(
+            value: '__section_${league.name}_$division',
+            enabled: false,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 7, bottom: 3),
+              child: Text(
+                '$leagueName • $sectionLabel',
+                style: const TextStyle(
+                  color: Color(0xFF8BE07F),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.4,
+                ),
+              ),
+            ),
+          ),
+        );
+
+        items.addAll(
+          clubs.map(
+            (club) => DropdownMenuItem<String>(
+              value: club.name,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: Text(
+                  '${club.name} • ${club.strength}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+    }
+    return items;
   }
 
   Widget _buildNationalityDropdown() {
