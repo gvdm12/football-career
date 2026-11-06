@@ -2355,6 +2355,38 @@ class Career {
         .whereType<CareerNews>()
         .toList();
 
+    final divisionNews = <CareerNews>[];
+    for (final league in LeagueDivisionService.twoTierLeagues) {
+      final previousTop =
+          leagueDivisions[LeagueDivisionService.key(league, 1)] ?? const [];
+      final nextTop =
+          newLeagueDivisions[LeagueDivisionService.key(league, 1)] ?? const [];
+      final promoted =
+          nextTop.where((club) => !previousTop.contains(club)).toList();
+      final relegated =
+          previousTop.where((club) => !nextTop.contains(club)).toList();
+      if (promoted.isEmpty || relegated.isEmpty) continue;
+
+      final playerWasPromoted = promoted.contains(newPlayer.club);
+      final playerWasRelegated = relegated.contains(newPlayer.club);
+      divisionNews.add(
+        CareerNews(
+          id: 'division_movement_s${newSeason}_${league.name}',
+          season: newSeason,
+          matchNumber: 0,
+          title: playerWasPromoted
+              ? 'Повышение в высший дивизион!'
+              : playerWasRelegated
+                  ? 'Клуб вылетел во второй дивизион'
+                  : 'Повышение и вылет в ${league.displayName}',
+          description:
+              'В высший дивизион вышли: ${promoted.join(', ')}. '
+              'Во второй дивизион вылетели: ${relegated.join(', ')}.',
+          type: CareerNewsType.season,
+        ),
+      );
+    }
+
     final previousStats = previousSeasonStats.isNotEmpty
         ? previousSeasonStats.last
         : null;
@@ -2394,7 +2426,7 @@ class Career {
       history: newHistory,
       leagueTable: newLeagueTable,
       leagueMatches: newLeagueMatches,
-      news: [...news, ...worldTransferNews, ...coachTransferNews, ...leagueNews, ...transferRumorNews, ...sponsorOfferNews],
+      news: [...news, ...worldTransferNews, ...coachTransferNews, ...leagueNews, ...divisionNews, ...transferRumorNews, ...sponsorOfferNews],
       objectives: nextObjectives,
       recentMatchRatings: const [],
       sponsorOffers: nextSponsorOffers,
