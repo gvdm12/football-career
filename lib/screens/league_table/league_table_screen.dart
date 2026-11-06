@@ -18,7 +18,7 @@ class LeagueTableScreen extends StatelessWidget {
     final hasTwoDivisions =
         league != null && LeagueDivisionService.hasSecondDivision(league);
 
-    if (!hasTwoDivisions || league == null) {
+    if (!hasTwoDivisions) {
       return Scaffold(
         appBar: AppBar(
           backgroundColor: const Color.fromARGB(82, 81, 84, 82),
