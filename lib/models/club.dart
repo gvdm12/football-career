@@ -222,6 +222,12 @@ class Clubs {
       ..addAll(values);
   }
 
+  /// Полностью сбрасывает глобальное состояние предыдущей карьеры.
+  static void resetCareerState() {
+    applyStrengthOverrides(const {});
+    RealClubSquads.applyCareerTransfers(const []);
+  }
+
   static const List<Club> all = [
     // =====================================================
     // АНГЛИЯ — PREMIER LEAGUE 2026/27 (20)
