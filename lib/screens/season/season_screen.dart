@@ -5352,13 +5352,10 @@ class _SeasonScreenState extends State<SeasonScreen> {
     final isHome = cupMatch.homeTeam == playerClub;
     final opponent = isHome ? cupMatch.awayTeam : cupMatch.homeTeam;
 
-    final stage = switch (cupMatch.round) {
-      1 => AppStrings.cupStageName(1),
-      2 => AppStrings.cupStageName(2),
-      3 => AppStrings.cupStageName(3),
-      4 => AppStrings.cupStageName(4),
-      _ => AppStrings.nationalCup,
-    };
+    final stage = AppStrings.cupStageName(
+      cupMatch.round,
+      hasRoundOf32: career.domesticCup?.totalRounds == 5,
+    );
 
     String? resultText;
     Color resultColor = Colors.white54;
