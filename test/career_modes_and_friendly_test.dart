@@ -107,6 +107,21 @@ void main() {
       expect(career.copyWith(season: 6).canChangeClub, isTrue);
     });
 
+    test('five-season transfer cooldown survives starting the next season', () {
+      final career = createTestCareer(
+        settings: const CareerSettings(limitTransfersToFiveYears: true),
+        season: 5,
+      ).copyWith(lastClubChangeSeason: 5);
+
+      final nextSeason = career.startNextSeason();
+
+      expect(nextSeason.season, 6);
+      expect(nextSeason.lastClubChangeSeason, 5);
+      expect(nextSeason.canChangeClub, isFalse);
+      expect(nextSeason.seasonsUntilClubChange, 4);
+      expect(nextSeason.copyWith(season: 10).canChangeClub, isTrue);
+    });
+
     test('no-injury mode clears an existing injury and prevents new ones', () {
       final career = createTestCareer(
         settings: const CareerSettings(playWithoutInjuries: true),
