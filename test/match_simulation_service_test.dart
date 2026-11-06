@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_football/models/club.dart';
+import 'package:flutter_football/models/league_division_service.dart';
 import 'package:flutter_football/models/league_match.dart';
 import 'package:flutter_football/models/league_table.dart';
 import 'package:flutter_football/services/match_simulation_service.dart';
@@ -187,6 +188,137 @@ void main() {
       }
 
       expect(signature(reversed), signature(table));
+    });
+
+    test('rebuilds the correct table for every second-division league', () {
+      final divisions = LeagueDivisionService.createInitialDivisions();
+
+      for (final league in LeagueDivisionService.twoTierLeagues) {
+        for (var division = 1; division <= 2; division++) {
+          final currentClubs =
+              divisions[LeagueDivisionService.key(league, division)]!;
+          final otherClubs =
+              divisions[LeagueDivisionService.key(league, division == 1 ? 2 : 1)]!;
+          final player = currentClubs[0];
+          final opponent = currentClubs[1];
+          final third = currentClubs[2];
+          final fourth = currentClubs[3];
+
+          final table = MatchSimulationService.rebuildLeagueTable(
+            playerClub: player,
+            fixtures: [
+              LeagueMatch(
+                id: 1,
+                round: 1,
+                homeTeam: player,
+                awayTeam: opponent,
+                homeGoals: 2,
+                awayGoals: 0,
+              ),
+              LeagueMatch(
+                id: 2,
+                round: 1,
+                homeTeam: third,
+                awayTeam: fourth,
+                homeGoals: 1,
+                awayGoals: 1,
+              ),
+              // Междивизионный матч из ошибочного/старого сохранения
+              // не должен менять ни одну из таблиц.
+              LeagueMatch(
+                id: 3,
+                round: 2,
+                homeTeam: player,
+                awayTeam: otherClubs.first,
+                homeGoals: 7,
+                awayGoals: 0,
+              ),
+            ],
+            division: division,
+            divisions: divisions,
+            fallbackTable: const [],
+          );
+
+          expect(
+            table.map((entry) => entry.club).toSet(),
+            currentClubs.toSet(),
+            reason: '${league.name}, division $division must contain only its clubs',
+          );
+          expect(
+            table.fold<int>(0, (sum, entry) => sum + entry.played),
+            4,
+            reason: '${league.name}, division $division must count only two valid fixtures',
+          );
+          expect(
+            table.firstWhere((entry) => entry.club == player).played,
+            1,
+            reason: '${league.name}, division $division player match count',
+          );
+        }
+      }
+    });
+
+    test('uses a promoted club actual division after promotion and relegation', () {
+      final divisions = LeagueDivisionService.createInitialDivisions();
+      final topKey = LeagueDivisionService.key(League.england, 1);
+      final secondKey = LeagueDivisionService.key(League.england, 2);
+      final top = divisions[topKey]!;
+      final second = divisions[secondKey]!;
+      final finalTables = <String, List<LeagueTableEntry>>{
+        topKey: [
+          for (var i = 0; i < top.length; i++)
+            LeagueTableEntry(
+              club: top[i],
+              played: 38,
+              wins: top.length - i,
+              draws: 0,
+              losses: i,
+              goalsFor: 60 - i,
+              goalsAgainst: 10 + i,
+            ),
+        ],
+        secondKey: [
+          for (var i = 0; i < second.length; i++)
+            LeagueTableEntry(
+              club: second[i],
+              played: 46,
+              wins: second.length - i,
+              draws: 0,
+              losses: i,
+              goalsFor: 70 - i,
+              goalsAgainst: 10 + i,
+            ),
+        ],
+      };
+      final nextDivisions = LeagueDivisionService.advanceSeason(
+        divisions: divisions,
+        finalTables: finalTables,
+      );
+      final promotedClub = second.first;
+      final nextTop = nextDivisions[topKey]!;
+      final opponent = nextTop.firstWhere((club) => club != promotedClub);
+
+      final table = MatchSimulationService.rebuildLeagueTable(
+        playerClub: promotedClub,
+        // Передаём старый дивизион намеренно: сервис должен доверять
+        // обновлённому сохранённому составу после повышения.
+        division: 2,
+        divisions: nextDivisions,
+        fixtures: [
+          LeagueMatch(
+            id: 1,
+            round: 1,
+            homeTeam: promotedClub,
+            awayTeam: opponent,
+            homeGoals: 1,
+            awayGoals: 0,
+          ),
+        ],
+        fallbackTable: const [],
+      );
+
+      expect(table.map((entry) => entry.club).toSet(), nextTop.toSet());
+      expect(table.firstWhere((entry) => entry.club == promotedClub).wins, 1);
     });
 
     test('returns the fallback table when the club has no league', () {
