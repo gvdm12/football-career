@@ -122,6 +122,76 @@ void main() {
       expect(nextSeason.copyWith(season: 10).canChangeClub, isTrue);
     });
 
+    test('starting a new season after a cross-league transfer rebuilds every club calendar', () {
+      final career = createTestCareer(season: 8).copyWith(
+        player: createTestCareer(season: 8).player.copyWith(club: 'Chelsea'),
+      );
+
+      final nextSeason = career.startNextSeason();
+
+      expect(nextSeason.season, 9);
+      expect(nextSeason.player.club, 'Chelsea');
+      expect(nextSeason.seasonMatches, isNotEmpty);
+      expect(
+        nextSeason.seasonMatches.every(
+          (match) => match.result == null,
+        ),
+        isTrue,
+      );
+      expect(
+        nextSeason.leagueMatches.any(
+          (match) =>
+              match.homeTeam == 'Chelsea' || match.awayTeam == 'Chelsea',
+        ),
+        isTrue,
+      );
+      expect(
+        nextSeason.leagueMatches.any(
+          (match) =>
+              match.homeTeam == 'Fenerbahçe' ||
+              match.awayTeam == 'Fenerbahçe',
+        ),
+        isFalse,
+      );
+      expect(nextSeason.leagueTable.any((entry) => entry.club == 'Chelsea'), isTrue);
+      expect(nextSeason.developmentPoints, greaterThan(career.developmentPoints));
+    });
+
+    test('loading a save with a new club and previous club calendar repairs season data', () {
+      final original = createTestCareer(season: 9);
+      final transferred = original.copyWith(
+        player: original.player.copyWith(club: 'Chelsea'),
+      );
+
+      // Имитируем старое/рассинхронизированное сохранение:
+      // клуб уже изменён, а календарь и таблица остались от Real Madrid.
+      final restored = Career.fromJson(transferred.toJson());
+
+      expect(restored.player.club, 'Chelsea');
+      expect(
+        restored.leagueMatches.any(
+          (match) =>
+              match.homeTeam == 'Chelsea' || match.awayTeam == 'Chelsea',
+        ),
+        isTrue,
+      );
+      expect(
+        restored.leagueMatches.any(
+          (match) =>
+              match.homeTeam == 'Real Madrid' ||
+              match.awayTeam == 'Real Madrid',
+        ),
+        isFalse,
+      );
+      expect(
+        restored.seasonMatches.every((match) => match.result == null),
+        isTrue,
+      );
+      expect(restored.leagueTable.any((entry) => entry.club == 'Chelsea'), isTrue);
+      expect(restored.domesticCup?.league, League.england);
+      expect(restored.domesticCup?.teams.contains('Chelsea'), isTrue);
+    });
+
     test('no-injury mode clears an existing injury and prevents new ones', () {
       final career = createTestCareer(
         settings: const CareerSettings(playWithoutInjuries: true),
