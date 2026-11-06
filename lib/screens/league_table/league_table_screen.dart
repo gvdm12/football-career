@@ -223,7 +223,7 @@ class LeagueTableScreen extends StatelessWidget {
     final relegationPosition =
         isTwoTierLeague &&
         !isSecondDivision &&
-        position > table.length - movementPlaces;
+        position > career.leagueTable.length - movementPlaces;
 
     final qualificationColor = qualifiesForChampionsLeague || promotionPosition
         ? const Color(0xFF42A5F5)
