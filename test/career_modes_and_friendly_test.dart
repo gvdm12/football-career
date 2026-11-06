@@ -42,43 +42,61 @@ const unplayedTeamMatch = Match(
 
 void main() {
   group('Domestic cup progression', () {
-    test('second-division English club can progress from semifinal to final', () {
+    test('clubs from every league and division can progress to the final', () {
       final divisions = LeagueDivisionService.createInitialDivisions();
-      final secondDivisionClub =
-          LeagueDivisionService.clubsFor(League.england, 2, divisions).first.name;
-      var cup = DomesticCup.create(
-        league: League.england,
-        season: 1,
-        playerClub: secondDivisionClub,
-        leagueDivisions: divisions,
-        seed: 1,
-      );
 
-      expect(cup.teams, contains(secondDivisionClub));
-      expect(cup.totalRounds, 5);
+      for (final league in League.values) {
+        final divisionCount =
+            LeagueDivisionService.hasSecondDivision(league) ? 2 : 1;
 
-      // Проигрышей игрока нет: симулируем победу всех команд,
-      // чтобы пройти от 1/16 финала до финала.
-      for (var round = 1; round <= 4; round++) {
-        final roundMatches = cup.matches
-            .where((match) => match.round == round)
-            .toList();
-        for (final match in roundMatches) {
-          final playerIsHome = match.homeTeam == secondDivisionClub;
-          final playerIsAway = match.awayTeam == secondDivisionClub;
-          cup = cup.recordResult(
-            matchId: match.id,
-            homeGoals: playerIsAway ? 0 : 1,
-            awayGoals: playerIsHome ? 1 : 0,
+        for (var division = 1; division <= divisionCount; division++) {
+          final playerClub =
+              LeagueDivisionService.clubsFor(league, division, divisions)
+                  .first
+                  .name;
+          var cup = DomesticCup.create(
+            league: league,
+            season: 1,
+            playerClub: playerClub,
+            leagueDivisions: divisions,
+            seed: league.index * 10 + division,
+          );
+
+          expect(cup.teams, contains(playerClub),
+              reason: '$league, division $division');
+          expect(cup.totalRounds,
+              LeagueDivisionService.hasSecondDivision(league) ? 5 : 4);
+
+          // Разыгрываем все стадии до финала, каждый раз обеспечивая
+          // победу клуба игрока независимо от того, дома он или в гостях.
+          for (var round = 1; round < cup.totalRounds; round++) {
+            final roundMatches = cup.matches
+                .where((match) => match.round == round)
+                .toList();
+            for (final match in roundMatches) {
+              final playerIsHome = match.homeTeam == playerClub;
+              final playerIsAway = match.awayTeam == playerClub;
+              cup = cup.recordResult(
+                matchId: match.id,
+                homeGoals: playerIsAway ? 0 : 2,
+                awayGoals: playerIsAway ? 2 : 0,
+              );
+            }
+            cup = cup.advanceRound();
+          }
+
+          final finalMatch = cup.matches
+              .singleWhere((match) => match.round == cup.totalRounds);
+          expect(cup.currentRound, cup.totalRounds,
+              reason: '$league, division $division');
+          expect(
+            finalMatch.homeTeam == playerClub ||
+                finalMatch.awayTeam == playerClub,
+            isTrue,
+            reason: '$league, division $division',
           );
         }
-        cup = cup.advanceRound();
       }
-
-      final finalMatch = cup.matches.singleWhere((match) => match.round == 5);
-      expect(cup.currentRound, 5);
-      expect(finalMatch.homeTeam == secondDivisionClub ||
-          finalMatch.awayTeam == secondDivisionClub, isTrue);
     });
   });
   group('Negotiation cooldowns', () {
