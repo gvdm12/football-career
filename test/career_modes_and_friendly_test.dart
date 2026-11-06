@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_football/models/career.dart';
+import 'package:flutter_football/models/domestic_cup.dart';
+import 'package:flutter_football/models/league_division_service.dart';
 import 'package:flutter_football/models/career_settings.dart';
 import 'package:flutter_football/models/friendly_match.dart';
 import 'package:flutter_football/models/league_player_season_stats.dart';
@@ -39,6 +41,47 @@ const unplayedTeamMatch = Match(
 );
 
 void main() {
+  group('Domestic cup progression', () {
+    test('second-division English club can progress from semifinal to final', () {
+      final divisions = LeagueDivisionService.createInitialDivisions();
+      final secondDivisionClub =
+          LeagueDivisionService.clubsFor(League.england, 2, divisions).first.name;
+      var cup = DomesticCup.create(
+        league: League.england,
+        season: 1,
+        playerClub: secondDivisionClub,
+        leagueDivisions: divisions,
+        seed: 1,
+      );
+
+      expect(cup.teams, contains(secondDivisionClub));
+      expect(cup.totalRounds, 5);
+
+      // Проигрышей игрока нет: симулируем победу всех команд,
+      // чтобы пройти от 1/16 финала до финала.
+      for (var round = 1; round <= 4; round++) {
+        final roundMatches = cup.matches
+            .where((match) => match.round == round)
+            .toList();
+        for (final match in roundMatches) {
+          cup = cup.recordResult(
+            matchId: match.id,
+            homeGoals: 1,
+            awayGoals: 0,
+          );
+        }
+        cup = cup.advanceRound();
+      }
+
+      expect(cup.currentRound, 5);
+      expect(cup.matches.where((match) => match.round == 5), hasLength(1));
+      expect(cup.matches.any(
+        (match) =>
+            match.homeTeam == secondDivisionClub ||
+            match.awayTeam == secondDivisionClub,
+      ), isTrue);
+    });
+  });
   group('Negotiation cooldowns', () {
     test('counts a club fixture even when the player did not play', () {
       final career = createTestCareer();
