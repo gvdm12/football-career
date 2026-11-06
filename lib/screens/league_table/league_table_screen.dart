@@ -66,8 +66,8 @@ class LeagueTableScreen extends StatelessWidget {
             labelColor: green,
             unselectedLabelColor: Colors.white70,
             tabs: [
-              Tab(text: 'Первая лига'),
-              Tab(text: 'Вторая лига'),
+              Tab(text: AppStrings.isEnglish ? 'First Division' : 'Первая лига'),
+              Tab(text: AppStrings.isEnglish ? 'Second Division' : 'Вторая лига'),
             ],
           ),
         ),
