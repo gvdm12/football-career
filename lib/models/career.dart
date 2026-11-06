@@ -696,7 +696,8 @@ class Career {
         .toSet();
     final rebuildLeagueCalendar = savedLeagueMatches.isEmpty ||
         (expectedPlayerFixtures.isNotEmpty &&
-            !setEquals(expectedPlayerFixtures, savedPlayerFixtures));
+            (expectedPlayerFixtures.length != savedPlayerFixtures.length ||
+                !expectedPlayerFixtures.every(savedPlayerFixtures.contains)));
     final leagueMatches = rebuildLeagueCalendar
         ? expectedLeagueMatches
         : savedLeagueMatches;
@@ -2140,11 +2141,19 @@ class Career {
           : leagueDivisions,
       season: season,
     );
-    final currentLeague = Clubs.leagueOf(player.club);
+    // Таблица относится к клубу, за который игрок завершил предыдущий
+    // сезон, а не к новому клубу после трансфера.
+    final archivedCurrentSeason = newHistory
+        .where((stats) => stats.season == season)
+        .toList();
+    final seasonClub = archivedCurrentSeason.isEmpty
+        ? player.club
+        : archivedCurrentSeason.last.club;
+    final currentLeague = Clubs.leagueOf(seasonClub);
     final currentDivision = currentLeague == null
         ? 1
         : LeagueDivisionService.divisionForClub(
-              player.club,
+              seasonClub,
               leagueDivisions,
             ) ??
             1;
@@ -2165,9 +2174,6 @@ class Career {
       for (final entry in europeanLeagueStandings.entries)
         entry.key: List<LeagueTableEntry>.from(entry.value),
     };
-    final archivedCurrentSeason = newHistory
-        .where((stats) => stats.season == season)
-        .toList();
     final previousClub = archivedCurrentSeason.isEmpty
         ? null
         : archivedCurrentSeason.last;
