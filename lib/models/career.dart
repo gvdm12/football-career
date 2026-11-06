@@ -671,32 +671,65 @@ class Career {
         : <String, int>{};
     Clubs.applyStrengthOverrides(restoredClubStrengths);
 
+    final currentSeason = (json['season'] as num?)?.toInt() ?? 1;
+    final expectedLeagueMatches = _createLeagueMatches(
+      loadedPlayer.club,
+      leagueDivisions: restoredLeagueDivisions,
+    );
     final savedLeagueMatches = readList('leagueMatches', LeagueMatch.fromJson);
 
-    final leagueMatches = savedLeagueMatches.isNotEmpty
-        ? savedLeagueMatches
-        : _createLeagueMatches(
-            loadedPlayer.club,
-            leagueDivisions: restoredLeagueDivisions,
-          );
+    // Старые сохранения иногда содержат уже нового игрока, но календарь
+    // предыдущего клуба. Сверяем именно пары и туры текущего клуба.
+    String fixtureKey(LeagueMatch match) =>
+        '${match.round}:${match.homeTeam}:${match.awayTeam}';
+    final expectedPlayerFixtures = expectedLeagueMatches
+        .where((match) =>
+            match.homeTeam == loadedPlayer.club ||
+            match.awayTeam == loadedPlayer.club)
+        .map(fixtureKey)
+        .toSet();
+    final savedPlayerFixtures = savedLeagueMatches
+        .where((match) =>
+            match.homeTeam == loadedPlayer.club ||
+            match.awayTeam == loadedPlayer.club)
+        .map(fixtureKey)
+        .toSet();
+    final rebuildLeagueCalendar = savedLeagueMatches.isEmpty ||
+        (expectedPlayerFixtures.isNotEmpty &&
+            (expectedPlayerFixtures.length != savedPlayerFixtures.length ||
+                !expectedPlayerFixtures.every(savedPlayerFixtures.contains)));
+    final leagueMatches = rebuildLeagueCalendar
+        ? expectedLeagueMatches
+        : savedLeagueMatches;
 
-    // Сохраняем календарь и результаты старых карьер.
-    // Если календаря игрока нет в сохранении, создаём его.
+    final expectedSeasonMatches =
+        _createSeasonMatches(loadedPlayer.club, leagueMatches);
     final savedSeasonMatches = readList('seasonMatches', SeasonMatch.fromJson);
-
-    final seasonMatches = savedSeasonMatches.isNotEmpty
-        ? savedSeasonMatches
-        : _createSeasonMatches(loadedPlayer.club, leagueMatches);
+    final seasonCalendarMatches =
+        savedSeasonMatches.length == expectedSeasonMatches.length &&
+            List.generate(expectedSeasonMatches.length, (index) {
+              final saved = savedSeasonMatches[index];
+              final expected = expectedSeasonMatches[index];
+              return saved.number == expected.number &&
+                  saved.opponent == expected.opponent &&
+                  saved.isHome == expected.isHome;
+            }).every((matches) => matches);
+    final rebuildSeasonCalendar =
+        rebuildLeagueCalendar || !seasonCalendarMatches;
+    final seasonMatches = rebuildSeasonCalendar
+        ? expectedSeasonMatches
+        : savedSeasonMatches;
 
     final savedTable = readList('leagueTable', LeagueTableEntry.fromJson);
-
-    final leagueTable = savedTable.isNotEmpty
-        ? savedTable
-        : _createLeagueTable(
+    final leagueTable = rebuildSeasonCalendar ||
+            savedTable.isEmpty ||
+            !savedTable.any((entry) => entry.club == loadedPlayer.club)
+        ? _createLeagueTable(
             loadedPlayer.club,
             seasonMatches,
             leagueDivisions: restoredLeagueDivisions,
-          );
+          )
+        : savedTable;
 
     final rawCup = json['domesticCup'];
 
@@ -705,17 +738,24 @@ class Career {
     if (rawCup is Map) {
       restoredCup = DomesticCup.fromJson(Map<String, dynamic>.from(rawCup));
 
-      // Миграция старых сохранений: раньше кубки этих лиг создавались на 16 команд.
-      // Пересоздаём сетку только до первого сыгранного матча, чтобы не терять результаты.
-      if (restoredCup.teams.length == 16 &&
-          LeagueDivisionService.hasSecondDivision(restoredCup.league) &&
-          restoredCup.matches.every((match) => !match.isPlayed)) {
-        restoredCup = DomesticCup.create(
-          league: restoredCup.league,
-          season: restoredCup.season,
-          playerClub: loadedPlayer.club,
-          leagueDivisions: restoredLeagueDivisions,
-        );
+      final clubLeague = Clubs.leagueOf(loadedPlayer.club);
+      // После смены клуба старый кубок не должен оставаться в сохранении.
+      // При несовпадении сезона, лиги или участников создаём кубок заново.
+      if (clubLeague == null ||
+          restoredCup.season != currentSeason ||
+          restoredCup.league != clubLeague ||
+          !restoredCup.teams.contains(loadedPlayer.club) ||
+          (restoredCup.teams.length == 16 &&
+              LeagueDivisionService.hasSecondDivision(restoredCup.league) &&
+              restoredCup.matches.every((match) => !match.isPlayed))) {
+        restoredCup = clubLeague == null
+            ? null
+            : DomesticCup.create(
+                league: clubLeague,
+                season: currentSeason,
+                playerClub: loadedPlayer.club,
+                leagueDivisions: restoredLeagueDivisions,
+              );
       }
     } else {
       final clubLeague = Clubs.leagueOf(loadedPlayer.club);
@@ -766,7 +806,6 @@ class Career {
 
     final rawEuropaLeague = json['europaLeague'];
     final rawWorldCup = json['worldCup'];
-    final currentSeason = (json['season'] as num?)?.toInt() ?? 1;
     final europaStandings =
         LeagueSeasonSimulator.europaLeagueSlots.keys.every(
           europeanLeagueStandings.containsKey,
@@ -2102,11 +2141,19 @@ class Career {
           : leagueDivisions,
       season: season,
     );
-    final currentLeague = Clubs.leagueOf(player.club);
+    // Таблица относится к клубу, за который игрок завершил предыдущий
+    // сезон, а не к новому клубу после трансфера.
+    final archivedCurrentSeason = newHistory
+        .where((stats) => stats.season == season)
+        .toList();
+    final seasonClub = archivedCurrentSeason.isEmpty
+        ? player.club
+        : archivedCurrentSeason.last.club;
+    final currentLeague = Clubs.leagueOf(seasonClub);
     final currentDivision = currentLeague == null
         ? 1
         : LeagueDivisionService.divisionForClub(
-              player.club,
+              seasonClub,
               leagueDivisions,
             ) ??
             1;
@@ -2127,9 +2174,6 @@ class Career {
       for (final entry in europeanLeagueStandings.entries)
         entry.key: List<LeagueTableEntry>.from(entry.value),
     };
-    final archivedCurrentSeason = newHistory
-        .where((stats) => stats.season == season)
-        .toList();
     final previousClub = archivedCurrentSeason.isEmpty
         ? null
         : archivedCurrentSeason.last;
