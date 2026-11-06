@@ -101,6 +101,7 @@ class LeagueDivisionService {
   static Map<String, List<LeagueTableEntry>> simulateAllDivisions({
     required Map<String, List<String>> divisions,
     required int season,
+    int? roundsToSimulate,
   }) {
     final result = <String, List<LeagueTableEntry>>{};
     for (final league in League.values) {
@@ -117,7 +118,10 @@ class LeagueDivisionService {
           season * 100000 + league.index * 7919 + division * 104729,
         );
         var updated = table;
-        for (final match in fixtures) {
+        for (final match in fixtures.where(
+          (fixture) =>
+              roundsToSimulate == null || fixture.round <= roundsToSimulate,
+        )) {
           final homeStrength = Clubs.getByName(match.homeTeam).strength;
           final awayStrength = Clubs.getByName(match.awayTeam).strength;
           final homeGoals = _generateGoals(random, homeStrength, awayStrength);
