@@ -2332,7 +2332,9 @@ class Career {
       leagueDivisions: newLeagueDivisions,
     );
 
-    // Пресса освещает не только клуб игрока, но и результаты других лиг.
+    // Новости должны брать таблицу именно того дивизиона,
+    // в котором клуб провёл завершившийся сезон. qualificationStandings
+    // содержит только высшие дивизионы и не подходит для Serie B / Ligue 2.
     final currentPlayerLeague = Clubs.leagueOf(newPlayer.club);
     final otherLeagues =
         League.values.where((league) => league != currentPlayerLeague).toList()
@@ -2341,31 +2343,55 @@ class Career {
       if (currentPlayerLeague != null) currentPlayerLeague,
       ...otherLeagues.take(3),
     ];
-    final leagueNews = newsLeagues
-        .map((league) {
-          final table =
-              [
-                ...(qualificationStandings[league] ??
-                    const <LeagueTableEntry>[]),
-              ]..sort(
-                (a, b) => b.points != a.points
-                    ? b.points.compareTo(a.points)
-                    : b.goalDifference.compareTo(a.goalDifference),
-              );
-          if (table.isEmpty) return null;
-          final champion = table.first.club;
-          return CareerNews(
-            id: 'league_result_s${newSeason}_${league.name}',
+
+    String divisionDisplayName(League league, int division) {
+      if (division == 1) return league.displayName;
+      return switch (league) {
+        League.england => 'Championship',
+        League.spain => 'Segunda División',
+        League.germany => '2. Bundesliga',
+        League.italy => 'Serie B',
+        League.france => 'Ligue 2',
+        League.russia => 'Первая лига',
+        _ => '${league.displayName} — второй дивизион',
+      };
+    }
+
+    final leagueNews = <CareerNews>[];
+    for (final league in newsLeagues) {
+      final playerLeague = league == currentPlayerLeague;
+      final divisionsToCover = playerLeague &&
+              LeagueDivisionService.hasSecondDivision(league)
+          ? const [1, 2]
+          : const [1];
+
+      for (final division in divisionsToCover) {
+        final table = [
+          ...(finalDivisionTables[
+                  LeagueDivisionService.key(league, division)] ??
+              const <LeagueTableEntry>[]),
+        ]..sort(
+            (a, b) => b.points != a.points
+                ? b.points.compareTo(a.points)
+                : b.goalDifference.compareTo(a.goalDifference),
+          );
+        if (table.isEmpty) continue;
+
+        final champion = table.first.club;
+        final competitionName = divisionDisplayName(league, division);
+        leagueNews.add(
+          CareerNews(
+            id: 'league_result_s${newSeason}_${league.name}_d$division',
             season: newSeason,
             matchNumber: 0,
-            title: 'Итоги сезона в ${league.displayName}',
+            title: 'Итоги сезона в $competitionName',
             description:
-                '$champion завершил предыдущий сезон на первом месте и стал чемпионом лиги.',
+                '$champion завершил предыдущий сезон на первом месте и стал чемпионом $competitionName.',
             type: CareerNewsType.season,
-          );
-        })
-        .whereType<CareerNews>()
-        .toList();
+          ),
+        );
+      }
+    }
 
     final divisionNews = <CareerNews>[];
     for (final league in LeagueDivisionService.twoTierLeagues) {
@@ -2381,19 +2407,21 @@ class Career {
 
       final playerWasPromoted = promoted.contains(newPlayer.club);
       final playerWasRelegated = relegated.contains(newPlayer.club);
+      final topName = divisionDisplayName(league, 1);
+      final secondName = divisionDisplayName(league, 2);
       divisionNews.add(
         CareerNews(
           id: 'division_movement_s${newSeason}_${league.name}',
           season: newSeason,
           matchNumber: 0,
           title: playerWasPromoted
-              ? 'Повышение в высший дивизион!'
+              ? 'Повышение в $topName!'
               : playerWasRelegated
-                  ? 'Клуб вылетел во второй дивизион'
-                  : 'Повышение и вылет в ${league.displayName}',
+                  ? 'Клуб вылетел в $secondName'
+                  : 'Повышение и вылет: $topName',
           description:
-              'В высший дивизион вышли: ${promoted.join(', ')}. '
-              'Во второй дивизион вылетели: ${relegated.join(', ')}.',
+              'В $topName вышли из $secondName: ${promoted.join(', ')}. '
+              'Из $topName во $secondName вылетели: ${relegated.join(', ')}.',
           type: CareerNewsType.season,
         ),
       );
