@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_football/models/club.dart';
+import 'package:flutter_football/models/cup_match.dart';
 import 'package:flutter_football/models/domestic_cup.dart';
 import 'package:flutter_football/models/league_division_service.dart';
 import 'package:flutter_football/models/league_table.dart';
@@ -94,32 +95,55 @@ void main() {
       expect(nextSecond.length, second.length);
     });
 
-    test('national cup for a two-tier league starts at 1/16 final', () {
+    test('national cups for all two-tier leagues start at 1/16 final', () {
       final divisions = LeagueDivisionService.createInitialDivisions();
-      final playerClub =
-          divisions[LeagueDivisionService.key(League.england, 2)]!.first;
-      final cup = DomesticCup.create(
-        league: League.england,
-        season: 1,
-        playerClub: playerClub,
-        leagueDivisions: divisions,
-        seed: 42,
-      );
+      const expectedStages = [
+        '1/16 финала',
+        '1/8 финала',
+        'Четвертьфинал',
+        'Полуфинал',
+        'Финал',
+      ];
 
-      expect(cup.teams.length, 32);
-      expect(cup.teams.toSet().length, 32);
-      expect(
-        cup.teams,
-        containsAll(divisions[LeagueDivisionService.key(League.england, 1)]!),
-      );
-      expect(
-        cup.teams.where(
-          divisions[LeagueDivisionService.key(League.england, 2)]!.contains,
-        ).length,
-        12,
-      );
-      expect(cup.currentRoundMatches.length, 16);
-      expect(cup.roundName, '1/16 финала');
+      for (final league in LeagueDivisionService.twoTierLeagues) {
+        final firstDivision =
+            divisions[LeagueDivisionService.key(league, 1)]!;
+        final secondDivision =
+            divisions[LeagueDivisionService.key(league, 2)]!;
+        var cup = DomesticCup.create(
+          league: league,
+          season: 1,
+          playerClub: secondDivision.first,
+          leagueDivisions: divisions,
+          seed: 42,
+        );
+
+        expect(cup.teams.length, 32, reason: league.name);
+        expect(cup.teams.toSet().length, 32, reason: league.name);
+        expect(cup.teams, containsAll(firstDivision), reason: league.name);
+        expect(
+          cup.teams.where(secondDivision.contains).length,
+          12,
+          reason: league.name,
+        );
+        expect(cup.currentRoundMatches.length, 16, reason: league.name);
+
+        for (final stage in expectedStages) {
+          expect(cup.roundName, stage, reason: '${league.name}: $stage');
+          final stageMatches = List<CupMatch>.from(cup.currentRoundMatches);
+          for (final match in stageMatches) {
+            cup = cup.recordResult(
+              matchId: match.id,
+              homeGoals: 1,
+              awayGoals: 0,
+            );
+          }
+          if (stage != expectedStages.last) {
+            cup = cup.advanceRound(seed: 42);
+          }
+        }
+        expect(cup.isFinished, isTrue, reason: league.name);
+      }
     });
 
     test('national cup format remains unchanged outside the six leagues', () {
