@@ -123,8 +123,9 @@ void main() {
     });
 
     test('starting a new season after a cross-league transfer rebuilds every club calendar', () {
-      final career = createTestCareer(season: 8).copyWith(
-        player: createTestCareer(season: 8).player.copyWith(club: 'Chelsea'),
+      final completedSeason = createTestCareer(season: 8).archiveCurrentSeason();
+      final career = completedSeason.copyWith(
+        player: completedSeason.player.copyWith(club: 'Chelsea'),
       );
 
       final nextSeason = career.startNextSeason();
@@ -154,11 +155,12 @@ void main() {
         isFalse,
       );
       expect(nextSeason.leagueTable.any((entry) => entry.club == 'Chelsea'), isTrue);
-      expect(nextSeason.developmentPoints, greaterThan(career.developmentPoints));
+      expect(career.developmentPoints, greaterThan(0));
+      expect(nextSeason.developmentPoints, career.developmentPoints);
     });
 
     test('loading a save with a new club and previous club calendar repairs season data', () {
-      final original = createTestCareer(season: 9);
+      final original = createTestCareer(season: 9).archiveCurrentSeason();
       final transferred = original.copyWith(
         player: original.player.copyWith(club: 'Chelsea'),
       );
