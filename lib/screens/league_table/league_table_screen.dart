@@ -65,7 +65,7 @@ class LeagueTableScreen extends StatelessWidget {
             AppStrings.leagueTable,
             style: const TextStyle(fontWeight: FontWeight.w900),
           ),
-          bottom: const TabBar(
+          bottom: TabBar(
             indicatorColor: green,
             labelColor: green,
             unselectedLabelColor: Colors.white70,
