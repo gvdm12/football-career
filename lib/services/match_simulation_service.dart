@@ -105,15 +105,40 @@ class MatchSimulationService {
       return fallbackTable;
     }
 
-    final clubs = LeagueDivisionService.clubsFor(league, division, divisions);
-    final opponents = clubs
-        .where((club) => club.name != playerClub)
-        .map((club) => club.name)
+    // Состав дивизиона из сохранения важнее базового дивизиона клуба:
+    // после повышения/вылета клуб может сменить уровень между сезонами.
+    final actualDivision =
+        LeagueDivisionService.divisionForClub(playerClub, divisions) ??
+        division;
+    final clubs = LeagueDivisionService.clubsFor(
+      league,
+      actualDivision,
+      divisions,
+    );
+    final divisionClubs = clubs.map((club) => club.name).toSet();
+
+    // Не строим таблицу с клубом, отсутствующим в выбранном дивизионе.
+    if (!divisionClubs.contains(playerClub)) {
+      return fallbackTable;
+    }
+
+    final opponents = divisionClubs
+        .where((club) => club != playerClub)
         .toList();
 
     var table = LeagueTable.create(playerClub, opponents);
 
-    final playedFixtures = fixtures.where((fixture) => fixture.isPlayed).toList()
+    // Защита от старых/рассинхронизированных сохранений: в таблицу попадают
+    // только матчи между двумя клубами текущего дивизиона.
+    final playedFixtures = fixtures
+        .where(
+          (fixture) =>
+              fixture.isPlayed &&
+              fixture.homeTeam != fixture.awayTeam &&
+              divisionClubs.contains(fixture.homeTeam) &&
+              divisionClubs.contains(fixture.awayTeam),
+        )
+        .toList()
       ..sort((a, b) {
         final roundComparison = a.round.compareTo(b.round);
         if (roundComparison != 0) return roundComparison;
