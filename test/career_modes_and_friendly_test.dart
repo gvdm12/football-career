@@ -74,7 +74,6 @@ void main() {
                 .where((match) => match.round == round)
                 .toList();
             for (final match in roundMatches) {
-              final playerIsHome = match.homeTeam == playerClub;
               final playerIsAway = match.awayTeam == playerClub;
               cup = cup.recordResult(
                 matchId: match.id,
