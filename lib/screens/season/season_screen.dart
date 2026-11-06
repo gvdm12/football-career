@@ -4915,9 +4915,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
         }).toList() ??
         <CupMatch>[];
 
+    final cupTotalRounds = cup?.totalRounds ?? 4;
+
     if (totalLeagueMatches > 0) {
       for (final match in cupMatches) {
-        final progress = cup.totalRounds == 5
+        final progress = cupTotalRounds == 5
             ? 0.15 + (match.round - 1) * 0.20
             : switch (match.round) {
                 1 => 0.15,
