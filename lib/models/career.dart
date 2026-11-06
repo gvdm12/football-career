@@ -700,10 +700,23 @@ class Career {
 
     final rawCup = json['domesticCup'];
 
-    final DomesticCup? restoredCup;
+    DomesticCup? restoredCup;
 
     if (rawCup is Map) {
       restoredCup = DomesticCup.fromJson(Map<String, dynamic>.from(rawCup));
+
+      // Миграция старых сохранений: раньше кубки этих лиг создавались на 16 команд.
+      // Пересоздаём сетку только до первого сыгранного матча, чтобы не терять результаты.
+      if (restoredCup.teams.length == 16 &&
+          LeagueDivisionService.hasSecondDivision(restoredCup.league) &&
+          restoredCup.matches.every((match) => !match.isPlayed)) {
+        restoredCup = DomesticCup.create(
+          league: restoredCup.league,
+          season: restoredCup.season,
+          playerClub: loadedPlayer.club,
+          leagueDivisions: restoredLeagueDivisions,
+        );
+      }
     } else {
       final clubLeague = Clubs.leagueOf(loadedPlayer.club);
 
