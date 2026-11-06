@@ -54,7 +54,7 @@ void main() {
             LeagueTableEntry(
               club: club,
               played: 46,
-              wins: club == second[0] ? 35 : club == second[1] ? 33 : 10,
+              wins: club == second[0] ? 35 : club == second[1] ? 33 : club == second[2] ? 31 : 10,
               draws: 0,
               losses: 0,
               goalsFor: 60,
@@ -70,10 +70,10 @@ void main() {
       final nextTop = next[LeagueDivisionService.key(League.england, 1)]!;
       final nextSecond = next[LeagueDivisionService.key(League.england, 2)]!;
 
-      expect(nextTop, containsAll(second.take(2)));
+      expect(nextTop, containsAll(second.take(3)));
       expect(nextTop, isNot(contains(top[top.length - 1])));
       expect(nextTop, isNot(contains(top[top.length - 2])));
-      expect(nextSecond, containsAll(top.skip(top.length - 2)));
+      expect(nextSecond, containsAll(top.skip(top.length - 3)));
       expect(nextTop.length, top.length);
       expect(nextSecond.length, second.length);
     });
