@@ -4760,13 +4760,9 @@ class _SeasonScreenState extends State<SeasonScreen> {
     final isHome = match.homeTeam == playerClub;
     final opponent = isHome ? match.awayTeam : match.homeTeam;
 
-    final stage = switch (match.round) {
-      1 => AppStrings.cupStageName(1),
-      2 => AppStrings.cupStageName(2),
-      3 => AppStrings.cupStageName(3),
-      4 => AppStrings.cupStageName(4),
-      _ => AppStrings.nationalCup,
-    };
+    final stage = career.domesticCup == null
+        ? AppStrings.nationalCup
+        : AppStrings.tournamentStageName(career.domesticCup!.roundName);
 
     final playerColor = ClubColors.primary(playerClub);
     final opponentColor = ClubColors.primary(opponent);
