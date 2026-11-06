@@ -11,6 +11,7 @@ import 'package:flutter_football/screens/home/home_screen.dart';
 import 'package:flutter_football/screens/match/match_screen.dart';
 import 'package:flutter_football/screens/season/season_screen.dart';
 import 'package:flutter_football/services/app_strings.dart';
+import 'package:flutter_football/widgets/liquid_glass.dart';
 import 'package:flutter_svg/svg.dart';
 
 class PlayerScreen extends StatefulWidget {
@@ -725,33 +726,34 @@ class _PlayerScreenState extends State<PlayerScreen> {
     String? subtitle,
     required Widget child,
   }) {
-    return Container(
-      width: double.infinity,
+    return LiquidGlass(
+      radius: 20,
       padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.075),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.13)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              color: Color(0xFF8BE07F),
-              fontSize: 11,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.8,
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                color: Color(0xFF8BE07F),
+                fontSize: 11,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0.8,
+              ),
             ),
-          ),
-          if (subtitle != null) ...[
-            const SizedBox(height: 5),
-            Text(subtitle, style: const TextStyle(color: Colors.white54, fontSize: 11)),
+            if (subtitle != null) ...[
+              const SizedBox(height: 5),
+              Text(
+                subtitle,
+                style: const TextStyle(color: Colors.white54, fontSize: 11),
+              ),
+            ],
+            const SizedBox(height: 14),
+            child,
           ],
-          const SizedBox(height: 14),
-          child,
-        ],
+        ),
       ),
     );
   }
@@ -881,7 +883,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(stats.club, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-                  const Divider(color: Color(0x332FFFFFFF), height: 18),
+                  const Divider(color: Color(0x33FFFFFF), height: 18),
                   Row(
                     children: [
                       Expanded(child: _CareerHistoryStat(label: AppStrings.matches, value: '${stats.matches}')),
