@@ -216,9 +216,15 @@ class LeagueTableScreen extends StatelessWidget {
         europaSlots != null &&
         position >= europaSlots.$1 &&
         position < europaSlots.$1 + europaSlots.$2;
-    final promotionPosition = isSecondDivision && position <= 2;
+    final movementPlaces = league == null
+        ? 2
+        : LeagueDivisionService.movementPlaces(league);
+    final promotionPosition =
+        isSecondDivision && position <= movementPlaces;
     final relegationPosition =
-        isTwoTierLeague && !isSecondDivision && position > table.length - 2;
+        isTwoTierLeague &&
+        !isSecondDivision &&
+        position > table.length - movementPlaces;
 
     final qualificationColor = qualifiesForChampionsLeague || promotionPosition
         ? const Color(0xFF42A5F5)
