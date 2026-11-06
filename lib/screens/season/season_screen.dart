@@ -4917,13 +4917,15 @@ class _SeasonScreenState extends State<SeasonScreen> {
 
     if (totalLeagueMatches > 0) {
       for (final match in cupMatches) {
-        final progress = switch (match.round) {
-          1 => 0.15,
-          2 => 0.40,
-          3 => 0.65,
-          4 => 0.85,
-          _ => 0.50,
-        };
+        final progress = cup.totalRounds == 5
+            ? 0.15 + (match.round - 1) * 0.20
+            : switch (match.round) {
+                1 => 0.15,
+                2 => 0.40,
+                3 => 0.65,
+                4 => 0.85,
+                _ => 0.50,
+              };
 
         final position = (totalLeagueMatches * progress).clamp(
           1.0,
