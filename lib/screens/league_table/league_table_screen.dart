@@ -45,14 +45,10 @@ class LeagueTableScreen extends StatelessWidget {
     );
     final firstDivisionTable = career.currentLeagueDivision == 1
         ? career.leagueTable
-        : simulatedTables[
-                LeagueDivisionService.key(league, 1)] ??
-            const [];
+        : simulatedTables[LeagueDivisionService.key(league, 1)] ?? const [];
     final secondDivisionTable = career.currentLeagueDivision == 2
         ? career.leagueTable
-        : simulatedTables[
-                LeagueDivisionService.key(league, 2)] ??
-            const [];
+        : simulatedTables[LeagueDivisionService.key(league, 2)] ?? const [];
 
     return DefaultTabController(
       length: 2,
@@ -70,8 +66,12 @@ class LeagueTableScreen extends StatelessWidget {
             labelColor: green,
             unselectedLabelColor: Colors.white70,
             tabs: [
-              Tab(text: AppStrings.isEnglish ? 'First Division' : 'Первая лига'),
-              Tab(text: AppStrings.isEnglish ? 'Second Division' : 'Вторая лига'),
+              Tab(
+                text: AppStrings.isEnglish ? 'First Division' : 'Первая лига',
+              ),
+              Tab(
+                text: AppStrings.isEnglish ? 'Second Division' : 'Вторая лига',
+              ),
             ],
           ),
         ),
@@ -79,9 +79,9 @@ class LeagueTableScreen extends StatelessWidget {
           children: [
             Positioned.fill(
               child: Opacity(
-                opacity: 0.20,
+                opacity: 0.65,
                 child: Image.asset(
-                  'assets/images/uclfon.png',
+                  'assets/images/tablefon.png',
                   fit: BoxFit.cover,
                 ),
               ),
@@ -100,11 +100,7 @@ class LeagueTableScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTable(
-    List<dynamic> table,
-    int division,
-    bool hasTwoDivisions,
-  ) {
+  Widget _buildTable(List<dynamic> table, int division, bool hasTwoDivisions) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(10),
       child: Column(
@@ -136,9 +132,7 @@ class LeagueTableScreen extends StatelessWidget {
       return Wrap(
         spacing: 12,
         runSpacing: 6,
-        children: [
-          _legendItem(const Color(0xFF42A5F5), 'Повышение'),
-        ],
+        children: [_legendItem(const Color(0xFF42A5F5), 'Повышение')],
       );
     }
     return Wrap(
@@ -279,12 +273,12 @@ class LeagueTableScreen extends StatelessWidget {
         : LeagueDivisionService.movementPlaces(league);
     final promotionPosition =
         hasTwoDivisions && isSecondDivision && position <= movementPlaces;
-    final relegationPosition = hasTwoDivisions &&
+    final relegationPosition =
+        hasTwoDivisions &&
         !isSecondDivision &&
         position > tableLength - movementPlaces;
 
-    final qualificationColor =
-        qualifiesForChampionsLeague || promotionPosition
+    final qualificationColor = qualifiesForChampionsLeague || promotionPosition
         ? const Color(0xFF42A5F5)
         : qualifiesForEuropaLeague
         ? const Color(0xFFFFA726)
