@@ -395,6 +395,22 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
 
                 const SizedBox(height: 10),
 
+                Text(
+                  AppStrings.startingClub,
+                  style: const TextStyle(
+                    color: green,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                _buildClubSelector(),
+
+                const SizedBox(height: 20),
+
                 Container(
                   margin: const EdgeInsets.only(bottom: 6),
                   padding: const EdgeInsets.symmetric(
@@ -576,22 +592,6 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                   ),
                 ],
 
-                Text(
-                  AppStrings.startingClub,
-                  style: const TextStyle(
-                    color: green,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1,
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-
-                _buildClubSelector(),
-
-                const SizedBox(height: 20),
-
                 SizedBox(
                   width: double.infinity,
                   height: 58,
@@ -704,6 +704,19 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
     );
   }
 
+  String _clubDetails(Club club) {
+    final country = LanguageService.isEnglish
+        ? club.league.displayName
+        : club.league.countryName;
+    final division = AppStrings.isEnglish
+        ? 'Division ${club.division}'
+        : '${club.division}-й дивизион';
+    final strength = AppStrings.isEnglish
+        ? 'Strength ${club.strength}'
+        : 'Сила ${club.strength}';
+    return '$country • $division • $strength';
+  }
+
   Widget _buildClubSelector() {
     final club = Clubs.getByName(selectedClub!);
 
@@ -755,7 +768,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${LanguageService.isEnglish ? club.league.displayName : club.league.countryName} • ${AppStrings.isEnglish ? 'Strength' : 'Сила'} ${club.strength}',
+                    '${_clubDetails(club)}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -1100,7 +1113,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                                             ),
                                             const SizedBox(height: 4),
                                             Text(
-                                              '${AppStrings.isEnglish ? 'Club strength' : 'Сила клуба'}: ${club.strength}',
+                                              '${_clubDetails(club)}',
                                               style: const TextStyle(
                                                 color: Colors.white54,
                                                 fontSize: 10,
