@@ -96,6 +96,8 @@ class AccountService {
   }
 
   static Future<bool> isDeveloper() async {
+    // Гостевой режим продолжает работать без подключённого Firebase.
+    if (!FirebaseService.isInitialized) return false;
     return isDeveloperRole(await accountRole());
   }
 
