@@ -36,6 +36,10 @@ enum FCPointsPurchaseResult {
 
 class FCPointsService {
   static const String _storageKey = 'fc_points_profile_v1';
+  static const int maxBalance = 99999;
+  static const int _developerWelcomeBonus = 5000;
+
+  static int _clampBalance(int value) => value.clamp(0, maxBalance).toInt();
 
   /// Каждый режим покупается отдельно за FC Points.
   static const List<FCPointsShopItem> shopItems = [
@@ -72,18 +76,26 @@ class FCPointsService {
     final preferences = await SharedPreferences.getInstance();
     final raw = preferences.getString(_storageKey);
     if (raw == null) {
-      return {'balance': 0, 'claimedRewards': <String>[], 'ownedModes': <String>[]};
+      return {
+        'balance': 0,
+        'claimedRewards': <String>[],
+        'ownedModes': <String>[],
+        'claimedDeveloperBonuses': <String>[],
+      };
     }
 
     try {
       final decoded = jsonDecode(raw);
       if (decoded is! Map) {
-        return {'balance': 0, 'claimedRewards': <String>[], 'ownedModes': <String>[]};
+        return {
+          'balance': 0,
+          'claimedRewards': <String>[],
+          'ownedModes': <String>[],
+          'claimedDeveloperBonuses': <String>[],
+        };
       }
       return {
-        'balance': ((decoded['balance'] as num?)?.toInt() ?? 0)
-            .clamp(0, 1 << 31)
-            .toInt(),
+        'balance': _clampBalance((decoded['balance'] as num?)?.toInt() ?? 0),
         'claimedRewards': (decoded['claimedRewards'] as List?)
                 ?.whereType<String>()
                 .toList() ??
@@ -92,10 +104,49 @@ class FCPointsService {
                 ?.whereType<String>()
                 .toList() ??
             <String>[],
+        'claimedDeveloperBonuses':
+            (decoded['claimedDeveloperBonuses'] as List?)
+                ?.whereType<String>()
+                .toList() ??
+            <String>[],
       };
     } catch (_) {
-      return {'balance': 0, 'claimedRewards': <String>[], 'ownedModes': <String>[]};
+      return {
+        'balance': 0,
+        'claimedRewards': <String>[],
+        'ownedModes': <String>[],
+        'claimedDeveloperBonuses': <String>[],
+      };
     }
+  }
+
+  /// Однократно начисляет аккаунту разработчика стартовые 5000 FC Points.
+  /// UID фиксируется в том же локальном профиле, поэтому повторные открытия
+  /// магазина и перезапуски приложения не начисляют бонус повторно.
+  static Future<void> _applyDeveloperWelcomeBonus() async {
+    if (!await AccountService.isDeveloper()) return;
+    final uid = AccountService.currentUser?.uid;
+    if (uid == null || uid.isEmpty) return;
+
+    final state = await _readState();
+    final claimed = (state['claimedDeveloperBonuses'] as List<String>).toSet();
+    if (claimed.contains(uid)) return;
+
+    claimed.add(uid);
+    final updatedState = {
+      'balance': _clampBalance(
+        (state['balance'] as int) + _developerWelcomeBonus,
+      ),
+      'claimedRewards': state['claimedRewards'],
+      'ownedModes': state['ownedModes'],
+      'claimedDeveloperBonuses': claimed.toList()..sort(),
+    };
+    final preferences = await SharedPreferences.getInstance();
+    final saved = await preferences.setString(
+      _storageKey,
+      jsonEncode(updatedState),
+    );
+    if (!saved) throw Exception('Не удалось начислить бонус FC Points');
   }
 
   static Future<Set<String>> ownedModes() async {
@@ -116,6 +167,7 @@ class FCPointsService {
   /// Списывает валюту и открывает только выбранный режим.
   /// Баланс и покупка записываются одним обновлением профиля.
   static Future<FCPointsPurchaseResult> purchaseMode(String modeId) async {
+    await _applyDeveloperWelcomeBonus();
     FCPointsShopItem? item;
     for (final candidate in shopItems) {
       if (candidate.id == modeId) {
@@ -154,6 +206,7 @@ class FCPointsService {
   }
 
   static Future<int> balance() async {
+    await _applyDeveloperWelcomeBonus();
     final state = await _readState();
     return state['balance'] as int;
   }
@@ -161,6 +214,7 @@ class FCPointsService {
   /// Начисляет награду за завершённый сезон один раз на конкретную карьеру.
   /// Повторный вызов безопасен, в том числе после повторного открытия экрана.
   static Future<int> awardSeason(Career career) async {
+    await _applyDeveloperWelcomeBonus();
     final seasonStats = career.history.where(
       (item) => item.season == career.season,
     );
@@ -205,9 +259,10 @@ class FCPointsService {
 
     claimed.add(rewardId);
     final updatedState = {
-      'balance': (state['balance'] as int) + reward,
+      'balance': _clampBalance((state['balance'] as int) + reward),
       'claimedRewards': claimed.toList()..sort(),
       'ownedModes': state['ownedModes'],
+      'claimedDeveloperBonuses': state['claimedDeveloperBonuses'],
     };
     final preferences = await SharedPreferences.getInstance();
     final saved = await preferences.setString(
