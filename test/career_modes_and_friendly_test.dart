@@ -154,16 +154,22 @@ void main() {
   });
 
   group('Career modes', () {
-    test('five-season transfer limit blocks early club changes', () {
+    test('five-year transfer windows open only in seasons 5, 10 and 15', () {
       final career = createTestCareer(
         settings: const CareerSettings(limitTransfersToFiveYears: true),
-        season: 4,
-      ).copyWith(lastClubChangeSeason: 1);
+        season: 1,
+      );
 
-      expect(career.canChangeClub, isFalse);
-      expect(career.seasonsUntilClubChange, 2);
-      expect(career.copyWith(contractYears: 0).canChangeClub, isFalse);
-      expect(career.copyWith(season: 6).canChangeClub, isTrue);
+      expect(career.copyWith(season: 4).canChangeClub, isFalse);
+      expect(career.copyWith(season: 4).seasonsUntilClubChange, 1);
+      expect(career.copyWith(season: 5).canChangeClub, isTrue);
+      expect(career.copyWith(season: 6).canChangeClub, isFalse);
+      expect(career.copyWith(season: 9).seasonsUntilClubChange, 1);
+      expect(career.copyWith(season: 10).canChangeClub, isTrue);
+      expect(career.copyWith(season: 11).canChangeClub, isFalse);
+      expect(career.copyWith(season: 14).seasonsUntilClubChange, 1);
+      expect(career.copyWith(season: 15).canChangeClub, isTrue);
+      expect(career.copyWith(season: 16).canChangeClub, isFalse);
     });
 
     test('five-season transfer cooldown survives starting the next season', () {

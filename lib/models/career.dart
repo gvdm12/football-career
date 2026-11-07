@@ -112,21 +112,18 @@ class Career {
   int get currentFormLevel =>
       ((currentFormRating - 6.5) * 2).round().clamp(-3, 3).toInt();
 
-  // Стартовый клуб считается первым клубом карьеры: при включённом
-  // ограничении первая смена клуба доступна только в 5-м сезоне.
-  // После каждого реального перехода отсчёт пяти сезонов начинается заново.
+  // В пятилетнем режиме трансферные окна строго привязаны к сезонам
+  // 5, 10 и 15. Открытие окна не зависит от того, сменил ли игрок клуб
+  // в прошлый раз: пропущенное окно не должно повторяться в следующем сезоне.
   bool get canChangeClub {
     if (!settings.limitTransfersToFiveYears) return true;
-    if (lastClubChangeSeason <= 0) return season >= 5;
-    return season - lastClubChangeSeason >= 5;
+    return season >= 5 && season % 5 == 0;
   }
 
   int get seasonsUntilClubChange {
     if (canChangeClub) return 0;
-    final seasonsPassed = lastClubChangeSeason <= 0
-        ? season
-        : season - lastClubChangeSeason;
-    return (5 - seasonsPassed).clamp(0, 5).toInt();
+    if (season < 5) return 5 - season;
+    return 5 - (season % 5);
   }
 
   Player get playerForMatch {
