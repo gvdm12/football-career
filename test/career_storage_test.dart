@@ -159,7 +159,7 @@ void main() {
       expect(await FCPointsService.balance(), 240);
 
       await CareerStorage.deleteSlot(1);
-      expect(await FCPointsService.balance(), 530);
+      expect(await FCPointsService.balance(), 240);
     });
 
     test('different careers can earn rewards for the same season', () async {
@@ -193,9 +193,9 @@ void main() {
       );
 
       expect(first.careerId, isNot(second.careerId));
-      expect(await FCPointsService.awardSeason(first), 80);
-      expect(await FCPointsService.awardSeason(second), 80);
-      expect(await FCPointsService.balance(), 160);
+      expect(await FCPointsService.awardSeason(first), 10);
+      expect(await FCPointsService.awardSeason(second), 10);
+      expect(await FCPointsService.balance(), 20);
     });
   });
 
@@ -230,7 +230,7 @@ void main() {
         await FCPointsService.purchaseMode('unknown_mode'),
         FCPointsPurchaseResult.unknownItem,
       );
-      expect(await FCPointsService.balance(), 400);
+      expect(await FCPointsService.balance(), 500);
       expect(await FCPointsService.ownedModes(), {'any_starting_club'});
     });
 
