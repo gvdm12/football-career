@@ -1,22 +1,26 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/widgets/club_logo.dart';
 
 void main() {
-  test('для всех клубов есть безопасный вариант эмблемы или fallback', () {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  test('все эмблемы из справочника загружаются из локальных assets', () async {
     expect(Clubs.all.length, 352);
     expect(ClubLogo.mappedClubCount, 349);
+
     for (final club in Clubs.all) {
-      // null означает, что будет показан fallback, а не чужая эмблема.
-      final url = ClubLogo.logoUrlFor(club.name);
-      if (url != null) {
-        expect(url, startsWith('https://raw.githubusercontent.com/JoseArroyave/football-logos/'));
-        expect(url, endsWith('.svg'));
+      final assetPath = ClubLogo.assetPathFor(club.name);
+      if (assetPath != null) {
+        expect(assetPath, startsWith('assets/clubs/'));
+        expect(assetPath, endsWith('.svg'));
+        await rootBundle.load(assetPath);
       }
     }
   });
 
-  test('неизвестный клуб не получает случайную эмблему', () {
-    expect(ClubLogo.logoUrlFor('Unknown FC'), isNull);
+  test('неизвестный клуб не получает чужую эмблему', () {
+    expect(ClubLogo.assetPathFor('Unknown FC'), isNull);
   });
 }
