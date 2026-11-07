@@ -31,22 +31,28 @@ Firebase client config не является паролем или приват�
 через приложение можно только с ролью `player`. Изменить роль на `developer`
 может только владелец Firebase-проекта через консоль.
 
-## 4. Запустить приложение
+## 4. Запустить Android-приложение
 
-В PowerShell из корня проекта выполните команду, подставив значения своего
-Firebase-проекта:
+1. Скачайте `google-services.json` из Firebase Console.
+2. Положите его в `android/app/google-services.json`.
+3. В Firebase Console убедитесь, что включён Authentication → Sign-in method →
+   Email/Password, а также создана база Cloud Firestore.
+4. Из корня проекта выполните:
 
 ```powershell
-flutter run `
-  --dart-define=FIREBASE_API_KEY=ВАШ_API_KEY `
-  --dart-define=FIREBASE_ANDROID_APP_ID=ВАШ_ANDROID_APP_ID `
-  --dart-define=FIREBASE_MESSAGING_SENDER_ID=ВАШ_SENDER_ID `
-  --dart-define=FIREBASE_PROJECT_ID=ВАШ_PROJECT_ID
+flutter clean
+flutter pub get
+flutter run
 ```
 
-Если Firebase Console показывает Auth Domain или Storage Bucket, их можно
-дополнительно передать через `FIREBASE_AUTH_DOMAIN` и
-`FIREBASE_STORAGE_BUCKET`.
+Для Android параметры Firebase читаются через Google Services Gradle plugin
+из `google-services.json`. Вручную добавлять Firebase BoM или нативные
+`implementation("com.google.firebase:...")` зависимости не нужно: FlutterFire
+подключает SDK через зависимости Flutter.
+
+Для других платформ можно передавать параметры Firebase через
+`--dart-define`, как описано ниже. Android-конфигурация через JSON уже
+поддерживается автоматически.
 
 ## 5. Назначить личный аккаунт разработчиком
 
