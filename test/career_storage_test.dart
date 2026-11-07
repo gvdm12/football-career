@@ -153,13 +153,13 @@ void main() {
       expect(await FCPointsService.balance(), 0);
       final earned = await FCPointsService.awardSeason(career);
 
-      expect(earned, 530);
-      expect(await FCPointsService.balance(), 530);
+      expect(earned, 240);
+      expect(await FCPointsService.balance(), 240);
       expect(await FCPointsService.awardSeason(career), 0);
-      expect(await FCPointsService.balance(), 530);
+      expect(await FCPointsService.balance(), 240);
 
       await CareerStorage.deleteSlot(1);
-      expect(await FCPointsService.balance(), 530);
+      expect(await FCPointsService.balance(), 240);
     });
 
     test('different careers can earn rewards for the same season', () async {
@@ -193,9 +193,9 @@ void main() {
       );
 
       expect(first.careerId, isNot(second.careerId));
-      expect(await FCPointsService.awardSeason(first), 80);
-      expect(await FCPointsService.awardSeason(second), 80);
-      expect(await FCPointsService.balance(), 160);
+      expect(await FCPointsService.awardSeason(first), 10);
+      expect(await FCPointsService.awardSeason(second), 10);
+      expect(await FCPointsService.balance(), 20);
     });
   });
 
@@ -203,7 +203,7 @@ void main() {
     test('buys modes separately and prevents repeat purchases', () async {
       SharedPreferences.setMockInitialValues({
         'fc_points_profile_v1': jsonEncode({
-          'balance': 1000,
+          'balance': 2000,
           'claimedRewards': <String>[],
         }),
       });
@@ -212,7 +212,7 @@ void main() {
         await FCPointsService.purchaseMode('any_starting_club'),
         FCPointsPurchaseResult.purchased,
       );
-      expect(await FCPointsService.balance(), 400);
+      expect(await FCPointsService.balance(), 500);
       expect(
         await FCPointsService.ownedModes(),
         {'any_starting_club'},
@@ -230,7 +230,7 @@ void main() {
         await FCPointsService.purchaseMode('unknown_mode'),
         FCPointsPurchaseResult.unknownItem,
       );
-      expect(await FCPointsService.balance(), 400);
+      expect(await FCPointsService.balance(), 500);
       expect(await FCPointsService.ownedModes(), {'any_starting_club'});
     });
 
@@ -257,8 +257,8 @@ void main() {
           ),
         ],
       );
-      expect(await FCPointsService.awardSeason(career), 80);
-      expect(await FCPointsService.balance(), 630);
+      expect(await FCPointsService.awardSeason(career), 10);
+      expect(await FCPointsService.balance(), 10);
       expect(
         await FCPointsService.ownedModes(),
         {'career_without_injuries'},
