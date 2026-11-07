@@ -49,21 +49,25 @@ class _AccountScreenState extends State<AccountScreen> {
 
   Future<void> _refreshAccount() async {
     if (!FirebaseService.isInitialized) {
-      if (mounted) setState(() {
-        _user = null;
-        _role = null;
-        _checkingRole = false;
-      });
+      if (mounted) {
+        setState(() {
+          _user = null;
+          _role = null;
+          _checkingRole = false;
+        });
+      }
       return;
     }
 
     final user = AccountService.currentUser;
     if (user == null) {
-      if (mounted) setState(() {
-        _user = null;
-        _role = null;
-        _checkingRole = false;
-      });
+      if (mounted) {
+        setState(() {
+          _user = null;
+          _role = null;
+          _checkingRole = false;
+        });
+      }
       return;
     }
 
@@ -117,7 +121,7 @@ class _AccountScreenState extends State<AccountScreen> {
     } catch (error) {
       _showMessage(
         error is StateError
-            ? error.message ?? (_en ? 'Account error' : 'Ошибка аккаунта')
+            ? error.message.toString()
             : (_en
                 ? 'Could not complete the request. Check Firebase setup.'
                 : 'Не удалось выполнить запрос. Проверь настройку Firebase.'),
