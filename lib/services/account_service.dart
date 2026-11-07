@@ -97,8 +97,13 @@ class AccountService {
 
   static Future<bool> isDeveloper() async {
     // Гостевой режим продолжает работать без подключённого Firebase.
+    // При временной ошибке сети доступ не выдаётся, но локальная игра не падает.
     if (!FirebaseService.isInitialized) return false;
-    return isDeveloperRole(await accountRole());
+    try {
+      return isDeveloperRole(await accountRole());
+    } catch (_) {
+      return false;
+    }
   }
 
   static Future<void> sendPasswordReset(String email) async {
