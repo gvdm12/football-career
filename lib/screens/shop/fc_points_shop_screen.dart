@@ -85,8 +85,10 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
                 ? '${item.titleEn} unlocked'
                 : 'Режим «${item.titleRu}» открыт',
           );
+          break;
         case FCPointsPurchaseResult.alreadyOwned:
           await _loadShop();
+          break;
         case FCPointsPurchaseResult.insufficientFunds:
           _showMessage(
             _english
