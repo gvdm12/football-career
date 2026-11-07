@@ -2006,7 +2006,7 @@ class Career {
           addBonus(SkillName.passing, 1);
         }
 
-        if (contributions >= 30) {
+        if (contributions >= 35) {
           addBonus(SkillName.dribbling, 1);
         }
 
