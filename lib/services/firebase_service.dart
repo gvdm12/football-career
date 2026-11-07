@@ -16,10 +16,15 @@ class FirebaseService {
 
   static Future<void> initialize() async {
     final options = _firebaseOptions();
-    if (options == null) return;
 
     try {
-      await Firebase.initializeApp(options: options);
+      // Android использует google-services.json через Gradle plugin.
+      // Явные параметры остаются запасным вариантом для других платформ.
+      if (options == null) {
+        await Firebase.initializeApp();
+      } else {
+        await Firebase.initializeApp(options: options);
+      }
       _initialized = true;
     } on FirebaseException {
       _initializationFailed = true;
