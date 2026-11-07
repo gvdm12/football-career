@@ -48,7 +48,7 @@ class FCPointsService {
     if (seasonStats.isEmpty) return 0;
 
     final stats = seasonStats.last;
-    final rewardId = 'undefined:season:undefined';
+    final rewardId = '${career.careerId}:season:${career.season}';
     final state = await _readState();
     final claimed = (state['claimedRewards'] as List<String>).toSet();
     if (claimed.contains(rewardId)) return 0;
@@ -64,6 +64,8 @@ class FCPointsService {
     for (final achievement in stats.achievements.toSet()) {
       reward += achievementRewards[achievement] ?? 0;
     }
+    // Дополнительная награда за завершение полной 20-сезонной карьеры.
+    if (career.season >= 20) reward += 300;
     // Дополнительная награда за завершение полной 20-сезонной карьеры.
     if (career.season >= 20) reward += 300;
 
