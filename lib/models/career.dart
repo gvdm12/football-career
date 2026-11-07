@@ -33,7 +33,11 @@ import 'transfer_offer.dart';
 import 'league_table.dart';
 import 'league_player_season_stats.dart';
 
+String _generateCareerId() =>
+    '${DateTime.now().microsecondsSinceEpoch}_${Random().nextInt(1 << 32)}';
+
 class Career {
+  final String careerId;
   final Player player;
   final CareerSettings settings;
   final List<CareerWorldTransfer> worldTransfers;
@@ -177,6 +181,7 @@ class Career {
   final Map<League, List<LeagueTableEntry>> europeanLeagueStandings;
 
   const Career({
+    this.careerId = '',
     required this.player,
     this.settings = const CareerSettings(),
     this.worldTransfers = const [],
@@ -564,6 +569,7 @@ class Career {
     );
 
     return Career(
+      careerId: _generateCareerId(),
       player: player,
       settings: settings,
       season: 1,
@@ -617,6 +623,7 @@ class Career {
 
   Map<String, dynamic> toJson() {
     return {
+      'careerId': careerId,
       'player': player.toJson(),
       'settings': settings.toJson(),
       'worldTransfers': worldTransfers.map((item) => item.toJson()).toList(),
@@ -1013,6 +1020,7 @@ class Career {
     }).toList();
 
     return Career(
+      careerId: json['careerId'] as String? ?? _generateCareerId(),
       player: loadedPlayer,
       settings: CareerSettings.fromJson(
         json['settings'] is Map
@@ -1145,6 +1153,7 @@ class Career {
   // ============================================================
 
   Career copyWith({
+    String? careerId,
     Player? player,
     CareerSettings? settings,
     List<CareerWorldTransfer>? worldTransfers,
@@ -1207,6 +1216,7 @@ class Career {
     bool clearInjury = false,
   }) {
     return Career(
+      careerId: careerId ?? this.careerId,
       player: player ?? this.player,
       settings: settings ?? this.settings,
       worldTransfers: worldTransfers ?? this.worldTransfers,
@@ -2633,6 +2643,7 @@ class Career {
         : null;
 
     return Career(
+      careerId: careerId,
       player: newPlayer,
       settings: settings,
       worldTransfers: allWorldTransfers,

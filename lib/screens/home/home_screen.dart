@@ -6,6 +6,7 @@ import 'package:flutter_football/screens/player/player_screen.dart';
 import 'package:flutter_football/screens/super_league/super_league_screen.dart';
 import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/services/career_storage.dart';
+import 'package:flutter_football/services/fc_points_service.dart';
 import 'package:flutter_football/settings/settings_screen.dart';
 import 'package:flutter_football/widgets/save_slot_sheet.dart';
 import 'package:flutter_svg/svg.dart';
@@ -22,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool _hasSavedCareer = false;
   bool _isLoading = true;
+  int _fcPointsBalance = 0;
 
   @override
   void initState() {
@@ -31,12 +33,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _checkSavedCareer() async {
     try {
-      final hasSave = await CareerStorage.hasSavedCareer();
+      final results = await Future.wait([
+        CareerStorage.hasSavedCareer(),
+        FCPointsService.balance(),
+      ]);
+      final hasSave = results[0] as bool;
+      final pointsBalance = results[1] as int;
 
       if (!mounted) return;
 
       setState(() {
         _hasSavedCareer = hasSave;
+        _fcPointsBalance = pointsBalance;
         _isLoading = false;
       });
     } catch (_) {
@@ -44,6 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       setState(() {
         _hasSavedCareer = false;
+        _fcPointsBalance = 0;
         _isLoading = false;
       });
     }
@@ -179,9 +188,29 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 10),
             child: Column(
               children: [
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: IconButton(
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.22),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: const Color(0xFFD9B65C).withValues(alpha: 0.55)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.monetization_on_rounded, color: Color(0xFFD9B65C), size: 20),
+                          const SizedBox(width: 7),
+                          Text(
+                            '$_fcPointsBalance FCP',
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
                     onPressed: _openSettings,
                     icon: SvgPicture.asset(
                       'assets/icons/settings.svg',
@@ -191,6 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     tooltip: AppStrings.settingsTooltip,
                   ),
+                  ],
                 ),
 
                 const Spacer(),
