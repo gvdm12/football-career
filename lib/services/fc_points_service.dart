@@ -77,7 +77,7 @@ class FCPointsService {
     try {
       final decoded = jsonDecode(raw);
       if (decoded is! Map) {
-        return {'balance': 0, 'claimedRewards': <String>[]};
+        return {'balance': 0, 'claimedRewards': <String>[], 'ownedModes': <String>[]};
       }
       return {
         'balance': ((decoded['balance'] as num?)?.toInt() ?? 0)
@@ -199,6 +199,7 @@ class FCPointsService {
     final updatedState = {
       'balance': (state['balance'] as int) + reward,
       'claimedRewards': claimed.toList()..sort(),
+      'ownedModes': state['ownedModes'],
     };
     final preferences = await SharedPreferences.getInstance();
     final saved = await preferences.setString(
