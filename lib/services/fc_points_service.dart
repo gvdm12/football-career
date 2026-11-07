@@ -64,6 +64,8 @@ class FCPointsService {
     for (final achievement in stats.achievements.toSet()) {
       reward += achievementRewards[achievement] ?? 0;
     }
+    // Дополнительная награда за завершение полной 20-сезонной карьеры.
+    if (career.season >= 20) reward += 300;
 
     const awardRewards = <String, int>{
       'Лучший бомбардир': 80,
