@@ -200,10 +200,17 @@ void main() {
   });
 
   group('FC Points shop', () {
+    test('career mode prices match the shop balance', () {
+      expect(
+        FCPointsService.shopItems.map((item) => item.price).toList(),
+        [4500, 2300, 1950],
+      );
+    });
+
     test('buys modes separately and prevents repeat purchases', () async {
       SharedPreferences.setMockInitialValues({
         'fc_points_profile_v1': jsonEncode({
-          'balance': 2000,
+          'balance': 5000,
           'claimedRewards': <String>[],
         }),
       });
@@ -237,7 +244,7 @@ void main() {
     test('earning FC Points does not erase purchased modes', () async {
       SharedPreferences.setMockInitialValues({
         'fc_points_profile_v1': jsonEncode({
-          'balance': 1000,
+          'balance': 2300,
           'claimedRewards': <String>[],
         }),
       });
