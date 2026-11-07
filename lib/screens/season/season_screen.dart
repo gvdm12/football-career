@@ -2860,7 +2860,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
     if (fcPointsEarned > 0 && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('+ $fcPointsEarned FC Points за сезон'),
+          content: Text(
+            AppStrings.isEnglish
+                ? '+ $fcPointsEarned FC Points earned this season'
+                : '+ $fcPointsEarned FC Points за сезон',
+          ),
           backgroundColor: const Color(0xFF174A25),
           duration: const Duration(seconds: 3),
         ),
