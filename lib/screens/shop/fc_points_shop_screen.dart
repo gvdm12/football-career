@@ -24,15 +24,51 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
   bool get _english => AppStrings.isEnglish;
 
   List<_RewardInfo> get _rewards => [
-    _RewardInfo(_english ? 'Season completed' : 'Завершение сезона', 10, Icons.flag_rounded),
-    _RewardInfo(_english ? 'League champion' : 'Чемпион лиги', 80, Icons.emoji_events_rounded),
-    _RewardInfo(_english ? 'National cup winner' : 'Обладатель кубка', 60, Icons.workspace_premium_rounded),
-    _RewardInfo(_english ? 'Europa League winner' : 'Победитель Лиги Европы', 90, Icons.verified_rounded),
-    _RewardInfo(_english ? 'Champions League winner' : 'Победитель Лиги чемпионов', 150, Icons.stars_rounded),
-    _RewardInfo(_english ? 'Golden Boot' : 'Золотая бутса', 50, Icons.sports_soccer_rounded),
-    _RewardInfo(_english ? 'Best assistant' : 'Лучший ассистент', 40, Icons.assistant_rounded),
-    _RewardInfo(_english ? 'Ballon d’Or' : 'Золотой мяч', 100, Icons.military_tech_rounded),
-    _RewardInfo(_english ? 'Full career completed' : 'Завершение всей карьеры', 50, Icons.workspace_premium_outlined),
+    _RewardInfo(
+      _english ? 'Season completed' : 'Завершение сезона',
+      10,
+      Icons.flag_rounded,
+    ),
+    _RewardInfo(
+      _english ? 'League champion' : 'Чемпион лиги',
+      80,
+      Icons.emoji_events_rounded,
+    ),
+    _RewardInfo(
+      _english ? 'National cup winner' : 'Обладатель кубка',
+      60,
+      Icons.workspace_premium_rounded,
+    ),
+    _RewardInfo(
+      _english ? 'Europa League winner' : 'Победитель Лиги Европы',
+      90,
+      Icons.verified_rounded,
+    ),
+    _RewardInfo(
+      _english ? 'Champions League winner' : 'Победитель Лиги чемпионов',
+      150,
+      Icons.stars_rounded,
+    ),
+    _RewardInfo(
+      _english ? 'Golden Boot' : 'Золотая бутса',
+      50,
+      Icons.sports_soccer_rounded,
+    ),
+    _RewardInfo(
+      _english ? 'Best assistant' : 'Лучший ассистент',
+      40,
+      Icons.assistant_rounded,
+    ),
+    _RewardInfo(
+      _english ? 'Ballon d’Or' : 'Золотой мяч',
+      100,
+      Icons.military_tech_rounded,
+    ),
+    _RewardInfo(
+      _english ? 'Full career completed' : 'Завершение всей карьеры',
+      50,
+      Icons.workspace_premium_outlined,
+    ),
   ];
 
   @override
@@ -60,8 +96,10 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: const Color(0xFF102A18),
-        title: Text(_english ? 'Confirm purchase' : 'Подтверждение покупки',
-            style: const TextStyle(color: Colors.white)),
+        title: Text(
+          _english ? 'Confirm purchase' : 'Подтверждение покупки',
+          style: const TextStyle(color: Colors.white),
+        ),
         content: Text(
           _english
               ? 'Unlock "${item.titleEn}" for ${item.price} FC Points?'
@@ -92,20 +130,33 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
             _balance -= item.price;
             _ownedModes.add(item.id);
           });
-          _showMessage(_english ? '${item.titleEn} unlocked' : 'Режим «${item.titleRu}» открыт');
+          _showMessage(
+            _english
+                ? '${item.titleEn} unlocked'
+                : 'Режим «${item.titleRu}» открыт',
+          );
           break;
         case FCPointsPurchaseResult.alreadyOwned:
           await _loadShop();
           break;
         case FCPointsPurchaseResult.insufficientFunds:
-          _showMessage(_english ? 'Not enough FC Points' : 'Недостаточно FC Points');
+          _showMessage(
+            _english ? 'Not enough FC Points' : 'Недостаточно FC Points',
+          );
           break;
         case FCPointsPurchaseResult.unknownItem:
-          _showMessage(_english ? 'This item is unavailable' : 'Покупка недоступна');
+          _showMessage(
+            _english ? 'This item is unavailable' : 'Покупка недоступна',
+          );
           break;
       }
     } catch (_) {
-      if (mounted) _showMessage(_english ? 'Could not save the purchase' : 'Не удалось сохранить покупку');
+      if (mounted)
+        _showMessage(
+          _english
+              ? 'Could not save the purchase'
+              : 'Не удалось сохранить покупку',
+        );
     } finally {
       if (mounted) setState(() => _buying.remove(item.id));
     }
@@ -113,7 +164,10 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
 
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: const Color(0xFF174A25)),
+      SnackBar(
+        content: Text(message),
+        backgroundColor: const Color(0xFF174A25),
+      ),
     );
   }
 
@@ -126,8 +180,10 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
         elevation: 0,
-        title: Text(_english ? 'FC Points Shop' : 'Магазин FC Points',
-            style: const TextStyle(fontWeight: FontWeight.w800)),
+        title: Text(
+          _english ? 'FC Points Shop' : 'Магазин FC Points',
+          style: const TextStyle(fontWeight: FontWeight.w800),
+        ),
         centerTitle: true,
       ),
       body: Stack(
@@ -161,8 +217,12 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
                     children: [
                       _buildBalanceCard(),
                       const SizedBox(height: 26),
-                      _sectionTitle(_english ? 'CAREER MODES' : 'РЕЖИМЫ КАРЬЕРЫ',
-                          _english ? 'Unlock new ways to play' : 'Открывай новые возможности'),
+                      _sectionTitle(
+                        _english ? 'CAREER MODES' : 'РЕЖИМЫ КАРЬЕРЫ',
+                        _english
+                            ? 'Unlock new ways to play'
+                            : 'Открывай новые возможности',
+                      ),
                       const SizedBox(height: 13),
                       for (final item in FCPointsService.shopItems)
                         Padding(
@@ -170,18 +230,14 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
                           child: _buildItemCard(item),
                         ),
                       const SizedBox(height: 17),
-                      _sectionTitle(_english ? 'HOW TO EARN' : 'КАК ЗАРАБОТАТЬ',
-                          _english ? 'Rewards for your achievements' : 'Награды за твои достижения'),
+                      _sectionTitle(
+                        _english ? 'HOW TO EARN' : 'КАК ЗАРАБОТАТЬ',
+                        _english
+                            ? 'Rewards for your achievements'
+                            : 'Награды за твои достижения',
+                      ),
                       const SizedBox(height: 12),
                       _buildRewardsCard(),
-                      const SizedBox(height: 16),
-                      Text(
-                        _english
-                            ? 'Each mode is purchased separately and remains unlocked for all future careers.'
-                            : 'Каждый режим покупается отдельно и остаётся открытым для всех следующих карьер.',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.white54, fontSize: 11, height: 1.5),
-                      ),
                     ],
                   ),
           ),
@@ -193,11 +249,18 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
   Widget _glow(double size, Color color) => Container(
     width: size,
     height: size,
-    decoration: BoxDecoration(shape: BoxShape.circle, color: color,
-      boxShadow: [BoxShadow(color: color, blurRadius: 80, spreadRadius: 35)]),
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      color: color,
+      boxShadow: [BoxShadow(color: color, blurRadius: 80, spreadRadius: 35)],
+    ),
   );
 
-  Widget _glass({required Widget child, EdgeInsets padding = const EdgeInsets.all(16), Color? borderColor}) {
+  Widget _glass({
+    required Widget child,
+    EdgeInsets padding = const EdgeInsets.all(16),
+    Color? borderColor,
+  }) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(22),
       child: BackdropFilter(
@@ -207,7 +270,9 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.075),
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: borderColor ?? Colors.white.withValues(alpha: 0.14)),
+            border: Border.all(
+              color: borderColor ?? Colors.white.withValues(alpha: 0.14),
+            ),
           ),
           child: child,
         ),
@@ -225,31 +290,57 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
             width: 58,
             height: 58,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [Color(0xFFF3D889), Color(0xFFB88A32)]),
+              gradient: const LinearGradient(
+                colors: [Color(0xFFF3D889), Color(0xFFB88A32)],
+              ),
               borderRadius: BorderRadius.circular(18),
-              boxShadow: [BoxShadow(color: _gold.withValues(alpha: 0.24), blurRadius: 18)],
+              boxShadow: [
+                BoxShadow(color: _gold.withValues(alpha: 0.24), blurRadius: 18),
+              ],
             ),
-            child: const Icon(Icons.monetization_on_rounded, color: Color(0xFF30220A), size: 34),
+            child: const Icon(
+              Icons.monetization_on_rounded,
+              color: Color(0xFF30220A),
+              size: 34,
+            ),
           ),
           const SizedBox(width: 15),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(_english ? 'YOUR FC POINTS' : 'ТВОИ FC POINTS',
-                    style: const TextStyle(color: Colors.white60, fontSize: 10,
-                      fontWeight: FontWeight.w900, letterSpacing: 1.4)),
+                Text(
+                  _english ? 'YOUR FC POINTS' : 'ТВОИ FC POINTS',
+                  style: const TextStyle(
+                    color: Colors.white60,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.4,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text('$_balance',
-                    style: const TextStyle(color: _gold, fontSize: 29,
-                      fontWeight: FontWeight.w900, height: 1.0)),
+                Text(
+                  '$_balance',
+                  style: const TextStyle(
+                    color: _gold,
+                    fontSize: 29,
+                    fontWeight: FontWeight.w900,
+                    height: 1.0,
+                  ),
+                ),
                 const SizedBox(height: 3),
-                Text(_english ? 'Available to spend' : 'Доступно для покупок',
-                    style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                Text(
+                  _english ? 'Available to spend' : 'Доступно для покупок',
+                  style: const TextStyle(color: Colors.white54, fontSize: 11),
+                ),
               ],
             ),
           ),
-          const Icon(Icons.account_balance_wallet_outlined, color: Colors.white38, size: 25),
+          const Icon(
+            Icons.account_balance_wallet_outlined,
+            color: Colors.white38,
+            size: 25,
+          ),
         ],
       ),
     );
@@ -258,10 +349,20 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
   Widget _sectionTitle(String title, String subtitle) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(title, style: const TextStyle(color: _green, fontSize: 12,
-        fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+      Text(
+        title,
+        style: const TextStyle(
+          color: _green,
+          fontSize: 12,
+          fontWeight: FontWeight.w900,
+          letterSpacing: 1.5,
+        ),
+      ),
       const SizedBox(height: 3),
-      Text(subtitle, style: const TextStyle(color: Colors.white54, fontSize: 11)),
+      Text(
+        subtitle,
+        style: const TextStyle(color: Colors.white54, fontSize: 11),
+      ),
     ],
   );
 
@@ -270,7 +371,9 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
     final buying = _buying.contains(item.id);
     final enough = _balance >= item.price;
     return _glass(
-      borderColor: owned ? _green.withValues(alpha: 0.48) : Colors.white.withValues(alpha: 0.12),
+      borderColor: owned
+          ? _green.withValues(alpha: 0.48)
+          : Colors.white.withValues(alpha: 0.12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -288,29 +391,58 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: Text(_english ? item.titleEn : item.titleRu,
-                  style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800)),
+                child: Text(
+                  _english ? item.titleEn : item.titleRu,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
               ),
               if (owned)
                 const Icon(Icons.check_circle_rounded, color: _green, size: 23)
               else
-                const Icon(Icons.lock_outline_rounded, color: Colors.white38, size: 21),
+                const Icon(
+                  Icons.lock_outline_rounded,
+                  color: Colors.white38,
+                  size: 21,
+                ),
             ],
           ),
           const SizedBox(height: 11),
-          Text(_english ? item.descriptionEn : item.descriptionRu,
-              style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.45)),
+          Text(
+            _english ? item.descriptionEn : item.descriptionRu,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 12,
+              height: 1.45,
+            ),
+          ),
           const SizedBox(height: 15),
           Row(
             children: [
               const Icon(Icons.monetization_on_rounded, color: _gold, size: 19),
               const SizedBox(width: 5),
-              Text('${item.price} FCP', style: const TextStyle(color: _gold,
-                fontWeight: FontWeight.w900, fontSize: 14)),
+              Text(
+                '${item.price} FCP',
+                style: const TextStyle(
+                  color: _gold,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 14,
+                ),
+              ),
               const Spacer(),
               if (owned)
-                const Text('КУПЛЕНО', style: TextStyle(color: _green,
-                  fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1))
+                const Text(
+                  'КУПЛЕНО',
+                  style: TextStyle(
+                    color: _green,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1,
+                  ),
+                )
               else
                 FilledButton(
                   onPressed: buying || !enough ? null : () => _buy(item),
@@ -318,13 +450,26 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
                     backgroundColor: _green,
                     foregroundColor: const Color(0xFF082A12),
                     disabledBackgroundColor: Colors.white12,
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 11),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 11,
+                    ),
                   ),
                   child: buying
-                      ? const SizedBox(width: 16, height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2))
-                      : Text(_english ? (enough ? 'UNLOCK' : 'NOT ENOUGH') : (enough ? 'ОТКРЫТЬ' : 'НЕ ХВАТАЕТ'),
-                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900)),
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(
+                          _english
+                              ? (enough ? 'UNLOCK' : 'NOT ENOUGH')
+                              : (enough ? 'ОТКРЫТЬ' : 'НЕ ХВАТАЕТ'),
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
                 ),
             ],
           ),
@@ -353,10 +498,24 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
                     child: Icon(_rewards[i].icon, color: _gold, size: 18),
                   ),
                   const SizedBox(width: 11),
-                  Expanded(child: Text(_rewards[i].title,
-                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600))),
-                  Text('+ ${_rewards[i].points} FCP',
-                    style: const TextStyle(color: _gold, fontSize: 12, fontWeight: FontWeight.w900)),
+                  Expanded(
+                    child: Text(
+                      _rewards[i].title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    '+ ${_rewards[i].points} FCP',
+                    style: const TextStyle(
+                      color: _gold,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
                 ],
               ),
             ),
