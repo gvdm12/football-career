@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_football/widgets/club_logo.dart';
 
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/career_settings.dart';
@@ -1215,10 +1216,11 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                                             11,
                                           ),
                                         ),
-                                        child: const Icon(
-                                          Icons.shield_outlined,
-                                          color: Colors.white,
-                                          size: 23,
+                                        child: ClubLogo(
+                                          clubName: club.name,
+                                          size: 42,
+                                          fallbackColor: club.primaryColor,
+                                          borderRadius: 11,
                                         ),
                                       ),
                                       const SizedBox(width: 12),
