@@ -306,6 +306,9 @@ class ClubLogo extends StatelessWidget {
     'Sochaux': 'https://raw.githubusercontent.com/JoseArroyave/football-logos/main/logos/france/FC_Sochaux-Montbéliard.svg',
   };
 
+  /// Количество клубов с найденной эмблемой.
+  static int get mappedClubCount => _logoUrls.length;
+
   /// Возвращает адрес только для точного совпадения имени клуба.
   static String? logoUrlFor(String clubName) => _logoUrls[clubName];
 
