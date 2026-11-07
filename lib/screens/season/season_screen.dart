@@ -36,6 +36,7 @@ import 'package:flutter_football/screens/world_cup_screen.dart';
 import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/screens/press_conference_dialog.dart';
 import 'package:flutter_football/services/career_storage.dart';
+import 'package:flutter_football/services/fc_points_service.dart';
 import 'package:flutter_football/services/fatigue_service.dart';
 import 'package:flutter_football/services/match_simulation_service.dart';
 import 'package:flutter_football/screens/career_end_screen.dart';
@@ -2838,6 +2839,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
       );
     }
 
+    final fcPointsEarned = await FCPointsService.awardSeason(completedCareer);
+
     setState(() {
       career = completedCareer;
     });
@@ -2852,6 +2855,16 @@ class _SeasonScreenState extends State<SeasonScreen> {
           .toList();
       await _showSeasonAwards(awards);
       if (!mounted) return;
+    }
+
+    if (fcPointsEarned > 0 && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('+ $fcPointsEarned FC Points за сезон'),
+          backgroundColor: const Color(0xFF174A25),
+          duration: const Duration(seconds: 3),
+        ),
+      );
     }
 
     setState(() {

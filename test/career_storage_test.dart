@@ -5,6 +5,8 @@ import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/services/career_storage.dart';
+import 'package:flutter_football/services/fc_points_service.dart';
+import 'package:flutter_football/models/season_stats.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Career _career(String name) {
@@ -127,6 +129,73 @@ void main() {
 
       expect(await CareerStorage.loadSlot(2), isNull);
       expect((await CareerStorage.loadSlot(1))?.player.name, 'Первый');
+    });
+  });
+
+  group('FC Points', () {
+    test('balance is separate from career slots and persists', () async {
+      final career = _career('Игрок').copyWith(
+        history: [
+          const SeasonStats(
+            season: 1,
+            club: 'Тестовый клуб',
+            matches: 30,
+            goals: 12,
+            assists: 5,
+            yellowCards: 1,
+            redCards: 0,
+            averageRating: 7.1,
+            achievements: ['Чемпион страны', 'Победитель Лиги чемпионов'],
+          ),
+        ],
+      );
+
+      expect(await FCPointsService.balance(), 0);
+      final earned = await FCPointsService.awardSeason(career);
+
+      expect(earned, 530);
+      expect(await FCPointsService.balance(), 530);
+      expect(await FCPointsService.awardSeason(career), 0);
+      expect(await FCPointsService.balance(), 530);
+
+      await CareerStorage.deleteSlot(1);
+      expect(await FCPointsService.balance(), 530);
+    });
+
+    test('different careers can earn rewards for the same season', () async {
+      final first = _career('Первый').copyWith(
+        history: [
+          const SeasonStats(
+            season: 1,
+            club: 'Клуб',
+            matches: 10,
+            goals: 1,
+            assists: 0,
+            yellowCards: 0,
+            redCards: 0,
+            averageRating: 6.5,
+          ),
+        ],
+      );
+      final second = _career('Второй').copyWith(
+        history: [
+          const SeasonStats(
+            season: 1,
+            club: 'Клуб',
+            matches: 10,
+            goals: 1,
+            assists: 0,
+            yellowCards: 0,
+            redCards: 0,
+            averageRating: 6.5,
+          ),
+        ],
+      );
+
+      expect(first.careerId, isNot(second.careerId));
+      expect(await FCPointsService.awardSeason(first), 80);
+      expect(await FCPointsService.awardSeason(second), 80);
+      expect(await FCPointsService.balance(), 160);
     });
   });
 
