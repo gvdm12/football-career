@@ -219,9 +219,6 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
                       const SizedBox(height: 26),
                       _sectionTitle(
                         _english ? 'CAREER MODES' : 'РЕЖИМЫ КАРЬЕРЫ',
-                        _english
-                            ? 'Unlock new ways to play'
-                            : 'Открывай новые возможности',
                       ),
                       const SizedBox(height: 13),
                       for (final item in FCPointsService.shopItems)
@@ -232,9 +229,6 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
                       const SizedBox(height: 17),
                       _sectionTitle(
                         _english ? 'HOW TO EARN' : 'КАК ЗАРАБОТАТЬ',
-                        _english
-                            ? 'Rewards for your achievements'
-                            : 'Награды за твои достижения',
                       ),
                       const SizedBox(height: 12),
                       _buildRewardsCard(),
@@ -328,11 +322,6 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
                     height: 1.0,
                   ),
                 ),
-                const SizedBox(height: 3),
-                Text(
-                  _english ? 'Available to spend' : 'Доступно для покупок',
-                  style: const TextStyle(color: Colors.white54, fontSize: 11),
-                ),
               ],
             ),
           ),
@@ -346,24 +335,14 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
     );
   }
 
-  Widget _sectionTitle(String title, String subtitle) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        title,
-        style: const TextStyle(
-          color: _green,
-          fontSize: 12,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 1.5,
-        ),
-      ),
-      const SizedBox(height: 3),
-      Text(
-        subtitle,
-        style: const TextStyle(color: Colors.white54, fontSize: 11),
-      ),
-    ],
+  Widget _sectionTitle(String title) => Text(
+    title,
+    style: const TextStyle(
+      color: _green,
+      fontSize: 12,
+      fontWeight: FontWeight.w900,
+      letterSpacing: 1.5,
+    ),
   );
 
   Widget _buildItemCard(FCPointsShopItem item) {
