@@ -44,7 +44,7 @@ class FCPointsService {
       titleEn: 'Choose any club',
       descriptionRu: 'Выбирай любую команду из доступных лиг и дивизионов.',
       descriptionEn: 'Choose any team from available leagues and divisions.',
-      price: 600,
+      price: 1500,
       icon: Icons.shield_outlined,
     ),
     FCPointsShopItem(
@@ -53,7 +53,7 @@ class FCPointsService {
       titleEn: 'Career without injuries',
       descriptionRu: 'Твой игрок не будет получать травмы на протяжении карьеры.',
       descriptionEn: 'Your player will not receive injuries during the career.',
-      price: 450,
+      price: 1000,
       icon: Icons.health_and_safety_outlined,
     ),
     FCPointsShopItem(
@@ -62,7 +62,7 @@ class FCPointsService {
       titleEn: 'Transfers every 5 years',
       descriptionRu: 'Менять клуб можно будет только в сезонах 5, 10, 15 и далее.',
       descriptionEn: 'Change clubs only in seasons 5, 10, 15 and so on.',
-      price: 500,
+      price: 800,
       icon: Icons.swap_horiz_rounded,
     ),
   ];
@@ -161,26 +161,23 @@ class FCPointsService {
     final claimed = (state['claimedRewards'] as List<String>).toSet();
     if (claimed.contains(rewardId)) return 0;
 
-    var reward = 80; // Базовая награда за завершение сезона.
+    var reward = 10; // Базовая награда за завершение сезона.
     const achievementRewards = <String, int>{
-      'Чемпион страны': 150,
-      'Обладатель кубка страны': 100,
-      'Победитель Лиги Европы': 200,
-      'Победитель Лиги чемпионов': 300,
-      'Чемпион мира': 400,
+      'Чемпион страны': 80,
+      'Обладатель кубка страны': 60,
+      'Победитель Лиги Европы': 90,
+      'Победитель Лиги чемпионов': 150,
     };
     for (final achievement in stats.achievements.toSet()) {
       reward += achievementRewards[achievement] ?? 0;
     }
     // Дополнительная награда за завершение полной 20-сезонной карьеры.
-    if (career.season >= 20) reward += 300;
+    if (career.season >= 20) reward += 50;
 
     const awardRewards = <String, int>{
-      'Лучший бомбардир': 80,
-      'Лучший ассистент': 60,
-      'Золотой мяч': 200,
-      'Лучший молодой игрок': 50,
-      'Команда года': 25,
+      'Лучший бомбардир': 50,
+      'Лучший ассистент': 40,
+      'Золотой мяч': 100,
     };
     final earnedCategories = career.seasonAwards
         .where(
