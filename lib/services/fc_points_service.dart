@@ -1,18 +1,77 @@
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
 
 /// Постоянная игровая валюта профиля. Не связана с деньгами внутри карьеры
 /// и не сбрасывается при удалении или создании сохранения.
+class FCPointsShopItem {
+  final String id;
+  final String titleRu;
+  final String titleEn;
+  final String descriptionRu;
+  final String descriptionEn;
+  final int price;
+  final IconData icon;
+
+  const FCPointsShopItem({
+    required this.id,
+    required this.titleRu,
+    required this.titleEn,
+    required this.descriptionRu,
+    required this.descriptionEn,
+    required this.price,
+    required this.icon,
+  });
+}
+
+enum FCPointsPurchaseResult {
+  purchased,
+  alreadyOwned,
+  insufficientFunds,
+  unknownItem,
+}
+
 class FCPointsService {
   static const String _storageKey = 'fc_points_profile_v1';
+
+  /// Каждый режим покупается отдельно за FC Points.
+  static const List<FCPointsShopItem> shopItems = [
+    FCPointsShopItem(
+      id: 'any_starting_club',
+      titleRu: 'Выбор любого клуба',
+      titleEn: 'Choose any club',
+      descriptionRu: 'Выбирай любую команду из доступных лиг и дивизионов.',
+      descriptionEn: 'Choose any team from available leagues and divisions.',
+      price: 600,
+      icon: Icons.shield_outlined,
+    ),
+    FCPointsShopItem(
+      id: 'career_without_injuries',
+      titleRu: 'Карьера без травм',
+      titleEn: 'Career without injuries',
+      descriptionRu: 'Твой игрок не будет получать травмы на протяжении карьеры.',
+      descriptionEn: 'Your player will not receive injuries during the career.',
+      price: 450,
+      icon: Icons.health_and_safety_outlined,
+    ),
+    FCPointsShopItem(
+      id: 'five_year_transfers',
+      titleRu: 'Трансферы раз в 5 лет',
+      titleEn: 'Transfers every 5 years',
+      descriptionRu: 'Менять клуб можно будет только в сезонах 5, 10, 15 и далее.',
+      descriptionEn: 'Change clubs only in seasons 5, 10, 15 and so on.',
+      price: 500,
+      icon: Icons.swap_horiz_rounded,
+    ),
+  ];
 
   static Future<Map<String, dynamic>> _readState() async {
     final preferences = await SharedPreferences.getInstance();
     final raw = preferences.getString(_storageKey);
     if (raw == null) {
-      return {'balance': 0, 'claimedRewards': <String>[]};
+      return {'balance': 0, 'claimedRewards': <String>[], 'ownedModes': <String>[]};
     }
 
     try {
@@ -28,10 +87,59 @@ class FCPointsService {
                 ?.whereType<String>()
                 .toList() ??
             <String>[],
+        'ownedModes': (decoded['ownedModes'] as List?)
+                ?.whereType<String>()
+                .toList() ??
+            <String>[],
       };
     } catch (_) {
       return {'balance': 0, 'claimedRewards': <String>[]};
     }
+  }
+
+  static Future<Set<String>> ownedModes() async {
+    final state = await _readState();
+    return (state['ownedModes'] as List<String>).toSet();
+  }
+
+  static Future<bool> isModeOwned(String modeId) async {
+    return (await ownedModes()).contains(modeId);
+  }
+
+  /// Списывает валюту и открывает только выбранный режим.
+  /// Баланс и покупка записываются одним обновлением профиля.
+  static Future<FCPointsPurchaseResult> purchaseMode(String modeId) async {
+    FCPointsShopItem? item;
+    for (final candidate in shopItems) {
+      if (candidate.id == modeId) {
+        item = candidate;
+        break;
+      }
+    }
+    if (item == null) return FCPointsPurchaseResult.unknownItem;
+
+    final state = await _readState();
+    final owned = (state['ownedModes'] as List<String>).toSet();
+    if (owned.contains(modeId)) return FCPointsPurchaseResult.alreadyOwned;
+
+    final currentBalance = state['balance'] as int;
+    if (currentBalance < item.price) {
+      return FCPointsPurchaseResult.insufficientFunds;
+    }
+
+    owned.add(modeId);
+    final updatedState = {
+      'balance': currentBalance - item.price,
+      'claimedRewards': state['claimedRewards'],
+      'ownedModes': owned.toList()..sort(),
+    };
+    final preferences = await SharedPreferences.getInstance();
+    final saved = await preferences.setString(
+      _storageKey,
+      jsonEncode(updatedState),
+    );
+    if (!saved) throw Exception('Не удалось сохранить покупку FC Points');
+    return FCPointsPurchaseResult.purchased;
   }
 
   static Future<int> balance() async {
