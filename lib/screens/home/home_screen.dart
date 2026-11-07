@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_football/models/career.dart';
+import 'package:flutter_football/screens/account/account_screen.dart';
 import 'package:flutter_football/screens/create%20player/create_player_screen.dart';
 import 'package:flutter_football/screens/player/player_screen.dart';
 import 'package:flutter_football/screens/super_league/super_league_screen.dart';
@@ -222,6 +223,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const AccountScreen(),
+                              ),
+                            );
+                          },
+                          icon: const Icon(
+                            Icons.account_circle_outlined,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                          tooltip: AppStrings.isEnglish ? 'Account' : 'Аккаунт',
+                        ),
                         IconButton(
                           onPressed: _openShop,
                           icon: const Icon(

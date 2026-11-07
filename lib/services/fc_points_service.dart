@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
+import 'package:flutter_football/services/account_service.dart';
 
 /// Постоянная игровая валюта профиля. Не связана с деньгами внутри карьеры
 /// и не сбрасывается при удалении или создании сохранения.
@@ -98,11 +99,17 @@ class FCPointsService {
   }
 
   static Future<Set<String>> ownedModes() async {
+    if (await AccountService.isDeveloper()) {
+      return shopItems.map((item) => item.id).toSet();
+    }
     final state = await _readState();
     return (state['ownedModes'] as List<String>).toSet();
   }
 
   static Future<bool> isModeOwned(String modeId) async {
+    if (await AccountService.isDeveloper()) {
+      return shopItems.any((item) => item.id == modeId);
+    }
     return (await ownedModes()).contains(modeId);
   }
 
@@ -117,6 +124,10 @@ class FCPointsService {
       }
     }
     if (item == null) return FCPointsPurchaseResult.unknownItem;
+    // Аккаунт разработчика получает доступ ко всем режимам без списания FCP.
+    if (await AccountService.isDeveloper()) {
+      return FCPointsPurchaseResult.alreadyOwned;
+    }
 
     final state = await _readState();
     final owned = (state['ownedModes'] as List<String>).toSet();

@@ -3,11 +3,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'screens/home/home_screen.dart';
 import 'services/language_service.dart';
+import 'services/firebase_service.dart';
 import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await LanguageService.loadLanguage();
+  await FirebaseService.initialize();
 
   runApp(const FootballCareerApp());
 }

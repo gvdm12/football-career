@@ -1,0 +1,32 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      // Пользователь может читать только собственный профиль.
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // Клиентская регистрация всегда создаёт обычный аккаунт.
+      // Роль developer назначается владельцем проекта вручную в Firebase Console.
+      allow create: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly([
+          'displayName',
+          'email',
+          'role',
+          'createdAt'
+        ])
+        && request.resource.data.role == 'player';
+
+      // Клиенту разрешено менять только имя и дату обновления.
+      // Поле role, включая developer, менять через приложение нельзя.
+      allow update: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['displayName', 'updatedAt']);
+
+      allow delete: if false;
+    }
+  }
+}
