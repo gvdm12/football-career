@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter_football/models/club.dart';
+import 'package:flutter_football/services/fatigue_service.dart';
 import 'player.dart';
 import 'career.dart';
 import 'career_settings.dart';
@@ -115,8 +116,12 @@ class Match {
 
     final difficultyAdjustment =
         career?.settings.difficulty.selectionChanceAdjustment ?? 0.0;
+    // Усталый игрок чаще отдыхает: тренер даёт ему передышку.
+    final fatiguePenalty = FatigueService.selectionPenalty(career?.fatigue ?? 0);
+
     playChance = (chanceBeforeAgeDecline -
-            ageRelatedPenalty +
+            ageRelatedPenalty -
+            fatiguePenalty +
             difficultyAdjustment)
         .clamp(0.05, 0.99)
         .toDouble();

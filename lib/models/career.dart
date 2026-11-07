@@ -8,6 +8,7 @@ import 'package:flutter_football/models/career_coach_transfer.dart';
 import 'package:flutter_football/models/real_club_coaches.dart';
 import 'package:flutter_football/models/real_club_squads.dart';
 import 'package:flutter_football/models/friendly_match.dart';
+import 'package:flutter_football/services/fatigue_service.dart';
 import 'package:flutter_football/services/pre_season_service.dart';
 import 'package:flutter_football/services/world_transfer_service.dart';
 import 'package:flutter_football/models/champions_league.dart';
@@ -57,6 +58,9 @@ class Career {
   final SponsorContract? sponsorContract;
   final List<PositionRival> rivals;
   final int coachTrust;
+
+  /// Усталость игрока, 0..100. См. FatigueService.
+  final int fatigue;
   final int reputationModifier;
   final int agentLevel;
   final String coachName;
@@ -142,6 +146,23 @@ class Career {
         SkillName.vision => skills.copyWith(vision: value),
       };
     }
+    // Усталость снижает навыки только на матч и не меняет сохранённого игрока.
+    final physicalPenalty = FatigueService.physicalSkillPenalty(fatigue);
+    if (physicalPenalty > 0) {
+      final technicalPenalty = FatigueService.technicalSkillPenalty(fatigue);
+      int lowered(int value, int penalty) =>
+          (value - penalty).clamp(1, 99).toInt();
+      skills = skills.copyWith(
+        pace: lowered(skills.pace, physicalPenalty),
+        physical: lowered(skills.physical, physicalPenalty),
+        shooting: lowered(skills.shooting, technicalPenalty),
+        passing: lowered(skills.passing, technicalPenalty),
+        dribbling: lowered(skills.dribbling, technicalPenalty),
+        defending: lowered(skills.defending, technicalPenalty),
+        heading: lowered(skills.heading, technicalPenalty),
+        vision: lowered(skills.vision, technicalPenalty),
+      );
+    }
     return player.copyWith(skills: skills);
   }
 
@@ -190,6 +211,7 @@ class Career {
     this.sponsorContract,
     this.rivals = const [],
     this.coachTrust = 65,
+    this.fatigue = 0,
     this.reputationModifier = 0,
     this.agentLevel = 1,
     this.agentCredits = 0,
@@ -607,6 +629,7 @@ class Career {
       'sponsorContract': sponsorContract?.toJson(),
       'rivals': rivals.map((item) => item.toJson()).toList(),
       'coachTrust': coachTrust,
+      'fatigue': fatigue,
       'reputationModifier': reputationModifier,
       'agentLevel': agentLevel,
       'coachName': coachName,
@@ -1008,6 +1031,9 @@ class Career {
       coachTrust: ((json['coachTrust'] as num?)?.toInt() ?? 65)
           .clamp(0, 100)
           .toInt(),
+      fatigue: ((json['fatigue'] as num?)?.toInt() ?? 0)
+          .clamp(0, FatigueService.max)
+          .toInt(),
       reputationModifier: (json['reputationModifier'] as num?)?.toInt() ?? 0,
       agentLevel: ((json['agentLevel'] as num?)?.toInt() ?? 1)
           .clamp(1, 10)
@@ -1097,6 +1123,7 @@ class Career {
     bool clearSponsorContract = false,
     List<PositionRival>? rivals,
     int? coachTrust,
+    int? fatigue,
     int? reputationModifier,
     int? agentLevel,
     String? coachName,
@@ -1163,6 +1190,7 @@ class Career {
       sponsorContract: clearSponsorContract ? null : sponsorContract ?? this.sponsorContract,
       rivals: rivals ?? this.rivals,
       coachTrust: coachTrust ?? this.coachTrust,
+      fatigue: fatigue ?? this.fatigue,
       reputationModifier: reputationModifier ?? this.reputationModifier,
       agentLevel: agentLevel ?? this.agentLevel,
       coachName: coachName ?? this.coachName,
@@ -1363,7 +1391,25 @@ class Career {
     return match.playerGoals * 2 + match.playerAssists + performanceBonus;
   }
 
+  /// Учитывает результат матча любого турнира: рейтинг, доверие тренера,
+  /// травмы, а также усталость игрока.
   Career afterMatch(Match match) {
+    final updated = _afterMatchCore(match);
+
+    return updated.copyWith(
+      fatigue: FatigueService.afterMatch(
+        current: fatigue,
+        playerPlayed: match.playerPlayed,
+        isLeagueFixture: FatigueService.isLeagueFixture(
+          match: match,
+          playerClub: player.club,
+          seasonMatches: seasonMatches,
+        ),
+      ),
+    );
+  }
+
+  Career _afterMatchCore(Match match) {
     // Конкуренты получают игровую практику даже тогда, когда игрок пропустил матч.
     // Месячная статистика хранится отдельно, чтобы награда не использовала
     // накопленные за весь сезон показатели конкурента.

@@ -36,6 +36,7 @@ import 'package:flutter_football/screens/world_cup_screen.dart';
 import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/screens/press_conference_dialog.dart';
 import 'package:flutter_football/services/career_storage.dart';
+import 'package:flutter_football/services/fatigue_service.dart';
 import 'package:flutter_football/services/match_simulation_service.dart';
 import 'package:flutter_football/screens/career_end_screen.dart';
 import 'package:flutter_football/widgets/liquid_glass.dart';
@@ -3970,6 +3971,52 @@ class _SeasonScreenState extends State<SeasonScreen> {
     );
   }
 
+  Widget _buildFatigueBar() {
+    final english = AppStrings.isEnglish;
+    final value = career.fatigue.clamp(0, FatigueService.max).toInt();
+    final color = value < 40
+        ? const Color(0xFF8BE07F)
+        : value < 70
+        ? Colors.orangeAccent
+        : Colors.redAccent;
+
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              english ? 'Fatigue' : 'Усталость',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            Text(
+              '${FatigueService.label(value, english: english)} · $value%',
+              style: TextStyle(
+                color: color,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(6),
+          child: LinearProgressIndicator(
+            value: value / FatigueService.max,
+            minHeight: 6,
+            backgroundColor: Colors.white.withValues(alpha: 0.12),
+            valueColor: AlwaysStoppedAnimation<Color>(color),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildProgressCard() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
@@ -4093,6 +4140,8 @@ class _SeasonScreenState extends State<SeasonScreen> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 12),
+                  _buildFatigueBar(),
                   if (seasonFinished) ...[
                     const SizedBox(height: 12),
                     Container(
