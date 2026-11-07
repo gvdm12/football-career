@@ -195,6 +195,7 @@ class FCPointsService {
       'balance': currentBalance - item.price,
       'claimedRewards': state['claimedRewards'],
       'ownedModes': owned.toList()..sort(),
+      'claimedDeveloperBonuses': state['claimedDeveloperBonuses'],
     };
     final preferences = await SharedPreferences.getInstance();
     final saved = await preferences.setString(
@@ -258,8 +259,10 @@ class FCPointsService {
     }
 
     claimed.add(rewardId);
+    final previousBalance = state['balance'] as int;
+    final updatedBalance = _clampBalance(previousBalance + reward);
     final updatedState = {
-      'balance': _clampBalance((state['balance'] as int) + reward),
+      'balance': updatedBalance,
       'claimedRewards': claimed.toList()..sort(),
       'ownedModes': state['ownedModes'],
       'claimedDeveloperBonuses': state['claimedDeveloperBonuses'],
@@ -270,6 +273,6 @@ class FCPointsService {
       jsonEncode(updatedState),
     );
     if (!saved) throw Exception('Не удалось сохранить FC Points');
-    return reward;
+    return updatedBalance - previousBalance;
   }
 }
