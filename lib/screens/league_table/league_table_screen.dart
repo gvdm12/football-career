@@ -4,6 +4,7 @@ import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/league_season_simulator.dart';
 import 'package:flutter_football/models/league_division_service.dart';
 import 'package:flutter_football/services/app_strings.dart';
+import 'package:flutter_football/widgets/club_logo.dart';
 
 class LeagueTableScreen extends StatelessWidget {
   final Career career;
@@ -325,13 +326,22 @@ class LeagueTableScreen extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Text(
-              entry.club,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: isPlayerClub ? FontWeight.w900 : FontWeight.w600,
-              ),
+            child: Row(
+              children: [
+                ClubLogo(clubName: entry.club, size: 25, borderRadius: 7,
+                  fallbackColor: Clubs.getByName(entry.club).primaryColor),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    entry.club,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: isPlayerClub ? FontWeight.w900 : FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           SizedBox(
