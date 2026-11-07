@@ -953,7 +953,7 @@ class Career {
             id: 'rumor_s${currentSeason}_${club.hashCode}',
             season: currentSeason,
             matchNumber: -1,
-            title: 'Трансферные слухи: интерес со стороны ${club}',
+            title: 'Трансферные слухи: интерес со стороны $club',
             description:
                 'Скауты клуба следят за вашими последними выступлениями. Официального предложения пока нет.',
             type: CareerNewsType.rumor,
@@ -1728,7 +1728,7 @@ class Career {
       if (previousBand != nextBand) {
         final rising = nextBand > previousBand;
         final formNews = CareerNews(
-          id: 'form_s${season}_m${competitionRound}_${nextBand}',
+          id: 'form_s${season}_m${competitionRound}_$nextBand',
           season: season,
           matchNumber: competitionRound,
           title: rising ? 'Форма игрока улучшается' : 'Спад игровой формы',
@@ -2534,10 +2534,7 @@ class Career {
     final otherLeagues =
         League.values.where((league) => league != currentPlayerLeague).toList()
           ..shuffle(Random(newSeason * 97 + newPlayer.overall));
-    final newsLeagues = <League>[
-      if (currentPlayerLeague != null) currentPlayerLeague,
-      ...otherLeagues.take(3),
-    ];
+    final newsLeagues = <League>[?currentPlayerLeague, ...otherLeagues.take(3)];
 
     String divisionDisplayName(League league, int division) {
       if (division == 1) return league.displayName;

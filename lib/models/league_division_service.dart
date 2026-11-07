@@ -15,8 +15,7 @@ class LeagueDivisionService {
     League.russia,
   };
 
-  static String key(League league, int division) =>
-      '${league.name}_${division}';
+  static String key(League league, int division) => '${league.name}_$division';
 
   static bool hasSecondDivision(League league) =>
       twoTierLeagues.contains(league);
@@ -45,13 +44,15 @@ class LeagueDivisionService {
   static Map<String, List<String>> createInitialDivisions() {
     final result = <String, List<String>>{};
     for (final league in League.values) {
-      result[key(league, 1)] = Clubs.byLeagueDivision(league, 1)
-          .map((club) => club.name)
-          .toList();
+      result[key(league, 1)] = Clubs.byLeagueDivision(
+        league,
+        1,
+      ).map((club) => club.name).toList();
       if (hasSecondDivision(league)) {
-        result[key(league, 2)] = Clubs.byLeagueDivision(league, 2)
-            .map((club) => club.name)
-            .toList();
+        result[key(league, 2)] = Clubs.byLeagueDivision(
+          league,
+          2,
+        ).map((club) => club.name).toList();
       }
     }
     return result;
@@ -93,8 +94,12 @@ class LeagueDivisionService {
     int division,
     Map<String, List<String>> divisions,
   ) {
-    final names = divisions[key(league, division)] ??
-        Clubs.byLeagueDivision(league, division).map((club) => club.name).toList();
+    final names =
+        divisions[key(league, division)] ??
+        Clubs.byLeagueDivision(
+          league,
+          division,
+        ).map((club) => club.name).toList();
     return names.map(Clubs.getByName).toList();
   }
 
@@ -134,8 +139,9 @@ class LeagueDivisionService {
             awayGoals: awayGoals,
           );
         }
-        result[key(league, division)] =
-            List<LeagueTableEntry>.unmodifiable(updated);
+        result[key(league, division)] = List<LeagueTableEntry>.unmodifiable(
+          updated,
+        );
       }
     }
     return result;
@@ -158,14 +164,19 @@ class LeagueDivisionService {
       final topTable = finalTables[topKey];
       final secondTable = finalTables[secondKey];
       final places = movementPlaces(league);
-      if (topTable == null || secondTable == null ||
-          topTable.length < places || secondTable.length < places) {
+      if (topTable == null ||
+          secondTable == null ||
+          topTable.length < places ||
+          secondTable.length < places) {
         continue;
       }
 
-      final promoted =
-          secondTable.take(places).map((entry) => entry.club).toList();
-      final relegated = topTable.skip(topTable.length - places)
+      final promoted = secondTable
+          .take(places)
+          .map((entry) => entry.club)
+          .toList();
+      final relegated = topTable
+          .skip(topTable.length - places)
           .map((entry) => entry.club)
           .toList();
 

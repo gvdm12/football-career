@@ -578,7 +578,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 18),
         scrollDirection: Axis.horizontal,
         itemCount: sections.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           final selected = _selectedSection == index;
           return InkWell(
@@ -799,7 +799,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
               Expanded(
                 child: _CareerHistoryStat(
                   label: AppStrings.matches,
-                  value: '${careerMatches}',
+                  value: '$careerMatches',
                 ),
               ),
             ],

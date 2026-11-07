@@ -96,8 +96,10 @@ class NewsScreen extends StatelessWidget {
     if (news.matchNumber < 0) {
       return 'ПРЕДСЕЗОНЬЕ  •  СЕЗОН ${news.season}';
     }
-    return AppStrings.newsSeasonAndMatch(news.season, news.matchNumber)
-        .toUpperCase();
+    return AppStrings.newsSeasonAndMatch(
+      news.season,
+      news.matchNumber,
+    ).toUpperCase();
   }
 
   @override
@@ -481,7 +483,11 @@ class NewsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 5),
-              Icon(Icons.swipe_rounded, color: Colors.white.withValues(alpha: 0.35), size: 15),
+              Icon(
+                Icons.swipe_rounded,
+                color: Colors.white.withValues(alpha: 0.35),
+                size: 15,
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -491,7 +497,7 @@ class NewsScreen extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.only(right: 4),
               itemCount: news.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 11),
+              separatorBuilder: (_, _) => const SizedBox(width: 11),
               itemBuilder: (context, index) => _buildTimelineItem(news[index]),
             ),
           ),
@@ -521,7 +527,10 @@ class NewsScreen extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: accent.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(6),
@@ -579,7 +588,11 @@ class NewsScreen extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    Icon(_getIcon(news.type), color: accent.withValues(alpha: 0.8), size: 13),
+                    Icon(
+                      _getIcon(news.type),
+                      color: accent.withValues(alpha: 0.8),
+                      size: 13,
+                    ),
                     const SizedBox(width: 5),
                     Text(
                       AppStrings.isEnglish ? 'CAREER NEWS' : 'НОВОСТИ КАРЬЕРЫ',
@@ -614,9 +627,7 @@ class NewsScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.055),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.12),
-                ),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,

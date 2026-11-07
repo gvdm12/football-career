@@ -151,12 +151,13 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
           break;
       }
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         _showMessage(
           _english
               ? 'Could not save the purchase'
               : 'Не удалось сохранить покупку',
         );
+      }
     } finally {
       if (mounted) setState(() => _buying.remove(item.id));
     }

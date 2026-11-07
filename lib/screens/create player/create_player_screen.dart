@@ -287,9 +287,11 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
             _allowAnyClub && _ownedModes.contains('any_starting_club'),
         difficulty: _difficulty,
         limitTransfersToFiveYears:
-            _limitTransfersToFiveYears && _ownedModes.contains('five_year_transfers'),
+            _limitTransfersToFiveYears &&
+            _ownedModes.contains('five_year_transfers'),
         playWithoutInjuries:
-            _playWithoutInjuries && _ownedModes.contains('career_without_injuries'),
+            _playWithoutInjuries &&
+            _ownedModes.contains('career_without_injuries'),
         // Частота травм корректируется сложностью отдельно.
         injuryFrequency: 1.0,
         // Скорость развития оставлена прежней: лёгкая сложность ускоряет,
@@ -490,7 +492,9 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                         color: Color(0xFFD9B65C),
                       ),
                       title: Text(
-                        AppStrings.isEnglish ? 'Open mode shop' : 'Открыть магазин режимов',
+                        AppStrings.isEnglish
+                            ? 'Open mode shop'
+                            : 'Открыть магазин режимов',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 13,
@@ -501,9 +505,15 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                         AppStrings.isEnglish
                             ? 'Unlock each career mode separately'
                             : 'Каждый режим покупается отдельно',
-                        style: const TextStyle(color: Colors.white60, fontSize: 11),
+                        style: const TextStyle(
+                          color: Colors.white60,
+                          fontSize: 11,
+                        ),
                       ),
-                      trailing: const Icon(Icons.chevron_right, color: Color(0xFFD9B65C)),
+                      trailing: const Icon(
+                        Icons.chevron_right,
+                        color: Color(0xFFD9B65C),
+                      ),
                       onTap: _openShop,
                     ),
                   ),
@@ -545,26 +555,35 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                       // ),
                       subtitle: Text(
                         _ownedModes.contains('any_starting_club')
-                            ? (AppStrings.isEnglish ? 'Mode unlocked' : 'Режим открыт')
-                            : (AppStrings.isEnglish ? 'Locked — buy in the shop' : 'Закрыто — купи в магазине'),
-                        style: const TextStyle(color: Colors.white60, fontSize: 11),
+                            ? (AppStrings.isEnglish
+                                  ? 'Mode unlocked'
+                                  : 'Режим открыт')
+                            : (AppStrings.isEnglish
+                                  ? 'Locked — buy in the shop'
+                                  : 'Закрыто — купи в магазине'),
+                        style: const TextStyle(
+                          color: Colors.white60,
+                          fontSize: 11,
+                        ),
                       ),
-                      onChanged: _ownedModes.contains('any_starting_club') ? (value) {
-                        setState(() {
-                          _allowAnyClub = value;
-                          if (!value &&
-                              !startingClubs.any(
-                                (club) => club.name == selectedClub,
-                              )) {
-                            selectedClub = startingClubs.first.name;
-                          }
-                        });
-                      } : null,
+                      onChanged: _ownedModes.contains('any_starting_club')
+                          ? (value) {
+                              setState(() {
+                                _allowAnyClub = value;
+                                if (!value &&
+                                    !startingClubs.any(
+                                      (club) => club.name == selectedClub,
+                                    )) {
+                                  selectedClub = startingClubs.first.name;
+                                }
+                              });
+                            }
+                          : null,
                     ),
                   ),
                   SizedBox(height: 3),
                   DropdownButtonFormField<CareerDifficulty>(
-                    value: _difficulty,
+                    initialValue: _difficulty,
                     dropdownColor: const Color(0xFF0B3A1A),
                     decoration: InputDecoration(
                       labelText: AppStrings.isEnglish
@@ -623,12 +642,20 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                     // ),
                     subtitle: Text(
                       _ownedModes.contains('five_year_transfers')
-                          ? (AppStrings.isEnglish ? 'Mode unlocked' : 'Режим открыт')
-                          : (AppStrings.isEnglish ? 'Locked — buy in the shop' : 'Закрыто — купи в магазине'),
-                      style: const TextStyle(color: Colors.white60, fontSize: 11),
+                          ? (AppStrings.isEnglish
+                                ? 'Mode unlocked'
+                                : 'Режим открыт')
+                          : (AppStrings.isEnglish
+                                ? 'Locked — buy in the shop'
+                                : 'Закрыто — купи в магазине'),
+                      style: const TextStyle(
+                        color: Colors.white60,
+                        fontSize: 11,
+                      ),
                     ),
                     onChanged: _ownedModes.contains('five_year_transfers')
-                        ? (value) => setState(() => _limitTransfersToFiveYears = value)
+                        ? (value) =>
+                              setState(() => _limitTransfersToFiveYears = value)
                         : null,
                   ),
                   SwitchListTile.adaptive(
@@ -656,12 +683,20 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                     // ),
                     subtitle: Text(
                       _ownedModes.contains('career_without_injuries')
-                          ? (AppStrings.isEnglish ? 'Mode unlocked' : 'Режим открыт')
-                          : (AppStrings.isEnglish ? 'Locked — buy in the shop' : 'Закрыто — купи в магазине'),
-                      style: const TextStyle(color: Colors.white60, fontSize: 11),
+                          ? (AppStrings.isEnglish
+                                ? 'Mode unlocked'
+                                : 'Режим открыт')
+                          : (AppStrings.isEnglish
+                                ? 'Locked — buy in the shop'
+                                : 'Закрыто — купи в магазине'),
+                      style: const TextStyle(
+                        color: Colors.white60,
+                        fontSize: 11,
+                      ),
                     ),
                     onChanged: _ownedModes.contains('career_without_injuries')
-                        ? (value) => setState(() => _playWithoutInjuries = value)
+                        ? (value) =>
+                              setState(() => _playWithoutInjuries = value)
                         : null,
                   ),
                 ],
@@ -839,7 +874,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${_clubDetails(club)}',
+                    _clubDetails(club),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -1204,7 +1239,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                                             ),
                                             const SizedBox(height: 4),
                                             Text(
-                                              '${_clubDetails(club)}',
+                                              _clubDetails(club),
                                               style: const TextStyle(
                                                 color: Colors.white54,
                                                 fontSize: 10,

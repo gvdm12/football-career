@@ -89,7 +89,9 @@ class _ShopScreenState extends State<ShopScreen> {
       career.temporarySkillBoostMatches['personalTrainer'] ?? 0;
 
   int _nextStaffPurchasePrice(String key) {
-    final purchases = (career.skillTrainingPurchases[key] ?? 0).clamp(0, 10).toInt();
+    final purchases = (career.skillTrainingPurchases[key] ?? 0)
+        .clamp(0, 10)
+        .toInt();
     return _staffPurchaseBasePrice * (1 << purchases);
   }
 
@@ -114,7 +116,8 @@ class _ShopScreenState extends State<ShopScreen> {
   }
 
   Future<void> _buyPersonalTrainer() async {
-    if (career.money < _personalTrainerPrice || _personalTrainerCooldown > 0) return;
+    if (career.money < _personalTrainerPrice || _personalTrainerCooldown > 0)
+      return;
     final purchases = Map<String, int>.from(career.skillTrainingPurchases);
     final cooldowns = Map<String, int>.from(career.temporarySkillBoostMatches);
     purchases['personalTrainer'] = (purchases['personalTrainer'] ?? 0) + 1;
@@ -163,8 +166,9 @@ class _ShopScreenState extends State<ShopScreen> {
   Future<void> _buyRecovery() async {
     if (!career.isInjured ||
         career.injuryRecoveryUsed ||
-        career.money < _recoveryPrice)
+        career.money < _recoveryPrice) {
       return;
+    }
 
     final remaining = (career.injuryMatchesRemaining - 2).clamp(0, 10).toInt();
 
@@ -289,7 +293,7 @@ class _ShopScreenState extends State<ShopScreen> {
                         ),
                         const SizedBox(height: 14),
                         DropdownButtonFormField<SkillName>(
-                          value: selectedSkill,
+                          initialValue: selectedSkill,
                           dropdownColor: const Color(0xFF12351B),
                           decoration: InputDecoration(
                             labelText: 'Характеристика',
@@ -318,8 +322,9 @@ class _ShopScreenState extends State<ShopScreen> {
                             );
                           }).toList(),
                           onChanged: (value) {
-                            if (value != null)
+                            if (value != null) {
                               setState(() => selectedSkill = value);
+                            }
                           },
                         ),
                         const SizedBox(height: 8),
@@ -458,27 +463,35 @@ class _ShopScreenState extends State<ShopScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                _sectionTitle('КАРЬЕРНЫЙ ШТАБ'),
-                _purchaseCard(
-                  icon: Icons.psychology_alt,
-                  title: 'Спортивный психолог',
-                  description: _psychologistCooldown > 0
-                      ? 'Повышает доверие тренера на 8 пунктов. Повторная покупка через $_psychologistCooldown матчей.'
-                      : 'Повышает доверие тренера на 8 пунктов. Повторная покупка доступна через 10 матчей.',
-                  price: _psychologistPrice,
-                  onPressed: career.money >= _psychologistPrice && _psychologistCooldown == 0 ? _buyPsychologist : null,
-                ),
-                const SizedBox(height: 8),
-                _purchaseCard(
-                  icon: Icons.sports,
-                  title: 'Персональный тренер',
-                  description: _personalTrainerCooldown > 0
-                      ? 'Даёт 2 очка развития. Повторная покупка через $_personalTrainerCooldown матчей.'
-                      : 'Даёт 2 очка развития. Повторная покупка доступна через 10 матчей.',
-                  price: _personalTrainerPrice,
-                  onPressed: career.money >= _personalTrainerPrice && _personalTrainerCooldown == 0 ? _buyPersonalTrainer : null,
-                ),
-              ],
+                  _sectionTitle('КАРЬЕРНЫЙ ШТАБ'),
+                  _purchaseCard(
+                    icon: Icons.psychology_alt,
+                    title: 'Спортивный психолог',
+                    description: _psychologistCooldown > 0
+                        ? 'Повышает доверие тренера на 8 пунктов. Повторная покупка через $_psychologistCooldown матчей.'
+                        : 'Повышает доверие тренера на 8 пунктов. Повторная покупка доступна через 10 матчей.',
+                    price: _psychologistPrice,
+                    onPressed:
+                        career.money >= _psychologistPrice &&
+                            _psychologistCooldown == 0
+                        ? _buyPsychologist
+                        : null,
+                  ),
+                  const SizedBox(height: 8),
+                  _purchaseCard(
+                    icon: Icons.sports,
+                    title: 'Персональный тренер',
+                    description: _personalTrainerCooldown > 0
+                        ? 'Даёт 2 очка развития. Повторная покупка через $_personalTrainerCooldown матчей.'
+                        : 'Даёт 2 очка развития. Повторная покупка доступна через 10 матчей.',
+                    price: _personalTrainerPrice,
+                    onPressed:
+                        career.money >= _personalTrainerPrice &&
+                            _personalTrainerCooldown == 0
+                        ? _buyPersonalTrainer
+                        : null,
+                  ),
+                ],
               ),
             ),
           ),
@@ -500,27 +513,56 @@ class _ShopScreenState extends State<ShopScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(children: [
-            Icon(icon, color: const Color(0xFF8BE07F), size: 22),
-            const SizedBox(width: 9),
-            Expanded(child: Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800))),
-          ]),
-          const SizedBox(height: 7),
-          Text(description, style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.35)),
-          const SizedBox(height: 9),
-          Row(children: [
-            Expanded(child: Text('${price} €', style: const TextStyle(color: Color(0xFF8BE07F), fontWeight: FontWeight.w900))),
-            ElevatedButton(
-              onPressed: onPressed,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF8BE07F),
-                foregroundColor: const Color(0xFF082A12),
-                disabledBackgroundColor: Colors.white12,
-                disabledForegroundColor: Colors.white38,
+          Row(
+            children: [
+              Icon(icon, color: const Color(0xFF8BE07F), size: 22),
+              const SizedBox(width: 9),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
               ),
-              child: Text(onPressed == null ? 'Недостаточно денег' : 'Купить'),
+            ],
+          ),
+          const SizedBox(height: 7),
+          Text(
+            description,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 12,
+              height: 1.35,
             ),
-          ]),
+          ),
+          const SizedBox(height: 9),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  '$price €',
+                  style: const TextStyle(
+                    color: Color(0xFF8BE07F),
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: onPressed,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF8BE07F),
+                  foregroundColor: const Color(0xFF082A12),
+                  disabledBackgroundColor: Colors.white12,
+                  disabledForegroundColor: Colors.white38,
+                ),
+                child: Text(
+                  onPressed == null ? 'Недостаточно денег' : 'Купить',
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
