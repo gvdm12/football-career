@@ -4,8 +4,8 @@ import 'package:flutter_football/widgets/club_logo.dart';
 
 void main() {
   test('для всех клубов есть безопасный вариант эмблемы или fallback', () {
-    expect(Clubs.all.length, 298);
-    expect(ClubLogo.mappedClubCount, 290);
+    expect(Clubs.all.length, 352);
+    expect(ClubLogo.mappedClubCount, 349);
     for (final club in Clubs.all) {
       // null означает, что будет показан fallback, а не чужая эмблема.
       final url = ClubLogo.logoUrlFor(club.name);
