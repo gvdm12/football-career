@@ -10,6 +10,8 @@ import 'package:flutter_football/widgets/jersey_number_picker.dart';
 import 'package:flutter_football/screens/player/player_screen.dart';
 import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/services/career_storage.dart';
+import 'package:flutter_football/services/fc_points_service.dart';
+import 'package:flutter_football/screens/shop/fc_points_shop_screen.dart';
 import 'package:flutter_football/services/language_service.dart';
 import 'package:country_flags/country_flags.dart';
 import 'package:flutter_svg/svg.dart';
@@ -36,6 +38,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
   bool _allowAnyClub = false;
   bool _limitTransfersToFiveYears = false;
   bool _playWithoutInjuries = false;
+  Set<String> _ownedModes = {};
   CareerDifficulty _difficulty = CareerDifficulty.normal;
 
   List<Map<String, String>> get positions => [
@@ -210,6 +213,21 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
     Clubs.resetCareerState();
     startingClubs = Clubs.randomStartingClubs();
     selectedClub = startingClubs.first.name;
+    _loadOwnedModes();
+  }
+
+  Future<void> _loadOwnedModes() async {
+    final modes = await FCPointsService.ownedModes();
+    if (!mounted) return;
+    setState(() => _ownedModes = modes);
+  }
+
+  Future<void> _openShop() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const FCPointsShopScreen()),
+    );
+    await _loadOwnedModes();
   }
 
   @override
@@ -265,10 +283,13 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
     final career = Career.create(
       player.copyWith(jerseyNumber: jerseyNumber),
       settings: CareerSettings(
-        allowAnyStartingClub: _allowAnyClub,
+        allowAnyStartingClub:
+            _allowAnyClub && _ownedModes.contains('any_starting_club'),
         difficulty: _difficulty,
-        limitTransfersToFiveYears: _limitTransfersToFiveYears,
-        playWithoutInjuries: _playWithoutInjuries,
+        limitTransfersToFiveYears:
+            _limitTransfersToFiveYears && _ownedModes.contains('five_year_transfers'),
+        playWithoutInjuries:
+            _playWithoutInjuries && _ownedModes.contains('career_without_injuries'),
         // Частота травм корректируется сложностью отдельно.
         injuryFrequency: 1.0,
         // Скорость развития оставлена прежней: лёгкая сложность ускоряет,
@@ -455,6 +476,39 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                 if (_showCareerSettings) ...[
                   Container(
                     margin: const EdgeInsets.only(bottom: 10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD9B65C).withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(13),
+                      border: Border.all(
+                        color: const Color(0xFFD9B65C).withValues(alpha: 0.35),
+                      ),
+                    ),
+                    child: ListTile(
+                      dense: true,
+                      leading: const Icon(
+                        Icons.storefront_outlined,
+                        color: Color(0xFFD9B65C),
+                      ),
+                      title: Text(
+                        AppStrings.isEnglish ? 'Open mode shop' : 'Открыть магазин режимов',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      subtitle: Text(
+                        AppStrings.isEnglish
+                            ? 'Unlock each career mode separately'
+                            : 'Каждый режим покупается отдельно',
+                        style: const TextStyle(color: Colors.white60, fontSize: 11),
+                      ),
+                      trailing: const Icon(Icons.chevron_right, color: Color(0xFFD9B65C)),
+                      onTap: _openShop,
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 10),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 14,
                       vertical: 8,
@@ -489,7 +543,13 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                       //     fontSize: 11,
                       //   ),
                       // ),
-                      onChanged: (value) {
+                      subtitle: Text(
+                        _ownedModes.contains('any_starting_club')
+                            ? (AppStrings.isEnglish ? 'Mode unlocked' : 'Режим открыт')
+                            : (AppStrings.isEnglish ? 'Locked — buy in the shop' : 'Закрыто — купи в магазине'),
+                        style: const TextStyle(color: Colors.white60, fontSize: 11),
+                      ),
+                      onChanged: _ownedModes.contains('any_starting_club') ? (value) {
                         setState(() {
                           _allowAnyClub = value;
                           if (!value &&
@@ -499,7 +559,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                             selectedClub = startingClubs.first.name;
                           }
                         });
-                      },
+                      } : null,
                     ),
                   ),
                   SizedBox(height: 3),
@@ -561,8 +621,15 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                     //     fontSize: 11,
                     //   ),
                     // ),
-                    onChanged: (value) =>
-                        setState(() => _limitTransfersToFiveYears = value),
+                    subtitle: Text(
+                      _ownedModes.contains('five_year_transfers')
+                          ? (AppStrings.isEnglish ? 'Mode unlocked' : 'Режим открыт')
+                          : (AppStrings.isEnglish ? 'Locked — buy in the shop' : 'Закрыто — купи в магазине'),
+                      style: const TextStyle(color: Colors.white60, fontSize: 11),
+                    ),
+                    onChanged: _ownedModes.contains('five_year_transfers')
+                        ? (value) => setState(() => _limitTransfersToFiveYears = value)
+                        : null,
                   ),
                   SwitchListTile.adaptive(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 4),
@@ -587,8 +654,15 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                     //     fontSize: 11,
                     //   ),
                     // ),
-                    onChanged: (value) =>
-                        setState(() => _playWithoutInjuries = value),
+                    subtitle: Text(
+                      _ownedModes.contains('career_without_injuries')
+                          ? (AppStrings.isEnglish ? 'Mode unlocked' : 'Режим открыт')
+                          : (AppStrings.isEnglish ? 'Locked — buy in the shop' : 'Закрыто — купи в магазине'),
+                      style: const TextStyle(color: Colors.white60, fontSize: 11),
+                    ),
+                    onChanged: _ownedModes.contains('career_without_injuries')
+                        ? (value) => setState(() => _playWithoutInjuries = value)
+                        : null,
                   ),
                 ],
 

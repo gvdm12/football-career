@@ -7,6 +7,7 @@ import 'package:flutter_football/screens/super_league/super_league_screen.dart';
 import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/services/career_storage.dart';
 import 'package:flutter_football/services/fc_points_service.dart';
+import 'package:flutter_football/screens/shop/fc_points_shop_screen.dart';
 import 'package:flutter_football/settings/settings_screen.dart';
 import 'package:flutter_football/widgets/save_slot_sheet.dart';
 import 'package:flutter_svg/svg.dart';
@@ -156,6 +157,14 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _openShop() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const FCPointsShopScreen()),
+    );
+    if (mounted) await _checkSavedCareer();
+  }
+
   void _openSettings() {
     Navigator.push(
       context,
@@ -210,16 +219,30 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                     ),
-                    IconButton(
-                    onPressed: _openSettings,
-                    icon: SvgPicture.asset(
-                      'assets/icons/settings.svg',
-                      width: 38,
-                      height: 38,
-                      fit: BoxFit.contain,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: _openShop,
+                          icon: const Icon(
+                            Icons.storefront_outlined,
+                            color: Color(0xFFD9B65C),
+                            size: 29,
+                          ),
+                          tooltip: AppStrings.isEnglish ? 'FC Points Shop' : 'Магазин FC Points',
+                        ),
+                        IconButton(
+                          onPressed: _openSettings,
+                          icon: SvgPicture.asset(
+                            'assets/icons/settings.svg',
+                            width: 38,
+                            height: 38,
+                            fit: BoxFit.contain,
+                          ),
+                          tooltip: AppStrings.settingsTooltip,
+                        ),
+                      ],
                     ),
-                    tooltip: AppStrings.settingsTooltip,
-                  ),
                   ],
                 ),
 

@@ -199,6 +199,85 @@ void main() {
     });
   });
 
+  group('FC Points shop', () {
+    test('buys modes separately and prevents repeat purchases', () async {
+      SharedPreferences.setMockInitialValues({
+        'fc_points_profile_v1': jsonEncode({
+          'balance': 1000,
+          'claimedRewards': <String>[],
+        }),
+      });
+
+      expect(
+        await FCPointsService.purchaseMode('any_starting_club'),
+        FCPointsPurchaseResult.purchased,
+      );
+      expect(await FCPointsService.balance(), 400);
+      expect(
+        await FCPointsService.ownedModes(),
+        {'any_starting_club'},
+      );
+
+      expect(
+        await FCPointsService.purchaseMode('any_starting_club'),
+        FCPointsPurchaseResult.alreadyOwned,
+      );
+      expect(
+        await FCPointsService.purchaseMode('career_without_injuries'),
+        FCPointsPurchaseResult.insufficientFunds,
+      );
+      expect(
+        await FCPointsService.purchaseMode('unknown_mode'),
+        FCPointsPurchaseResult.unknownItem,
+      );
+      expect(await FCPointsService.balance(), 400);
+      expect(await FCPointsService.ownedModes(), {'any_starting_club'});
+    });
+
+    test('earning FC Points does not erase purchased modes', () async {
+      SharedPreferences.setMockInitialValues({
+        'fc_points_profile_v1': jsonEncode({
+          'balance': 1000,
+          'claimedRewards': <String>[],
+        }),
+      });
+      await FCPointsService.purchaseMode('career_without_injuries');
+
+      final career = _career('Игрок').copyWith(
+        history: [
+          const SeasonStats(
+            season: 1,
+            club: 'Клуб',
+            matches: 10,
+            goals: 1,
+            assists: 0,
+            yellowCards: 0,
+            redCards: 0,
+            averageRating: 6.5,
+          ),
+        ],
+      );
+      expect(await FCPointsService.awardSeason(career), 80);
+      expect(await FCPointsService.balance(), 630);
+      expect(
+        await FCPointsService.ownedModes(),
+        {'career_without_injuries'},
+      );
+    });
+
+    test('reads older FC Points profiles without owned modes', () async {
+      SharedPreferences.setMockInitialValues({
+        'fc_points_profile_v1': jsonEncode({
+          'balance': 275,
+          'claimedRewards': <String>[],
+        }),
+      });
+
+      expect(await FCPointsService.balance(), 275);
+      expect(await FCPointsService.ownedModes(), isEmpty);
+    });
+  });
+
   group('slot summaries', () {
     test('describes filled, damaged and empty slots', () async {
       SharedPreferences.setMockInitialValues({
