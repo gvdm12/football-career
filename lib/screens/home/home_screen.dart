@@ -7,6 +7,7 @@ import 'package:flutter_football/screens/super_league/super_league_screen.dart';
 import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/services/career_storage.dart';
 import 'package:flutter_football/settings/settings_screen.dart';
+import 'package:flutter_football/widgets/save_slot_sheet.dart';
 import 'package:flutter_svg/svg.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -49,6 +50,23 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _createNewCareer() async {
+    final slot = await SaveSlotSheet.show(
+      context,
+      mode: SaveSlotMode.newCareer,
+    );
+
+    if (!mounted) return;
+
+    if (slot == null) {
+      // Слоты могли быть удалены в панели выбора.
+      await _checkSavedCareer();
+      return;
+    }
+
+    await CareerStorage.setActiveSlot(slot);
+
+    if (!mounted) return;
+
     await Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const CreatePlayerScreen()),
@@ -61,6 +79,30 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _continueCareer() async {
     if (_isLoading) return;
+
+    // Если сохранение одно, продолжаем его сразу, иначе даём выбрать слот.
+    final summaries = await CareerStorage.slotSummaries();
+    final occupied = summaries.where((item) => !item.isEmpty).toList();
+
+    if (!mounted) return;
+
+    final int? slot = occupied.length == 1
+        ? occupied.first.slot
+        : await SaveSlotSheet.show(
+            context,
+            mode: SaveSlotMode.continueCareer,
+          );
+
+    if (!mounted) return;
+
+    if (slot == null) {
+      await _checkSavedCareer();
+      return;
+    }
+
+    await CareerStorage.setActiveSlot(slot);
+
+    if (!mounted) return;
 
     setState(() {
       _isLoading = true;
