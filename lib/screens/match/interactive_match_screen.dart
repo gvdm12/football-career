@@ -10,6 +10,7 @@ import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/match.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/player_status.dart';
+import 'package:flutter_football/services/interactive_match_balance.dart';
 
 class InteractiveMatchScreen extends StatefulWidget {
   final Career career;
@@ -72,6 +73,10 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   String _event = 'Матч начинается! Ваша команда разыгрывает мяч.';
   final List<String> _chronicle = [];
   String _phase = 'buildUp';
+  // Все попытки игрока в эпизодах нужны для адаптивной сложности матча.
+  int _actionAttempts = 0;
+  int _actionSuccesses = 0;
+  bool _instructionGiven = false;
 
   late final bool _playerPlayed;
   late final int _homeStrength;
@@ -82,6 +87,14 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
   late final String _awayTeam;
 
   Player get _player => widget.career.player;
+
+  int get _playerTeamStrength => widget.isHome ? _homeStrength : _awayStrength;
+  int get _opponentTeamStrength =>
+      widget.isHome ? _awayStrength : _homeStrength;
+
+  /// Разница мячей с точки зрения команды игрока.
+  int get _playerGoalDifference =>
+      widget.isHome ? _homeGoals - _awayGoals : _awayGoals - _homeGoals;
 
   bool get _isChampionsLeague => widget.competition == 'championsLeague';
   bool get _isEuropaLeague => widget.competition == 'europaLeague';
@@ -310,6 +323,14 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     if (_minute >= 90) {
       _minute = 90;
       _finished = true;
+      // Оценка учитывает и результат команды относительно ожиданий.
+      _rating += InteractiveMatchBalance.teamResultRatingAdjustment(
+        position: _player.position,
+        goalsFor: widget.isHome ? _homeGoals : _awayGoals,
+        goalsAgainst: widget.isHome ? _awayGoals : _homeGoals,
+        teamStrength: _playerTeamStrength,
+        opponentStrength: _opponentTeamStrength,
+      );
       _rating = _rating.clamp(4.0, 10.0).toDouble();
       final homeAggregate = _homeGoals + widget.homeAggregateGoalsBeforeMatch;
       final awayAggregate = _awayGoals + widget.awayAggregateGoalsBeforeMatch;
@@ -404,6 +425,27 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     }
   }
 
+  /// Бросок на успех действия игрока.
+  ///
+  /// К базовому шансу добавляется поправка за силу соперника, уровень и форму
+  /// игрока и адаптивная сложность, чтобы матч не был ни лёгким, ни
+  /// безнадёжным независимо от соперника.
+  bool _rollAction(double chance) {
+    final modifier = InteractiveMatchBalance.successModifier(
+      teamStrength: _playerTeamStrength,
+      opponentStrength: _opponentTeamStrength,
+      playerOverall: _player.overall,
+      formRating: widget.career.currentFormRating,
+      attempts: _actionAttempts,
+      successes: _actionSuccesses,
+    );
+    final adjusted = (chance + modifier).clamp(0.12, 0.97).toDouble();
+    final success = _random.nextDouble() < adjusted;
+    _actionAttempts++;
+    if (success) _actionSuccesses++;
+    return success;
+  }
+
   // Бонусы за высокий профильный навык растут ступенчато после 80, 85, 90 и 95.
   double _skillTierBonus(double skill) {
     if (skill < 80) return 0;
@@ -462,6 +504,45 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       _momentTitle = 'Атака у штрафной';
       _momentDescription =
           'Команда закрепилась на половине соперника. Можно обострить передачей, сместиться или подготовить удар.';
+      _momentReady = true;
+      return;
+    }
+
+    // Указание тренера во втором тайме: не чаще одного раза за матч.
+    if (!_instructionGiven &&
+        _minute >= 58 &&
+        _minute <= 82 &&
+        _random.nextDouble() < 0.5) {
+      _instructionGiven = true;
+      final text = InteractiveMatchBalance.coachInstructionText(
+        _playerGoalDifference,
+      );
+      _phase = 'coachInstruction';
+      _momentTitle = text.title;
+      _momentDescription = text.description;
+      _event = '$_minute-я минута. Указание тренера.';
+      _momentReady = true;
+      return;
+    }
+
+    // Ход матча подсказывает эпизод: расклад сил, счёт и время.
+    final contextPhase = InteractiveMatchBalance.pickContextPhase(
+      position: _player.position,
+      teamStrength: _playerTeamStrength,
+      opponentStrength: _opponentTeamStrength,
+      minute: _minute,
+      goalDifference: _playerGoalDifference,
+      roll: _random.nextDouble(),
+      variantRoll: _random.nextDouble(),
+    );
+    final contextText = contextPhase == null
+        ? null
+        : InteractiveMatchBalance.momentText(contextPhase, _player.position);
+    if (contextPhase != null && contextText != null) {
+      _phase = contextPhase;
+      _momentTitle = contextText.title;
+      _momentDescription = contextText.description;
+      _event = '$_minute-я минута. ${contextText.title.toLowerCase()}.';
       _momentReady = true;
       return;
     }
@@ -725,6 +806,13 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
     if (_phase == 'unavailable') {
       return [_actionButton('Продолжить матч', 'continue')];
     }
+    if (_phase == 'coachInstruction') {
+      return [
+        _actionButton('Играть выше и давить на соперника', 'instrPress'),
+        _actionButton('Сохранять результат и играть осторожнее', 'instrHold'),
+        _actionButton('Продолжать в прежнем ритме', 'instrKeep'),
+      ];
+    }
     if (_phase == 'penalty') {
       return [_actionButton('Пробить пенальти', 'penaltyShoot')];
     }
@@ -970,6 +1058,27 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
       setState(() {});
       return;
     }
+    if (action == 'instrPress' ||
+        action == 'instrHold' ||
+        action == 'instrKeep') {
+      final effect = InteractiveMatchBalance.coachInstructionEffect(
+        action: action,
+        goalDifference: _playerGoalDifference,
+      );
+      double scaled(double value, double factor) =>
+          (value * factor).clamp(0.0, 2.8).toDouble();
+      if (widget.isHome) {
+        _homeXgRemaining = scaled(_homeXgRemaining, effect.ownXg);
+        _awayXgRemaining = scaled(_awayXgRemaining, effect.opponentXg);
+      } else {
+        _awayXgRemaining = scaled(_awayXgRemaining, effect.ownXg);
+        _homeXgRemaining = scaled(_homeXgRemaining, effect.opponentXg);
+      }
+      _rating += effect.rating;
+      _phase = 'buildUp';
+      _advanceClock(effect.message);
+      return;
+    }
     if ([
       'playCenter',
       'playRight',
@@ -987,7 +1096,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                           : (_awayStrength - _homeStrength)) *
                       0.0015)
               .clamp(0.46, 0.99);
-      if (_random.nextDouble() < passChance) {
+      if (_rollAction(passChance)) {
         _phase = 'offBallRun';
         _rating += 0.22;
         final direction = action == 'playCenter'
@@ -1017,7 +1126,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                   (_player.skills.vision - 60) * 0.0015 +
                   _skillTierBonus(_skill(action)) * 0.55)
               .clamp(0.45, 0.98);
-      if (_random.nextDouble() < wallChance) {
+      if (_rollAction(wallChance)) {
         _phase = 'chance';
         _rating += 0.30;
         _advanceClock(
@@ -1044,7 +1153,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                   teamAdvantage * 0.001 +
                   _skillTierBonus(_skill(action)) * 0.55)
               .clamp(0.40, 0.97);
-      if (_random.nextDouble() < runChance) {
+      if (_rollAction(runChance)) {
         _phase = 'chance';
         _rating += 0.28;
         _advanceClock(
@@ -1071,7 +1180,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                   teamAdvantage * 0.0008 +
                   _skillTierBonus(_skill(action)) * 0.45)
               .clamp(0.42, 0.96);
-      if (_random.nextDouble() < movementChance) {
+      if (_rollAction(movementChance)) {
         _phase = 'aerialChance';
         _rating += 0.18;
         _advanceClock(
@@ -1102,7 +1211,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                   (_player.skills.vision - 60) * 0.002 +
                   _skillTierBonus(_skill(action)) * 0.65)
               .clamp(0.48, 0.99);
-      if (_random.nextDouble() < passChance) {
+      if (_rollAction(passChance)) {
         _rating += 0.32;
         final attackXg = widget.isHome ? _homeXgRemaining : _awayXgRemaining;
         final partnerScoreChance =
@@ -1146,7 +1255,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
                   (_player.skills.defending - 60) * 0.003 +
                   _skillTierBonus(_skill('defend')) * 0.55)
               .clamp(0.20, 0.94);
-      if (action == 'press' && _random.nextDouble() < pressChance) {
+      if (action == 'press' && _rollAction(pressChance)) {
         _phase = 'midfield';
         _rating += 0.20;
         _advanceClock(
@@ -1347,7 +1456,7 @@ class _InteractiveMatchScreenState extends State<InteractiveMatchScreen> {
         widget.career.settings.difficulty.interactiveActionAdjustment;
     final adjustedChance =
         (chance - fatiguePenalty + difficultyAdjustment).clamp(0.20, 0.98).toDouble();
-    final success = _random.nextDouble() < adjustedChance;
+    final success = _rollAction(adjustedChance);
     if (success) _successfulActions++;
     String message;
 

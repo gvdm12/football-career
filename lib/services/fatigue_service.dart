@@ -63,14 +63,19 @@ class FatigueService {
     return match.homeTeam == home && match.awayTeam == away;
   }
 
-  /// Штраф к физическим навыкам (скорость, физика) в матче: 0..6.
+  /// Наибольший штраф к физическим навыкам при полной усталости.
+  static const int maxPhysicalSkillPenalty = 3;
+
+  /// Штраф к физическим навыкам (скорость, физика) в матче: 0..3.
   static int physicalSkillPenalty(int fatigue) {
     if (fatigue <= skillPenaltyThreshold) return 0;
     final span = max - skillPenaltyThreshold;
-    return (((fatigue - skillPenaltyThreshold) / span) * 6).round().clamp(0, 6);
+    return (((fatigue - skillPenaltyThreshold) / span) * maxPhysicalSkillPenalty)
+        .round()
+        .clamp(0, maxPhysicalSkillPenalty);
   }
 
-  /// Штраф к остальным навыкам: вдвое меньше физического.
+  /// Штраф к остальным навыкам: вдвое меньше физического (до 1).
   static int technicalSkillPenalty(int fatigue) =>
       physicalSkillPenalty(fatigue) ~/ 2;
 

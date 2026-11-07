@@ -202,8 +202,8 @@ void main() {
         previousSkill = skill;
         previousSelection = selection;
       }
-      expect(FatigueService.physicalSkillPenalty(100), 6);
-      expect(FatigueService.technicalSkillPenalty(100), 3);
+      expect(FatigueService.physicalSkillPenalty(100), 3);
+      expect(FatigueService.technicalSkillPenalty(100), 1);
       expect(FatigueService.selectionPenalty(100), closeTo(0.16, 1e-9));
     });
 
@@ -238,9 +238,9 @@ void main() {
 
       final matchPlayer = exhausted.playerForMatch;
 
-      expect(matchPlayer.skills.pace, fresh.player.skills.pace - 6);
-      expect(matchPlayer.skills.physical, fresh.player.skills.physical - 6);
-      expect(matchPlayer.skills.shooting, fresh.player.skills.shooting - 3);
+      expect(matchPlayer.skills.pace, fresh.player.skills.pace - 3);
+      expect(matchPlayer.skills.physical, fresh.player.skills.physical - 3);
+      expect(matchPlayer.skills.shooting, fresh.player.skills.shooting - 1);
       expect(exhausted.player.skills.pace, fresh.player.skills.pace);
       expect(fresh.playerForMatch.skills.pace, fresh.player.skills.pace);
     });
