@@ -93,10 +93,12 @@ class _FCPointsShopScreenState extends State<FCPointsShopScreen> {
                 ? 'Not enough FC Points'
                 : 'Недостаточно FC Points',
           );
+          break;
         case FCPointsPurchaseResult.unknownItem:
           _showMessage(
             _english ? 'This item is unavailable' : 'Покупка недоступна',
           );
+          break;
       }
     } catch (_) {
       if (mounted) {
