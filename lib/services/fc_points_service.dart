@@ -93,7 +93,7 @@ class FCPointsService {
             <String>[],
       };
     } catch (_) {
-      return {'balance': 0, 'claimedRewards': <String>[]};
+      return {'balance': 0, 'claimedRewards': <String>[], 'ownedModes': <String>[]};
     }
   }
 
