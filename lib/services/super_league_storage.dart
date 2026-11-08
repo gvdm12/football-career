@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/super_league_career.dart';
 import 'package:flutter_football/services/account_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
