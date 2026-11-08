@@ -136,7 +136,10 @@ class CareerStorage {
         if (slot == null || slot < 1 || slot > slotCount || raw is! String) {
           continue;
         }
-        await preferences.setString(_localKey(slot), raw);
+        // Уже имеющийся локальный файл может содержать более свежую офлайн-карьеру.
+        if (!preferences.containsKey(_localKey(slot))) {
+          await preferences.setString(_localKey(slot), raw);
+        }
       }
       _lastSyncSucceeded = true;
       _lastSyncError = null;
@@ -242,17 +245,19 @@ class CareerStorage {
           .doc('$slot')
           .get()
           .timeout(_cloudTimeout);
-      final raw = remote.data()?['careerJson'];
-      if (raw is String) {
-        await preferences.setString(_localKey(slot), raw);
-        _lastSyncSucceeded = true;
-        _lastSyncError = null;
-      } else if (!remote.exists) {
-        final localRaw = preferences.getString(_localKey(slot));
-        if (localRaw != null) {
+      final remoteRaw = remote.data()?['careerJson'];
+      final localRaw = preferences.getString(_localKey(slot));
+      if (localRaw != null) {
+        // Локальная версия приоритетна: так офлайн-результат матча не затрётся
+        // старой копией из облака после следующего запуска.
+        if (remoteRaw != localRaw) {
           await _writeCloud(uid, slot, localRaw).timeout(_cloudTimeout);
         }
+      } else if (remoteRaw is String) {
+        await preferences.setString(_localKey(slot), remoteRaw);
       }
+      _lastSyncSucceeded = true;
+      _lastSyncError = null;
     } catch (error) {
       _markSyncError(error);
     }
