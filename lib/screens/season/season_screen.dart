@@ -3732,15 +3732,6 @@ class _SeasonScreenState extends State<SeasonScreen> {
                                 _buildFriendlyMatchesSection(),
                               ],
                               const SizedBox(height: 8),
-                              if (isSaving)
-                                const Padding(
-                                  padding: EdgeInsets.all(12),
-                                  child: Center(
-                                    child: CircularProgressIndicator(
-                                      color: Color(0xFF8BE07F),
-                                    ),
-                                  ),
-                                ),
                               if (worldCupBlocksSeason &&
                                   career.worldCup != null)
                                 _buildWorldCupCalendarSection(
