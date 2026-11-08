@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_football/widgets/club_logo.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/transfer_offer.dart';
@@ -269,12 +270,25 @@ class _TransferScreenState extends State<TransferScreen> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Text(
-                  offer.club.name,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                  ),
+                Row(
+                  children: [
+                    ClubLogo(
+                      clubName: offer.club.name,
+                      size: 42,
+                      borderRadius: 10,
+                      fallbackColor: offer.club.primaryColor,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        offer.club.name,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -416,12 +430,25 @@ class _TransferScreenState extends State<TransferScreen> {
                   ),
                 ),
                 const SizedBox(height: 5),
-                Text(
-                  offer.club.name,
-                  style: const TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w900,
-                  ),
+                Row(
+                  children: [
+                    ClubLogo(
+                      clubName: offer.club.name,
+                      size: 42,
+                      borderRadius: 10,
+                      fallbackColor: offer.club.primaryColor,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        offer.club.name,
+                        style: const TextStyle(
+                          fontSize: 19,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Text(

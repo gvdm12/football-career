@@ -2,8 +2,10 @@ import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_football/widgets/club_logo.dart';
 
 import 'package:flutter_football/models/career.dart';
+import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/match.dart';
 import 'package:flutter_football/services/app_strings.dart';
@@ -250,11 +252,6 @@ class MatchScreen extends StatelessWidget {
   }
 
   Widget _buildScoreCard() {
-    final homePrimary = ClubColors.primary(match.homeTeam);
-    final homeSecondary = ClubColors.secondary(match.homeTeam);
-    final awayPrimary = ClubColors.primary(match.awayTeam);
-    final awaySecondary = ClubColors.secondary(match.awayTeam);
-
     return ClipRRect(
       borderRadius: BorderRadius.circular(26),
       child: BackdropFilter(
@@ -308,8 +305,6 @@ class MatchScreen extends StatelessWidget {
                   Expanded(
                     child: _buildTeam(
                       name: match.homeTeam,
-                      primary: homePrimary,
-                      secondary: homeSecondary,
                     ),
                   ),
                   const Padding(
@@ -326,8 +321,6 @@ class MatchScreen extends StatelessWidget {
                   Expanded(
                     child: _buildTeam(
                       name: match.awayTeam,
-                      primary: awayPrimary,
-                      secondary: awaySecondary,
                     ),
                   ),
                 ],
@@ -366,35 +359,14 @@ class MatchScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTeam({
-    required String name,
-    required Color primary,
-    required Color secondary,
-  }) {
+  Widget _buildTeam({required String name}) {
     return Column(
       children: [
-        Container(
-          width: 54,
-          height: 54,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [primary, secondary],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
-          ),
-          child: Center(
-            child: Text(
-              name.isNotEmpty ? name[0].toUpperCase() : '?',
-              style: TextStyle(
-                color: _readableTextColor(primary),
-                fontSize: 26,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ),
+        ClubLogo(
+          clubName: name,
+          size: 58,
+          borderRadius: 14,
+          fallbackColor: Clubs.getByName(name).primaryColor,
         ),
         const SizedBox(height: 8),
         Text(
