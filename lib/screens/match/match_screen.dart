@@ -384,10 +384,6 @@ class MatchScreen extends StatelessWidget {
     );
   }
 
-  Color _readableTextColor(Color color) {
-    return color.computeLuminance() > 0.45 ? Colors.black : Colors.white;
-  }
-
   Widget _buildPlayerStats() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(22),
