@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_football/widgets/club_logo.dart';
 
 import 'package:flutter_football/models/career.dart';
+import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/match.dart';
 import 'package:flutter_football/services/app_strings.dart';
