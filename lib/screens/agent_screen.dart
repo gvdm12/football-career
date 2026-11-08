@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_football/widgets/club_logo.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/transfer_offer.dart';
@@ -462,6 +463,8 @@ class _AgentScreenState extends State<AgentScreen> {
         children: [
           Row(
             children: [
+              ClubLogo(clubName: offer.club.name, size: 28, borderRadius: 8),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   offer.club.name,
