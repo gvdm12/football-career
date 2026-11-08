@@ -223,6 +223,7 @@ class ClubLogo extends StatelessWidget {
     'elversberg': 'assets/clubs/germany/bundesliga/germany_sv-elversberg.football-logos.cc.svg',
     'lokomotivmoscow': 'assets/clubs/russie/rpl/russia_lokomotiv-moskva.football-logos.cc.svg',
     'spartakmoscow': 'assets/clubs/russie/rpl/russia_spartak-moskva.football-logos.cc.svg',
+    'austinfc': 'assets/clubs/mls/usa_austins-fc.football-logos.cc.svg',
   };
 
   static String _normalizeName(String value) =>
