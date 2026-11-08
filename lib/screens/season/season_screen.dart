@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_football/widgets/club_logo.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/career_news.dart';
 import 'package:flutter_football/models/champions_league.dart';
@@ -3814,30 +3815,11 @@ class _SeasonScreenState extends State<SeasonScreen> {
         children: [
           Row(
             children: [
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [secondary, primary]),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.35),
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    career.player.club.isNotEmpty
-                        ? career.player.club[0].toUpperCase()
-                        : '?',
-                    style: TextStyle(
-                      color: secondary.computeLuminance() > 0.45
-                          ? Colors.black
-                          : Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
+              ClubLogo(
+                clubName: career.player.club,
+                size: 54,
+                borderRadius: 12,
+                fallbackColor: primary,
               ),
               const SizedBox(width: 12),
               Expanded(
