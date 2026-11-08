@@ -219,6 +219,10 @@ class ClubLogo extends StatelessWidget {
     'sochi': 'assets/clubs/russie/rpl 2/russia_sochi.football-logos.cc.svg',
     'ufa': 'assets/clubs/russie/rpl 2/russia_ufa.football-logos.cc.svg',
     'chelyabinsk': 'assets/clubs/russie/rpl 2/russia_chelyabinsk.football-logos.cc.svg',
+    'racingsantander': 'assets/clubs/spain/la liga/spain_racing.football-logos.cc.svg',
+    'elversberg': 'assets/clubs/germany/bundesliga/germany_sv-elversberg.football-logos.cc.svg',
+    'lokomotivmoscow': 'assets/clubs/russie/rpl/russia_lokomotiv-moskva.football-logos.cc.svg',
+    'spartakmoscow': 'assets/clubs/russie/rpl/russia_spartak-moskva.football-logos.cc.svg',
   };
 
   static String _normalizeName(String value) =>
