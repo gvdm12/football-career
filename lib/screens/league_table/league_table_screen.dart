@@ -328,6 +328,8 @@ class LeagueTableScreen extends StatelessWidget {
           Expanded(
             child: Row(
               children: [
+                ClubLogo(clubName: entry.club, size: 22, borderRadius: 6),
+                const SizedBox(width: 7),
                 Expanded(
                   child: Text(
                     entry.club,
