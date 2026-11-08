@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_football/models/club_colors.dart';
 
-/// Компактное отображение клуба.
+/// Отображает локальную SVG-эмблему клуба.
 ///
-/// Пока локальные SVG-эмблемы не используются, показываем фирменный
-/// градиент клуба и его первую букву вместо нейтрального щита.
+/// Если эмблема отсутствует или SVG не удалось разобрать, показывается
+/// безопасная цветная заглушка. Сетевые запросы не выполняются.
 class ClubLogo extends StatelessWidget {
   final String clubName;
   final double size;
@@ -19,12 +20,189 @@ class ClubLogo extends StatelessWidget {
     this.borderRadius = 10,
   });
 
-  /// Локальные эмблемы можно будет подключать постепенно.
-  static const Map<String, String> _logoAssets = {};
+  /// Ключи — нормализованные названия клубов из Clubs.all.
+  /// В карте находятся только файлы, реально добавленные в assets/clubs.
+  static const Map<String, String> _logoAssets = {
+    'arsenal': 'assets/clubs/england/epl/england_arsenal.football-logos.cc.svg',
+    'astonvilla': 'assets/clubs/england/epl/england_aston-villa.football-logos.cc.svg',
+    'bournemouth': 'assets/clubs/england/epl/england_bournemouth.football-logos.cc.svg',
+    'brentford': 'assets/clubs/england/epl/england_brentford.football-logos.cc.svg',
+    'brighton': 'assets/clubs/england/epl/england_brighton.football-logos.cc.svg',
+    'chelsea': 'assets/clubs/england/epl/england_chelsea.football-logos.cc.svg',
+    'coventrycity': 'assets/clubs/england/epl/england_coventry-city.football-logos.cc.svg',
+    'crystalpalace': 'assets/clubs/england/epl/england_crystal-palace.football-logos.cc.svg',
+    'everton': 'assets/clubs/england/epl/england_everton.football-logos.cc.svg',
+    'fulham': 'assets/clubs/england/epl/england_fulham.football-logos.cc.svg',
+    'hullcity': 'assets/clubs/england/epl/england_hull-city.football-logos.cc.svg',
+    'ipswichtown': 'assets/clubs/england/epl/england_ipswich.football-logos.cc.svg',
+    'leedsunited': 'assets/clubs/england/epl/england_leeds-united.football-logos.cc.svg',
+    'liverpool': 'assets/clubs/england/epl/england_liverpool.football-logos.cc.svg',
+    'manchestercity': 'assets/clubs/england/epl/england_manchester-city.football-logos.cc.svg',
+    'manchesterunited': 'assets/clubs/england/epl/england_manchester-united.football-logos.cc.svg',
+    'newcastleunited': 'assets/clubs/england/epl/england_newcastle.football-logos.cc.svg',
+    'nottinghamforest': 'assets/clubs/england/epl/england_nottingham-forest.football-logos.cc.svg',
+    'sunderland': 'assets/clubs/england/epl/england_sunderland.football-logos.cc.svg',
+    'tottenham': 'assets/clubs/england/epl/england_tottenham.football-logos.cc.svg',
+    'athleticbilbao': 'assets/clubs/spain/la liga/spain_athletic-club.football-logos.cc.svg',
+    'atleticomadrid': 'assets/clubs/spain/la liga/spain_atletico-madrid.football-logos.cc (1).svg',
+    'barcelona': 'assets/clubs/spain/la liga/spain_barcelona.football-logos.cc.svg',
+    'deportivolacoruna': 'assets/clubs/spain/la liga/spain_deportivo-la-coruna.football-logos.cc.svg',
+    'elche': 'assets/clubs/spain/la liga/spain_elche.football-logos.cc.svg',
+    'espanyol': 'assets/clubs/spain/la liga/spain_espanyol.football-logos.cc.svg',
+    'getafe': 'assets/clubs/spain/la liga/spain_getafe.football-logos.cc.svg',
+    'levante': 'assets/clubs/spain/la liga/spain_levante.football-logos.cc.svg',
+    'malaga': 'assets/clubs/spain/la liga/spain_malaga.football-logos.cc.svg',
+    'osasuna': 'assets/clubs/spain/la liga/spain_osasuna.football-logos.cc.svg',
+    'rayovallecano': 'assets/clubs/spain/la liga/spain_rayo-vallecano.football-logos.cc.svg',
+    'realbetis': 'assets/clubs/spain/la liga/spain_real-betis.football-logos.cc.svg',
+    'realmadrid': 'assets/clubs/spain/la liga/spain_real-madrid.football-logos.cc.svg',
+    'realsociedad': 'assets/clubs/spain/la liga/spain_real-sociedad.football-logos.cc.svg',
+    'sevilla': 'assets/clubs/spain/la liga/spain_sevilla.football-logos.cc.svg',
+    'valencia': 'assets/clubs/spain/la liga/spain_valencia.football-logos.cc.svg',
+    'villarreal': 'assets/clubs/spain/la liga/spain_villarreal.football-logos.cc.svg',
+    'acmilan': 'assets/clubs/italy/serie A/italy_milan.football-logos.cc.svg',
+    'atalanta': 'assets/clubs/italy/serie A/italy_atalanta.football-logos.cc.svg',
+    'bologna': 'assets/clubs/italy/serie A/italy_bologna.football-logos.cc.svg',
+    'cagliari': 'assets/clubs/italy/serie A/italy_cagliari.football-logos.cc.svg',
+    'fiorentina': 'assets/clubs/italy/serie A/italy_fiorentina.football-logos.cc.svg',
+    'frosinone': 'assets/clubs/italy/serie A/italy_frosinone.football-logos.cc.svg',
+    'genoa': 'assets/clubs/italy/serie A/italy_genoa.football-logos.cc.svg',
+    'inter': 'assets/clubs/italy/serie A/italy_inter.football-logos.cc.svg',
+    'juventus': 'assets/clubs/italy/serie A/italy_juventus.football-logos.cc.svg',
+    'lazio': 'assets/clubs/italy/serie A/italy_lazio.football-logos.cc.svg',
+    'lecce': 'assets/clubs/italy/serie A/italy_lecce.football-logos.cc.svg',
+    'monza': 'assets/clubs/italy/serie A/italy_monza.football-logos.cc.svg',
+    'napoli': 'assets/clubs/italy/serie A/italy_napoli.football-logos.cc.svg',
+    'parma': 'assets/clubs/italy/serie A/italy_parma.football-logos.cc.svg',
+    'roma': 'assets/clubs/italy/serie A/italy_roma.football-logos.cc.svg',
+    'sassuolo': 'assets/clubs/italy/serie A/italy_sassuolo.football-logos.cc.svg',
+    'torino': 'assets/clubs/italy/serie A/italy_torino.football-logos.cc.svg',
+    'udinese': 'assets/clubs/italy/serie A/italy_udinese.football-logos.cc.svg',
+    'venezia': 'assets/clubs/italy/serie A/italy_venezia.football-logos.cc.svg',
+    'augsburg': 'assets/clubs/germany/bundesliga/germany_augsburg.football-logos.cc.svg',
+    'bayernmunich': 'assets/clubs/germany/bundesliga/germany_bayern-munchen.football-logos.cc.svg',
+    'bayerleverkusen': 'assets/clubs/germany/bundesliga/germany_bayer-leverkusen.football-logos.cc.svg',
+    'borussiadortmund': 'assets/clubs/germany/bundesliga/germany_borussia-dortmund.football-logos.cc.svg',
+    'monchengladbach': 'assets/clubs/germany/bundesliga/germany_borussia-monchengladbach.football-logos.cc.svg',
+    'eintrachtfrankfurt': 'assets/clubs/germany/bundesliga/germany_eintracht-frankfurt.football-logos.cc.svg',
+    'hamburgersv': 'assets/clubs/germany/bundesliga/germany_hamburger-sv.football-logos.cc.svg',
+    'hoffenheim': 'assets/clubs/germany/bundesliga/germany_hoffenheim.football-logos.cc.svg',
+    'mainz05': 'assets/clubs/germany/bundesliga/germany_mainz-05.football-logos.cc.svg',
+    'paderborn': 'assets/clubs/germany/bundesliga/germany_paderborn.football-logos.cc.svg',
+    'rbleipzig': 'assets/clubs/germany/bundesliga/germany_rb-leipzig.football-logos.cc.svg',
+    'schalke04': 'assets/clubs/germany/bundesliga/germany_schalke-04.football-logos.cc.svg',
+    'scfreiburg': 'assets/clubs/germany/bundesliga/germany_freiburg.football-logos.cc.svg',
+    'unionberlin': 'assets/clubs/germany/bundesliga/germany_union-berlin.football-logos.cc.svg',
+    'vfbstuttgart': 'assets/clubs/germany/bundesliga/germany_vfb-stuttgart.football-logos.cc.svg',
+    'werderbremen': 'assets/clubs/germany/bundesliga/germany_werder-bremen.football-logos.cc.svg',
+    'fckoln': 'assets/clubs/germany/bundesliga/germany_koln.football-logos.cc.svg',
+    'angers': 'assets/clubs/france/ligue 1/france_angers.football-logos.cc.svg',
+    'auxerre': 'assets/clubs/france/ligue 1/france_auxerre.football-logos.cc.svg',
+    'brest': 'assets/clubs/france/ligue 1/france_brest.football-logos.cc.svg',
+    'lehavre': 'assets/clubs/france/ligue 1/france_le-havre-ac.football-logos.cc.svg',
+    'lemans': 'assets/clubs/france/ligue 1/france_le-mans.football-logos.cc.svg',
+    'lille': 'assets/clubs/france/ligue 1/france_lille.football-logos.cc.svg',
+    'lorient': 'assets/clubs/france/ligue 1/france_lorient.football-logos.cc.svg',
+    'lyon': 'assets/clubs/france/ligue 1/france_lyon.football-logos.cc.svg',
+    'marseille': 'assets/clubs/france/ligue 1/france_marseille.football-logos.cc.svg',
+    'parisfc': 'assets/clubs/france/ligue 1/france_paris-fc.football-logos.cc.svg',
+    'psg': 'assets/clubs/france/ligue 1/france_paris-saint-germain.football-logos.cc (1).svg',
+    'rennes': 'assets/clubs/france/ligue 1/france_rennes.football-logos.cc.svg',
+    'strasbourg': 'assets/clubs/france/ligue 1/france_rc-strasbourg-alsace.football-logos.cc.svg',
+    'toulouse': 'assets/clubs/france/ligue 1/france_toulouse.football-logos.cc.svg',
+    'troyes': 'assets/clubs/france/ligue 1/france_troyes.football-logos.cc.svg',
+    'lens': 'assets/clubs/france/ligue 1/france_rc-lens.football-logos.cc.svg',
+    'nice': 'assets/clubs/france/ligue 1/france_nice.football-logos.cc.svg',
+    'akrontolyatti': 'assets/clubs/russie/rpl/russia_akron.football-logos.cc.svg',
+    'akhmatgrozny': 'assets/clubs/russie/rpl/russia_akhmat.football-logos.cc.svg',
+    'baltikakaliningrad': 'assets/clubs/russie/rpl/russia_baltika.football-logos.cc.svg',
+    'cskamoscow': 'assets/clubs/russie/rpl/russia_cska-moskva.football-logos.cc.svg',
+    'dynamomakhachkala': 'assets/clubs/russie/rpl/russia_dynamo-makhachkala.football-logos.cc.svg',
+    'dynamomoscow': 'assets/clubs/russie/rpl/russia_dynamo-moscow.football-logos.cc.svg',
+    'krasnodar': 'assets/clubs/russie/rpl/russia_krasnodar.football-logos.cc.svg',
+    'orenburg': 'assets/clubs/russie/rpl/russia_orenburg.football-logos.cc.svg',
+    'rodinamoscow': 'assets/clubs/russie/rpl/russia_rodina-moscow.football-logos.cc.svg',
+    'rostov': 'assets/clubs/russie/rpl/russia_rostov.football-logos.cc.svg',
+    'zenit': 'assets/clubs/russie/rpl/russia_zenit.football-logos.cc.svg',
+    'alanyaspor': 'assets/clubs/turkiye superlig/turkey_alanyaspor.football-logos.cc.svg',
+    'istanbulbasaksehir': 'assets/clubs/turkiye superlig/turkey_basaksehir.football-logos.cc.svg',
+    'besiktas': 'assets/clubs/turkiye superlig/turkey_besiktas.football-logos.cc.svg',
+    'fenerbahce': 'assets/clubs/turkiye superlig/turkey_fenerbahce.football-logos.cc.svg',
+    'galatasaray': 'assets/clubs/turkiye superlig/turkey_galatasaray.football-logos.cc.svg',
+    'trabzonspor': 'assets/clubs/turkiye superlig/turkey_trabzonspor.football-logos.cc.svg',
+    'anderlecht': 'assets/clubs/belgium liga/belgium_anderlecht.football-logos.cc.svg',
+    'antwerp': 'assets/clubs/belgium liga/belgium_antwerp.football-logos.cc.svg',
+    'cerclebrugge': 'assets/clubs/belgium liga/belgium_cercle-brugge.football-logos.cc.svg',
+    'clubbrugge': 'assets/clubs/belgium liga/belgium_club-brugge.football-logos.cc.svg',
+    'genk': 'assets/clubs/belgium liga/belgium_genk.football-logos.cc.svg',
+    'gent': 'assets/clubs/belgium liga/belgium_gent.football-logos.cc.svg',
+    'standardliege': 'assets/clubs/belgium liga/belgium_standard-liege.football-logos.cc.svg',
+    'unionsaintgilloise': 'assets/clubs/belgium liga/belgium_union-saint-gilloise.football-logos.cc.svg',
+    'westerlo': 'assets/clubs/belgium liga/belgium_westerlo.football-logos.cc.svg',
+    'ajax': 'assets/clubs/eredivisie/netherlands_ajax.football-logos.cc.svg',
+    'azalkmaar': 'assets/clubs/eredivisie/netherlands_az-alkmaar.football-logos.cc.svg',
+    'fctwente': 'assets/clubs/eredivisie/netherlands_twente.football-logos.cc.svg',
+    'fcutrecht': 'assets/clubs/eredivisie/netherlands_fc-utrecht.football-logos.cc.svg',
+    'feyenoord': 'assets/clubs/eredivisie/netherlands_feyenoord.football-logos.cc.svg',
+    'psv': 'assets/clubs/eredivisie/netherlands_psv.football-logos.cc.svg',
+    'arouca': 'assets/clubs/portugal liga/portugal_arouca.football-logos.cc.svg',
+    'benfica': 'assets/clubs/portugal liga/portugal_benfica.football-logos.cc.svg',
+    'famalicao': 'assets/clubs/portugal liga/portugal_famalicao.football-logos.cc.svg',
+    'moreirense': 'assets/clubs/portugal liga/portugal_moreirense.football-logos.cc.svg',
+    'rioave': 'assets/clubs/portugal liga/portugal_rio-ave.football-logos.cc.svg',
+    'sportingcp': 'assets/clubs/portugal liga/portugal_sporting-cp.football-logos.cc.svg',
+    'atlantaunited': 'assets/clubs/mls/usa_atlanta-united.football-logos.cc.svg',
+    'cfmontreal': 'assets/clubs/mls/usa_cf-montreal.football-logos.cc.svg',
+    'charlottefc': 'assets/clubs/mls/usa_charlotte-fc.football-logos.cc.svg',
+    'dcunited': 'assets/clubs/mls/usa_dc-united.football-logos.cc.svg',
+    'fccincinnati': 'assets/clubs/mls/usa_fc-cincinnati.football-logos.cc.svg',
+    'lagalaxy': 'assets/clubs/mls/usa_la-galaxy.football-logos.cc.svg',
+    'losangelesfc': 'assets/clubs/mls/usa_los-angeles-fc.football-logos.cc.svg',
+    'newyorkredbulls': 'assets/clubs/mls/usa_new-york-red-bulls.football-logos.cc.svg',
+    'burnley': 'assets/clubs/england/championship/england_burnley.football-logos.cc.svg',
+    'millwall': 'assets/clubs/england/championship/england_millwall.football-logos.cc.svg',
+    'watford': 'assets/clubs/england/championship/england_watford.football-logos.cc.svg',
+    'wrexham': 'assets/clubs/england/championship/england_wrexham.football-logos.cc.svg',
+    'albacete': 'assets/clubs/spain/la liga 2/spain_albacete.football-logos.cc.svg',
+    'burgos': 'assets/clubs/spain/la liga 2/spain_burgos.football-logos.cc.svg',
+    'cadiz': 'assets/clubs/spain/la liga 2/spain_cadiz.football-logos.cc.svg',
+    'castellon': 'assets/clubs/spain/la liga 2/spain_castellon.football-logos.cc.svg',
+    'eldense': 'assets/clubs/spain/la liga 2/spain_eldense.football-logos.cc.svg',
+    'leganes': 'assets/clubs/spain/la liga 2/spain_leganes.football-logos.cc.svg',
+    'tenerife': 'assets/clubs/spain/la liga 2/spain_tenerife.football-logos.cc.svg',
+    'sabadell': 'assets/clubs/spain/la liga 2/spain_sabadell.football-logos.cc.svg',
+    'cordoba': 'assets/clubs/spain/la liga 2/spain_cordoba.football-logos.cc.svg',
+    'fcandorra': 'assets/clubs/spain/la liga 2/spain_fc-andorra.football-logos.cc.svg',
+    'girona': 'assets/clubs/spain/la liga 2/spain_girona.football-logos.cc.svg',
+    'granada': 'assets/clubs/spain/la liga 2/spain_granada.football-logos.cc.svg',
+    'mallorca': 'assets/clubs/spain/la liga 2/spain_mallorca.football-logos.cc.svg',
+    'eibar': 'assets/clubs/spain/la liga 2/spain_eibar.football-logos.cc.svg',
+    'almeria': 'assets/clubs/spain/la liga 2/spain_almeria.football-logos.cc.svg',
+    'laspalmas': 'assets/clubs/spain/la liga 2/spain_las-palmas.football-logos.cc.svg',
+    'vflbochum': 'assets/clubs/germany/2 bundesliga/germany_vfl-bochum.football-logos.cc.svg',
+    'ascoli': 'assets/clubs/italy/serie B/italy_ascoli.football-logos.cc.svg',
+    'benevento': 'assets/clubs/italy/serie B/italy_benevento.football-logos.cc.svg',
+    'cremonese': 'assets/clubs/italy/serie B/italy_cremonese.football-logos.cc.svg',
+    'empoli': 'assets/clubs/italy/serie B/italy_empoli.football-logos.cc.svg',
+    'modena': 'assets/clubs/italy/serie B/italy_modena.football-logos.cc.svg',
+    'palermo': 'assets/clubs/italy/serie B/italy_palermo.football-logos.cc.svg',
+    'pisa': 'assets/clubs/italy/serie B/italy_pisa.football-logos.cc.svg',
+    'sampdoria': 'assets/clubs/italy/serie B/italy_sampdoria.football-logos.cc.svg',
+    'dijon': 'assets/clubs/france/ligue 2/france_dijon.football-logos.cc.svg',
+    'montpellier': 'assets/clubs/france/ligue 2/france_montpellier.football-logos.cc.svg',
+    'nantes': 'assets/clubs/france/ligue 2/france_nantes.football-logos.cc.svg',
+    'sochi': 'assets/clubs/russie/rpl 2/russia_sochi.football-logos.cc.svg',
+    'ufa': 'assets/clubs/russie/rpl 2/russia_ufa.football-logos.cc.svg',
+    'chelyabinsk': 'assets/clubs/russie/rpl 2/russia_chelyabinsk.football-logos.cc.svg',
+  };
+
+  static String _normalizeName(String value) =>
+      value.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
 
   static int get mappedClubCount => _logoAssets.length;
 
-  static String? assetPathFor(String clubName) => _logoAssets[clubName];
+  static String? assetPathFor(String clubName) =>
+      _logoAssets[_normalizeName(clubName.trim())];
 
   Widget _fallback() {
     final primary = fallbackColor ?? ClubColors.primary(clubName);
@@ -82,6 +260,26 @@ class ClubLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(width: size, height: size, child: _fallback());
+    final assetPath = assetPathFor(clubName);
+
+    if (assetPath == null) {
+      return SizedBox(width: size, height: size, child: _fallback());
+    }
+
+    return SizedBox(
+      width: size,
+      height: size,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: SvgPicture.asset(
+          assetPath,
+          width: size,
+          height: size,
+          fit: BoxFit.contain,
+          semanticsLabel: '$clubName crest',
+          errorBuilder: (context, error, stackTrace) => _fallback(),
+        ),
+      ),
+    );
   }
 }
