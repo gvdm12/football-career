@@ -1221,6 +1221,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                                           size: 42,
                                           fallbackColor: club.primaryColor,
                                           borderRadius: 11,
+                                          useFallback: true,
                                         ),
                                       ),
                                       const SizedBox(width: 12),
