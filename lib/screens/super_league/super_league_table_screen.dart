@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/super_league_career.dart';
 import 'package:flutter_football/models/super_league_division.dart';
+import 'package:flutter_football/widgets/club_logo.dart';
 
 class SuperLeagueTableScreen extends StatefulWidget {
   final SuperLeagueCareer career;
@@ -211,8 +212,6 @@ class _SuperLeagueTableScreenState extends State<SuperLeagueTableScreen> {
         ? const Color(0xFF22C55E)
         : null;
     final difference = entry.goalDifference;
-    final primary = ClubColors.primary(entry.club);
-    final secondary = ClubColors.secondary(entry.club);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
@@ -245,28 +244,7 @@ class _SuperLeagueTableScreenState extends State<SuperLeagueTableScreen> {
           Expanded(
             child: Row(
               children: [
-                Container(
-                  width: 28,
-                  height: 28,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [secondary, primary]),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.25),
-                    ),
-                  ),
-                  child: Text(
-                    entry.club.isNotEmpty ? entry.club[0].toUpperCase() : '?',
-                    style: TextStyle(
-                      color: secondary.computeLuminance() > 0.45
-                          ? Colors.black
-                          : Colors.white,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 11,
-                    ),
-                  ),
-                ),
+                ClubLogo(clubName: entry.club, size: 28, borderRadius: 8),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
