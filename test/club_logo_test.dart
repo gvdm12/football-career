@@ -1,26 +1,18 @@
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/widgets/club_logo.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-
-  test('все эмблемы из справочника загружаются из локальных assets', () async {
+  test('пока для всех клубов используется заглушка вместо эмблемы', () {
     expect(Clubs.all.length, 352);
-    expect(ClubLogo.mappedClubCount, 349);
+    expect(ClubLogo.mappedClubCount, 0);
 
     for (final club in Clubs.all) {
-      final assetPath = ClubLogo.assetPathFor(club.name);
-      if (assetPath != null) {
-        expect(assetPath, startsWith('assets/clubs/'));
-        expect(assetPath, endsWith('.svg'));
-        await rootBundle.load(assetPath);
-      }
+      expect(ClubLogo.assetPathFor(club.name), isNull);
     }
   });
 
-  test('неизвестный клуб не получает чужую эмблему', () {
+  test('неизвестный клуб также не получает чужую эмблему', () {
     expect(ClubLogo.assetPathFor('Unknown FC'), isNull);
   });
 }
