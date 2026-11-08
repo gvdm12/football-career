@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/super_league_career.dart';
+import 'package:flutter_football/widgets/club_logo.dart';
 
 class SuperLeagueCalendarScreen extends StatelessWidget {
   final SuperLeagueCareer career;
@@ -130,14 +131,36 @@ class SuperLeagueCalendarScreen extends StatelessWidget {
                                   style: const TextStyle(color: _green, fontSize: 9,
                                       fontWeight: FontWeight.w900, letterSpacing: 0.8)),
                               const SizedBox(height: 4),
-                              Text(isHome
-                                  ? '${career.player.club} — $opponent'
-                                  : '$opponent — ${career.player.club}',
-                                  style: TextStyle(
-                                    color: fixture.isPlayed ? Colors.white70 : Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: fixture.isPlayed ? FontWeight.w500 : FontWeight.w800,
-                                  )),
+                              Row(
+                                children: [
+                                  ClubLogo(
+                                    clubName: isHome ? career.player.club : opponent,
+                                    size: 20,
+                                    borderRadius: 5,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Expanded(
+                                    child: Text(
+                                      isHome
+                                          ? '${career.player.club} — $opponent'
+                                          : '$opponent — ${career.player.club}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: fixture.isPlayed ? Colors.white70 : Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: fixture.isPlayed ? FontWeight.w500 : FontWeight.w800,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  ClubLogo(
+                                    clubName: isHome ? opponent : career.player.club,
+                                    size: 20,
+                                    borderRadius: 5,
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                         ),
