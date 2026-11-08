@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_football/widgets/club_logo.dart';
 import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/club_colors.dart';
@@ -281,38 +282,7 @@ class _SuperLeagueCreatePlayerScreenState
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      width: 54,
-                      height: 54,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            ClubColors.secondary(widget.club.name),
-                            ClubColors.primary(widget.club.name),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Text(
-                        widget.club.name
-                            .split(' ')
-                            .map((part) => part.isEmpty ? '' : part[0])
-                            .take(2)
-                            .join()
-                            .toUpperCase(),
-                        style: TextStyle(
-                          color:
-                              ClubColors.secondary(
-                                    widget.club.name,
-                                  ).computeLuminance() >
-                                  0.45
-                              ? Colors.black
-                              : Colors.white,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ),
+                    ClubLogo(clubName: widget.club.name, size: 54, borderRadius: 14),
                     const SizedBox(width: 14),
                     Expanded(
                       child: Column(
