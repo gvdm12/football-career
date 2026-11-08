@@ -39,7 +39,7 @@ class CareerStorage {
   static const String _legacyActiveSlotKey = 'active_career_slot';
   static const int slotCount = 3;
 
-  static String? _uid => AccountService.currentUser?.uid;
+  static String? get _uid => AccountService.currentUser?.uid;
   static bool _lastSyncSucceeded = true;
   static String? _lastSyncError;
 
