@@ -260,6 +260,7 @@ class ClubLogo extends StatelessWidget {
     'yeniseykrasnoyarsk': 'assets/clubs/russie/rpl 2/russia_yenisey.football-logos.cc.svg',
     'sportinggijon': 'assets/clubs/spain/la liga 2/spain_sporting-gijon.football-logos.cc.svg',
     'realvalladolid': 'assets/clubs/spain/la liga 2/spain_valladolid.football-logos.cc.svg',
+    'deportivo': 'assets/clubs/spain/la liga/spain_deportivo-la-coruna.football-logos.cc.svg',
   };
 
   static String _normalizeName(String value) =>
