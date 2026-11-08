@@ -61,6 +61,10 @@ class SuperLeagueStorage {
     }
 
     var raw = preferences.getString(_saveKey);
+    if (raw == null && _uid == null) {
+      raw = preferences.getString(_oldLegacySaveKey);
+      if (raw != null) await preferences.setString(_saveKey, raw);
+    }
     if (raw == null && _uid != null && await AccountService.isDeveloper()) {
       // Перенос старого общего сохранения только в аккаунт разработчика.
       raw = preferences.getString(_legacySaveKey) ??
