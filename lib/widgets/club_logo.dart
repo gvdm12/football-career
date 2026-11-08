@@ -383,9 +383,19 @@ class ClubLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     final assetPath = assetPathFor(clubName);
     if (assetPath == null) return _fallback();
-    return SizedBox(width: size, height: size,
-      child: SvgPicture.asset(assetPath, fit: BoxFit.contain,
+    return SizedBox(
+      width: size,
+      height: size,
+      child: SvgPicture.asset(
+        assetPath,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+        alignment: Alignment.center,
+        clipBehavior: Clip.hardEdge,
         placeholderBuilder: (_) => _fallback(),
-        errorBuilder: (_, __, ___) => _fallback()));
+        errorBuilder: (_, __, ___) => _fallback(),
+      ),
+    );
   }
 }
