@@ -265,6 +265,45 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
 
+                if (CareerStorage.isCloudAccount)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          CareerStorage.lastSyncSucceeded
+                              ? Icons.cloud_done_outlined
+                              : Icons.cloud_off_outlined,
+                          size: 14,
+                          color: CareerStorage.lastSyncSucceeded
+                              ? const Color(0xFF8BE07F)
+                              : const Color(0xFFFFC078),
+                        ),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            CareerStorage.lastSyncSucceeded
+                                ? (AppStrings.isEnglish
+                                    ? 'Cloud sync enabled'
+                                    : 'Облачная синхронизация включена')
+                                : (AppStrings.isEnglish
+                                    ? 'Saved locally · cloud sync unavailable'
+                                    : 'Сохранено локально · облако недоступно'),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: CareerStorage.lastSyncSucceeded
+                                  ? const Color(0xFFBDEDB6)
+                                  : const Color(0xFFFFD39A),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
                 const Spacer(),
 
                 Container(
