@@ -11,6 +11,7 @@ class ClubLogo extends StatelessWidget {
   final double size;
   final Color? fallbackColor;
   final double borderRadius;
+  final bool useFallback;
 
   const ClubLogo({
     super.key,
@@ -18,6 +19,7 @@ class ClubLogo extends StatelessWidget {
     this.size = 40,
     this.fallbackColor,
     this.borderRadius = 10,
+    this.useFallback = false,
   });
 
   /// Ключи — нормализованные названия клубов из Clubs.all.
@@ -329,7 +331,9 @@ class ClubLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     final assetPath = assetPathFor(clubName);
 
-    if (assetPath == null) {
+    // В стартовом выборе используем лёгкую заглушку: некоторые SVG-файлы
+    // очень сложные и могут надолго блокировать отрисовку на слабых устройствах.
+    if (useFallback || assetPath == null) {
       return SizedBox(width: size, height: size, child: _fallback());
     }
 
