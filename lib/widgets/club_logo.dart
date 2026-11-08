@@ -348,7 +348,10 @@ class ClubLogo extends StatelessWidget {
           height: size,
           fit: BoxFit.contain,
           semanticsLabel: '$clubName crest',
-          errorBuilder: (context, error, stackTrace) => _fallback(),
+          errorBuilder: (context, error, stackTrace) {
+            debugPrint('Не удалось загрузить эмблему $clubName ($assetPath): $error');
+            return _fallback();
+          },
         ),
       ),
     );
