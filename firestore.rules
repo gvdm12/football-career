@@ -49,6 +49,22 @@ service cloud.firestore {
 
         allow delete: if request.auth != null && request.auth.uid == userId;
       }
+
+      // Баланс FC Points, награды и купленные режимы принадлежат UID.
+      match /gameData/{documentId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+
+        allow create, update: if request.auth != null
+          && request.auth.uid == userId
+          && documentId == 'fcPoints'
+          && request.resource.data.keys().hasOnly(['stateJson', 'updatedAt'])
+          && request.resource.data.stateJson is string
+          && request.resource.data.stateJson.size() <= 200000;
+
+        allow delete: if request.auth != null
+          && request.auth.uid == userId
+          && documentId == 'fcPoints';
+      }
     }
   }
 }
