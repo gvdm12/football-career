@@ -353,7 +353,9 @@ class CareerStorage {
         if (slot == null || slot < 1 || slot > slotCount || raw is! String) {
           continue;
         }
-        await preferences.setString(_localKey(slot), raw);
+        if (!preferences.containsKey(_localKey(slot))) {
+          await preferences.setString(_localKey(slot), raw);
+        }
       }
       _lastSyncSucceeded = true;
       _lastSyncError = null;
