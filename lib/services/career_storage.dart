@@ -305,21 +305,28 @@ class CareerStorage {
 
     final uid = _uid;
     if (uid != null) {
-      try {
-        final snapshot = await _cloudSlots(uid).get().timeout(_cloudTimeout);
-        for (final document in snapshot.docs) {
-          final slot = int.tryParse(document.id);
-          final raw = document.data()['careerJson'];
-          if (slot == null || slot < 1 || slot > slotCount || raw is! String) {
-            continue;
+      if (raws.isNotEmpty) {
+        // Если локальные слоты уже есть, не задерживаем экран выбора карьеры.
+        unawaited(_refreshSlotSummaries(uid, preferences));
+      } else {
+        // На новом устройстве без локального кэша делаем короткую попытку
+        // получить облачные сохранения, после чего показываем доступный результат.
+        try {
+          final snapshot = await _cloudSlots(uid).get().timeout(_cloudTimeout);
+          for (final document in snapshot.docs) {
+            final slot = int.tryParse(document.id);
+            final raw = document.data()['careerJson'];
+            if (slot == null || slot < 1 || slot > slotCount || raw is! String) {
+              continue;
+            }
+            raws[slot] = raw;
+            await preferences.setString(_localKey(slot), raw);
           }
-          raws[slot] = raw;
-          await preferences.setString(_localKey(slot), raw);
+          _lastSyncSucceeded = true;
+          _lastSyncError = null;
+        } catch (error) {
+          _markSyncError(error);
         }
-        _lastSyncSucceeded = true;
-        _lastSyncError = null;
-      } catch (error) {
-        _markSyncError(error);
       }
     }
 
@@ -327,6 +334,27 @@ class CareerStorage {
       for (var slot = 1; slot <= slotCount; slot++)
         summarize(slot, raws[slot]),
     ];
+  }
+
+  static Future<void> _refreshSlotSummaries(
+    String uid,
+    SharedPreferences preferences,
+  ) async {
+    try {
+      final snapshot = await _cloudSlots(uid).get().timeout(_cloudTimeout);
+      for (final document in snapshot.docs) {
+        final slot = int.tryParse(document.id);
+        final raw = document.data()['careerJson'];
+        if (slot == null || slot < 1 || slot > slotCount || raw is! String) {
+          continue;
+        }
+        await preferences.setString(_localKey(slot), raw);
+      }
+      _lastSyncSucceeded = true;
+      _lastSyncError = null;
+    } catch (error) {
+      _markSyncError(error);
+    }
   }
 
   static CareerSlotSummary summarize(int slot, String? raw) {
