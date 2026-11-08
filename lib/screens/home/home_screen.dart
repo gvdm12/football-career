@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _checkSavedCareer() async {
     try {
+      await CareerStorage.prepareAccount();
       final results = await Future.wait([
         CareerStorage.hasSavedCareer(),
         FCPointsService.balance(),
@@ -224,13 +225,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          onPressed: () {
-                            Navigator.push(
+                          onPressed: () async {
+                            await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (_) => const AccountScreen(),
                               ),
                             );
+                            if (mounted) await _checkSavedCareer();
                           },
                           icon: const Icon(
                             Icons.account_circle_outlined,
