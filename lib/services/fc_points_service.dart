@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -255,9 +256,39 @@ class FCPointsService {
   }
 
   static Future<int> balance() async {
-    await _applyDeveloperWelcomeBonus();
-    final state = await _readState();
-    return state['balance'] as int;
+    final preferences = await SharedPreferences.getInstance();
+    final raw = preferences.getString(_storageKey);
+
+    // Главный экран берёт баланс из локального профиля без ожидания Firestore.
+    // Обновление и проверка бонуса разработчика выполняются в фоне.
+    if (raw != null) {
+      unawaited(_refreshProfileInBackground(preferences));
+      return _decodeState(raw)['balance'] as int;
+    }
+
+    // На первом запуске профиль может находиться только в облаке.
+    // Не блокируем стартовый экран сетевым запросом.
+    unawaited(_refreshProfileInBackground(preferences));
+    return 0;
+  }
+
+  static Future<void> _refreshProfileInBackground(
+    SharedPreferences preferences,
+  ) async {
+    try {
+      await _applyDeveloperWelcomeBonus();
+      final uid = _uid;
+      final cloud = _cloudProfile;
+      if (uid == null || cloud == null) return;
+
+      final snapshot = await cloud.get().timeout(const Duration(seconds: 4));
+      final cloudRaw = snapshot.data()?['stateJson'];
+      if (cloudRaw is String) {
+        await preferences.setString(_storageKey, cloudRaw);
+      }
+    } catch (_) {
+      // Локальный баланс остаётся доступен при проблемах с сетью.
+    }
   }
 
   /// Начисляет награду за завершённый сезон один раз на конкретную карьеру.
