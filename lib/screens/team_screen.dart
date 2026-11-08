@@ -1,6 +1,7 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_football/widgets/club_logo.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/player.dart';
@@ -130,19 +131,11 @@ class TeamScreen extends StatelessWidget {
                             const SizedBox(height: 10),
                             Row(
                               children: [
-                                Container(
-                                  width: 44,
-                                  height: 44,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.10),
-                                    borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(color: _border),
-                                  ),
-                                  child: const Icon(
-                                    Icons.shield_outlined,
-                                    color: _accent,
-                                    size: 24,
-                                  ),
+                                ClubLogo(
+                                  clubName: player.club,
+                                  size: 48,
+                                  borderRadius: 14,
+                                  fallbackColor: club.primaryColor,
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
