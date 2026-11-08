@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -38,6 +39,7 @@ class CareerStorage {
   static const String _legacyCareerKey = 'saved_career_v1';
   static const String _legacyActiveSlotKey = 'active_career_slot';
   static const int slotCount = 3;
+  static const Duration _cloudTimeout = Duration(seconds: 4);
 
   static String? get _uid => AccountService.currentUser?.uid;
   static bool _lastSyncSucceeded = true;
@@ -89,10 +91,14 @@ class CareerStorage {
 
   /// Вызывается при открытии главного экрана и после входа в аккаунт.
   /// Облачные данные имеют приоритет над локальным кэшем.
+  /// Запуск фоновой синхронизации: интерфейс не ждёт Firestore.
   static Future<void> prepareAccount() async {
     final uid = _uid;
     if (uid == null) return;
+    unawaited(_prepareAccountInBackground(uid));
+  }
 
+  static Future<void> _prepareAccountInBackground(String uid) async {
     final preferences = await SharedPreferences.getInstance();
     final migrationKey = _migrationKey(uid);
     if (preferences.getBool(migrationKey) != true) {
@@ -102,14 +108,14 @@ class CareerStorage {
         // никогда не получают чужое старое сохранение.
         if (await AccountService.isDeveloper()) {
           for (var slot = 1; slot <= slotCount; slot++) {
-            final remote = await _cloudSlots(uid).doc('$slot').get();
+            final remote = await _cloudSlots(uid).doc('$slot').get().timeout(_cloudTimeout);
             if (remote.exists) continue;
             final legacyKey = slot == 1
                 ? _legacyCareerKey
                 : 'saved_career_slot_$slot';
             final legacyJson = preferences.getString(legacyKey);
             if (legacyJson == null) continue;
-            await _writeCloud(uid, slot, legacyJson);
+            await _writeCloud(uid, slot, legacyJson).timeout(_cloudTimeout);
             await preferences.setString('saved_career_${uid}_slot_$slot', legacyJson);
           }
         }
@@ -123,7 +129,7 @@ class CareerStorage {
     // Восстанавливаем локальный кэш с облака. Если сети нет, оставляем
     // доступными ранее закэшированные данные.
     try {
-      final snapshot = await _cloudSlots(uid).get();
+      final snapshot = await _cloudSlots(uid).get().timeout(_cloudTimeout);
       for (final document in snapshot.docs) {
         final slot = int.tryParse(document.id);
         final raw = document.data()['careerJson'];
@@ -158,12 +164,21 @@ class CareerStorage {
       return;
     }
 
+    // Локальная запись — основная и обязательная. Firestore синхронизируется
+    // отдельно, чтобы медленная сеть не блокировала календарь и кнопки матчей.
+    unawaited(_syncCloudSave(uid, slot, raw));
+  }
+
+  static Future<void> _syncCloudSave(
+    String uid,
+    int slot,
+    String raw,
+  ) async {
     try {
-      await _writeCloud(uid, slot, raw);
+      await _writeCloud(uid, slot, raw).timeout(_cloudTimeout);
       _lastSyncSucceeded = true;
       _lastSyncError = null;
     } catch (error) {
-      // Игра не теряет локальное сохранение из-за временного отсутствия сети.
       _markSyncError(error);
     }
   }
@@ -186,35 +201,61 @@ class CareerStorage {
     final preferences = await SharedPreferences.getInstance();
     final uid = _uid;
 
-    if (uid != null) {
-      try {
-        final remote = await _cloudSlots(uid).doc('$slot').get();
-        final raw = remote.data()?['careerJson'];
-        if (raw is String) {
-          await preferences.setString(_localKey(slot), raw);
-          _lastSyncSucceeded = true;
-          _lastSyncError = null;
-          return _decodeCareer(raw);
+    // Сначала мгновенно открываем локальную карьеру. Облако не должно
+    // задерживать продолжение игры при слабом или отсутствующем интернете.
+    final localRaw = preferences.getString(_localKey(slot));
+    if (localRaw != null) {
+      if (uid != null) {
+        unawaited(_refreshCloudSlot(uid, slot, preferences));
+      }
+      return _decodeCareer(localRaw);
+    }
+
+    // На новом устройстве локального кэша ещё нет — пробуем получить облачную
+    // копию, но ограничиваем ожидание, чтобы экран не зависал бесконечно.
+    if (uid == null) return null;
+    try {
+      final remote = await _cloudSlots(uid)
+          .doc('$slot')
+          .get()
+          .timeout(_cloudTimeout);
+      final raw = remote.data()?['careerJson'];
+      if (raw is String) {
+        await preferences.setString(_localKey(slot), raw);
+        _lastSyncSucceeded = true;
+        _lastSyncError = null;
+        return _decodeCareer(raw);
+      }
+    } catch (error) {
+      _markSyncError(error);
+    }
+    return null;
+  }
+
+  static Future<void> _refreshCloudSlot(
+    String uid,
+    int slot,
+    SharedPreferences preferences,
+  ) async {
+    try {
+      final remote = await _cloudSlots(uid)
+          .doc('$slot')
+          .get()
+          .timeout(_cloudTimeout);
+      final raw = remote.data()?['careerJson'];
+      if (raw is String) {
+        await preferences.setString(_localKey(slot), raw);
+        _lastSyncSucceeded = true;
+        _lastSyncError = null;
+      } else if (!remote.exists) {
+        final localRaw = preferences.getString(_localKey(slot));
+        if (localRaw != null) {
+          await _writeCloud(uid, slot, localRaw).timeout(_cloudTimeout);
         }
-      } catch (error) {
-        _markSyncError(error);
       }
+    } catch (error) {
+      _markSyncError(error);
     }
-
-    final raw = preferences.getString(_localKey(slot));
-    if (raw == null) return null;
-
-    // Если это локальный кэш аккаунта, пробуем отправить его в облако,
-    // когда документ ещё не создан (например, после офлайн-игры).
-    if (uid != null) {
-      try {
-        final remote = await _cloudSlots(uid).doc('$slot').get();
-        if (!remote.exists) await _writeCloud(uid, slot, raw);
-      } catch (error) {
-        _markSyncError(error);
-      }
-    }
-    return _decodeCareer(raw);
   }
 
   static Career _decodeCareer(String raw) {
@@ -265,7 +306,7 @@ class CareerStorage {
     final uid = _uid;
     if (uid != null) {
       try {
-        final snapshot = await _cloudSlots(uid).get();
+        final snapshot = await _cloudSlots(uid).get().timeout(_cloudTimeout);
         for (final document in snapshot.docs) {
           final slot = int.tryParse(document.id);
           final raw = document.data()['careerJson'];
