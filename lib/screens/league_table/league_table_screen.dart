@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_football/widgets/club_logo.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/league_season_simulator.dart';
