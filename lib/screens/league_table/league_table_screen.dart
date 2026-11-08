@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_football/widgets/club_logo.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/league_season_simulator.dart';
@@ -327,6 +328,8 @@ class LeagueTableScreen extends StatelessWidget {
           Expanded(
             child: Row(
               children: [
+                ClubLogo(clubName: entry.club, size: 22, borderRadius: 6),
+                const SizedBox(width: 7),
                 Expanded(
                   child: Text(
                     entry.club,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_football/widgets/club_logo.dart';
 import 'package:flutter_football/services/app_strings.dart';
 import 'package:flutter_football/models/club.dart';
-import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/super_league_career.dart';
 import 'package:flutter_football/models/super_league_division.dart';
@@ -158,42 +158,7 @@ class _SuperLeagueClubSelectionScreenState
                             ),
                             child: Row(
                               children: [
-                                Container(
-                                  width: 42,
-                                  height: 42,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        ClubColors.secondary(club.name),
-                                        ClubColors.primary(club.name),
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    club.name
-                                        .split(' ')
-                                        .map(
-                                          (part) =>
-                                              part.isNotEmpty ? part[0] : '',
-                                        )
-                                        .take(2)
-                                        .join()
-                                        .toUpperCase(),
-                                    style: TextStyle(
-                                      color:
-                                          ClubColors.secondary(
-                                                club.name,
-                                              ).computeLuminance() >
-                                              0.45
-                                          ? Colors.black
-                                          : Colors.white,
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
+                                ClubLogo(clubName: club.name, size: 42, borderRadius: 12),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
