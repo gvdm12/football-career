@@ -129,6 +129,13 @@ class FCPointsService {
 
         // Перенос прежнего общего профиля FC Points выполняется только
         // для аккаунта разработчика. Обычные аккаунты начинают отдельно.
+        final localRaw = preferences.getString(_storageKey);
+        if (localRaw != null) {
+          final localState = _decodeState(localRaw);
+          await _writeState(localState);
+          return localState;
+        }
+
         if (await AccountService.isDeveloper()) {
           final legacyRaw = preferences.getString(_legacyStorageKey);
           if (legacyRaw != null) {
