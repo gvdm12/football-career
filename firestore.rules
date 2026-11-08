@@ -56,14 +56,21 @@ service cloud.firestore {
 
         allow create, update: if request.auth != null
           && request.auth.uid == userId
-          && documentId == 'fcPoints'
-          && request.resource.data.keys().hasOnly(['stateJson', 'updatedAt'])
-          && request.resource.data.stateJson is string
-          && request.resource.data.stateJson.size() <= 200000;
+          && (
+            (documentId == 'fcPoints'
+              && request.resource.data.keys().hasOnly(['stateJson', 'updatedAt'])
+              && request.resource.data.stateJson is string
+              && request.resource.data.stateJson.size() <= 200000)
+            ||
+            (documentId == 'superLeague'
+              && request.resource.data.keys().hasOnly(['careerJson', 'updatedAt'])
+              && request.resource.data.careerJson is string
+              && request.resource.data.careerJson.size() <= 900000)
+          );
 
         allow delete: if request.auth != null
           && request.auth.uid == userId
-          && documentId == 'fcPoints';
+          && documentId in ['fcPoints', 'superLeague'];
       }
     }
   }
