@@ -73,6 +73,24 @@ flutter:
    - assets/icons/
    - assets/flags/
    - assets/clubs/
+   - assets/clubs/belgium liga/
+   - assets/clubs/england/championship/
+   - assets/clubs/england/epl/
+   - assets/clubs/eredivisie/
+   - assets/clubs/france/ligue 1/
+   - assets/clubs/france/ligue 2/
+   - assets/clubs/germany/2 bundesliga/
+   - assets/clubs/germany/bundesliga/
+   - assets/clubs/italy/serie A/
+   - assets/clubs/italy/serie B/
+   - assets/clubs/mls/
+   - assets/clubs/portugal liga/
+   - assets/clubs/russie/rpl 2/
+   - assets/clubs/russie/rpl/
+   - assets/clubs/saudi pro ligue/
+   - assets/clubs/spain/la liga 2/
+   - assets/clubs/spain/la liga/
+   - assets/clubs/turkiye superlig/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
