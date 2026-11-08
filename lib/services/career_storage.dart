@@ -96,23 +96,28 @@ class CareerStorage {
     final preferences = await SharedPreferences.getInstance();
     final migrationKey = _migrationKey(uid);
     if (preferences.getBool(migrationKey) != true) {
-      // Старое общее сохранение переносим только в аккаунт разработчика:
-      // именно в нём создавалась прежняя карьера. Обычные аккаунты
-      // никогда не получают чужое старое сохранение.
-      if (await AccountService.isDeveloper()) {
-        for (var slot = 1; slot <= slotCount; slot++) {
-          final remote = await _cloudSlots(uid).doc('$slot').get();
-          if (remote.exists) continue;
-          final legacyKey = slot == 1
-              ? _legacyCareerKey
-              : 'saved_career_slot_$slot';
-          final legacyJson = preferences.getString(legacyKey);
-          if (legacyJson == null) continue;
-          await _writeCloud(uid, slot, legacyJson);
-          await preferences.setString('saved_career_${uid}_slot_$slot', legacyJson);
+      try {
+        // Старое общее сохранение переносим только в аккаунт разработчика:
+        // именно в нём создавалась прежняя карьера. Обычные аккаунты
+        // никогда не получают чужое старое сохранение.
+        if (await AccountService.isDeveloper()) {
+          for (var slot = 1; slot <= slotCount; slot++) {
+            final remote = await _cloudSlots(uid).doc('$slot').get();
+            if (remote.exists) continue;
+            final legacyKey = slot == 1
+                ? _legacyCareerKey
+                : 'saved_career_slot_$slot';
+            final legacyJson = preferences.getString(legacyKey);
+            if (legacyJson == null) continue;
+            await _writeCloud(uid, slot, legacyJson);
+            await preferences.setString('saved_career_${uid}_slot_$slot', legacyJson);
+          }
         }
+        await preferences.setBool(migrationKey, true);
+      } catch (error) {
+        _markSyncError(error);
+        // Не отмечаем миграцию завершённой: при следующем запуске повторим.
       }
-      await preferences.setBool(migrationKey, true);
     }
 
     // Восстанавливаем локальный кэш с облака. Если сети нет, оставляем
