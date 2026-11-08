@@ -27,6 +27,28 @@ service cloud.firestore {
           .hasOnly(['displayName', 'updatedAt']);
 
       allow delete: if false;
+
+      // Каждая карьера хранится отдельным документом, чтобы не упираться
+      // в лимит размера одного документа профиля Firestore.
+      match /careerSlots/{slotId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+
+        allow create, update: if request.auth != null
+          && request.auth.uid == userId
+          && slotId in ['1', '2', '3']
+          && request.resource.data.keys().hasOnly([
+            'slot',
+            'careerJson',
+            'updatedAt'
+          ])
+          && request.resource.data.slot is int
+          && request.resource.data.slot >= 1
+          && request.resource.data.slot <= 3
+          && request.resource.data.careerJson is string
+          && request.resource.data.careerJson.size() <= 900000;
+
+        allow delete: if request.auth != null && request.auth.uid == userId;
+      }
     }
   }
 }
