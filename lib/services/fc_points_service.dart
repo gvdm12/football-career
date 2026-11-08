@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_football/models/career.dart';
@@ -35,7 +36,47 @@ enum FCPointsPurchaseResult {
 }
 
 class FCPointsService {
-  static const String _storageKey = 'fc_points_profile_v1';
+  static const String _legacyStorageKey = 'fc_points_profile_v1';
+
+  static String? get _uid => AccountService.currentUser?.uid;
+  static String get _storageKey =>
+      _uid == null ? _legacyStorageKey : 'fc_points_profile_v1_${_uid}';
+
+  static DocumentReference<Map<String, dynamic>>? get _cloudProfile {
+    final uid = _uid;
+    if (uid == null) return null;
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('gameData')
+        .doc('fcPoints');
+  }
+
+  static Map<String, dynamic> _emptyState() => {
+    'balance': 0,
+    'claimedRewards': <String>[],
+    'ownedModes': <String>[],
+    'claimedDeveloperBonuses': <String>[],
+  };
+
+  static Future<void> _writeState(Map<String, dynamic> state) async {
+    final raw = jsonEncode(state);
+    final preferences = await SharedPreferences.getInstance();
+    final saved = await preferences.setString(_storageKey, raw);
+    if (!saved) throw Exception('Не удалось сохранить профиль FC Points');
+
+    final cloud = _cloudProfile;
+    if (cloud == null) return;
+    try {
+      await cloud.set({
+        'stateJson': raw,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    } catch (_) {
+      // Локальный профиль остаётся доступен офлайн; следующая запись
+      // повторно отправит актуальное состояние в Firestore.
+    }
+  }
   static const int maxBalance = 99999;
   static const int _developerWelcomeBonus = 5000;
 
@@ -74,26 +115,41 @@ class FCPointsService {
 
   static Future<Map<String, dynamic>> _readState() async {
     final preferences = await SharedPreferences.getInstance();
-    final raw = preferences.getString(_storageKey);
-    if (raw == null) {
-      return {
-        'balance': 0,
-        'claimedRewards': <String>[],
-        'ownedModes': <String>[],
-        'claimedDeveloperBonuses': <String>[],
-      };
+    final uid = _uid;
+    final cloud = _cloudProfile;
+
+    if (uid != null && cloud != null) {
+      try {
+        final snapshot = await cloud.get();
+        final cloudRaw = snapshot.data()?['stateJson'];
+        if (cloudRaw is String) {
+          await preferences.setString(_storageKey, cloudRaw);
+          return _decodeState(cloudRaw);
+        }
+
+        // Перенос прежнего общего профиля FC Points выполняется только
+        // для аккаунта разработчика. Обычные аккаунты начинают отдельно.
+        if (await AccountService.isDeveloper()) {
+          final legacyRaw = preferences.getString(_legacyStorageKey);
+          if (legacyRaw != null) {
+            final legacyState = _decodeState(legacyRaw);
+            await _writeState(legacyState);
+            return legacyState;
+          }
+        }
+      } catch (_) {
+        // При отсутствии сети продолжаем с локальным кэшем.
+      }
     }
 
+    final raw = preferences.getString(_storageKey);
+    return raw == null ? _emptyState() : _decodeState(raw);
+  }
+
+  static Map<String, dynamic> _decodeState(String raw) {
     try {
       final decoded = jsonDecode(raw);
-      if (decoded is! Map) {
-        return {
-          'balance': 0,
-          'claimedRewards': <String>[],
-          'ownedModes': <String>[],
-          'claimedDeveloperBonuses': <String>[],
-        };
-      }
+      if (decoded is! Map) return _emptyState();
       return {
         'balance': _clampBalance((decoded['balance'] as num?)?.toInt() ?? 0),
         'claimedRewards': (decoded['claimedRewards'] as List?)
@@ -111,12 +167,7 @@ class FCPointsService {
             <String>[],
       };
     } catch (_) {
-      return {
-        'balance': 0,
-        'claimedRewards': <String>[],
-        'ownedModes': <String>[],
-        'claimedDeveloperBonuses': <String>[],
-      };
+      return _emptyState();
     }
   }
 
@@ -141,12 +192,7 @@ class FCPointsService {
       'ownedModes': state['ownedModes'],
       'claimedDeveloperBonuses': claimed.toList()..sort(),
     };
-    final preferences = await SharedPreferences.getInstance();
-    final saved = await preferences.setString(
-      _storageKey,
-      jsonEncode(updatedState),
-    );
-    if (!saved) throw Exception('Не удалось начислить бонус FC Points');
+    await _writeState(updatedState);
   }
 
   static Future<Set<String>> ownedModes() async {
@@ -197,12 +243,7 @@ class FCPointsService {
       'ownedModes': owned.toList()..sort(),
       'claimedDeveloperBonuses': state['claimedDeveloperBonuses'],
     };
-    final preferences = await SharedPreferences.getInstance();
-    final saved = await preferences.setString(
-      _storageKey,
-      jsonEncode(updatedState),
-    );
-    if (!saved) throw Exception('Не удалось сохранить покупку FC Points');
+    await _writeState(updatedState);
     return FCPointsPurchaseResult.purchased;
   }
 
@@ -267,12 +308,7 @@ class FCPointsService {
       'ownedModes': state['ownedModes'],
       'claimedDeveloperBonuses': state['claimedDeveloperBonuses'],
     };
-    final preferences = await SharedPreferences.getInstance();
-    final saved = await preferences.setString(
-      _storageKey,
-      jsonEncode(updatedState),
-    );
-    if (!saved) throw Exception('Не удалось сохранить FC Points');
+    await _writeState(updatedState);
     return updatedBalance - previousBalance;
   }
 }
