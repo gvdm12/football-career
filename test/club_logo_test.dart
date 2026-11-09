@@ -3,12 +3,19 @@ import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/widgets/club_logo.dart';
 
 void main() {
-  test('пока для всех клубов используется заглушка вместо эмблемы', () {
+  test('эмблема есть у большинства клубов модели', () {
     expect(Clubs.all.length, 352);
-    expect(ClubLogo.mappedClubCount, 0);
+    expect(ClubLogo.mappedClubCount, greaterThan(200));
 
+    final withLogo = Clubs.all.where(
+      (club) => ClubLogo.assetPathFor(club.name) != null,
+    );
+    expect(withLogo.length, greaterThan(200));
+  });
+
+  test('путь к эмблеме клуба совпадает с Club.logoAsset', () {
     for (final club in Clubs.all) {
-      expect(ClubLogo.assetPathFor(club.name), isNull);
+      expect(club.logoAsset, ClubLogo.assetPathFor(club.name));
     }
   });
 

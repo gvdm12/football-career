@@ -41,7 +41,7 @@ class FCPointsService {
 
   static String? get _uid => AccountService.currentUser?.uid;
   static String get _storageKey =>
-      _uid == null ? _legacyStorageKey : 'fc_points_profile_v1_${_uid}';
+      _uid == null ? _legacyStorageKey : 'fc_points_profile_v1_$_uid';
 
   static DocumentReference<Map<String, dynamic>>? get _cloudProfile {
     final uid = _uid;
@@ -78,6 +78,7 @@ class FCPointsService {
       // повторно отправит актуальное состояние в Firestore.
     }
   }
+
   static const int maxBalance = 99999;
   static const int _developerWelcomeBonus = 5000;
 
@@ -98,7 +99,8 @@ class FCPointsService {
       id: 'career_without_injuries',
       titleRu: 'Карьера без травм',
       titleEn: 'Career without injuries',
-      descriptionRu: 'Твой игрок не будет получать травмы на протяжении карьеры.',
+      descriptionRu:
+          'Твой игрок не будет получать травмы на протяжении карьеры.',
       descriptionEn: 'Your player will not receive injuries during the career.',
       price: 2300,
       icon: Icons.health_and_safety_outlined,
@@ -107,7 +109,8 @@ class FCPointsService {
       id: 'five_year_transfers',
       titleRu: 'Трансферы раз в 5 лет',
       titleEn: 'Transfers every 5 years',
-      descriptionRu: 'Менять клуб можно будет только в сезонах 5, 10, 15 и далее.',
+      descriptionRu:
+          'Менять клуб можно будет только в сезонах 5, 10, 15 и далее.',
       descriptionEn: 'Change clubs only in seasons 5, 10, 15 and so on.',
       price: 1950,
       icon: Icons.swap_horiz_rounded,
@@ -160,13 +163,13 @@ class FCPointsService {
       if (decoded is! Map) return _emptyState();
       return {
         'balance': _clampBalance((decoded['balance'] as num?)?.toInt() ?? 0),
-        'claimedRewards': (decoded['claimedRewards'] as List?)
+        'claimedRewards':
+            (decoded['claimedRewards'] as List?)
                 ?.whereType<String>()
                 .toList() ??
             <String>[],
-        'ownedModes': (decoded['ownedModes'] as List?)
-                ?.whereType<String>()
-                .toList() ??
+        'ownedModes':
+            (decoded['ownedModes'] as List?)?.whereType<String>().toList() ??
             <String>[],
         'claimedDeveloperBonuses':
             (decoded['claimedDeveloperBonuses'] as List?)

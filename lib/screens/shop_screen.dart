@@ -116,8 +116,9 @@ class _ShopScreenState extends State<ShopScreen> {
   }
 
   Future<void> _buyPersonalTrainer() async {
-    if (career.money < _personalTrainerPrice || _personalTrainerCooldown > 0)
+    if (career.money < _personalTrainerPrice || _personalTrainerCooldown > 0) {
       return;
+    }
     final purchases = Map<String, int>.from(career.skillTrainingPurchases);
     final cooldowns = Map<String, int>.from(career.temporarySkillBoostMatches);
     purchases['personalTrainer'] = (purchases['personalTrainer'] ?? 0) + 1;

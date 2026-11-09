@@ -12,7 +12,7 @@ class SuperLeagueStorage {
 
   static String? get _uid => AccountService.currentUser?.uid;
   static String get _saveKey =>
-      _uid == null ? _legacySaveKey : 'super_league_career_v2_${_uid}';
+      _uid == null ? _legacySaveKey : 'super_league_career_v2_$_uid';
 
   static DocumentReference<Map<String, dynamic>>? get _cloudSave {
     final uid = _uid;
@@ -66,7 +66,8 @@ class SuperLeagueStorage {
     }
     if (raw == null && _uid != null && await AccountService.isDeveloper()) {
       // Перенос старого общего сохранения только в аккаунт разработчика.
-      raw = preferences.getString(_legacySaveKey) ??
+      raw =
+          preferences.getString(_legacySaveKey) ??
           preferences.getString(_oldLegacySaveKey);
       if (raw != null) {
         await preferences.setString(_saveKey, raw);

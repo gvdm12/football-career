@@ -2,6 +2,7 @@ import 'real_club_squads.dart';
 
 import 'package:flutter/material.dart';
 import 'club_colors.dart';
+import 'club_logos.dart';
 
 enum League {
   england,
@@ -201,6 +202,9 @@ class Club {
   Color get primaryColor => ClubColors.primary(name);
 
   Color get secondaryColor => ClubColors.secondary(name);
+
+  /// PNG-эмблема клуба или null, если эмблемы ещё нет.
+  String? get logoAsset => ClubLogos.assetFor(name);
 
   const Club({
     required this.name,
