@@ -851,11 +851,11 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                 color: Colors.white.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Image.asset(
-                club.league.logoAsset,
-                fit: BoxFit.contain,
-                errorBuilder: (_, _, _) =>
-                    const Icon(Icons.sports_soccer, color: green, size: 28),
+              child: ClubLogo(
+                clubName: club.name,
+                size: 48,
+                fallbackColor: club.primaryColor,
+                borderRadius: 12,
               ),
             ),
             const SizedBox(width: 12),
@@ -1221,7 +1221,6 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                                           size: 42,
                                           fallbackColor: club.primaryColor,
                                           borderRadius: 11,
-                                          useFallback: true,
                                         ),
                                       ),
                                       const SizedBox(width: 12),
