@@ -92,7 +92,7 @@ class FCPointsService {
       titleEn: 'Choose any club',
       descriptionRu: 'Выбирай любую команду из доступных лиг и дивизионов.',
       descriptionEn: 'Choose any team from available leagues and divisions.',
-      price: 4500,
+      price: 6000,
       icon: Icons.shield_outlined,
     ),
     FCPointsShopItem(
@@ -102,7 +102,7 @@ class FCPointsService {
       descriptionRu:
           'Твой игрок не будет получать травмы на протяжении карьеры.',
       descriptionEn: 'Your player will not receive injuries during the career.',
-      price: 2300,
+      price: 3330,
       icon: Icons.health_and_safety_outlined,
     ),
     FCPointsShopItem(
@@ -112,7 +112,7 @@ class FCPointsService {
       descriptionRu:
           'Менять клуб можно будет только в сезонах 5, 10, 15 и далее.',
       descriptionEn: 'Change clubs only in seasons 5, 10, 15 and so on.',
-      price: 1950,
+      price: 2950,
       icon: Icons.swap_horiz_rounded,
     ),
   ];
