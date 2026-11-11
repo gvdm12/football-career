@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_football/widgets/club_logo.dart';
 import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/club.dart';
+import 'package:flutter_football/models/league_player_season_stats.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/player_status.dart';
 import 'package:flutter_football/models/real_club_squads.dart';
@@ -443,9 +444,19 @@ class TeamScreen extends StatelessWidget {
       'midfielder',
       'forward',
     ];
-    final squad =
+    // У клубов без реальной базы игроков (в том числе созданного вами)
+    // показываем сгенерированный состав: тех же игроков, которых игра
+    // использует как соперников в лиге.
+    final realSquad =
         RealClubSquads.squads[career.player.club] ??
         const <String, List<RealClubPlayer>>{};
+    final squad = realSquad.values.any((players) => players.isNotEmpty)
+        ? realSquad
+        : LeaguePlayerStatsService.generatedSquad(
+            club: career.player.club,
+            season: career.season,
+            current: career.leaguePlayerStats,
+          );
     final totalPlayers =
         positions.fold<int>(
           0,

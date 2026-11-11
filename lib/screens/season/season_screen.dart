@@ -26,6 +26,7 @@ import 'package:flutter_football/screens/player/player_screen.dart';
 import 'package:flutter_football/screens/shop_screen.dart';
 import 'package:flutter_football/screens/coach_screen.dart';
 import 'package:flutter_football/screens/team_screen.dart';
+import 'package:flutter_football/screens/custom_club/my_club_screen.dart';
 import 'package:flutter_football/screens/agent_screen.dart';
 import 'package:flutter_football/screens/news_screen.dart';
 import 'package:flutter_football/screens/league_table/league_table_screen.dart';
@@ -3256,6 +3257,16 @@ class _SeasonScreenState extends State<SeasonScreen> {
     await _saveCareer(updatedCareer);
   }
 
+  Future<void> _openMyClub() async {
+    final updatedCareer = await Navigator.push<Career>(
+      context,
+      MaterialPageRoute(builder: (_) => MyClubScreen(career: career)),
+    );
+    if (!mounted || updatedCareer == null) return;
+    setState(() => career = updatedCareer);
+    await _saveCareer(updatedCareer);
+  }
+
   Future<void> _openTeam() async {
     final updatedCareer = await Navigator.push<Career>(
       context,
@@ -3459,6 +3470,15 @@ class _SeasonScreenState extends State<SeasonScreen> {
                           _openTeam();
                         },
                       ),
+                      if (career.customClub != null)
+                        _drawerItem(
+                          icon: Icons.shield_outlined,
+                          title: AppStrings.isEnglish ? 'My club' : 'Мой клуб',
+                          onTap: () {
+                            Navigator.pop(context);
+                            _openMyClub();
+                          },
+                        ),
                       _drawerItem(
                         icon: Icons.sports,
                         title: AppStrings.coachMenu,

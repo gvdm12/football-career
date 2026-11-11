@@ -115,6 +115,17 @@ class FCPointsService {
       price: 2950,
       icon: Icons.swap_horiz_rounded,
     ),
+    FCPointsShopItem(
+      id: 'custom_club',
+      titleRu: 'Свой клуб',
+      titleEn: 'Your own club',
+      descriptionRu:
+          'Создай собственный клуб с эмблемой и цветами, займи место любого клуба лиги и расти его до вершины.',
+      descriptionEn:
+          'Create your own club with a badge and colours, take the place of any club in a league and grow it to the top.',
+      price: 4000,
+      icon: Icons.add_business_outlined,
+    ),
   ];
 
   static Future<Map<String, dynamic>> _readState() async {

@@ -255,6 +255,49 @@ class LeaguePlayerStatsService {
     return result;
   }
 
+  /// Состав клуба из сгенерированных игроков лиги.
+  ///
+  /// Для клубов без реальной базы игроков берутся игроки текущего сезона
+  /// из [current] или, если их ещё нет, тот же состав, который игра создаёт
+  /// для лиги (он зависит только от клуба и сезона). Игроки делятся по
+  /// позициям, лучшие идут первыми, номера раздаются по порядку.
+  static Map<String, List<RealClubPlayer>> generatedSquad({
+    required String club,
+    required int season,
+    List<LeaguePlayerSeasonStats> current = const [],
+  }) {
+    var roster = current.where((item) => item.club == club).toList();
+    if (roster.isEmpty) roster = _createRoster(club, season);
+
+    const numberPlans = <PlayerPosition, List<int>>{
+      PlayerPosition.goalkeeper: [1, 13],
+      PlayerPosition.defender: [2, 3, 4, 5, 15, 16],
+      PlayerPosition.midfielder: [6, 8, 10, 14, 17, 18],
+      PlayerPosition.forward: [7, 9, 11, 19, 20, 21],
+    };
+
+    var spareNumber = 22;
+    final squad = <String, List<RealClubPlayer>>{};
+
+    for (final position in PlayerPosition.values) {
+      final players = roster.where((item) => item.position == position).toList()
+        ..sort((a, b) => b.overall.compareTo(a.overall));
+      final numbers = numberPlans[position]!;
+
+      squad[position.name] = [
+        for (var i = 0; i < players.length; i++)
+          RealClubPlayer(
+            players[i].playerName,
+            players[i].age,
+            players[i].overall,
+            i < numbers.length ? numbers[i] : spareNumber++,
+          ),
+      ];
+    }
+
+    return squad;
+  }
+
   /// Синхронизирует сохранённый список со всеми реальными игроками клуба.
   /// Также очищает случайных футболистов из старых сохранений.
   static void _syncRealRosters(

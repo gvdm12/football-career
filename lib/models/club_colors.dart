@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_football/models/club.dart';
 
 class ClubColors {
   static const Color defaultPrimary = Color(0xFF2E7D32);
@@ -264,14 +265,26 @@ class ClubColors {
   };
 
   static Color primary(String clubName) {
+    final custom = Clubs.customClub;
+    if (custom != null && custom.name == clubName) {
+      return Color(custom.primaryColor);
+    }
     return _colors[clubName]?[0] ?? defaultPrimary;
   }
 
   static Color secondary(String clubName) {
+    final custom = Clubs.customClub;
+    if (custom != null && custom.name == clubName) {
+      return Color(custom.secondaryColor);
+    }
     return _colors[clubName]?[1] ?? defaultSecondary;
   }
 
   static List<Color> forClub(String clubName) {
+    final custom = Clubs.customClub;
+    if (custom != null && custom.name == clubName) {
+      return [Color(custom.primaryColor), Color(custom.secondaryColor)];
+    }
     return _colors[clubName] ?? const [defaultPrimary, defaultSecondary];
   }
 }

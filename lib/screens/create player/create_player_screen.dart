@@ -5,6 +5,8 @@ import 'package:flutter_football/models/career.dart';
 import 'package:flutter_football/models/career_settings.dart';
 import 'package:flutter_football/models/player.dart';
 import 'package:flutter_football/models/club.dart';
+import 'package:flutter_football/models/custom_club.dart';
+import 'package:flutter_football/screens/custom_club/custom_club_create_screen.dart';
 import 'package:flutter_football/models/league_division_service.dart';
 import 'package:flutter_football/models/position_rival.dart';
 import 'package:flutter_football/widgets/jersey_number_picker.dart';
@@ -40,6 +42,8 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
   bool _limitTransfersToFiveYears = false;
   bool _playWithoutInjuries = false;
   Set<String> _ownedModes = {};
+  bool _useCustomClub = false;
+  CustomClub? _customClub;
   CareerDifficulty _difficulty = CareerDifficulty.normal;
 
   List<Map<String, String>> get positions => [
@@ -283,6 +287,9 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
 
     final career = Career.create(
       player.copyWith(jerseyNumber: jerseyNumber),
+      customClub: _useCustomClub && _ownedModes.contains('custom_club')
+          ? _customClub
+          : null,
       settings: CareerSettings(
         allowAnyStartingClub:
             _allowAnyClub && _ownedModes.contains('any_starting_club'),
@@ -572,6 +579,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                               setState(() {
                                 _allowAnyClub = value;
                                 if (!value &&
+                                    !_useCustomClub &&
                                     !startingClubs.any(
                                       (club) => club.name == selectedClub,
                                     )) {
@@ -700,6 +708,50 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
                               setState(() => _playWithoutInjuries = value)
                         : null,
                   ),
+                  SwitchListTile.adaptive(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                    value: _useCustomClub,
+                    activeThumbColor: green,
+                    title: Text(
+                      AppStrings.isEnglish
+                          ? 'Play for your own club'
+                          : 'Играть за свой клуб',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    subtitle: Text(
+                      !_ownedModes.contains('custom_club')
+                          ? (AppStrings.isEnglish
+                                ? 'Locked: buy it in the shop'
+                                : 'Закрыто: купи в магазине')
+                          : _customClub != null
+                          ? '${_customClub!.name} · ${_customClub!.league.displayName}'
+                          : (AppStrings.isEnglish
+                                ? 'Create your club before the career'
+                                : 'Создай клуб перед началом карьеры'),
+                      style: const TextStyle(
+                        color: Colors.white60,
+                        fontSize: 11,
+                      ),
+                    ),
+                    onChanged: _ownedModes.contains('custom_club')
+                        ? _toggleCustomClub
+                        : null,
+                  ),
+                  if (_useCustomClub && _customClub != null)
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                        onPressed: _openCustomClubCreator,
+                        icon: const Icon(Icons.edit_outlined, size: 18),
+                        label: Text(
+                          AppStrings.isEnglish ? 'Edit club' : 'Изменить клуб',
+                        ),
+                      ),
+                    ),
                 ],
 
                 SizedBox(
@@ -831,7 +883,7 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
     final club = Clubs.getByName(selectedClub!);
 
     return InkWell(
-      onTap: _showClubPicker,
+      onTap: _useCustomClub ? _openCustomClubCreator : _showClubPicker,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         width: double.infinity,
@@ -907,6 +959,39 @@ class _CreatePlayerScreenState extends State<CreatePlayerScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _openCustomClubCreator() async {
+    final created = await Navigator.push<CustomClub>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CustomClubCreateScreen(initial: _customClub),
+      ),
+    );
+    if (!mounted || created == null) return;
+
+    // Клуб подключается к реестру сразу, чтобы выбор клуба и подготовка
+    // игрока видели его как обычный клуб лиги.
+    Clubs.registerCustomClub(created);
+    setState(() {
+      _customClub = created;
+      _useCustomClub = true;
+      selectedClub = created.name;
+    });
+  }
+
+  void _toggleCustomClub(bool value) {
+    if (value) {
+      _openCustomClubCreator();
+      return;
+    }
+
+    Clubs.registerCustomClub(null);
+    setState(() {
+      _useCustomClub = false;
+      _customClub = null;
+      selectedClub = startingClubs.first.name;
+    });
   }
 
   Future<void> _showClubPicker() async {

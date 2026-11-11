@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_football/models/club.dart';
 import 'package:flutter_football/models/club_colors.dart';
 import 'package:flutter_football/models/club_logos.dart';
+import 'package:flutter_football/widgets/custom_club_badge.dart';
 
 /// Отображает локальную эмблему клуба (PNG из assets/club_logos).
 ///
@@ -86,6 +88,16 @@ class ClubLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Клуб, созданный игроком, рисуется своей эмблемой.
+    final custom = Clubs.customClub;
+    if (custom != null && custom.name == clubName) {
+      return SizedBox(
+        width: size,
+        height: size,
+        child: CustomClubBadge.fromClub(custom, size: size),
+      );
+    }
+
     final assetPath = assetPathFor(clubName);
 
     if (useFallback || assetPath == null) {

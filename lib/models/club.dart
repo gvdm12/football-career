@@ -3,6 +3,7 @@ import 'real_club_squads.dart';
 import 'package:flutter/material.dart';
 import 'club_colors.dart';
 import 'club_logos.dart';
+import 'custom_club.dart';
 
 enum League {
   england,
@@ -228,11 +229,12 @@ class Clubs {
 
   /// Полностью сбрасывает глобальное состояние предыдущей карьеры.
   static void resetCareerState() {
+    registerCustomClub(null);
     applyStrengthOverrides(const {});
     RealClubSquads.applyCareerTransfers(const []);
   }
 
-  static const List<Club> all = [
+  static const List<Club> _builtIn = [
     // =====================================================
     // АНГЛИЯ — PREMIER LEAGUE 2026/27 (20)
     // =====================================================
@@ -919,6 +921,54 @@ class Clubs {
       division: 2,
     ),
   ];
+
+  static CustomClub? _customClub;
+  static List<Club>? _allCache;
+
+  /// Клуб, созданный игроком в режиме «Свой клуб» (или null).
+  static CustomClub? get customClub => _customClub;
+
+  /// Подключает (или убирает, если null) созданный клуб к реестру.
+  /// Он занимает место заменённого реального клуба.
+  static void registerCustomClub(CustomClub? value) {
+    _customClub = value;
+    _allCache = null;
+  }
+
+  static bool isCustomClub(String clubName) =>
+      _customClub != null && _customClub!.name == clubName;
+
+  /// Названия встроенных клубов, без созданного игроком.
+  static Iterable<String> get builtInNames => _builtIn.map((club) => club.name);
+
+  /// Встроенные клубы дивизиона, без учёта созданного игроком клуба.
+  static List<Club> builtInByLeagueDivision(League league, int division) {
+    return _builtIn
+        .where((club) => club.league == league && club.division == division)
+        .toList();
+  }
+
+  /// Все клубы игры. В режиме «Свой клуб» созданный клуб стоит на месте
+  /// заменённого, поэтому число клубов и состав лиг не меняются.
+  static List<Club> get all {
+    final cached = _allCache;
+    if (cached != null) return cached;
+
+    final custom = _customClub;
+    if (custom == null) return _allCache = _builtIn;
+
+    final index = _builtIn.indexWhere((club) => club.name == custom.replacedClub);
+    if (index < 0) return _allCache = _builtIn;
+
+    final list = List<Club>.of(_builtIn);
+    list[index] = Club(
+      name: custom.name,
+      league: custom.league,
+      strength: custom.baseStrength,
+      division: custom.division,
+    );
+    return _allCache = list;
+  }
 
   /// Рассчитывает силу клуба с учётом рейтинга игрока.
   /// Бонус действует только на клуб, в котором он выступает.

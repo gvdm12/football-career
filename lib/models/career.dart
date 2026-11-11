@@ -9,6 +9,8 @@ import 'package:flutter_football/models/real_club_coaches.dart';
 import 'package:flutter_football/models/real_club_squads.dart';
 import 'package:flutter_football/models/friendly_match.dart';
 import 'package:flutter_football/services/fatigue_service.dart';
+import 'package:flutter_football/models/custom_club.dart';
+import 'package:flutter_football/services/custom_club_service.dart';
 import 'package:flutter_football/services/pre_season_service.dart';
 import 'package:flutter_football/services/world_transfer_service.dart';
 import 'package:flutter_football/models/champions_league.dart';
@@ -97,6 +99,9 @@ class Career {
   final Map<String, int> temporarySkillBoosts;
   final Map<String, int> temporarySkillBoostMatches;
   final Map<String, int> clubStrengths;
+
+  /// Клуб, созданный игроком в режиме «Свой клуб» (или null).
+  final CustomClub? customClub;
   final Map<String, List<String>> leagueDivisions;
 
   int get currentLeagueDivision {
@@ -239,6 +244,7 @@ class Career {
     this.temporarySkillBoosts = const {},
     this.temporarySkillBoostMatches = const {},
     this.clubStrengths = const {},
+    this.customClub,
     this.leagueDivisions = const {},
   });
 
@@ -512,8 +518,10 @@ class Career {
   factory Career.create(
     Player player, {
     CareerSettings settings = const CareerSettings(),
+    CustomClub? customClub,
   }) {
     Clubs.resetCareerState();
+    Clubs.registerCustomClub(customClub);
     final leagueDivisions = LeagueDivisionService.createInitialDivisions();
     final leagueMatches = _createLeagueMatches(
       player.club,
@@ -572,6 +580,7 @@ class Career {
       careerId: _generateCareerId(),
       player: player,
       settings: settings,
+      customClub: customClub,
       season: 1,
       rivals: PositionRival.generate(player: player, season: 1),
       coachName:
@@ -689,11 +698,20 @@ class Career {
       'temporarySkillBoosts': temporarySkillBoosts,
       'temporarySkillBoostMatches': temporarySkillBoostMatches,
       'clubStrengths': clubStrengths,
+      'customClub': customClub?.toJson(),
       'leagueDivisions': leagueDivisions,
     };
   }
 
   factory Career.fromJson(Map<String, dynamic> json) {
+    // Созданный клуб подключается к реестру раньше всего остального,
+    // чтобы все названия клубов в сохранении находили свои данные.
+    final rawCustomClub = json['customClub'];
+    final restoredCustomClub = rawCustomClub is Map
+        ? CustomClub.fromJson(Map<String, dynamic>.from(rawCustomClub))
+        : null;
+    Clubs.registerCustomClub(restoredCustomClub);
+
     final rawPlayer = json['player'];
 
     if (rawPlayer is! Map) {
@@ -1139,6 +1157,7 @@ class Career {
           ) ??
           const {},
       clubStrengths: restoredClubStrengths,
+      customClub: restoredCustomClub,
       leagueDivisions: restoredLeagueDivisions,
       temporarySkillBoostMatches:
           (json['temporarySkillBoostMatches'] as Map?)?.map(
@@ -1212,6 +1231,7 @@ class Career {
     Map<String, int>? temporarySkillBoosts,
     Map<String, int>? temporarySkillBoostMatches,
     Map<String, int>? clubStrengths,
+    CustomClub? customClub,
     Map<String, List<String>>? leagueDivisions,
     bool clearInjury = false,
   }) {
@@ -1286,6 +1306,7 @@ class Career {
       temporarySkillBoostMatches:
           temporarySkillBoostMatches ?? this.temporarySkillBoostMatches,
       clubStrengths: clubStrengths ?? this.clubStrengths,
+      customClub: customClub ?? this.customClub,
       leagueDivisions: leagueDivisions ?? this.leagueDivisions,
     );
   }
@@ -2335,7 +2356,7 @@ class Career {
         leagueTable,
       );
     }
-    final updatedClubStrengths = ClubStrengthService.update(
+    final baseClubStrengths = ClubStrengthService.update(
       currentStrengths: clubStrengths,
       standings: performanceStandings,
       domesticCupWinner: domesticCup?.champion,
@@ -2344,6 +2365,38 @@ class Career {
       divisionStandings: finalDivisionTables,
       leagueDivisions: leagueDivisions,
     );
+    final updatedClubStrengths = <String, int>{...baseClubStrengths};
+
+    // Итоги сезона созданного клуба: деньги, болельщики и рост силы
+    // от улучшений. Сила добавляется к тому, что игра уже посчитала.
+    CustomClub? updatedCustomClub = customClub;
+    final ownClub = customClub;
+    if (ownClub != null) {
+      final standing = CustomClubService.standingIn(
+        finalDivisionTables.values,
+        ownClub.name,
+      );
+      final ownDivision =
+          LeagueDivisionService.divisionForClub(ownClub.name, leagueDivisions) ??
+          ownClub.division;
+      final currentStrength =
+          updatedClubStrengths[ownClub.name] ??
+          Clubs.getByName(ownClub.name).strength;
+      final outcome = CustomClubService.applySeasonEnd(
+        club: ownClub,
+        season: season,
+        position: standing?.position ?? 0,
+        teamCount: standing?.teamCount ?? 0,
+        division: ownDivision,
+        currentStrength: currentStrength,
+      );
+      updatedCustomClub = outcome.club;
+      if (outcome.strengthDelta != 0) {
+        updatedClubStrengths[ownClub.name] =
+            (currentStrength + outcome.strengthDelta).clamp(60, 93).toInt();
+      }
+    }
+
     Clubs.applyStrengthOverrides(updatedClubStrengths);
 
     final newSeason = season + 1;
@@ -2651,6 +2704,7 @@ class Career {
       lastClubChangeSeason: lastClubChangeSeason,
       season: newSeason,
       clubStrengths: updatedClubStrengths,
+      customClub: updatedCustomClub,
       matches: 0,
       goals: 0,
       assists: 0,
